@@ -14,10 +14,12 @@ docs/
 ├── Requirement-Definition/        # Giai đoạn 1 — Định nghĩa yêu cầu
 │   ├── Dinh-nghia-yeu-cau-du-an.md      # RD-2026-001
 │   └── docx/                            # Thư mục xuất bản .docx/.pdf (đang trống)
-└── Basic-Design/                  # Giai đoạn 2 — Thiết kế cơ bản
-    ├── Thiet-ke-co-ban.md               # BD-2026-001
-    ├── Danh-sach-man-hinh.md            # SL-2026-001
-    └── Dac-ta-man-hinh.md               # SS-2026-001
+├── Basic-Design/                  # Giai đoạn 2 — Thiết kế cơ bản
+│   ├── Thiet-ke-co-ban.md               # BD-2026-001
+│   ├── Danh-sach-man-hinh.md            # SL-2026-001
+│   └── Dac-ta-man-hinh.md               # SS-2026-001
+└── Testing/                       # Biểu mẫu và tài liệu kiểm thử
+    └── 20260729_EVN_QA_Checklist_Template.xlsx
 
 tools/
 └── md2docx.py                     # Xuất .md sang .docx
@@ -31,6 +33,7 @@ tools/
 | `BD-2026-001` | [Thiết kế cơ bản](docs/Basic-Design/Thiet-ke-co-ban.md) | 1.1 | Kiến trúc hai site, 8 luồng nghiệp vụ, 29 bảng dữ liệu, 13 nhóm API, 9 tiến trình batch, 15 quyết định thiết kế |
 | `SL-2026-001` | [Danh sách màn hình](docs/Basic-Design/Danh-sach-man-hinh.md) | 1.1 | 60 màn hình, 12 thành phần dùng chung, ma trận vai trò, đề xuất 5 đợt triển khai |
 | `SS-2026-001` | [Đặc tả màn hình](docs/Basic-Design/Dac-ta-man-hinh.md) | 1.1 | Đặc tả chi tiết đủ 60 màn hình: thành phần, hành động, quy tắc nghiệp vụ, thông báo lỗi |
+| — | [QA Checklist Template](docs/Testing/20260729_EVN_QA_Checklist_Template.xlsx) | 2026-07-29 | Biểu mẫu kiểm thử song ngữ VN/JP — 3 sheet `Site Name` / `CMS` / `Browsers` |
 
 Quan hệ giữa các tài liệu:
 
