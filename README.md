@@ -8,55 +8,59 @@ Khách hàng: Mobility Enshu Railway Co., Ltd. · Đối tượng dịch vụ: c
 
 ```
 docs/
-├── Requirements/                  # Tài liệu nguồn, giữ nguyên không sửa (CS-03)
+├── Requirements/                      # Tài liệu nguồn từ khách hàng — giữ nguyên, không sửa
 │   ├── Thu thập yêu cầu ban đầu.docx
 │   └── Proposal.pptx
-├── Requirement-Definition/        # Giai đoạn 1 — Định nghĩa yêu cầu
-│   ├── Dinh-nghia-yeu-cau-du-an.md      # RD-2026-001
-│   └── docx/                            # Thư mục xuất bản .docx/.pdf (đang trống)
-├── Basic-Design/                  # Giai đoạn 2 — Thiết kế cơ bản
-│   ├── Thiet-ke-co-ban.md               # BD-2026-001
-│   ├── Danh-sach-man-hinh.md            # SL-2026-001
-│   └── Dac-ta-man-hinh.md               # SS-2026-001
-└── Testing/                       # Biểu mẫu và tài liệu kiểm thử
-    └── 20260729_EVN_QA_Checklist_Template.xlsx
+├── 00-Tong-quan-du-an.md              # OV-2026-001
+├── 01-Dinh-nghia-yeu-cau-du-an.md     # RD-2026-001
+├── 02-Danh-sach-so-do-man-hinh.md     # SM-2026-001
+└── 03-Dac-ta-chi-tiet-man-hinh.md     # SS-2026-001
 
 tools/
-└── md2docx.py                     # Xuất .md sang .docx
+└── md2docx.py                         # Xuất .md sang .docx
 ```
 
 ## Bộ tài liệu
 
 | Mã | Tài liệu | Phiên bản | Nội dung |
 | --- | --- | --- | --- |
-| `RD-2026-001` | [Định nghĩa yêu cầu](docs/Requirement-Definition/Dinh-nghia-yeu-cau-du-an.md) | 1.17 | 175 yêu cầu chức năng, 35 phi chức năng, 48 quy tắc nghiệp vụ, 28 quyết định đã chốt, 35 tiêu chí nghiệm thu |
-| `BD-2026-001` | [Thiết kế cơ bản](docs/Basic-Design/Thiet-ke-co-ban.md) | 1.1 | Kiến trúc hai site, 8 luồng nghiệp vụ, 29 bảng dữ liệu, 13 nhóm API, 9 tiến trình batch, 15 quyết định thiết kế |
-| `SL-2026-001` | [Danh sách màn hình](docs/Basic-Design/Danh-sach-man-hinh.md) | 1.1 | 60 màn hình, 12 thành phần dùng chung, ma trận vai trò, đề xuất 5 đợt triển khai |
-| `SS-2026-001` | [Đặc tả màn hình](docs/Basic-Design/Dac-ta-man-hinh.md) | 1.1 | Đặc tả chi tiết đủ 60 màn hình: thành phần, hành động, quy tắc nghiệp vụ, thông báo lỗi |
-| — | [QA Checklist Template](docs/Testing/20260729_EVN_QA_Checklist_Template.xlsx) | 2026-07-29 | Biểu mẫu kiểm thử song ngữ VN/JP — 3 sheet `Site Name` / `CMS` / `Browsers` |
+| `OV-2026-001` | [00 — Tổng quan dự án](docs/00-Tong-quan-du-an.md) | 1.0 | Bối cảnh, 10 vấn đề hiện tại, 6 mục tiêu có chỉ số đo, phạm vi trong/ngoài, 3 vai trò, kiến trúc hai site, 19 module chức năng, 5 điểm chạm AI, ràng buộc & giả định, lộ trình 3 giai đoạn, 7 rủi ro |
+| `RD-2026-001` | [01 — Định nghĩa yêu cầu dự án](docs/01-Dinh-nghia-yeu-cau-du-an.md) | 1.0 | **209** yêu cầu chức năng (19 module), **46** phi chức năng, **52** quy tắc nghiệp vụ, 3 máy trạng thái, mô hình dữ liệu khái niệm, ma trận quyền 37 dòng, **24** quyết định đã chốt, **20** điểm cần làm rõ, **30** tiêu chí nghiệm thu |
+| `SM-2026-001` | [02 — Danh sách & sơ đồ màn hình](docs/02-Danh-sach-so-do-man-hinh.md) | 1.0 | **83** màn hình (34 khách · 44 quản trị · 5 hệ thống), 2 sơ đồ site, 6 sơ đồ luồng nghiệp vụ, **26** thành phần dùng chung, ma trận màn hình × vai trò, 6 đợt triển khai |
+| `SS-2026-001` | [03 — Đặc tả chi tiết màn hình](docs/03-Dac-ta-chi-tiet-man-hinh.md) | 1.0 | Đặc tả đủ **83** màn hình: bố cục, thành phần, hành động, quy tắc kiểm tra, thông báo; 21 thành phần dùng chung đặc tả riêng; danh mục 27 thông báo dùng chung |
 
 Quan hệ giữa các tài liệu:
 
 ```
-Requirements/ (nguồn)  →  RD-2026-001  →  BD-2026-001  →  SL-2026-001  →  SS-2026-001
+docs/Requirements/ (nguồn từ khách hàng)
+            │
+            ▼
+     OV-2026-001  ──▶  RD-2026-001  ──▶  SM-2026-001  ──▶  SS-2026-001
+      tổng quan          yêu cầu          màn hình        đặc tả màn hình
 ```
 
-Mã tham chiếu (`FR-xx`, `BR-xx`, `NFR-xx`, `DEC-xx`, `OQ-xx`, `AC-xx`) đều trỏ về `RD-2026-001`, không định nghĩa lại ở tài liệu sau.
+Mã tham chiếu `FR-*`, `NFR-*`, `BR-*`, `DEC-*`, `OQ-*`, `AC-*` được **định nghĩa một lần duy nhất** trong `RD-2026-001`; các tài liệu sau chỉ tham chiếu, không định nghĩa lại.
 
 ## Trạng thái
 
-`RD-2026-001` đang ở trạng thái **Chờ khách hàng xác nhận**, còn **29 điểm cần làm rõ** (`OQ`). Ba điểm mức Cao nên chốt trước khi sang thiết kế chi tiết vì ảnh hưởng phạm vi dự án:
+Cả bốn tài liệu đang ở trạng thái **Bản thảo — chờ khách hàng xác nhận**.
+
+Còn **20 điểm cần làm rõ** (`OQ`). Sáu điểm mức **Cao** nên chốt trước khi sang thiết kế chi tiết vì ảnh hưởng phạm vi dự án:
 
 | OQ | Nội dung |
 | --- | --- |
-| `OQ-11` | Tài liệu kỹ thuật có sẵn ở dạng số không — quyết định `FR-AI-07` có khả thi hay không |
-| `OQ-14` | Có dùng OTP qua SMS khi Guest đặt lịch không |
-| `OQ-34` | Quản lý tồn kho có bao gồm đặt hàng từ nhà cung cấp không |
+| `OQ-01` | Có tách riêng vai trò **Kỹ thuật viên** không — Proposal có nhắc, yêu cầu ban đầu ghi rõ chỉ 3 vai trò |
+| `OQ-02` | Có phân quyền theo **cửa hàng** không |
+| `OQ-03` | Hệ thống phục vụ **bao nhiêu cửa hàng** trong giai đoạn đầu |
+| `OQ-05` | Guest đặt lịch có cần **xác thực OTP** không |
+| `OQ-06` | Nhà cung cấp **SMS gateway**, chi phí và giới hạn |
+| `OQ-08` | AOYAMA có **tài liệu kỹ thuật dạng số** không — quyết định tính khả thi của trợ lý AI kỹ thuật |
 
 ## Quy ước
 
-- Bản `.md` là **nguồn chính** — dễ sửa và xem được diff trên Git. Thư mục `docx/` là bản xuất ra để gửi cho người không dùng Git; khi sửa `.md` thì cần xuất lại bằng `python tools/md2docx.py <thư mục nguồn> <thư mục đích>` (cần `pip install python-docx`).
+- Bản `.md` là **nguồn chính** — dễ sửa và xem được diff trên Git. Khi cần gửi cho người không dùng Git thì xuất sang `.docx` bằng `python tools/md2docx.py <thư mục nguồn> <thư mục đích>` (cần `pip install python-docx`).
 - Mỗi tài liệu có bảng **Lịch sử phiên bản** ở cuối. Khi sửa nội dung có ảnh hưởng nghiệp vụ thì tăng phiên bản và ghi lại thay đổi.
+- Thư mục `docs/Requirements/` là tài liệu nguồn của khách hàng — **không chỉnh sửa**.
 
 ## Repo liên quan
 
