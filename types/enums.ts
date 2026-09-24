@@ -1,0 +1,106 @@
+/**
+ * Cac gia tri liet ke phai khop tuyet doi voi src/common/enums cua backend.
+ * Khi doi ben nao thi phai doi ca hai — day la giao uoc giua hai repo.
+ */
+
+export const BookingStatus = {
+  PENDING: 'PENDING',
+  CONFIRMED: 'CONFIRMED',
+  RECEIVED: 'RECEIVED',
+  DONE: 'DONE',
+  CANCELLED: 'CANCELLED',
+  NO_SHOW: 'NO_SHOW',
+} as const;
+export type BookingStatus = (typeof BookingStatus)[keyof typeof BookingStatus];
+
+export const WorkOrderStatus = {
+  RECEIVED: 'RECEIVED',
+  DIAGNOSING: 'DIAGNOSING',
+  QUOTED: 'QUOTED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  DELIVERED: 'DELIVERED',
+  CANCELLED: 'CANCELLED',
+} as const;
+export type WorkOrderStatus = (typeof WorkOrderStatus)[keyof typeof WorkOrderStatus];
+
+/** Thu tu cac moc hien tren thanh tien do CP-19. */
+export const WORK_ORDER_FLOW: WorkOrderStatus[] = [
+  WorkOrderStatus.RECEIVED,
+  WorkOrderStatus.DIAGNOSING,
+  WorkOrderStatus.QUOTED,
+  WorkOrderStatus.IN_PROGRESS,
+  WorkOrderStatus.COMPLETED,
+  WorkOrderStatus.DELIVERED,
+];
+
+export const QuotationStatus = {
+  DRAFT: 'DRAFT',
+  SENT: 'SENT',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED',
+  SUPERSEDED: 'SUPERSEDED',
+} as const;
+export type QuotationStatus = (typeof QuotationStatus)[keyof typeof QuotationStatus];
+
+export const PaymentStatus = {
+  UNPAID: 'UNPAID',
+  PARTIAL: 'PARTIAL',
+  PAID: 'PAID',
+} as const;
+export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
+
+export const PaymentMethod = {
+  CASH: 'CASH',
+  BANK_TRANSFER: 'BANK_TRANSFER',
+  CARD_AT_STORE: 'CARD_AT_STORE',
+  OTHER: 'OTHER',
+} as const;
+export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod];
+
+export const ServiceType = {
+  MAINTENANCE: 'MAINTENANCE',
+  REPAIR: 'REPAIR',
+} as const;
+export type ServiceType = (typeof ServiceType)[keyof typeof ServiceType];
+
+export const BookingServiceType = {
+  MAINTENANCE: 'MAINTENANCE',
+  REPAIR: 'REPAIR',
+  BOTH: 'BOTH',
+} as const;
+export type BookingServiceType = (typeof BookingServiceType)[keyof typeof BookingServiceType];
+
+export const AdminRole = {
+  ADMIN: 'ADMIN',
+  STAFF: 'STAFF',
+} as const;
+export type AdminRole = (typeof AdminRole)[keyof typeof AdminRole];
+
+export const UserRole = {
+  GUEST: 'R-GUEST',
+  USER: 'R-USER',
+  ADMIN: 'R-ADMIN',
+} as const;
+export type UserRole = (typeof UserRole)[keyof typeof UserRole];
+
+export const InventoryTxType = {
+  IN: 'IN',
+  OUT: 'OUT',
+  ADJUST: 'ADJUST',
+  RETURN: 'RETURN',
+} as const;
+export type InventoryTxType = (typeof InventoryTxType)[keyof typeof InventoryTxType];
+
+export const NotificationChannel = { SMS: 'SMS', EMAIL: 'EMAIL' } as const;
+export type NotificationChannel = (typeof NotificationChannel)[keyof typeof NotificationChannel];
+
+export const NotificationSendStatus = {
+  QUEUED: 'QUEUED',
+  SENT: 'SENT',
+  FAILED: 'FAILED',
+} as const;
+export type NotificationSendStatus =
+  (typeof NotificationSendStatus)[keyof typeof NotificationSendStatus];
+
+export type LanguageCode = 'en' | 'vi' | 'ja';

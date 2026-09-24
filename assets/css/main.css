@@ -1,0 +1,253 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Design tokens — bam theo he thong "organic" cua ban thiet ke man hinh
+ * (AOYAMA Service - Screen Flow). Ten bien giu nguyen nhu ban thiet ke de khi
+ * co ban CSS goc thi thay thang duoc ma khong phai sua giao dien.
+ *
+ * accent   = tong am cua site khach hang
+ * accent-2 = tong lanh cua trang quan tri va cac diem cham AI
+ */
+@layer base {
+  :root {
+    color-scheme: light;
+
+    --color-bg: #f3f0ea;
+    --color-surface: #ffffff;
+    --color-text: #241f1a;
+    --color-divider: #e2dcd2;
+
+    --color-accent: #b4552a;
+    --color-accent-100: #fdf7f2;
+    --color-accent-200: #f6e6d9;
+    --color-accent-300: #ecc9ad;
+    --color-accent-400: #dda37a;
+    --color-accent-500: #c8763f;
+    --color-accent-700: #8f4220;
+    --color-accent-800: #6d3218;
+
+    --color-accent-2: #2f6f6b;
+    --color-accent-2-100: #eef6f5;
+    --color-accent-2-200: #d7e9e7;
+    --color-accent-2-400: #7bb5b0;
+    --color-accent-2-500: #4b918b;
+    --color-accent-2-600: #3a7d77;
+    --color-accent-2-700: #2f6f6b;
+    --color-accent-2-800: #1f4f4c;
+
+    --color-neutral-100: #faf8f5;
+    --color-neutral-200: #f3f0ea;
+    --color-neutral-300: #e2dcd2;
+    --color-neutral-400: #c4bcae;
+    --color-neutral-500: #9a9186;
+    --color-neutral-600: #6f675e;
+    --color-neutral-700: #4f4840;
+    --color-neutral-800: #332e29;
+    --color-neutral-900: #1d1a17;
+
+    --color-success: #2f7d4f;
+    --color-success-bg: #e7f3ec;
+    --color-warning: #9a6b16;
+    --color-warning-bg: #fbf1dc;
+    --color-danger: #a3342c;
+    --color-danger-bg: #fbeae8;
+    --color-info: #2c5f8d;
+    --color-info-bg: #e8f0f7;
+
+    --font-heading: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Yu Gothic', system-ui,
+      sans-serif;
+    --font-body: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', system-ui, -apple-system, sans-serif;
+
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-pill: 999px;
+
+    --shadow-card: 0 1px 2px rgba(36, 31, 26, 0.04), 0 8px 24px -12px rgba(36, 31, 26, 0.12);
+  }
+
+  html {
+    background: var(--color-bg);
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    /**
+     * C-05 — giao dien phai de doc voi nguoi lon tuoi, nen co chu than mac dinh
+     * lon hon muc thong thuong cua web.
+     */
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    line-height: 1.25;
+    text-wrap: pretty;
+  }
+
+  /** NFR-UX — vien tieu diem phai thay ro khi dieu huong bang ban phim. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent-500);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+}
+
+@layer components {
+  /**
+   * Chieu cao cham toi thieu 48px — C-05, de nguoi lon tuoi bam khong truot
+   * tren dien thoai.
+   */
+  .ay-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-transparent
+      px-5 text-[15px] font-semibold transition-colors duration-150
+      disabled:cursor-not-allowed disabled:opacity-50;
+    min-height: 48px;
+    font-family: var(--font-body);
+  }
+
+  .ay-btn-primary {
+    background: var(--color-accent);
+    color: #fff;
+  }
+  .ay-btn-primary:hover:not(:disabled) {
+    background: var(--color-accent-700);
+  }
+
+  .ay-btn-secondary {
+    background: var(--color-surface);
+    border-color: var(--color-neutral-300);
+    color: var(--color-neutral-800);
+  }
+  .ay-btn-secondary:hover:not(:disabled) {
+    background: var(--color-accent-200);
+    border-color: var(--color-accent-300);
+  }
+
+  .ay-btn-ghost {
+    @apply px-2;
+    background: transparent;
+    color: var(--color-accent-700);
+    min-height: 40px;
+  }
+  .ay-btn-ghost:hover:not(:disabled) {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  .ay-btn-danger {
+    background: var(--color-danger);
+    color: #fff;
+  }
+  .ay-btn-danger:hover:not(:disabled) {
+    filter: brightness(0.92);
+  }
+
+  .ay-btn-sm {
+    @apply px-3 text-[13px];
+    min-height: 38px;
+  }
+
+  .ay-card {
+    @apply p-4;
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+  }
+
+  .ay-input {
+    @apply w-full rounded-xl border px-3 py-2.5 text-[15px] transition-colors;
+    background: var(--color-surface);
+    border-color: var(--color-neutral-300);
+    color: var(--color-text);
+    min-height: 48px;
+  }
+  .ay-input:focus {
+    border-color: var(--color-accent-400);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--color-accent-200);
+  }
+  .ay-input[aria-invalid='true'] {
+    border-color: var(--color-danger);
+  }
+
+  .ay-label {
+    @apply mb-1.5 block text-[13px] font-semibold;
+    color: var(--color-neutral-700);
+  }
+
+  .ay-hint {
+    @apply mt-1 text-[12.5px];
+    color: var(--color-neutral-600);
+  }
+
+  .ay-error {
+    @apply mt-1 text-[12.5px] font-medium;
+    color: var(--color-danger);
+  }
+
+  .ay-tag {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[12px] font-semibold;
+  }
+
+  .ay-kicker {
+    @apply text-[10.5px] font-semibold uppercase tracking-[0.1em];
+    color: var(--color-accent-700);
+  }
+
+  .ay-muted {
+    color: var(--color-neutral-600);
+  }
+
+  /** Bang du lieu CP-06 — cuon ngang rieng de than trang khong bi day rong. */
+  .ay-table-wrap {
+    @apply overflow-x-auto rounded-2xl;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  .ay-table {
+    @apply w-full border-collapse text-left text-[14px];
+  }
+  .ay-table thead th {
+    @apply whitespace-nowrap px-3 py-2.5 text-[12.5px] font-semibold uppercase tracking-wide;
+    color: var(--color-neutral-600);
+    border-bottom: 1px solid var(--color-divider);
+  }
+  .ay-table tbody td {
+    @apply px-3 py-2.5 align-middle;
+    border-bottom: 1px solid var(--color-divider);
+  }
+  .ay-table tbody tr:hover {
+    background: var(--color-neutral-100);
+  }
+}
+
+@layer utilities {
+  .ay-safe-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .ay-safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
