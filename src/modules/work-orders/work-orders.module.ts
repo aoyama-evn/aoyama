@@ -10,7 +10,11 @@ import { WorkOrderItem } from './entities/work-order-item.entity';
 import { WorkOrderPart } from './entities/work-order-part.entity';
 import { WorkOrderPhoto } from './entities/work-order-photo.entity';
 import { WorkOrderStatusHistory } from './entities/work-order-status-history.entity';
-import { AdminWorkOrdersController, PublicWorkOrdersController } from './work-orders.controller';
+import {
+  AdminWorkOrdersController,
+  MyServiceRecordsController,
+  PublicWorkOrdersController,
+} from './work-orders.controller';
 import { WorkOrdersService } from './work-orders.service';
 
 /** M-06 — Phieu dich vu. */
@@ -29,7 +33,7 @@ import { WorkOrdersService } from './work-orders.service';
     PartsModule,
     NotificationsModule,
   ],
-  controllers: [PublicWorkOrdersController, AdminWorkOrdersController],
+  controllers: [PublicWorkOrdersController, MyServiceRecordsController, AdminWorkOrdersController],
   providers: [WorkOrdersService],
   exports: [WorkOrdersService],
 })

@@ -11,6 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ForbiddenException } from '@nestjs/common';
 import { AuthUser, CurrentUser, Public } from 'src/common/decorators';
 import { AdminGuard, RolesGuard } from 'src/common/guards';
 import { AuditService } from 'src/modules/system/audit.service';
@@ -36,6 +37,33 @@ export class PublicWorkOrdersController {
   @ApiOperation({ summary: 'SC-26 — theo doi tien do sua chua' })
   progress(@Param('code') code: string) {
     return this.service.getPublicProgress(code);
+  }
+}
+
+/** SC-32 — khach xem chi tiet phieu dich vu cua chinh minh. */
+@ApiTags('work-orders')
+@ApiBearerAuth()
+@Controller('account/service-records')
+export class MyServiceRecordsController {
+  constructor(private readonly service: WorkOrdersService) {}
+
+  @Get(':id')
+  @ApiOperation({ summary: 'SC-32 — chi tiet phieu dich vu (khach)' })
+  async detail(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthUser) {
+    const workOrder = await this.service.findById(id);
+    // NFR-SE-07 — khach chi doc duoc phieu gan voi ho so cua chinh minh.
+    if (workOrder.customerId !== user.sub) {
+      throw new ForbiddenException({
+        code: 'FORBIDDEN',
+        message: 'Phieu dich vu khong thuoc ve tai khoan nay',
+      });
+    }
+    // An anh noi bo va moc khong danh cho khach.
+    return {
+      ...workOrder,
+      photos: (workOrder.photos ?? []).filter((p) => p.visibleToCustomer),
+      statusHistories: (workOrder.statusHistories ?? []).filter((h) => h.visibleToCustomer),
+    };
   }
 }
 
