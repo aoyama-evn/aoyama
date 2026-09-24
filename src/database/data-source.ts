@@ -12,8 +12,7 @@ loadEnv();
  * truoc khi phat hanh, sinh migration bang `npm run migration:generate` roi tat co
  * nay di — moi thay doi lieu do phai qua migration (NFR-MA-04).
  */
-const synchronize =
-  process.env.DB_SYNCHRONIZE === 'true' && process.env.NODE_ENV !== 'production';
+const synchronize = process.env.DB_SYNCHRONIZE === 'true' && process.env.NODE_ENV !== 'production';
 export const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',
   host: process.env.DB_HOST ?? 'localhost',

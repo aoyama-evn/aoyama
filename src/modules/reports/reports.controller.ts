@@ -1,7 +1,7 @@
-import { Controller, Get, Header, Query, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, Res, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { IsIn, IsOptional, IsString, IsUUID, Matches } from 'class-validator';
+import { IsIn, IsOptional, IsUUID, Matches } from 'class-validator';
 import { AdminGuard, RolesGuard } from 'src/common/guards';
 import { ExportService } from './export.service';
 import { ReportsService } from './reports.service';

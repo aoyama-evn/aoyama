@@ -35,7 +35,8 @@ export class PartsService {
     }
     if (query.category) qb.andWhere('p.category = :category', { category: query.category });
     if (query.maker) qb.andWhere('p.maker ILIKE :maker', { maker: `%${query.maker}%` });
-    if (query.isActive !== undefined) qb.andWhere('p.is_active = :active', { active: query.isActive });
+    if (query.isActive !== undefined)
+      qb.andWhere('p.is_active = :active', { active: query.isActive });
     // Loc phu tung hop voi mot dong xe — ho tro buoc chon phu tung o SA-11 va SA-12.
     if (query.compatibleWith) {
       qb.andWhere('p.compatible_vehicles::text ILIKE :cv', { cv: `%${query.compatibleWith}%` });

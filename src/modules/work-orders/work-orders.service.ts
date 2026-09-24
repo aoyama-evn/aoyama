@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { PageDto } from 'src/common/dto';
 import {
-  InventoryTxType,
   NotificationChannel,
   NotificationEvent,
   PaymentStatus,
@@ -39,8 +38,6 @@ export class WorkOrdersService {
 
   constructor(
     @InjectRepository(WorkOrder) private readonly repo: Repository<WorkOrder>,
-    @InjectRepository(WorkOrderItem) private readonly itemRepo: Repository<WorkOrderItem>,
-    @InjectRepository(WorkOrderPart) private readonly partRepo: Repository<WorkOrderPart>,
     @InjectRepository(WorkOrderPhoto) private readonly photoRepo: Repository<WorkOrderPhoto>,
     @InjectRepository(WorkOrderStatusHistory)
     private readonly historyRepo: Repository<WorkOrderStatusHistory>,
@@ -283,11 +280,15 @@ export class WorkOrdersService {
 
       if (dto.parts) {
         await manager.getRepository(WorkOrderPart).delete({ workOrderId: id });
-        await manager.getRepository(WorkOrderPart).save(
-          dto.parts.map((part) =>
-            manager.getRepository(WorkOrderPart).create({ ...part, id: undefined, workOrderId: id }),
-          ),
-        );
+        await manager
+          .getRepository(WorkOrderPart)
+          .save(
+            dto.parts.map((part) =>
+              manager
+                .getRepository(WorkOrderPart)
+                .create({ ...part, id: undefined, workOrderId: id }),
+            ),
+          );
       }
 
       // Buoc ghi chan doan dau tien dua phieu sang DIAGNOSING.
@@ -465,7 +466,11 @@ export class WorkOrdersService {
       storeId: full.storeId,
       servicedAt: full.completedAt ?? new Date(),
       type: inferServiceType(full),
-      summary: (full.items ?? []).map((i) => i.name).join(', ').slice(0, 250) || 'Dich vu',
+      summary:
+        (full.items ?? [])
+          .map((i) => i.name)
+          .join(', ')
+          .slice(0, 250) || 'Dich vu',
       detail: full.diagnosisNote,
       odometer: full.intakeOdometer,
       totalAmount: full.totalAmount,
@@ -497,7 +502,11 @@ export class WorkOrdersService {
       undefined,
       6,
     );
-    const km = this.settings.getNumber(SETTING_KEYS.MAINTENANCE_DEFAULT_INTERVAL_KM, undefined, 3000);
+    const km = this.settings.getNumber(
+      SETTING_KEYS.MAINTENANCE_DEFAULT_INTERVAL_KM,
+      undefined,
+      3000,
+    );
 
     const base = workOrder.completedAt ?? new Date();
     const due = new Date(base);

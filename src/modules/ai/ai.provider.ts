@@ -122,17 +122,21 @@ export class LlmAiProvider implements AiProvider {
     if (!this.apiKey) {
       return { answer: 'Chua co du lieu de tra loi cau hoi nay.', citations: [] };
     }
-    return this.callModel<TechAnswer>('technical', { question, context }, {
-      answer: 'Chua co du lieu de tra loi cau hoi nay.',
-      citations: [],
-    });
+    return this.callModel<TechAnswer>(
+      'technical',
+      { question, context },
+      {
+        answer: 'Chua co du lieu de tra loi cau hoi nay.',
+        citations: [],
+      },
+    );
   }
 
   /**
    * Diem goi duy nhat ra dich vu ngoai. Het thoi gian cho hoac loi mang deu
    * tra ve gia tri lui, khong nem ra ngoai — nghiep vu phai chay tiep duoc.
    */
-  private async callModel<T>(task: string, payload: unknown, fallback: T): Promise<T> {
+  private async callModel<T>(task: string, _payload: unknown, fallback: T): Promise<T> {
     const timeout = this.config.get<number>('ai.timeoutMs', 10_000);
     try {
       const controller = new AbortController();

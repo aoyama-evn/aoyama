@@ -309,7 +309,10 @@ export class ReportsService {
     return qb.getCount();
   }
 
-  private async countBookings(filter: { status: BookingStatus; storeId?: string }): Promise<number> {
+  private async countBookings(filter: {
+    status: BookingStatus;
+    storeId?: string;
+  }): Promise<number> {
     const qb = this.bookingRepo
       .createQueryBuilder('b')
       .where('b.status = :status', { status: filter.status });

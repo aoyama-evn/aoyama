@@ -38,7 +38,7 @@ export class HttpSmsProvider implements SmsProvider {
 
   constructor(@Inject(ConfigService) private readonly config: ConfigService) {}
 
-  async send(to: string, body: string): Promise<SmsSendResult> {
+  async send(to: string, _body: string): Promise<SmsSendResult> {
     const apiKey = this.config.get<string>('notification.sms.apiKey');
     if (!apiKey) {
       return { success: false, error: 'Chua cau hinh SMS_API_KEY' };

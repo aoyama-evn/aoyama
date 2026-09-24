@@ -35,19 +35,97 @@ async function seed(ds: DataSource): Promise<void> {
 
 async function seedSettings(ds: DataSource): Promise<void> {
   const repo = ds.getRepository(SystemSetting);
-  const defaults: { key: string; value: unknown; valueType: string; group: string; description: string }[] = [
-    { key: SETTING_KEYS.BOOKING_CANCEL_CUTOFF_HOURS, value: 2, valueType: 'NUMBER', group: 'booking', description: 'BR-04 — so gio toi thieu truoc gio hen khach con huy duoc' },
-    { key: SETTING_KEYS.BOOKING_RESCHEDULE_CUTOFF_HOURS, value: 2, valueType: 'NUMBER', group: 'booking', description: 'BR-05 — so gio toi thieu truoc gio hen khach con doi lich duoc' },
-    { key: SETTING_KEYS.BOOKING_MAX_ADVANCE_DAYS, value: 60, valueType: 'NUMBER', group: 'booking', description: 'BR-08 — so ngay toi da duoc dat truoc' },
-    { key: SETTING_KEYS.BOOKING_REMINDER_HOURS_BEFORE, value: 12, valueType: 'NUMBER', group: 'booking', description: 'FR-NOT-03 — nhac lich truoc bao nhieu gio' },
-    { key: SETTING_KEYS.BOOKING_NO_SHOW_AFTER_HOURS, value: 24, valueType: 'NUMBER', group: 'booking', description: 'BR-13 — sau bao nhieu gio thi danh dau khach khong den' },
-    { key: SETTING_KEYS.BOOKING_REQUIRE_OTP_FOR_GUEST, value: false, valueType: 'BOOLEAN', group: 'booking', description: 'OQ-05 — Guest dat lich co phai xac thuc OTP khong' },
-    { key: SETTING_KEYS.TAX_RATE_PERCENT, value: 10, valueType: 'NUMBER', group: 'pricing', description: 'Thue tieu thu ap dung cho bao gia va phieu dich vu' },
-    { key: SETTING_KEYS.MAINTENANCE_DEFAULT_INTERVAL_MONTHS, value: 6, valueType: 'NUMBER', group: 'maintenance', description: 'AI-05 — chu ky bao duong mac dinh theo thang' },
-    { key: SETTING_KEYS.MAINTENANCE_DEFAULT_INTERVAL_KM, value: 3000, valueType: 'NUMBER', group: 'maintenance', description: 'AI-05 — chu ky bao duong mac dinh theo km' },
-    { key: SETTING_KEYS.MAINTENANCE_REMINDER_DAYS_BEFORE, value: 14, valueType: 'NUMBER', group: 'maintenance', description: 'FR-NOT-05 — nhac ky bao duong truoc bao nhieu ngay' },
-    { key: SETTING_KEYS.AI_MEDIA_RETENTION_DAYS, value: 30, valueType: 'NUMBER', group: 'ai', description: 'RK-07 — so ngay luu anh va ghi am cua phien chan doan' },
-    { key: SETTING_KEYS.MAINTENANCE_MODE, value: false, valueType: 'BOOLEAN', group: 'system', description: 'SY-04 — bat che do bao tri' },
+  const defaults: {
+    key: string;
+    value: unknown;
+    valueType: string;
+    group: string;
+    description: string;
+  }[] = [
+    {
+      key: SETTING_KEYS.BOOKING_CANCEL_CUTOFF_HOURS,
+      value: 2,
+      valueType: 'NUMBER',
+      group: 'booking',
+      description: 'BR-04 — so gio toi thieu truoc gio hen khach con huy duoc',
+    },
+    {
+      key: SETTING_KEYS.BOOKING_RESCHEDULE_CUTOFF_HOURS,
+      value: 2,
+      valueType: 'NUMBER',
+      group: 'booking',
+      description: 'BR-05 — so gio toi thieu truoc gio hen khach con doi lich duoc',
+    },
+    {
+      key: SETTING_KEYS.BOOKING_MAX_ADVANCE_DAYS,
+      value: 60,
+      valueType: 'NUMBER',
+      group: 'booking',
+      description: 'BR-08 — so ngay toi da duoc dat truoc',
+    },
+    {
+      key: SETTING_KEYS.BOOKING_REMINDER_HOURS_BEFORE,
+      value: 12,
+      valueType: 'NUMBER',
+      group: 'booking',
+      description: 'FR-NOT-03 — nhac lich truoc bao nhieu gio',
+    },
+    {
+      key: SETTING_KEYS.BOOKING_NO_SHOW_AFTER_HOURS,
+      value: 24,
+      valueType: 'NUMBER',
+      group: 'booking',
+      description: 'BR-13 — sau bao nhieu gio thi danh dau khach khong den',
+    },
+    {
+      key: SETTING_KEYS.BOOKING_REQUIRE_OTP_FOR_GUEST,
+      value: false,
+      valueType: 'BOOLEAN',
+      group: 'booking',
+      description: 'OQ-05 — Guest dat lich co phai xac thuc OTP khong',
+    },
+    {
+      key: SETTING_KEYS.TAX_RATE_PERCENT,
+      value: 10,
+      valueType: 'NUMBER',
+      group: 'pricing',
+      description: 'Thue tieu thu ap dung cho bao gia va phieu dich vu',
+    },
+    {
+      key: SETTING_KEYS.MAINTENANCE_DEFAULT_INTERVAL_MONTHS,
+      value: 6,
+      valueType: 'NUMBER',
+      group: 'maintenance',
+      description: 'AI-05 — chu ky bao duong mac dinh theo thang',
+    },
+    {
+      key: SETTING_KEYS.MAINTENANCE_DEFAULT_INTERVAL_KM,
+      value: 3000,
+      valueType: 'NUMBER',
+      group: 'maintenance',
+      description: 'AI-05 — chu ky bao duong mac dinh theo km',
+    },
+    {
+      key: SETTING_KEYS.MAINTENANCE_REMINDER_DAYS_BEFORE,
+      value: 14,
+      valueType: 'NUMBER',
+      group: 'maintenance',
+      description: 'FR-NOT-05 — nhac ky bao duong truoc bao nhieu ngay',
+    },
+    {
+      key: SETTING_KEYS.AI_MEDIA_RETENTION_DAYS,
+      value: 30,
+      valueType: 'NUMBER',
+      group: 'ai',
+      description: 'RK-07 — so ngay luu anh va ghi am cua phien chan doan',
+    },
+    {
+      key: SETTING_KEYS.MAINTENANCE_MODE,
+      value: false,
+      valueType: 'BOOLEAN',
+      group: 'system',
+      description: 'SY-04 — bat che do bao tri',
+    },
   ];
 
   for (const row of defaults) {

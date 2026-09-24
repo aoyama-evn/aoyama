@@ -1,9 +1,4 @@
-import {
-  Language,
-  NotificationChannel,
-  NotificationEvent,
-  ServiceType,
-} from 'src/common/enums';
+import { Language, NotificationChannel, NotificationEvent, ServiceType } from 'src/common/enums';
 import { I18nText } from 'src/common/types';
 
 export interface StoreSeed {

@@ -75,7 +75,11 @@ export class BookingsService {
    * Toan bo buoc ghi nam trong mot giao dich de khong sinh lich hen mo coi khi
    * mot buoc phu that bai.
    */
-  async create(dto: CreateBookingDto, actor: Actor, adminExtras?: Partial<Booking>): Promise<Booking> {
+  async create(
+    dto: CreateBookingDto,
+    actor: Actor,
+    adminExtras?: Partial<Booking>,
+  ): Promise<Booking> {
     const phone = normalizePhone(dto.contactPhone);
     const scheduledAt = zonedDateTimeToUtc(dto.date, dto.startTime);
 
@@ -125,11 +129,13 @@ export class BookingsService {
       });
       const saved = await manager.getRepository(Booking).save(entity);
 
-      await manager.getRepository(BookingServiceLine).save(
-        serviceLines.map((line) =>
-          manager.getRepository(BookingServiceLine).create({ ...line, bookingId: saved.id }),
-        ),
-      );
+      await manager
+        .getRepository(BookingServiceLine)
+        .save(
+          serviceLines.map((line) =>
+            manager.getRepository(BookingServiceLine).create({ ...line, bookingId: saved.id }),
+          ),
+        );
 
       await manager.getRepository(BookingStatusHistory).save(
         manager.getRepository(BookingStatusHistory).create({
@@ -177,7 +183,10 @@ export class BookingsService {
       order: { statusHistories: { createdAt: 'ASC' } },
     });
     if (!booking) {
-      throw new NotFoundException({ code: 'BOOKING_NOT_FOUND', message: 'Khong tim thay lich hen' });
+      throw new NotFoundException({
+        code: 'BOOKING_NOT_FOUND',
+        message: 'Khong tim thay lich hen',
+      });
     }
     return booking;
   }
@@ -188,7 +197,10 @@ export class BookingsService {
       relations: { customer: true, vehicle: true, store: true, services: true },
     });
     if (!booking) {
-      throw new NotFoundException({ code: 'BOOKING_NOT_FOUND', message: 'Khong tim thay lich hen' });
+      throw new NotFoundException({
+        code: 'BOOKING_NOT_FOUND',
+        message: 'Khong tim thay lich hen',
+      });
     }
     return booking;
   }
@@ -437,10 +449,7 @@ export class BookingsService {
       .leftJoinAndSelect('b.services', 'bs');
   }
 
-  private applyFilters(
-    qb: ReturnType<BookingsService['baseQuery']>,
-    query: BookingQueryDto,
-  ): void {
+  private applyFilters(qb: ReturnType<BookingsService['baseQuery']>, query: BookingQueryDto): void {
     if (query.storeId) qb.andWhere('b.store_id = :storeId', { storeId: query.storeId });
     if (query.status) qb.andWhere('b.status = :status', { status: query.status });
     if (query.serviceType) {

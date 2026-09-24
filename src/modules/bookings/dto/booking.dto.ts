@@ -84,7 +84,9 @@ export class CreateBookingDto {
 
 /** SA-06 — Admin dat lich thay khach, BR-12. */
 export class AdminCreateBookingDto extends CreateBookingDto {
-  @ApiPropertyOptional({ description: 'Ho so khach da co; bo trong thi tao tu ten va so dien thoai' })
+  @ApiPropertyOptional({
+    description: 'Ho so khach da co; bo trong thi tao tu ten va so dien thoai',
+  })
   @IsOptional()
   @IsUUID('4')
   customerId?: string;

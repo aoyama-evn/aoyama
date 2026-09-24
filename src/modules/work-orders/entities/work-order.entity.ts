@@ -55,7 +55,12 @@ export class WorkOrder extends BaseEntity {
   status!: WorkOrderStatus;
 
   /** Truong rieng, doc lap voi trang thai phieu (RD muc 5.2). */
-  @Column({ name: 'payment_status', type: 'enum', enum: PaymentStatus, default: PaymentStatus.UNPAID })
+  @Column({
+    name: 'payment_status',
+    type: 'enum',
+    enum: PaymentStatus,
+    default: PaymentStatus.UNPAID,
+  })
   paymentStatus!: PaymentStatus;
 
   // ---- Hien trang xe khi tiep nhan (FR-WO-03, bat buoc theo BR-18) ----

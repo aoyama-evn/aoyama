@@ -1,4 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PageDto, PaginationQueryDto } from 'src/common/dto';
@@ -36,7 +41,10 @@ export class VehiclesService {
   async findOwnedBy(id: string, customerId: string): Promise<Vehicle> {
     const vehicle = await this.findById(id);
     if (vehicle.customerId !== customerId) {
-      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Xe khong thuoc ve tai khoan nay' });
+      throw new ForbiddenException({
+        code: 'FORBIDDEN',
+        message: 'Xe khong thuoc ve tai khoan nay',
+      });
     }
     return vehicle;
   }
@@ -61,7 +69,9 @@ export class VehiclesService {
   }
 
   /** BR-46 — bien so la khoa nghiep vu, khong duoc trung giua cac xe dang hoat dong. */
-  async create(data: Partial<Vehicle> & { customerId: string; plateNumber: string }): Promise<Vehicle> {
+  async create(
+    data: Partial<Vehicle> & { customerId: string; plateNumber: string },
+  ): Promise<Vehicle> {
     const plateNumber = normalizePlate(data.plateNumber);
     const existing = await this.repo.findOne({ where: { plateNumber } });
     if (existing) {
@@ -112,7 +122,10 @@ export class VehiclesService {
 
   // ---- Lich su dich vu (SC-31, SA-20) ----
 
-  async listHistory(vehicleId: string, query: PaginationQueryDto): Promise<PageDto<ServiceHistory>> {
+  async listHistory(
+    vehicleId: string,
+    query: PaginationQueryDto,
+  ): Promise<PageDto<ServiceHistory>> {
     const [items, total] = await this.historyRepo.findAndCount({
       where: { vehicleId },
       order: { servicedAt: 'DESC' },

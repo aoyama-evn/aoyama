@@ -1,22 +1,9 @@
 import { Customer } from 'src/modules/customers/entities/customer.entity';
-import {
-  MaintenanceSchedule,
-  ServiceHistory,
-  Vehicle,
-} from 'src/modules/vehicles/entities';
-import {
-  Store,
-  StoreBusinessHour,
-  StoreHoliday,
-  TimeSlot,
-} from 'src/modules/stores/entities';
+import { MaintenanceSchedule, ServiceHistory, Vehicle } from 'src/modules/vehicles/entities';
+import { Store, StoreBusinessHour, StoreHoliday, TimeSlot } from 'src/modules/stores/entities';
 import { PriceRule, Service } from 'src/modules/catalog/entities';
 import { Inventory, InventoryTransaction, Part } from 'src/modules/parts/entities';
-import {
-  Booking,
-  BookingService,
-  BookingStatusHistory,
-} from 'src/modules/bookings/entities';
+import { Booking, BookingService, BookingStatusHistory } from 'src/modules/bookings/entities';
 import {
   WorkOrder,
   WorkOrderItem,

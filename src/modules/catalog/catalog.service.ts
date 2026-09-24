@@ -68,7 +68,8 @@ export class CatalogService {
   ): Promise<PageDto<Service>> {
     const qb = this.serviceRepo.createQueryBuilder('s');
     if (query.type) qb.andWhere('s.type = :type', { type: query.type });
-    if (query.isActive !== undefined) qb.andWhere('s.is_active = :active', { active: query.isActive });
+    if (query.isActive !== undefined)
+      qb.andWhere('s.is_active = :active', { active: query.isActive });
     if (query.keyword) {
       qb.andWhere('(s.code ILIKE :kw OR s.name::text ILIKE :kw)', { kw: `%${query.keyword}%` });
     }

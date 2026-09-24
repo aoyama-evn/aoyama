@@ -26,11 +26,8 @@ import { KnowledgeDocument } from './entities/knowledge-document.entity';
     {
       provide: AI_PROVIDER,
       inject: [ConfigService, DisabledAiProvider, LlmAiProvider],
-      useFactory: (
-        config: ConfigService,
-        disabled: DisabledAiProvider,
-        llm: LlmAiProvider,
-      ) => (config.get<boolean>('ai.enabled') ? llm : disabled),
+      useFactory: (config: ConfigService, disabled: DisabledAiProvider, llm: LlmAiProvider) =>
+        config.get<boolean>('ai.enabled') ? llm : disabled,
     },
   ],
   exports: [AiService],

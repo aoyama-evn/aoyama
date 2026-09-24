@@ -82,7 +82,9 @@ export class StoresService {
 
   async addHoliday(storeId: string, date: string, reason?: string): Promise<StoreHoliday> {
     await this.findOne(storeId);
-    return this.holidayRepo.save(this.holidayRepo.create({ storeId, date, reason: reason ?? null }));
+    return this.holidayRepo.save(
+      this.holidayRepo.create({ storeId, date, reason: reason ?? null }),
+    );
   }
 
   async removeHoliday(storeId: string, holidayId: string): Promise<void> {

@@ -50,10 +50,7 @@ export class OtpService {
     }
 
     // Vo hieu hoa cac ma cu chua dung de chi mot ma con hieu luc tai mot thoi diem.
-    await this.repo.update(
-      { phone, purpose, consumedAt: IsNull() },
-      { consumedAt: new Date() },
-    );
+    await this.repo.update({ phone, purpose, consumedAt: IsNull() }, { consumedAt: new Date() });
 
     const code = generateNumericOtp(length);
     const expiresAt = new Date(Date.now() + ttl * 1000);
@@ -111,7 +108,9 @@ export class OtpService {
 
   /** Don ma het han — chay dinh ky de bang khong phinh vo han. */
   async purgeExpired(): Promise<number> {
-    const result = await this.repo.delete({ expiresAt: LessThan(new Date(Date.now() - 86_400_000)) });
+    const result = await this.repo.delete({
+      expiresAt: LessThan(new Date(Date.now() - 86_400_000)),
+    });
     return result.affected ?? 0;
   }
 }

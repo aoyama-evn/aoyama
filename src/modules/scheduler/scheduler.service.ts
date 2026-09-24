@@ -2,11 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, IsNull, LessThan, Repository } from 'typeorm';
-import {
-  BookingStatus,
-  NotificationChannel,
-  NotificationEvent,
-} from 'src/common/enums';
+import { BookingStatus, NotificationChannel, NotificationEvent } from 'src/common/enums';
 import { formatAppDate, formatAppDateTime } from 'src/common/utils';
 import { pickI18n } from 'src/common/types';
 import { AiService } from 'src/modules/ai/ai.service';

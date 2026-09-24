@@ -1,4 +1,4 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
@@ -28,8 +28,6 @@ const LOCK_MINUTES = 15;
  */
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
-
   constructor(
     @InjectRepository(Customer) private readonly customerRepo: Repository<Customer>,
     @InjectRepository(AdminUser) private readonly adminRepo: Repository<AdminUser>,
@@ -150,7 +148,10 @@ export class AuthService {
       });
     }
     if (!user.isActive) {
-      throw new UnauthorizedException({ code: 'ACCOUNT_DISABLED', message: 'Tai khoan da bi khoa' });
+      throw new UnauthorizedException({
+        code: 'ACCOUNT_DISABLED',
+        message: 'Tai khoan da bi khoa',
+      });
     }
 
     const matched = await bcrypt.compare(password, user.passwordHash);
@@ -200,7 +201,10 @@ export class AuthService {
     const admin = await this.adminRepo.findOne({ where: { id: subjectId } });
     if (admin) {
       if (!admin.isActive) {
-        throw new UnauthorizedException({ code: 'ACCOUNT_DISABLED', message: 'Tai khoan da bi khoa' });
+        throw new UnauthorizedException({
+          code: 'ACCOUNT_DISABLED',
+          message: 'Tai khoan da bi khoa',
+        });
       }
       return {
         sub: admin.id,

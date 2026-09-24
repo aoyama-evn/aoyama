@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Not, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { PageDto, PaginationQueryDto } from 'src/common/dto';
 import {
   NotificationChannel,
@@ -25,7 +25,6 @@ export class QuotationsService {
 
   constructor(
     @InjectRepository(Quotation) private readonly repo: Repository<Quotation>,
-    @InjectRepository(QuotationItem) private readonly itemRepo: Repository<QuotationItem>,
     private readonly dataSource: DataSource,
     private readonly workOrders: WorkOrdersService,
     private readonly customers: CustomersService,
@@ -37,7 +36,11 @@ export class QuotationsService {
    * SA-12 — lap bao gia. BR-34: tao ban moi thi ban truoc chuyen SUPERSEDED,
    * de lich su phan hoi cua khach van con nguyen.
    */
-  async create(workOrderId: string, dto: CreateQuotationDto, createdById: string): Promise<Quotation> {
+  async create(
+    workOrderId: string,
+    dto: CreateQuotationDto,
+    createdById: string,
+  ): Promise<Quotation> {
     const workOrder = await this.workOrders.findById(workOrderId);
 
     const latest = await this.repo.findOne({
@@ -51,7 +54,8 @@ export class QuotationsService {
       });
     }
 
-    const taxRate = dto.taxRate ?? this.settings.getNumber(SETTING_KEYS.TAX_RATE_PERCENT, undefined, 10);
+    const taxRate =
+      dto.taxRate ?? this.settings.getNumber(SETTING_KEYS.TAX_RATE_PERCENT, undefined, 10);
     const totals = computeTotals(dto.items, dto.discountAmount ?? 0, taxRate);
 
     return this.dataSource.transaction(async (manager) => {
@@ -110,7 +114,10 @@ export class QuotationsService {
       order: { items: { sortOrder: 'ASC' } },
     });
     if (!quotation) {
-      throw new NotFoundException({ code: 'QUOTATION_NOT_FOUND', message: 'Khong tim thay bao gia' });
+      throw new NotFoundException({
+        code: 'QUOTATION_NOT_FOUND',
+        message: 'Khong tim thay bao gia',
+      });
     }
     return quotation;
   }
@@ -123,7 +130,10 @@ export class QuotationsService {
       order: { items: { sortOrder: 'ASC' } },
     });
     if (!quotation) {
-      throw new NotFoundException({ code: 'QUOTATION_NOT_FOUND', message: 'Khong tim thay bao gia' });
+      throw new NotFoundException({
+        code: 'QUOTATION_NOT_FOUND',
+        message: 'Khong tim thay bao gia',
+      });
     }
     if (quotation.status === QuotationStatus.DRAFT) {
       throw new NotFoundException({

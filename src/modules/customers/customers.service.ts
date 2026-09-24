@@ -132,7 +132,9 @@ export class CustomersService {
     const target = await this.findById(targetId);
 
     await this.dataSource.transaction(async (manager) => {
-      await manager.getRepository(Vehicle).update({ customerId: source.id }, { customerId: target.id });
+      await manager
+        .getRepository(Vehicle)
+        .update({ customerId: source.id }, { customerId: target.id });
 
       if (!target.email && source.email) target.email = source.email;
       if (!target.address && source.address) target.address = source.address;

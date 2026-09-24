@@ -174,7 +174,11 @@ export class AdminBookingsController {
   @Put(':id/confirm')
   @ApiOperation({ summary: 'SA-05 — xac nhan lich hen, sinh ma QR va gui SMS' })
   async confirm(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthUser) {
-    const booking = await this.service.confirm(id, { type: 'ADMIN', id: user.sub, name: user.name });
+    const booking = await this.service.confirm(id, {
+      type: 'ADMIN',
+      id: user.sub,
+      name: user.name,
+    });
     await this.audit.record({
       actorId: user.sub,
       actorName: user.name,

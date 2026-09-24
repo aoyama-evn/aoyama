@@ -61,7 +61,10 @@ export class TokenService {
   }
 
   /** Doi refresh token lay cap moi, dong thoi thu hoi token vua dung. */
-  async rotate(refreshToken: string, rebuild: (subjectId: string) => Promise<AuthUser>): Promise<TokenPair> {
+  async rotate(
+    refreshToken: string,
+    rebuild: (subjectId: string) => Promise<AuthUser>,
+  ): Promise<TokenPair> {
     let decoded: { sub: string; role: UserRole };
     try {
       decoded = await this.jwt.verifyAsync(refreshToken, {

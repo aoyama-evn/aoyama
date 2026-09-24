@@ -54,7 +54,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
         const raw = obj.message;
         body = {
           code: (obj.code as string) ?? httpCodeFor(status),
-          message: Array.isArray(raw) ? (raw as string[]).join('; ') : (raw as string) ?? exception.message,
+          message: Array.isArray(raw)
+            ? (raw as string[]).join('; ')
+            : ((raw as string) ?? exception.message),
           details: obj.details ?? (Array.isArray(raw) ? raw : undefined),
         };
       }

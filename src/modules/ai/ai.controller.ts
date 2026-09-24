@@ -10,15 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import {
-  IsArray,
-  IsEnum,
-  IsIn,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUUID,
-} from 'class-validator';
+import { IsArray, IsEnum, IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { AuthUser, CurrentUser, Public } from 'src/common/decorators';
 import { PaginationQueryDto } from 'src/common/dto';
 import { Language } from 'src/common/enums';

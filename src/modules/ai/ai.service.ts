@@ -45,7 +45,11 @@ export class AiService {
     vehicleModel?: string;
     serviceIntent?: string;
   }): Promise<AiDiagnosis> {
-    const retentionDays = this.settings.getNumber(SETTING_KEYS.AI_MEDIA_RETENTION_DAYS, undefined, 30);
+    const retentionDays = this.settings.getNumber(
+      SETTING_KEYS.AI_MEDIA_RETENTION_DAYS,
+      undefined,
+      30,
+    );
     return this.diagnosisRepo.save(
       this.diagnosisRepo.create({
         sessionKey: input.sessionKey,
@@ -192,7 +196,9 @@ export class AiService {
   // ---------------- AI-04 — Nhan dang phu tung tu anh (SA-27) ----------------
 
   /** FR-PRT-04..07 — dien san bieu mau phu tung; Admin kiem tra roi moi luu (BR-43). */
-  async recognizePart(imageUrls: string[]): Promise<PartRecognitionResult & { isFallback: boolean }> {
+  async recognizePart(
+    imageUrls: string[],
+  ): Promise<PartRecognitionResult & { isFallback: boolean }> {
     const result = await this.provider.recognizePart(imageUrls);
     return { ...result, isFallback: Object.keys(result).length === 0 };
   }
