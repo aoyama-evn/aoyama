@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: aoyama-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: aoyama
+      POSTGRES_PASSWORD: aoyama
+      POSTGRES_DB: aoyama_service
+      TZ: Asia/Tokyo
+    ports:
+      - '5432:5432'
+    volumes:
+      - aoyama-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U aoyama -d aoyama_service']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  adminer:
+    image: adminer:latest
+    container_name: aoyama-adminer
+    restart: unless-stopped
+    ports:
+      - '8080:8080'
+    depends_on:
+      - db
+
+volumes:
+  aoyama-db-data:
