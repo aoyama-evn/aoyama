@@ -156,41 +156,41 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
 
     <div class="grid gap-4 lg:grid-cols-3">
       <div class="flex flex-col gap-4 lg:col-span-2">
-        <section class="ay-card">
+        <section class="card">
           <h2 class="mb-2 font-heading text-[16px]">Thông tin chung</h2>
           <dl class="grid gap-2 text-[14px] sm:grid-cols-2">
-            <div><dt class="ay-muted">Khách hàng</dt><dd>{{ workOrder.customer?.name }} · {{ workOrder.customer?.phone }}</dd></div>
-            <div><dt class="ay-muted">Cửa hàng</dt><dd>{{ i18n(workOrder.store?.name ?? null) }}</dd></div>
-            <div><dt class="ay-muted">Xe</dt><dd>{{ workOrder.vehicle?.plateNumber }} · {{ workOrder.vehicle?.maker }} {{ workOrder.vehicle?.model }}</dd></div>
-            <div><dt class="ay-muted">Số km khi nhận</dt><dd>{{ number(workOrder.intakeOdometer) }} km</dd></div>
+            <div><dt class="text-muted">Khách hàng</dt><dd>{{ workOrder.customer?.name }} · {{ workOrder.customer?.phone }}</dd></div>
+            <div><dt class="text-muted">Cửa hàng</dt><dd>{{ i18n(workOrder.store?.name ?? null) }}</dd></div>
+            <div><dt class="text-muted">Xe</dt><dd>{{ workOrder.vehicle?.plateNumber }} · {{ workOrder.vehicle?.maker }} {{ workOrder.vehicle?.model }}</dd></div>
+            <div><dt class="text-muted">Số km khi nhận</dt><dd>{{ number(workOrder.intakeOdometer) }} km</dd></div>
             <div v-if="workOrder.bookingId">
-              <dt class="ay-muted">Lịch hẹn</dt>
+              <dt class="text-muted">Lịch hẹn</dt>
               <dd><NuxtLink :to="`/admin/bookings/${workOrder.bookingId}`" class="underline">{{ workOrder.booking?.code }}</NuxtLink></dd>
             </div>
-            <div><dt class="ay-muted">Nhiên liệu khi nhận</dt><dd>{{ workOrder.intakeFuelLevel ?? '—' }}%</dd></div>
+            <div><dt class="text-muted">Nhiên liệu khi nhận</dt><dd>{{ workOrder.intakeFuelLevel ?? '—' }}%</dd></div>
           </dl>
           <div v-if="workOrder.intakeNote" class="mt-3 border-t border-divider pt-3">
-            <p class="text-[12.5px] ay-muted">Ghi chú tiếp nhận</p>
+            <p class="text-[12.5px] text-muted">Ghi chú tiếp nhận</p>
             <p class="whitespace-pre-line text-[14px]">{{ workOrder.intakeNote }}</p>
           </div>
         </section>
 
-        <section v-if="workOrder.customerSymptom || workOrder.diagnosisNote" class="ay-card">
+        <section v-if="workOrder.customerSymptom || workOrder.diagnosisNote" class="card">
           <h2 class="mb-2 font-heading text-[16px]">Chẩn đoán</h2>
           <div v-if="workOrder.customerSymptom" class="mb-2">
-            <p class="text-[12.5px] ay-muted">Khách mô tả</p>
+            <p class="text-[12.5px] text-muted">Khách mô tả</p>
             <p class="whitespace-pre-line text-[14px]">{{ workOrder.customerSymptom }}</p>
           </div>
           <div v-if="workOrder.diagnosisNote">
-            <p class="text-[12.5px] ay-muted">Kỹ thuật viên</p>
+            <p class="text-[12.5px] text-muted">Kỹ thuật viên</p>
             <p class="whitespace-pre-line text-[14px]">{{ workOrder.diagnosisNote }}</p>
           </div>
           <p v-if="workOrder.diagnosisCause" class="mt-2 text-[13.5px]">
-            <span class="ay-muted">Nguyên nhân: </span>{{ workOrder.diagnosisCause }}
+            <span class="text-muted">Nguyên nhân: </span>{{ workOrder.diagnosisCause }}
           </p>
         </section>
 
-        <section class="ay-card">
+        <section class="card">
           <h2 class="mb-2 font-heading text-[16px]">Hạng mục &amp; phụ tùng</h2>
 
           <AyEmptyState
@@ -222,7 +222,7 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
           </template>
         </section>
 
-        <section class="ay-card">
+        <section class="card">
           <h2 class="mb-3 font-heading text-[16px]">Tiến độ hiển thị cho khách</h2>
           <div class="grid gap-3 sm:grid-cols-2">
             <AyField :label="`Hoàn thành ${progress.progressPercent}%`">
@@ -232,12 +232,12 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
             </AyField>
             <AyField label="Dự kiến xong">
               <template #default="{ id: fid }">
-                <input :id="fid" v-model="progress.estimatedCompletionAt" class="ay-input" type="datetime-local">
+                <input :id="fid" v-model="progress.estimatedCompletionAt" class="input" type="datetime-local">
               </template>
             </AyField>
             <AyField label="Ghi chú tiến độ" class="sm:col-span-2" hint="Khách đọc được nội dung này">
               <template #default="{ id: fid }">
-                <textarea :id="fid" v-model="progress.progressNote" class="ay-input min-h-[70px]" />
+                <textarea :id="fid" v-model="progress.progressNote" class="input min-h-[70px]" />
               </template>
             </AyField>
           </div>
@@ -246,7 +246,7 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
       </div>
 
       <div class="flex flex-col gap-4">
-        <section class="ay-card">
+        <section class="card">
           <h2 class="mb-2 font-heading text-[16px]">Chi phí</h2>
           <AyMoneyTable
             :labor-subtotal="workOrder.laborSubtotal"
@@ -265,10 +265,10 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
           </AyButton>
         </section>
 
-        <section class="ay-card">
+        <section class="card">
           <div class="mb-2 flex items-baseline justify-between">
             <h2 class="font-heading text-[16px]">Báo giá</h2>
-            <NuxtLink :to="`/admin/work-orders/${id}/quotation`" class="ay-btn ay-btn-ghost ay-btn-sm">Lập mới</NuxtLink>
+            <NuxtLink :to="`/admin/work-orders/${id}/quotation`" class="btn btn-ghost text-[12.5px]">Lập mới</NuxtLink>
           </div>
           <AyEmptyState v-if="(quotations ?? []).length === 0" title="Chưa có báo giá" />
           <ul v-else class="flex flex-col gap-1.5 text-[13.5px]">
@@ -280,17 +280,17 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
           </ul>
         </section>
 
-        <section v-if="(workOrder.photos ?? []).length" class="ay-card">
+        <section v-if="(workOrder.photos ?? []).length" class="card">
           <h2 class="mb-2 font-heading text-[16px]">Hình ảnh</h2>
           <ul class="grid grid-cols-3 gap-1.5">
             <li v-for="photo in workOrder.photos" :key="photo.id">
               <img :src="photo.url" :alt="photo.caption ?? ''" class="aspect-square w-full rounded-lg object-cover">
-              <p class="mt-0.5 text-[10.5px] ay-muted">{{ photo.stage }}</p>
+              <p class="mt-0.5 text-[10.5px] text-muted">{{ photo.stage }}</p>
             </li>
           </ul>
         </section>
 
-        <section class="ay-card">
+        <section class="card">
           <h2 class="mb-3 font-heading text-[16px]">Nhật ký</h2>
           <AyChangeLog :entries="timelineEntries" />
         </section>
@@ -308,7 +308,7 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
     >
       <AyField v-if="statusTarget === 'CANCELLED'" label="Lý do hủy" class="mt-3">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="statusNote" class="ay-input" type="text">
+          <input :id="fid" v-model="statusNote" class="input" type="text">
         </template>
       </AyField>
     </AyConfirmDialog>

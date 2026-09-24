@@ -53,12 +53,12 @@ useHead({ title: 'Báo giá — AOYAMA Admin' });
     <AyFilterBar :has-active-filters="Boolean(filters.keyword || filters.status)" @reset="reset">
       <AyField label="Từ khóa" class="min-w-[200px] flex-1">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.keyword" class="ay-input" type="search" placeholder="Mã, tên khách, biển số">
+          <input :id="id" v-model="filters.keyword" class="input" type="search" placeholder="Mã, tên khách, biển số">
         </template>
       </AyField>
       <AyField label="Trạng thái">
         <template #default="{ id }">
-          <select :id="id" v-model="filters.status" class="ay-input">
+          <select :id="id" v-model="filters.status" class="input">
             <option value="">Tất cả</option>
             <option v-for="s in Object.values(QuotationStatus)" :key="s" :value="s">{{ s }}</option>
           </select>

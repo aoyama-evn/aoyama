@@ -74,12 +74,12 @@ useHead({ title: 'Lịch hẹn — AOYAMA Admin' });
     <AyFilterBar :has-active-filters="hasFilters" @reset="reset">
       <AyField label="Từ khóa" class="min-w-[200px] flex-1">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.keyword" class="ay-input" type="search" placeholder="Mã, tên, SĐT, biển số">
+          <input :id="id" v-model="filters.keyword" class="input" type="search" placeholder="Mã, tên, SĐT, biển số">
         </template>
       </AyField>
       <AyField label="Trạng thái">
         <template #default="{ id }">
-          <select :id="id" v-model="filters.status" class="ay-input">
+          <select :id="id" v-model="filters.status" class="input">
             <option value="">Tất cả</option>
             <option v-for="s in STATUSES" :key="s" :value="s">{{ s }}</option>
           </select>
@@ -87,12 +87,12 @@ useHead({ title: 'Lịch hẹn — AOYAMA Admin' });
       </AyField>
       <AyField label="Từ ngày">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.from" class="ay-input" type="date">
+          <input :id="id" v-model="filters.from" class="input" type="date">
         </template>
       </AyField>
       <AyField label="Đến ngày">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.to" class="ay-input" type="date">
+          <input :id="id" v-model="filters.to" class="input" type="date">
         </template>
       </AyField>
     </AyFilterBar>
@@ -118,7 +118,7 @@ useHead({ title: 'Lịch hẹn — AOYAMA Admin' });
       </template>
       <template #cell-contactName="{ row }">
         <span class="font-semibold">{{ row.contactName }}</span>
-        <span class="block text-[12px] ay-muted">{{ row.contactPhone }}</span>
+        <span class="block text-[12px] text-muted">{{ row.contactPhone }}</span>
       </template>
       <template #cell-vehicle="{ row }">
         {{ (row.vehicle as Booking['vehicle'])?.plateNumber ?? '—' }}

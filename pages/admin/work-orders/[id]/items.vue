@@ -151,28 +151,28 @@ useHead({ title: 'Chẩn đoán & hạng mục — AOYAMA Admin' });
       :description="`${workOrder.code} · ${workOrder.vehicle?.plateNumber} · ${workOrder.customer?.name}`"
     />
 
-    <section class="ay-card grid gap-3 sm:grid-cols-2">
+    <section class="card grid gap-3 sm:grid-cols-2">
       <AyField label="Kết luận chẩn đoán" class="sm:col-span-2">
         <template #default="{ id: fid }">
-          <textarea :id="fid" v-model="diagnosisNote" class="ay-input min-h-[90px]" placeholder="Mô tả tình trạng thực tế sau khi kiểm tra" />
+          <textarea :id="fid" v-model="diagnosisNote" class="input min-h-[90px]" placeholder="Mô tả tình trạng thực tế sau khi kiểm tra" />
         </template>
       </AyField>
       <AyField label="Nguyên nhân" class="sm:col-span-2">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="diagnosisCause" class="ay-input" type="text">
+          <input :id="fid" v-model="diagnosisCause" class="input" type="text">
         </template>
       </AyField>
     </section>
 
     <div class="grid gap-4 lg:grid-cols-3">
-      <section class="ay-card lg:col-span-2">
+      <section class="card lg:col-span-2">
         <div class="mb-3 flex items-baseline justify-between">
           <h2 class="font-heading text-[16px]">Hạng mục công việc</h2>
           <AyButton variant="ghost" size="sm" @click="addFreeItem">+ Hạng mục tự do</AyButton>
         </div>
 
-        <div class="ay-table-wrap !shadow-none">
-          <table class="ay-table">
+        <div class="table-wrap !shadow-none">
+          <table class="table">
             <thead>
               <tr>
                 <th scope="col">Tên hạng mục</th>
@@ -185,29 +185,29 @@ useHead({ title: 'Chẩn đoán & hạng mục — AOYAMA Admin' });
             <tbody>
               <tr v-for="(item, index) in items" :key="index">
                 <td>
-                  <input v-model="item.name" class="ay-input h-9 min-h-0 py-1" type="text">
+                  <input v-model="item.name" class="input h-9 min-h-0 py-1" type="text">
                   <AyAiBadge v-if="item.suggestedByAi" class="mt-1" />
                 </td>
-                <td><input v-model.number="item.unitPrice" class="ay-input h-9 min-h-0 py-1 text-right" type="number" min="0"></td>
-                <td><input v-model.number="item.quantity" class="ay-input h-9 min-h-0 py-1 text-center" type="number" min="1"></td>
+                <td><input v-model.number="item.unitPrice" class="input h-9 min-h-0 py-1 text-right" type="number" min="0"></td>
+                <td><input v-model.number="item.quantity" class="input h-9 min-h-0 py-1 text-center" type="number" min="1"></td>
                 <td class="text-right whitespace-nowrap">{{ money(item.unitPrice * item.quantity) }}</td>
                 <td>
                   <button type="button" class="text-danger" aria-label="Xóa hạng mục" @click="items.splice(index, 1)">×</button>
                 </td>
               </tr>
               <tr v-if="items.length === 0">
-                <td colspan="5" class="py-6 text-center ay-muted">Chưa có hạng mục nào</td>
+                <td colspan="5" class="py-6 text-center text-muted">Chưa có hạng mục nào</td>
               </tr>
             </tbody>
           </table>
         </div>
 
         <div class="mt-3">
-          <p class="ay-label">Thêm nhanh từ danh mục dịch vụ</p>
+          <p class="label">Thêm nhanh từ danh mục dịch vụ</p>
           <div class="flex flex-wrap gap-1.5">
             <button
               v-for="service in services ?? []" :key="service.id" type="button"
-              class="ay-btn ay-btn-secondary ay-btn-sm"
+              class="btn btn-secondary text-[12.5px]"
               @click="addServiceItem(service)"
             >
               + {{ i18n(service.name) }}
@@ -216,7 +216,7 @@ useHead({ title: 'Chẩn đoán & hạng mục — AOYAMA Admin' });
         </div>
       </section>
 
-      <section class="ay-card">
+      <section class="card">
         <h2 class="mb-3 font-heading text-[16px]">Phụ tùng</h2>
         <AyPartPicker :store-id="workOrder.storeId" @select="addPart" />
 
@@ -224,12 +224,12 @@ useHead({ title: 'Chẩn đoán & hạng mục — AOYAMA Admin' });
           <li v-for="(part, index) in parts" :key="index" class="flex items-center gap-2 text-[13.5px]">
             <span class="min-w-0 flex-1">
               <span class="block truncate font-semibold">{{ part.partName }}</span>
-              <span class="block text-[11.5px] ay-muted">
+              <span class="block text-[11.5px] text-muted">
                 {{ part.partCode }} · {{ money(part.unitPrice) }}
                 <template v-if="part.available !== undefined"> · tồn {{ part.available }}</template>
               </span>
             </span>
-            <input v-model.number="part.quantity" class="ay-input h-9 min-h-0 w-16 py-1 text-center" type="number" min="1">
+            <input v-model.number="part.quantity" class="input h-9 min-h-0 w-16 py-1 text-center" type="number" min="1">
             <button type="button" class="text-danger" aria-label="Xóa phụ tùng" @click="parts.splice(index, 1)">×</button>
           </li>
         </ul>
@@ -240,11 +240,11 @@ useHead({ title: 'Chẩn đoán & hạng mục — AOYAMA Admin' });
       </section>
     </div>
 
-    <section class="ay-card flex flex-wrap items-center justify-between gap-3">
+    <section class="card flex flex-wrap items-center justify-between gap-3">
       <dl class="flex gap-6 text-[14px]">
-        <div><dt class="ay-muted">Tiền công</dt><dd class="font-heading text-[17px]">{{ money(laborTotal) }}</dd></div>
-        <div><dt class="ay-muted">Tiền phụ tùng</dt><dd class="font-heading text-[17px]">{{ money(partsTotal) }}</dd></div>
-        <div><dt class="ay-muted">Tạm tính</dt><dd class="font-heading text-[17px]">{{ money(laborTotal + partsTotal) }}</dd></div>
+        <div><dt class="text-muted">Tiền công</dt><dd class="font-heading text-[17px]">{{ money(laborTotal) }}</dd></div>
+        <div><dt class="text-muted">Tiền phụ tùng</dt><dd class="font-heading text-[17px]">{{ money(partsTotal) }}</dd></div>
+        <div><dt class="text-muted">Tạm tính</dt><dd class="font-heading text-[17px]">{{ money(laborTotal + partsTotal) }}</dd></div>
       </dl>
 
       <div class="flex gap-2">

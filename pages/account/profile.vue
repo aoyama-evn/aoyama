@@ -49,34 +49,34 @@ useHead({ title: 'Hồ sơ cá nhân' });
     <AyPageHeader code="SC-33" title="Hồ sơ cá nhân" />
     <AccountNav />
 
-    <form class="ay-card grid max-w-2xl gap-3 sm:grid-cols-2" @submit.prevent="save">
+    <form class="card grid max-w-2xl gap-3 sm:grid-cols-2" @submit.prevent="save">
       <AyField label="Số điện thoại" hint="Đây là tên đăng nhập, không đổi trực tuyến được">
         <template #default="{ id }">
-          <input :id="id" class="ay-input bg-neutral-200" type="tel" :value="profile?.phone" disabled>
+          <input :id="id" class="input bg-neutral-200" type="tel" :value="profile?.phone" disabled>
         </template>
       </AyField>
 
       <AyField label="Họ tên" required>
         <template #default="{ id }">
-          <input :id="id" v-model="form.name" class="ay-input" type="text" required>
+          <input :id="id" v-model="form.name" class="input" type="text" required>
         </template>
       </AyField>
 
       <AyField label="Họ tên (kana)" hint="フリガナ">
         <template #default="{ id }">
-          <input :id="id" v-model="form.nameKana" class="ay-input" type="text">
+          <input :id="id" v-model="form.nameKana" class="input" type="text">
         </template>
       </AyField>
 
       <AyField label="Email">
         <template #default="{ id }">
-          <input :id="id" v-model="form.email" class="ay-input" type="email">
+          <input :id="id" v-model="form.email" class="input" type="email">
         </template>
       </AyField>
 
       <AyField label="Địa chỉ" class="sm:col-span-2">
         <template #default="{ id }">
-          <input :id="id" v-model="form.address" class="ay-input" type="text">
+          <input :id="id" v-model="form.address" class="input" type="text">
         </template>
       </AyField>
 

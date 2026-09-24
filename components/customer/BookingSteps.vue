@@ -1,47 +1,60 @@
 <script setup lang="ts">
 /**
- * Thanh buoc cua luong dat lich SC-12 → SC-16.
- * RK-05 — luong toi da 3 buoc nhap lieu roi den xac nhan, chu so va nhan lon
- * de nguoi lon tuoi theo doi duoc dang o dau.
+ * Thanh buoc cua luong dat lich SC-12 → SC-15.
+ * Ban thiet ke dung ba vong tron 20px noi bang duong ke 1.5px: buoc da qua hien
+ * dau tick tren nen accent-300, buoc dang lam to dam mau accent.
  */
-defineProps<{ current: 1 | 2 | 3 | 4 }>();
+const props = defineProps<{ current: 1 | 2 | 3 }>();
 
 const STEPS = [
-  { index: 1, label: 'Dịch vụ & cửa hàng', to: '/booking/step1' },
-  { index: 2, label: 'Ngày & giờ', to: '/booking/step2' },
-  { index: 3, label: 'Thông tin xe', to: '/booking/step3' },
-  { index: 4, label: 'Xác nhận', to: '/booking/confirm' },
-];
+  { index: 1, label: 'Dịch vụ' },
+  { index: 2, label: 'Thời gian' },
+  { index: 3, label: 'Thông tin' },
+] as const;
+
+function state(index: number): 'done' | 'current' | 'todo' {
+  if (index < props.current) return 'done';
+  return index === props.current ? 'current' : 'todo';
+}
 </script>
 
 <template>
-  <ol class="flex items-center gap-1 overflow-x-auto pb-1" aria-label="Các bước đặt lịch">
-    <li v-for="step in STEPS" :key="step.index" class="flex flex-none items-center gap-1">
-      <span
-        class="flex items-center gap-2 rounded-full px-3 py-1.5 text-[13px]"
-        :class="
-          step.index === current
-            ? 'bg-accent text-white font-semibold'
-            : step.index < current
-              ? 'bg-accent-200 text-accent-800'
-              : 'bg-neutral-200 ay-muted'
+  <ol class="flex items-center gap-1.5 text-[11.5px]" aria-label="Các bước đặt lịch">
+    <template v-for="(step, i) in STEPS" :key="step.index">
+      <li
+        class="flex items-center gap-1.5"
+        :style="
+          state(step.index) === 'current'
+            ? 'color: var(--color-accent-700); font-weight: 700'
+            : 'color: var(--color-neutral-600)'
         "
-        :aria-current="step.index === current ? 'step' : undefined"
+        :aria-current="state(step.index) === 'current' ? 'step' : undefined"
       >
         <span
-          class="grid h-5 w-5 place-items-center rounded-full text-[11px]"
-          :class="step.index === current ? 'bg-white/25' : 'bg-white/60'"
+          class="grid place-items-center rounded-full text-[11px]"
+          style="width: 20px; height: 20px"
+          :style="
+            state(step.index) === 'done'
+              ? 'background: var(--color-accent-300)'
+              : state(step.index) === 'current'
+                ? 'background: var(--color-accent); color: var(--color-bg)'
+                : 'border: 1.5px solid var(--color-divider)'
+          "
         >
-          <template v-if="step.index < current">✓</template>
-          <template v-else>{{ step.index }}</template>
+          {{ state(step.index) === 'done' ? '✓' : step.index }}
         </span>
         {{ step.label }}
-      </span>
-      <span
-        v-if="step.index < STEPS.length"
-        class="h-0.5 w-4 bg-neutral-300"
+      </li>
+      <li
+        v-if="i < STEPS.length - 1"
+        class="h-[1.5px] flex-1"
+        :style="
+          step.index < current
+            ? 'background: var(--color-accent-300)'
+            : 'background: var(--color-divider)'
+        "
         aria-hidden="true"
       />
-    </li>
+    </template>
   </ol>
 </template>

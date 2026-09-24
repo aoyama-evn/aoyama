@@ -109,11 +109,11 @@ useHead({ title: isNew ? 'Thêm tài khoản' : 'Sửa tài khoản' });
       back-to="/admin/users"
     />
 
-    <section class="ay-card grid gap-3 sm:grid-cols-2">
+    <section class="card grid gap-3 sm:grid-cols-2">
       <AyField label="Tên đăng nhập" :required="isNew" hint="Không đổi được sau khi tạo">
         <template #default="{ id: fid }">
           <input
-            :id="fid" v-model="form.username" class="ay-input font-mono" type="text"
+            :id="fid" v-model="form.username" class="input font-mono" type="text"
             :disabled="!isNew" :class="!isNew ? 'bg-neutral-200' : ''"
           >
         </template>
@@ -121,31 +121,31 @@ useHead({ title: isNew ? 'Thêm tài khoản' : 'Sửa tài khoản' });
 
       <AyField v-if="isNew" label="Mật khẩu" required hint="Tối thiểu 8 ký tự">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.password" class="ay-input" type="password" autocomplete="new-password">
+          <input :id="fid" v-model="form.password" class="input" type="password" autocomplete="new-password">
         </template>
       </AyField>
 
       <AyField label="Họ tên" required>
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.fullName" class="ay-input" type="text">
+          <input :id="fid" v-model="form.fullName" class="input" type="text">
         </template>
       </AyField>
 
       <AyField label="Email">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.email" class="ay-input" type="email">
+          <input :id="fid" v-model="form.email" class="input" type="email">
         </template>
       </AyField>
 
       <AyField label="Điện thoại">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.phone" class="ay-input" type="tel">
+          <input :id="fid" v-model="form.phone" class="input" type="tel">
         </template>
       </AyField>
 
       <AyField label="Vai trò" required hint="Quản trị được vào cấu hình, nhật ký và quản lý tài khoản">
         <template #default="{ id: fid }">
-          <select :id="fid" v-model="form.role" class="ay-input">
+          <select :id="fid" v-model="form.role" class="input">
             <option :value="AdminRole.STAFF">Nhân viên</option>
             <option :value="AdminRole.ADMIN">Quản trị</option>
           </select>
@@ -154,7 +154,7 @@ useHead({ title: isNew ? 'Thêm tài khoản' : 'Sửa tài khoản' });
 
       <AyField label="Cửa hàng phụ trách" hint="Bỏ trống = làm việc với mọi cửa hàng">
         <template #default="{ id: fid }">
-          <select :id="fid" v-model="form.storeId" class="ay-input">
+          <select :id="fid" v-model="form.storeId" class="input">
             <option value="">Mọi cửa hàng</option>
             <option v-for="store in stores ?? []" :key="store.id" :value="store.id">
               {{ i18n(store.name) }}
@@ -165,7 +165,7 @@ useHead({ title: isNew ? 'Thêm tài khoản' : 'Sửa tài khoản' });
 
       <AyField label="Ngôn ngữ giao diện">
         <template #default="{ id: fid }">
-          <select :id="fid" v-model="form.language" class="ay-input">
+          <select :id="fid" v-model="form.language" class="input">
             <option value="ja">日本語</option>
             <option value="en">English</option>
             <option value="vi">Tiếng Việt</option>
@@ -181,14 +181,14 @@ useHead({ title: isNew ? 'Thêm tài khoản' : 'Sửa tài khoản' });
       <AyButton to="/admin/users" variant="secondary">Hủy</AyButton>
     </div>
 
-    <section v-if="!isNew" class="ay-card">
+    <section v-if="!isNew" class="card">
       <h2 class="mb-2 font-heading text-[16px]">Đặt lại mật khẩu</h2>
-      <p class="mb-2 text-[12.5px] ay-muted">
+      <p class="mb-2 text-[12.5px] text-muted">
         Người dùng sẽ bị buộc đổi mật khẩu ở lần đăng nhập kế tiếp, và mọi phiên đang mở bị thu hồi.
       </p>
       <div class="flex flex-wrap gap-2">
         <input
-          v-model="resetPassword" class="ay-input max-w-xs flex-1" type="password"
+          v-model="resetPassword" class="input max-w-xs flex-1" type="password"
           placeholder="Mật khẩu mới" autocomplete="new-password" aria-label="Mật khẩu mới"
         >
         <AyButton variant="secondary" :loading="resetting" @click="doResetPassword">Đặt lại</AyButton>

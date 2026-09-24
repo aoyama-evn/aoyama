@@ -78,7 +78,7 @@ useHead({ title: 'Trợ lý AOYAMA — chẩn đoán xe' });
     </AyPageHeader>
 
     <!-- Chon y dinh truoc, giup goi y sat hon -->
-    <div v-if="!session" class="ay-card flex flex-col gap-3">
+    <div v-if="!session" class="card flex flex-col gap-3">
       <p class="text-[14px]">Bạn cần hỗ trợ gì cho xe của mình?</p>
       <div class="flex gap-2">
         <AyButton
@@ -94,7 +94,7 @@ useHead({ title: 'Trợ lý AOYAMA — chẩn đoán xe' });
           Sửa chữa
         </AyButton>
       </div>
-      <p class="text-[12.5px] ay-muted">
+      <p class="text-[12.5px] text-muted">
         Chọn xong, hãy mô tả triệu chứng ở ô bên dưới. Ví dụ: “xe kêu lạ khi phanh gấp”.
       </p>
     </div>
@@ -116,7 +116,7 @@ useHead({ title: 'Trợ lý AOYAMA — chẩn đoán xe' });
         </div>
       </template>
 
-      <div v-if="sending" class="self-start rounded-2xl bg-surface px-4 py-2.5 text-[13.5px] ay-muted">
+      <div v-if="sending" class="self-start rounded-2xl bg-surface px-4 py-2.5 text-[13.5px] text-muted">
         Đang phân tích… (tối đa 10 giây)
       </div>
     </div>
@@ -124,7 +124,7 @@ useHead({ title: 'Trợ lý AOYAMA — chẩn đoán xe' });
     <!-- SC-11 Ket qua chan doan -->
     <section v-if="hasFindings" class="flex flex-col gap-3">
       <h2 class="font-heading text-[17px]">Kết quả chẩn đoán</h2>
-      <p class="text-[12.5px] ay-muted">
+      <p class="text-[12.5px] text-muted">
         Đây là gợi ý của trợ lý AI dựa trên mô tả của bạn, không phải kết luận. Kỹ thuật viên sẽ
         kiểm tra thực tế trước khi báo giá.
       </p>
@@ -135,9 +135,9 @@ useHead({ title: 'Trợ lý AOYAMA — chẩn đoán xe' });
       />
     </section>
 
-    <div v-else-if="analysisFailed" class="ay-card flex flex-col gap-2">
+    <div v-else-if="analysisFailed" class="card flex flex-col gap-2">
       <p class="text-[14px] font-semibold">Chưa đủ thông tin để chẩn đoán</p>
-      <p class="text-[13px] ay-muted">
+      <p class="text-[13px] text-muted">
         Bạn có thể mô tả thêm, hoặc đặt lịch để kỹ thuật viên kiểm tra trực tiếp — cách này luôn
         chính xác nhất.
       </p>
@@ -147,13 +147,13 @@ useHead({ title: 'Trợ lý AOYAMA — chẩn đoán xe' });
     </div>
 
     <!-- O soan -->
-    <div class="ay-card flex flex-col gap-2">
+    <div class="card flex flex-col gap-2">
       <AyImageUpload v-model="images" :max="3" label="Gửi kèm ảnh (không bắt buộc)" />
       <AyVoiceRecorder @recorded="transcript = 'Ghi âm đã gửi kèm'" />
 
       <div class="flex gap-2">
         <textarea
-          v-model="text" class="ay-input min-h-[52px] flex-1"
+          v-model="text" class="input min-h-[52px] flex-1"
           placeholder="Mô tả tình trạng xe của bạn…"
           @keydown.enter.exact.prevent="send"
         />
@@ -163,7 +163,7 @@ useHead({ title: 'Trợ lý AOYAMA — chẩn đoán xe' });
       </div>
     </div>
 
-    <p class="text-center text-[12.5px] ay-muted">
+    <p class="text-center text-[12.5px] text-muted">
       Ảnh và ghi âm chỉ dùng cho phiên chẩn đoán này và được xóa sau thời hạn lưu trữ.
       Xem <NuxtLink to="/privacy" class="underline">Chính sách dữ liệu</NuxtLink>.
     </p>

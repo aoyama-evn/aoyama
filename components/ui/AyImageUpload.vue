@@ -53,7 +53,7 @@ function remove(index: number): void {
 
 <template>
   <div class="flex flex-col gap-2">
-    <span v-if="label" class="ay-label">{{ label }}</span>
+    <span v-if="label" class="label">{{ label }}</span>
 
     <div
       class="rounded-2xl border-2 border-dashed px-4 py-6 text-center transition-colors"
@@ -62,13 +62,13 @@ function remove(index: number): void {
       @dragleave.prevent="dragging = false"
       @drop.prevent="dragging = false; handleFiles($event.dataTransfer?.files ?? null)"
     >
-      <p class="text-[13.5px] ay-muted">Kéo thả ảnh vào đây hoặc</p>
-      <label class="ay-btn ay-btn-secondary ay-btn-sm mt-2 cursor-pointer">
+      <p class="text-[13.5px] text-muted">Kéo thả ảnh vào đây hoặc</p>
+      <label class="btn btn-secondary text-[12.5px] mt-2 cursor-pointer">
         Chọn ảnh
         <input type="file" class="sr-only" multiple :accept="ACCEPT.join(',')"
           @change="handleFiles(($event.target as HTMLInputElement).files)">
       </label>
-      <p class="mt-2 text-[11.5px] ay-muted">
+      <p class="mt-2 text-[11.5px] text-muted">
         Tối đa {{ max }} ảnh, mỗi ảnh dưới {{ maxSizeMb }} MB
       </p>
     </div>

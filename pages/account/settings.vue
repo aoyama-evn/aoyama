@@ -49,14 +49,14 @@ useHead({ title: 'Cài đặt thông báo & ngôn ngữ' });
     <AyPageHeader code="SC-34" title="Cài đặt thông báo &amp; ngôn ngữ" />
     <AccountNav />
 
-    <form class="ay-card flex max-w-2xl flex-col gap-4" @submit.prevent="save">
+    <form class="card flex max-w-2xl flex-col gap-4" @submit.prevent="save">
       <fieldset class="flex flex-col gap-2">
-        <legend class="ay-label">Kênh nhận thông báo</legend>
+        <legend class="label">Kênh nhận thông báo</legend>
         <label class="flex items-start gap-2.5 text-[14px]">
           <input v-model="form.notifySms" type="checkbox" class="mt-1 h-4 w-4 accent-[var(--color-accent)]">
           <span>
             <strong>SMS</strong>
-            <span class="block text-[12.5px] ay-muted">
+            <span class="block text-[12.5px] text-muted">
               Xác nhận lịch hẹn, nhắc lịch, báo xe đã sửa xong. Nên bật để không bỏ lỡ.
             </span>
           </span>
@@ -65,14 +65,14 @@ useHead({ title: 'Cài đặt thông báo & ngôn ngữ' });
           <input v-model="form.notifyEmail" type="checkbox" class="mt-1 h-4 w-4 accent-[var(--color-accent)]">
           <span>
             <strong>Email</strong>
-            <span class="block text-[12.5px] ay-muted">Cần có email trong hồ sơ cá nhân.</span>
+            <span class="block text-[12.5px] text-muted">Cần có email trong hồ sơ cá nhân.</span>
           </span>
         </label>
       </fieldset>
 
       <AyField label="Ngôn ngữ hiển thị">
         <template #default="{ id }">
-          <select :id="id" v-model="form.language" class="ay-input">
+          <select :id="id" v-model="form.language" class="input">
             <option v-for="lang in LANGS" :key="lang.code" :value="lang.code">{{ lang.label }}</option>
           </select>
         </template>

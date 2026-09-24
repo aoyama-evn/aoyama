@@ -30,11 +30,11 @@ useHead({ title: 'Đăng nhập — AOYAMA Service' });
 </script>
 
 <template>
-  <div class="ay-card flex flex-col gap-4">
+  <div class="card flex flex-col gap-4">
     <div>
-      <p class="ay-kicker">SC-18</p>
+      <p class="card-kicker">SC-18</p>
       <h1 class="font-heading text-[20px]">Đăng nhập</h1>
-      <p class="mt-1 text-[13.5px] ay-muted">
+      <p class="mt-1 text-[13.5px] text-muted">
         Nhập số điện thoại, chúng tôi gửi mã xác thực qua SMS. Không cần nhớ mật khẩu.
       </p>
     </div>
@@ -43,7 +43,7 @@ useHead({ title: 'Đăng nhập — AOYAMA Service' });
       <AyField label="Số điện thoại" required>
         <template #default="{ id }">
           <input
-            :id="id" v-model="phone" class="ay-input" type="tel"
+            :id="id" v-model="phone" class="input" type="tel"
             placeholder="090-1234-5678" autocomplete="tel" required
           >
         </template>
@@ -56,11 +56,11 @@ useHead({ title: 'Đăng nhập — AOYAMA Service' });
       </AyButton>
     </form>
 
-    <p class="text-center text-[13px] ay-muted">
+    <p class="text-center text-[13px] text-muted">
       Chưa có tài khoản?
       <NuxtLink to="/register" class="underline">Đăng ký</NuxtLink>
     </p>
-    <p class="text-center text-[13px] ay-muted">
+    <p class="text-center text-[13px] text-muted">
       Chỉ muốn tra cứu một lịch hẹn?
       <NuxtLink to="/booking/lookup" class="underline">Tra cứu bằng mã</NuxtLink>
     </p>

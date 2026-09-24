@@ -67,7 +67,7 @@ useHead({ title: 'Đổi lịch hẹn — AOYAMA Admin' });
 
     <AyField label="Lý do đổi lịch" hint="Ghi vào nhật ký thay đổi của lịch hẹn">
       <template #default="{ id: fieldId }">
-        <input :id="fieldId" v-model="reason" class="ay-input" type="text">
+        <input :id="fieldId" v-model="reason" class="input" type="text">
       </template>
     </AyField>
 

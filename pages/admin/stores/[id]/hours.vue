@@ -101,7 +101,7 @@ useHead({ title: 'Giờ làm việc — AOYAMA Admin' });
       </template>
     </AyPageHeader>
 
-    <section class="ay-card">
+    <section class="card">
       <h2 class="mb-3 font-heading text-[16px]">Giờ làm việc theo thứ</h2>
 
       <ul class="flex flex-col gap-2">
@@ -115,12 +115,12 @@ useHead({ title: 'Giờ làm việc — AOYAMA Admin' });
 
           <template v-if="!hour.isClosed">
             <input
-              v-model="hour.openTime" class="ay-input h-10 min-h-0 w-auto py-1" type="time"
+              v-model="hour.openTime" class="input h-10 min-h-0 w-auto py-1" type="time"
               :aria-label="`Giờ mở cửa ${WEEKDAYS[hour.weekday]}`"
             >
-            <span class="ay-muted">–</span>
+            <span class="text-muted">–</span>
             <input
-              v-model="hour.closeTime" class="ay-input h-10 min-h-0 w-auto py-1" type="time"
+              v-model="hour.closeTime" class="input h-10 min-h-0 w-auto py-1" type="time"
               :aria-label="`Giờ đóng cửa ${WEEKDAYS[hour.weekday]}`"
             >
           </template>
@@ -130,18 +130,18 @@ useHead({ title: 'Giờ làm việc — AOYAMA Admin' });
       <AyButton class="mt-3" :loading="savingHours" @click="saveHours">Lưu giờ làm việc</AyButton>
     </section>
 
-    <section class="ay-card">
+    <section class="card">
       <h2 class="mb-3 font-heading text-[16px]">Ngày nghỉ</h2>
 
       <div class="flex flex-wrap items-end gap-2">
         <AyField label="Ngày">
           <template #default="{ id: fid }">
-            <input :id="fid" v-model="holidayDate" class="ay-input" type="date">
+            <input :id="fid" v-model="holidayDate" class="input" type="date">
           </template>
         </AyField>
         <AyField label="Lý do" class="min-w-[200px] flex-1">
           <template #default="{ id: fid }">
-            <input :id="fid" v-model="holidayReason" class="ay-input" type="text" placeholder="Nghỉ lễ, kiểm kê…">
+            <input :id="fid" v-model="holidayReason" class="input" type="text" placeholder="Nghỉ lễ, kiểm kê…">
           </template>
         </AyField>
         <AyButton :disabled="!holidayDate" @click="addHoliday">Thêm</AyButton>
@@ -159,7 +159,7 @@ useHead({ title: 'Giờ làm việc — AOYAMA Admin' });
           class="flex items-center gap-3 border-b border-divider pb-1.5 text-[13.5px] last:border-0"
         >
           <span class="font-heading">{{ holiday.date }}</span>
-          <span class="flex-1 ay-muted">{{ holiday.reason ?? '—' }}</span>
+          <span class="flex-1 text-muted">{{ holiday.reason ?? '—' }}</span>
           <button type="button" class="text-[12.5px] text-danger underline" @click="removeHoliday(holiday.id)">
             Xóa
           </button>

@@ -49,7 +49,7 @@ useHead({ title: 'Quét mã QR — AOYAMA Admin' });
 
     <AyLoading v-if="checking" label="Đang kiểm tra mã…" />
 
-    <section v-else-if="result" class="ay-card flex flex-col gap-3">
+    <section v-else-if="result" class="card flex flex-col gap-3">
       <div
         class="flex items-start gap-3 rounded-xl px-3 py-2.5"
         :class="result.valid ? 'bg-success-bg text-success' : 'bg-danger-bg text-danger'"
@@ -65,12 +65,12 @@ useHead({ title: 'Quét mã QR — AOYAMA Admin' });
 
       <template v-if="result.booking">
         <dl class="grid gap-2 text-[14px] sm:grid-cols-2">
-          <div><dt class="ay-muted">Mã lịch hẹn</dt><dd class="font-mono">{{ result.booking.code }}</dd></div>
-          <div><dt class="ay-muted">Thời gian hẹn</dt><dd>{{ dateTime(result.booking.scheduledAt) }}</dd></div>
-          <div><dt class="ay-muted">Khách hàng</dt><dd>{{ result.booking.contactName }} · {{ result.booking.contactPhone }}</dd></div>
-          <div><dt class="ay-muted">Cửa hàng</dt><dd>{{ i18n(result.booking.store?.name ?? null) }}</dd></div>
+          <div><dt class="text-muted">Mã lịch hẹn</dt><dd class="font-mono">{{ result.booking.code }}</dd></div>
+          <div><dt class="text-muted">Thời gian hẹn</dt><dd>{{ dateTime(result.booking.scheduledAt) }}</dd></div>
+          <div><dt class="text-muted">Khách hàng</dt><dd>{{ result.booking.contactName }} · {{ result.booking.contactPhone }}</dd></div>
+          <div><dt class="text-muted">Cửa hàng</dt><dd>{{ i18n(result.booking.store?.name ?? null) }}</dd></div>
           <div class="sm:col-span-2">
-            <dt class="ay-muted">Xe</dt>
+            <dt class="text-muted">Xe</dt>
             <dd>
               {{ result.booking.vehicle
                 ? `${result.booking.vehicle.plateNumber} · ${result.booking.vehicle.maker} ${result.booking.vehicle.model}`
@@ -78,7 +78,7 @@ useHead({ title: 'Quét mã QR — AOYAMA Admin' });
             </dd>
           </div>
           <div v-if="result.booking.symptomDescription" class="sm:col-span-2">
-            <dt class="ay-muted">Mô tả của khách</dt>
+            <dt class="text-muted">Mô tả của khách</dt>
             <dd class="whitespace-pre-line">{{ result.booking.symptomDescription }}</dd>
           </div>
         </dl>

@@ -41,14 +41,14 @@ useHead({ title: 'Lịch hẹn của tôi' });
     <div class="flex gap-2" role="tablist">
       <button
         type="button" role="tab" :aria-selected="tab === 'UPCOMING'"
-        class="ay-btn ay-btn-sm" :class="tab === 'UPCOMING' ? 'ay-btn-primary' : 'ay-btn-secondary'"
+        class="btn text-[12.5px]" :class="tab === 'UPCOMING' ? 'btn-primary' : 'btn-secondary'"
         @click="tab = 'UPCOMING'"
       >
         Sắp tới
       </button>
       <button
         type="button" role="tab" :aria-selected="tab === 'PAST'"
-        class="ay-btn ay-btn-sm" :class="tab === 'PAST' ? 'ay-btn-primary' : 'ay-btn-secondary'"
+        class="btn text-[12.5px]" :class="tab === 'PAST' ? 'btn-primary' : 'btn-secondary'"
         @click="tab = 'PAST'"
       >
         Đã qua
@@ -67,14 +67,14 @@ useHead({ title: 'Lịch hẹn của tôi' });
 
     <ul v-else class="flex flex-col gap-2.5">
       <li v-for="booking in visible" :key="booking.id">
-        <NuxtLink :to="`/bookings/${booking.code}`" class="ay-card flex flex-wrap items-center gap-3 transition-colors hover:bg-accent-100">
+        <NuxtLink :to="`/bookings/${booking.code}`" class="card flex flex-wrap items-center gap-3 transition-colors hover:bg-accent-100">
           <div class="min-w-0 flex-1">
             <p class="font-heading text-[16px]">{{ dateTime(booking.scheduledAt) }}</p>
-            <p class="truncate text-[13px] ay-muted">
+            <p class="truncate text-[13px] text-muted">
               {{ i18n(booking.store?.name ?? null) }}
               · {{ (booking.services ?? []).map((s) => s.serviceName).join(', ') || 'Chưa có dịch vụ' }}
             </p>
-            <p class="mt-0.5 font-mono text-[12px] ay-muted">{{ booking.code }}</p>
+            <p class="mt-0.5 font-mono text-[12px] text-muted">{{ booking.code }}</p>
           </div>
           <AyStatusTag :status="booking.status" />
         </NuxtLink>
@@ -83,7 +83,7 @@ useHead({ title: 'Lịch hẹn của tôi' });
 
     <div v-if="data?.meta && data.meta.totalPages > 1" class="flex justify-center gap-2">
       <AyButton variant="secondary" size="sm" :disabled="!data.meta.hasPrev" @click="page -= 1">Trước</AyButton>
-      <span class="self-center text-[13px] ay-muted">{{ data.meta.page }} / {{ data.meta.totalPages }}</span>
+      <span class="self-center text-[13px] text-muted">{{ data.meta.page }} / {{ data.meta.totalPages }}</span>
       <AyButton variant="secondary" size="sm" :disabled="!data.meta.hasNext" @click="page += 1">Sau</AyButton>
     </div>
   </div>

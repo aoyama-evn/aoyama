@@ -17,15 +17,15 @@ const { money } = useFormat();
 <template>
   <dl class="flex flex-col gap-1.5 text-[14px]">
     <div v-if="laborSubtotal !== undefined" class="flex justify-between">
-      <dt class="ay-muted">Tiền công</dt>
+      <dt class="text-muted">Tiền công</dt>
       <dd>{{ money(laborSubtotal) }}</dd>
     </div>
     <div v-if="partsSubtotal !== undefined" class="flex justify-between">
-      <dt class="ay-muted">Tiền phụ tùng</dt>
+      <dt class="text-muted">Tiền phụ tùng</dt>
       <dd>{{ money(partsSubtotal) }}</dd>
     </div>
     <div v-if="subtotal !== undefined" class="flex justify-between">
-      <dt class="ay-muted">Tạm tính</dt>
+      <dt class="text-muted">Tạm tính</dt>
       <dd>{{ money(subtotal) }}</dd>
     </div>
     <div v-if="discountAmount" class="flex justify-between text-success">
@@ -33,7 +33,7 @@ const { money } = useFormat();
       <dd>− {{ money(discountAmount) }}</dd>
     </div>
     <div v-if="taxAmount !== undefined" class="flex justify-between">
-      <dt class="ay-muted">Thuế{{ taxRate !== undefined ? ` (${taxRate}%)` : '' }}</dt>
+      <dt class="text-muted">Thuế{{ taxRate !== undefined ? ` (${taxRate}%)` : '' }}</dt>
       <dd>{{ money(taxAmount) }}</dd>
     </div>
 
@@ -43,7 +43,7 @@ const { money } = useFormat();
     </div>
 
     <div v-if="paidAmount !== undefined" class="flex justify-between text-[13px]">
-      <dt class="ay-muted">Đã thanh toán</dt>
+      <dt class="text-muted">Đã thanh toán</dt>
       <dd>
         {{ money(paidAmount) }}
         <span v-if="paidAmount < totalAmount" class="text-danger">

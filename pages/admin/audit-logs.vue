@@ -71,7 +71,7 @@ useHead({ title: 'Nhật ký thao tác — AOYAMA Admin' });
     >
       <AyField label="Đối tượng">
         <template #default="{ id }">
-          <select :id="id" v-model="filters.entity" class="ay-input">
+          <select :id="id" v-model="filters.entity" class="input">
             <option value="">Tất cả</option>
             <option v-for="entity in ENTITIES" :key="entity" :value="entity">{{ entity }}</option>
           </select>
@@ -79,17 +79,17 @@ useHead({ title: 'Nhật ký thao tác — AOYAMA Admin' });
       </AyField>
       <AyField label="Hành động">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.action" class="ay-input" type="search" placeholder="CREATE, UPDATE, CONFIRM…">
+          <input :id="id" v-model="filters.action" class="input" type="search" placeholder="CREATE, UPDATE, CONFIRM…">
         </template>
       </AyField>
       <AyField label="Từ ngày">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.from" class="ay-input" type="date">
+          <input :id="id" v-model="filters.from" class="input" type="date">
         </template>
       </AyField>
       <AyField label="Đến ngày">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.to" class="ay-input" type="date">
+          <input :id="id" v-model="filters.to" class="input" type="date">
         </template>
       </AyField>
     </AyFilterBar>
@@ -106,14 +106,14 @@ useHead({ title: 'Nhật ký thao tác — AOYAMA Admin' });
       <template #cell-createdAt="{ row }">{{ dateTime(row.createdAt as string) }}</template>
       <template #cell-actorName="{ row }">
         {{ row.actorName ?? '—' }}
-        <span class="block text-[11.5px] ay-muted">{{ row.actorType }}</span>
+        <span class="block text-[11.5px] text-muted">{{ row.actorType }}</span>
       </template>
       <template #cell-action="{ row }">
         <span class="font-mono text-[12.5px]">{{ row.action }}</span>
       </template>
       <template #cell-entity="{ row }">{{ row.entity }}</template>
       <template #cell-changes="{ row }">
-        <span class="line-clamp-1 font-mono text-[11.5px] ay-muted">
+        <span class="line-clamp-1 font-mono text-[11.5px] text-muted">
           {{ row.changes ? JSON.stringify(row.changes) : '—' }}
         </span>
       </template>
@@ -132,23 +132,23 @@ useHead({ title: 'Nhật ký thao tác — AOYAMA Admin' });
     >
       <dl v-if="detail" class="mt-3 flex flex-col gap-2 text-left text-[13.5px]">
         <div class="flex justify-between">
-          <dt class="ay-muted">Thời điểm</dt><dd>{{ dateTime(detail.createdAt) }}</dd>
+          <dt class="text-muted">Thời điểm</dt><dd>{{ dateTime(detail.createdAt) }}</dd>
         </div>
         <div class="flex justify-between">
-          <dt class="ay-muted">Người thực hiện</dt><dd>{{ detail.actorName ?? detail.actorType }}</dd>
+          <dt class="text-muted">Người thực hiện</dt><dd>{{ detail.actorName ?? detail.actorType }}</dd>
         </div>
         <div class="flex justify-between">
-          <dt class="ay-muted">Hành động</dt><dd class="font-mono">{{ detail.action }}</dd>
+          <dt class="text-muted">Hành động</dt><dd class="font-mono">{{ detail.action }}</dd>
         </div>
         <div class="flex justify-between">
-          <dt class="ay-muted">Đối tượng</dt><dd>{{ detail.entity }}</dd>
+          <dt class="text-muted">Đối tượng</dt><dd>{{ detail.entity }}</dd>
         </div>
         <div class="flex justify-between">
-          <dt class="ay-muted">Mã đối tượng</dt>
+          <dt class="text-muted">Mã đối tượng</dt>
           <dd class="font-mono text-[11.5px]">{{ detail.entityId ?? '—' }}</dd>
         </div>
         <div v-if="detail.changes">
-          <dt class="ay-muted">Thay đổi</dt>
+          <dt class="text-muted">Thay đổi</dt>
           <dd>
             <pre class="overflow-x-auto rounded-xl bg-neutral-100 p-2 font-mono text-[11.5px]">{{ JSON.stringify(detail.changes, null, 2) }}</pre>
           </dd>

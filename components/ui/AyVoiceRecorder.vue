@@ -79,7 +79,7 @@ const display = computed(() => {
     </AyButton>
 
     <template v-if="recording">
-      <span class="ay-tag bg-danger-bg text-danger">
+      <span class="tag bg-danger-bg text-danger">
         <span class="h-2 w-2 animate-pulse rounded-full bg-current" aria-hidden="true" />
         Đang ghi {{ display }} / 2:00
       </span>

@@ -103,7 +103,7 @@ useHead({ title: 'Mẫu thông báo — AOYAMA Admin' });
       </template>
     </AyPageHeader>
 
-    <section v-for="[event, list] in grouped" :key="event" class="ay-card">
+    <section v-for="[event, list] in grouped" :key="event" class="card">
       <h2 class="mb-2 font-heading text-[16px]">{{ EVENT_LABELS[event] ?? event }}</h2>
 
       <ul class="flex flex-col gap-1.5">
@@ -111,10 +111,10 @@ useHead({ title: 'Mẫu thông báo — AOYAMA Admin' });
           v-for="template in list" :key="template.id"
           class="flex flex-wrap items-center gap-3 border-b border-divider pb-1.5 text-[13.5px] last:border-0"
         >
-          <span class="ay-tag bg-neutral-200 text-neutral-700">{{ template.channel }}</span>
+          <span class="tag bg-neutral-200 text-neutral-700">{{ template.channel }}</span>
           <span class="w-20">{{ LANG_LABELS[template.language] }}</span>
-          <span class="min-w-0 flex-1 truncate ay-muted">{{ template.body }}</span>
-          <span v-if="!template.isActive" class="ay-tag bg-danger-bg text-danger">tắt</span>
+          <span class="min-w-0 flex-1 truncate text-muted">{{ template.body }}</span>
+          <span v-if="!template.isActive" class="tag bg-danger-bg text-danger">tắt</span>
           <button type="button" class="text-[12.5px] underline" @click="startEdit(template)">Sửa</button>
         </li>
       </ul>
@@ -129,14 +129,14 @@ useHead({ title: 'Mẫu thông báo — AOYAMA Admin' });
       @cancel="editing = null"
     >
       <div v-if="editing" class="mt-3 flex flex-col gap-3 text-left">
-        <p class="text-[12.5px] ay-muted">
+        <p class="text-[12.5px] text-muted">
           {{ EVENT_LABELS[editing.event] ?? editing.event }} · {{ editing.channel }} ·
           {{ LANG_LABELS[editing.language] }}
         </p>
 
         <AyField v-if="editing.channel === 'EMAIL'" label="Tiêu đề">
           <template #default="{ id: fid }">
-            <input :id="fid" v-model="draft.subject" class="ay-input" type="text">
+            <input :id="fid" v-model="draft.subject" class="input" type="text">
           </template>
         </AyField>
 
@@ -145,7 +145,7 @@ useHead({ title: 'Mẫu thông báo — AOYAMA Admin' });
           :hint="editing.channel === 'SMS' ? `${smsLength} ký tự — tin nhắn dài làm tăng chi phí` : undefined"
         >
           <template #default="{ id: fid }">
-            <textarea :id="fid" v-model="draft.body" class="ay-input min-h-[120px]" />
+            <textarea :id="fid" v-model="draft.body" class="input min-h-[120px]" />
           </template>
         </AyField>
 
@@ -154,7 +154,7 @@ useHead({ title: 'Mẫu thông báo — AOYAMA Admin' });
           <ul class="flex flex-wrap gap-1">
             <li
               v-for="variable in editing.availableVariables" :key="variable"
-              class="ay-tag cursor-pointer bg-neutral-200 text-neutral-700"
+              class="tag cursor-pointer bg-neutral-200 text-neutral-700"
               @click="insertVariable(variable)"
             >
               {{ braced(variable) }}

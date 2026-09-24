@@ -4,50 +4,85 @@ import type { Booking } from '~/types/models';
 /** SC-16 Dat lich — hoan tat. FR-BOOK-10, FR-BOOK-11. */
 const route = useRoute();
 const api = useApi();
-const { i18n, dateTime } = useFormat();
+const ui = useUiStore();
+const { i18n, date: fmtDate, clock } = useFormat();
 
 const code = route.query.code as string | undefined;
-const { data: booking } = await useAsyncData(
-  `booking-done-${code}`,
-  () => (code ? api.get<Booking>(`/bookings/${code}`) : Promise.resolve(null)),
+const { data: booking } = await useAsyncData(`booking-done-${code}`, () =>
+  code ? api.get<Booking>(`/bookings/${code}`) : Promise.resolve(null),
 );
+
+async function copyCode(): Promise<void> {
+  const value = booking.value?.code ?? code ?? '';
+  try {
+    await navigator.clipboard.writeText(value);
+    ui.success('Đã sao chép mã lịch hẹn');
+  } catch {
+    ui.warning('Trình duyệt không cho sao chép', `Mã của bạn là ${value}`);
+  }
+}
 
 useHead({ title: 'Đã nhận yêu cầu đặt lịch' });
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-xl flex-col gap-5">
-    <div class="ay-card flex flex-col items-center gap-3 text-center">
-      <span class="grid h-14 w-14 place-items-center rounded-full bg-success-bg text-[26px] text-success" aria-hidden="true">✓</span>
-      <h1 class="font-heading text-[21px]">Đã nhận yêu cầu đặt lịch</h1>
-      <p class="max-w-prose text-[14px] ay-muted">
-        Cửa hàng sẽ xác nhận và gửi mã QR cho bạn qua SMS. Hãy lưu lại mã lịch hẹn bên dưới.
-      </p>
+  <div class="flex flex-col items-center gap-4 px-1 pb-4 pt-6 text-center">
+    <span
+      class="grid place-items-center rounded-full text-white"
+      style="width: 64px; height: 64px; background: var(--color-accent-2-500)"
+      aria-hidden="true"
+    >
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round">
+        <path d="M4 12.5 9.5 18 20 6.5" />
+      </svg>
+    </span>
 
-      <div class="my-1 rounded-2xl bg-accent-100 px-6 py-4">
-        <p class="text-[12.5px] ay-muted">Mã lịch hẹn</p>
-        <p class="select-all font-heading text-[26px] tracking-widest text-accent-800">
-          {{ booking?.code ?? code }}
-        </p>
+    <div>
+      <h3>Đặt lịch thành công</h3>
+      <p class="mt-1 text-[12.5px] text-muted">Booking received</p>
+    </div>
+
+    <div class="w-full px-5 py-4" style="background: var(--color-surface); border-radius: 24px">
+      <div class="mb-1 text-[11px] text-muted">Mã lịch hẹn · Booking code</div>
+      <div class="font-heading text-[25px]" style="letter-spacing: 0.02em">
+        {{ booking?.code ?? code }}
       </div>
+      <button type="button" class="btn btn-ghost mt-1 text-[12px]" @click="copyCode">
+        Sao chép mã
+      </button>
     </div>
 
-    <section v-if="booking" class="ay-card flex flex-col gap-2">
-      <h2 class="font-heading text-[16px]">Chi tiết</h2>
-      <dl class="flex flex-col gap-2 text-[14px]">
-        <div class="flex gap-3"><dt class="w-28 flex-none ay-muted">Cửa hàng</dt><dd>{{ i18n(booking.store?.name ?? null) }}</dd></div>
-        <div class="flex gap-3"><dt class="w-28 flex-none ay-muted">Thời gian</dt><dd class="font-semibold">{{ dateTime(booking.scheduledAt) }}</dd></div>
-        <div class="flex gap-3"><dt class="w-28 flex-none ay-muted">Trạng thái</dt><dd><AyStatusTag :status="booking.status" /></dd></div>
-      </dl>
-    </section>
+    <dl v-if="booking" class="flex w-full flex-col gap-2 text-left text-[13.5px]">
+      <div class="flex gap-2.5">
+        <dt class="w-[78px] flex-none text-[12px] text-muted">Thời gian</dt>
+        <dd>
+          {{ fmtDate(booking.scheduledAt, 'yyyy/MM/dd (EEE)') }} ·
+          {{ clock(booking.slotStartTime) }}–{{ clock(booking.slotEndTime) }}
+        </dd>
+      </div>
+      <div class="flex gap-2.5">
+        <dt class="w-[78px] flex-none text-[12px] text-muted">Cửa hàng</dt>
+        <dd>{{ i18n(booking.store?.name ?? null) }}</dd>
+      </div>
+      <div class="flex gap-2.5">
+        <dt class="w-[78px] flex-none text-[12px] text-muted">Dịch vụ</dt>
+        <dd>{{ (booking.services ?? []).map((s) => s.serviceName).join(', ') }}</dd>
+      </div>
+    </dl>
 
-    <div class="flex flex-col gap-2 sm:flex-row">
-      <AyButton :to="`/bookings/${booking?.code ?? code}`" class="sm:flex-1">Xem lịch hẹn &amp; mã QR</AyButton>
-      <AyButton to="/" variant="secondary" class="sm:flex-1">Về trang chủ</AyButton>
-    </div>
-
-    <p class="text-center text-[12.5px] ay-muted">
-      Chưa nhận được SMS? Bạn vẫn tra cứu được lịch hẹn bằng mã ở trên và số điện thoại đã đăng ký.
+    <p
+      class="w-full px-3.5 py-3 text-left text-[12.5px] leading-relaxed"
+      style="background: var(--color-accent-100); border-radius: 20px"
+    >
+      Cửa hàng sẽ xác nhận và <strong>gửi mã QR</strong> cho bạn sớm nhất có thể — hãy ghi lại mã
+      lịch hẹn để tra cứu.
     </p>
+
+    <NuxtLink :to="`/bookings/${booking?.code ?? code}`" class="btn btn-primary btn-cta">
+      Xem chi tiết lịch hẹn
+    </NuxtLink>
+    <NuxtLink to="/" class="btn btn-secondary btn-block" style="min-height: 44px">
+      Về trang chủ
+    </NuxtLink>
   </div>
 </template>

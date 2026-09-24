@@ -83,7 +83,7 @@ useHead({ title: 'Tồn kho — AOYAMA Admin' });
     >
       <AyField label="Từ khóa" class="min-w-[220px] flex-1">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.keyword" class="ay-input" type="search" placeholder="Mã hoặc tên phụ tùng">
+          <input :id="id" v-model="filters.keyword" class="input" type="search" placeholder="Mã hoặc tên phụ tùng">
         </template>
       </AyField>
       <label class="flex items-center gap-2 self-end pb-2.5 text-[13.5px]">
@@ -103,7 +103,7 @@ useHead({ title: 'Tồn kho — AOYAMA Admin' });
     >
       <template #cell-part="{ row }">
         <span class="font-semibold">{{ i18n((row as unknown as Inventory).part?.name ?? null) }}</span>
-        <span class="block font-mono text-[11.5px] ay-muted">{{ (row as unknown as Inventory).part?.code }}</span>
+        <span class="block font-mono text-[11.5px] text-muted">{{ (row as unknown as Inventory).part?.code }}</span>
       </template>
       <template #cell-store="{ row }">
         {{ i18n((row as unknown as Inventory).store?.name ?? null) }}
@@ -137,7 +137,7 @@ useHead({ title: 'Tồn kho — AOYAMA Admin' });
     >
       <AyField label="Ngưỡng cảnh báo" class="mt-3">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model.number="minQuantity" class="ay-input" type="number" min="0">
+          <input :id="fid" v-model.number="minQuantity" class="input" type="number" min="0">
         </template>
       </AyField>
     </AyConfirmDialog>

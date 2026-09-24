@@ -32,14 +32,14 @@ watch(() => props.open, (open) => { if (open) typed.value = ''; });
       aria-modal="true"
       @click.self="emit('cancel')"
     >
-      <div class="ay-card w-full max-w-md">
+      <div class="card w-full max-w-md">
         <h3 class="font-heading text-[17px]">{{ title }}</h3>
-        <p v-if="message" class="mt-2 text-[14px] ay-muted">{{ message }}</p>
+        <p v-if="message" class="mt-2 text-[14px] text-muted">{{ message }}</p>
         <slot />
 
         <div v-if="confirmPhrase" class="mt-3">
-          <label class="ay-label">Gõ <strong>{{ confirmPhrase }}</strong> để xác nhận</label>
-          <input v-model="typed" class="ay-input" type="text">
+          <label class="label">Gõ <strong>{{ confirmPhrase }}</strong> để xác nhận</label>
+          <input v-model="typed" class="input" type="text">
         </div>
 
         <div class="mt-5 flex justify-end gap-2">

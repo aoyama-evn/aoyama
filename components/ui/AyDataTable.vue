@@ -80,8 +80,8 @@ watch(
 
 <template>
   <div class="flex flex-col gap-3">
-    <div class="ay-table-wrap">
-      <table class="ay-table">
+    <div class="table-wrap">
+      <table class="table">
         <thead>
           <tr>
             <th v-if="selectable" scope="col" class="w-10">
@@ -118,7 +118,7 @@ watch(
 
         <tbody>
           <tr v-if="loading">
-            <td :colspan="columns.length + (selectable ? 1 : 0)" class="py-10 text-center ay-muted">
+            <td :colspan="columns.length + (selectable ? 1 : 0)" class="py-10 text-center text-muted">
               Đang tải dữ liệu…
             </td>
           </tr>
@@ -165,7 +165,7 @@ watch(
       v-if="meta && meta.totalPages > 1"
       class="flex flex-wrap items-center justify-between gap-3 text-[13px]"
     >
-      <p class="ay-muted">
+      <p class="text-muted">
         {{ (meta.page - 1) * meta.limit + 1 }}–{{ Math.min(meta.page * meta.limit, meta.total) }}
         / {{ meta.total.toLocaleString('ja-JP') }}
       </p>
@@ -173,7 +173,7 @@ watch(
       <nav class="flex items-center gap-1" aria-label="Phân trang">
         <button
           type="button"
-          class="ay-btn ay-btn-secondary ay-btn-sm"
+          class="btn btn-secondary text-[12.5px]"
           :disabled="!meta.hasPrev"
           @click="emit('update:page', meta.page - 1)"
         >
@@ -183,8 +183,8 @@ watch(
           v-for="p in pageNumbers"
           :key="p"
           type="button"
-          class="ay-btn ay-btn-sm min-w-[38px]"
-          :class="p === meta.page ? 'ay-btn-primary' : 'ay-btn-secondary'"
+          class="btn text-[12.5px] min-w-[38px]"
+          :class="p === meta.page ? 'btn-primary' : 'btn-secondary'"
           :aria-current="p === meta.page ? 'page' : undefined"
           @click="emit('update:page', p)"
         >
@@ -192,7 +192,7 @@ watch(
         </button>
         <button
           type="button"
-          class="ay-btn ay-btn-secondary ay-btn-sm"
+          class="btn btn-secondary text-[12.5px]"
           :disabled="!meta.hasNext"
           @click="emit('update:page', meta.page + 1)"
         >

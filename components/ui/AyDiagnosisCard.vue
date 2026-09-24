@@ -17,10 +17,10 @@ const SEVERITY: Record<string, { label: string; class: string }> = {
 </script>
 
 <template>
-  <article class="ay-card flex flex-col gap-2">
+  <article class="card flex flex-col gap-2">
     <header class="flex items-start justify-between gap-3">
       <h3 class="font-heading text-[15.5px]">
-        <span class="ay-muted">{{ rank }}.</span> {{ finding.label }}
+        <span class="text-muted">{{ rank }}.</span> {{ finding.label }}
       </h3>
       <AyAiBadge :confidence="finding.matchPercent" />
     </header>
@@ -37,13 +37,13 @@ const SEVERITY: Record<string, { label: string; class: string }> = {
           :aria-label="`Mức độ khớp ${finding.matchPercent}%`"
         />
       </div>
-      <p class="mt-1 text-[12px] ay-muted">Mức độ khớp {{ Math.round(finding.matchPercent) }}%</p>
+      <p class="mt-1 text-[12px] text-muted">Mức độ khớp {{ Math.round(finding.matchPercent) }}%</p>
     </div>
 
     <p v-if="finding.description" class="text-[13.5px]">{{ finding.description }}</p>
 
     <footer class="flex flex-wrap items-center gap-2">
-      <span v-if="finding.severity" class="ay-tag" :class="SEVERITY[finding.severity]?.class">
+      <span v-if="finding.severity" class="tag" :class="SEVERITY[finding.severity]?.class">
         {{ SEVERITY[finding.severity]?.label }}
       </span>
       <AyButton variant="ghost" size="sm" class="ml-auto" @click="emit('book', finding)">

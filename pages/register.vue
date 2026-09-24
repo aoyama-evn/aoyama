@@ -34,11 +34,11 @@ useHead({ title: 'Đăng ký — AOYAMA Service' });
 </script>
 
 <template>
-  <div class="ay-card flex flex-col gap-4">
+  <div class="card flex flex-col gap-4">
     <div>
-      <p class="ay-kicker">SC-17</p>
+      <p class="card-kicker">SC-17</p>
       <h1 class="font-heading text-[20px]">Đăng ký tài khoản</h1>
-      <p class="mt-1 text-[13.5px] ay-muted">
+      <p class="mt-1 text-[13.5px] text-muted">
         Có tài khoản, bạn xem được toàn bộ lịch sử bảo dưỡng của xe và đặt lại lịch chỉ với vài chạm.
       </p>
     </div>
@@ -46,19 +46,19 @@ useHead({ title: 'Đăng ký — AOYAMA Service' });
     <form class="flex flex-col gap-3" @submit.prevent="submit">
       <AyField label="Họ tên" required>
         <template #default="{ id }">
-          <input :id="id" v-model="form.name" class="ay-input" type="text" autocomplete="name" required>
+          <input :id="id" v-model="form.name" class="input" type="text" autocomplete="name" required>
         </template>
       </AyField>
 
       <AyField label="Số điện thoại" required hint="Dùng để đăng nhập và nhận thông báo">
         <template #default="{ id }">
-          <input :id="id" v-model="form.phone" class="ay-input" type="tel" placeholder="090-1234-5678" autocomplete="tel" required>
+          <input :id="id" v-model="form.phone" class="input" type="tel" placeholder="090-1234-5678" autocomplete="tel" required>
         </template>
       </AyField>
 
       <AyField label="Email" hint="Không bắt buộc">
         <template #default="{ id }">
-          <input :id="id" v-model="form.email" class="ay-input" type="email" autocomplete="email">
+          <input :id="id" v-model="form.email" class="input" type="email" autocomplete="email">
         </template>
       </AyField>
 
@@ -78,7 +78,7 @@ useHead({ title: 'Đăng ký — AOYAMA Service' });
       </AyButton>
     </form>
 
-    <p class="text-center text-[13px] ay-muted">
+    <p class="text-center text-[13px] text-muted">
       Đã có tài khoản?
       <NuxtLink to="/login" class="underline">Đăng nhập</NuxtLink>
     </p>

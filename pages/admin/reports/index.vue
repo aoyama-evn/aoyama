@@ -53,12 +53,12 @@ useHead({ title: 'Báo cáo tổng hợp — AOYAMA Admin' });
     <AyFilterBar>
       <AyField label="Từ ngày">
         <template #default="{ id }">
-          <input :id="id" v-model="range.from" class="ay-input" type="date">
+          <input :id="id" v-model="range.from" class="input" type="date">
         </template>
       </AyField>
       <AyField label="Đến ngày">
         <template #default="{ id }">
-          <input :id="id" v-model="range.to" class="ay-input" type="date">
+          <input :id="id" v-model="range.to" class="input" type="date">
         </template>
       </AyField>
       <div class="ml-auto flex gap-2">
@@ -83,27 +83,27 @@ useHead({ title: 'Báo cáo tổng hợp — AOYAMA Admin' });
         <AyStatCard label="Doanh thu kỳ này" :value="money(data.revenue)" />
       </div>
 
-      <section class="ay-card">
+      <section class="card">
         <h2 class="mb-3 font-heading text-[16px]">Lịch hẹn theo ngày</h2>
         <div class="flex h-40 items-end gap-1 overflow-x-auto">
           <div
             v-for="day in data.bookings.byDay" :key="day.date"
             class="flex min-w-[26px] flex-1 flex-col items-center gap-1"
           >
-            <span class="text-[10.5px] ay-muted">{{ day.count }}</span>
+            <span class="text-[10.5px] text-muted">{{ day.count }}</span>
             <div
               class="w-full rounded-t bg-accent-400"
               :style="{ height: `${(day.count / maxDay) * 100}%` }"
               :title="`${day.date}: ${day.count} lịch hẹn`"
             />
-            <span class="text-[9.5px] ay-muted">{{ day.date.slice(5) }}</span>
+            <span class="text-[9.5px] text-muted">{{ day.date.slice(5) }}</span>
           </div>
         </div>
         <AyEmptyState v-if="data.bookings.byDay.length === 0" title="Chưa có lịch hẹn trong khoảng này" />
       </section>
 
       <div class="grid gap-4 lg:grid-cols-2">
-        <section class="ay-card">
+        <section class="card">
           <h2 class="mb-3 font-heading text-[16px]">Lịch hẹn theo trạng thái</h2>
           <ul class="flex flex-col gap-2">
             <li v-for="row in data.bookings.byStatus" :key="row.status" class="flex items-center gap-3">
@@ -119,7 +119,7 @@ useHead({ title: 'Báo cáo tổng hợp — AOYAMA Admin' });
           </ul>
         </section>
 
-        <section class="ay-card">
+        <section class="card">
           <h2 class="mb-3 font-heading text-[16px]">Phiếu dịch vụ</h2>
           <p class="mb-2 text-[13.5px]">
             Thời gian xử lý trung bình:

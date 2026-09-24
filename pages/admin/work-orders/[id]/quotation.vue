@@ -183,12 +183,12 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
       </template>
     </AyPageHeader>
 
-    <section v-if="suggestion && suggestion.lines.length" class="ay-card">
+    <section v-if="suggestion && suggestion.lines.length" class="card">
       <div class="mb-2 flex items-center gap-2">
         <h2 class="font-heading text-[16px]">Gợi ý của trợ lý AI</h2>
         <AyAiBadge />
       </div>
-      <p class="mb-2 text-[12.5px] ay-muted">
+      <p class="mb-2 text-[12.5px] text-muted">
         Đây là đề xuất. Bấm thêm từng dòng bạn đồng ý — không có gì tự động vào báo giá.
       </p>
       <ul class="flex flex-col gap-1.5">
@@ -207,7 +207,7 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
     </section>
 
     <div class="grid gap-4 lg:grid-cols-3">
-      <section class="ay-card lg:col-span-2">
+      <section class="card lg:col-span-2">
         <div class="mb-3 flex flex-wrap items-baseline justify-between gap-2">
           <h2 class="font-heading text-[16px]">Các dòng báo giá</h2>
           <div class="flex gap-1">
@@ -216,8 +216,8 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
           </div>
         </div>
 
-        <div class="ay-table-wrap !shadow-none">
-          <table class="ay-table">
+        <div class="table-wrap !shadow-none">
+          <table class="table">
             <thead>
               <tr>
                 <th scope="col" class="w-24">Loại</th>
@@ -232,18 +232,18 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
             <tbody>
               <tr v-for="(line, index) in lines" :key="index">
                 <td>
-                  <select v-model="line.kind" class="ay-input h-9 min-h-0 py-1 text-[12.5px]">
+                  <select v-model="line.kind" class="input h-9 min-h-0 py-1 text-[12.5px]">
                     <option value="LABOR">Công</option>
                     <option value="PART">Phụ tùng</option>
                     <option value="OTHER">Khác</option>
                   </select>
                 </td>
                 <td>
-                  <input v-model="line.name" class="ay-input h-9 min-h-0 py-1" type="text">
+                  <input v-model="line.name" class="input h-9 min-h-0 py-1" type="text">
                   <AyAiBadge v-if="line.suggestedByAi" class="mt-1" />
                 </td>
-                <td><input v-model.number="line.unitPrice" class="ay-input h-9 min-h-0 py-1 text-right" type="number" min="0"></td>
-                <td><input v-model.number="line.quantity" class="ay-input h-9 min-h-0 py-1 text-center" type="number" min="1"></td>
+                <td><input v-model.number="line.unitPrice" class="input h-9 min-h-0 py-1 text-right" type="number" min="0"></td>
+                <td><input v-model.number="line.quantity" class="input h-9 min-h-0 py-1 text-center" type="number" min="1"></td>
                 <td class="text-center">
                   <input
                     v-model="line.isOptional" type="checkbox"
@@ -257,47 +257,47 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
                 </td>
               </tr>
               <tr v-if="lines.length === 0">
-                <td colspan="7" class="py-6 text-center ay-muted">Chưa có dòng nào</td>
+                <td colspan="7" class="py-6 text-center text-muted">Chưa có dòng nào</td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <p class="mt-2 text-[12px] ay-muted">
+        <p class="mt-2 text-[12px] text-muted">
           Đánh dấu “Tùy chọn” cho hạng mục khách có thể bỏ khi phản hồi báo giá.
         </p>
       </section>
 
       <div class="flex flex-col gap-4">
-        <section class="ay-card">
+        <section class="card">
           <h2 class="mb-2 font-heading text-[16px]">Thêm phụ tùng</h2>
           <AyPartPicker :store-id="workOrder.storeId" @select="addPart" />
         </section>
 
-        <section class="ay-card flex flex-col gap-3">
+        <section class="card flex flex-col gap-3">
           <h2 class="font-heading text-[16px]">Tổng kết</h2>
 
           <AyField label="Giảm giá">
             <template #default="{ id: fid }">
-              <input :id="fid" v-model.number="discountAmount" class="ay-input" type="number" min="0">
+              <input :id="fid" v-model.number="discountAmount" class="input" type="number" min="0">
             </template>
           </AyField>
 
           <AyField label="Thuế (%)">
             <template #default="{ id: fid }">
-              <input :id="fid" v-model.number="taxRate" class="ay-input" type="number" min="0" max="100">
+              <input :id="fid" v-model.number="taxRate" class="input" type="number" min="0" max="100">
             </template>
           </AyField>
 
           <AyField label="Hiệu lực đến">
             <template #default="{ id: fid }">
-              <input :id="fid" v-model="validUntil" class="ay-input" type="date">
+              <input :id="fid" v-model="validUntil" class="input" type="date">
             </template>
           </AyField>
 
           <AyField label="Ghi chú gửi khách">
             <template #default="{ id: fid }">
-              <textarea :id="fid" v-model="note" class="ay-input min-h-[70px]" />
+              <textarea :id="fid" v-model="note" class="input min-h-[70px]" />
             </template>
           </AyField>
 

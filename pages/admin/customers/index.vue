@@ -40,7 +40,7 @@ useHead({ title: 'Khách hàng — AOYAMA Admin' });
     <AyFilterBar :has-active-filters="Boolean(keyword)" @reset="keyword = ''">
       <AyField label="Tìm kiếm" class="min-w-[240px] flex-1">
         <template #default="{ id }">
-          <input :id="id" v-model="keyword" class="ay-input" type="search" placeholder="Tên, số điện thoại hoặc email">
+          <input :id="id" v-model="keyword" class="input" type="search" placeholder="Tên, số điện thoại hoặc email">
         </template>
       </AyField>
     </AyFilterBar>
@@ -60,7 +60,7 @@ useHead({ title: 'Khách hàng — AOYAMA Admin' });
       <template #cell-phone="{ row }">{{ row.phone }}</template>
       <template #cell-email="{ row }">{{ row.email ?? '—' }}</template>
       <template #cell-isGuest="{ row }">
-        <span class="ay-tag" :class="row.isGuest ? 'bg-neutral-200 text-neutral-700' : 'bg-success-bg text-success'">
+        <span class="tag" :class="row.isGuest ? 'bg-neutral-200 text-neutral-700' : 'bg-success-bg text-success'">
           {{ row.isGuest ? 'Khách vãng lai' : 'Đã đăng ký' }}
         </span>
       </template>

@@ -16,7 +16,7 @@ useHead({ title: 'Câu hỏi thường gặp — AOYAMA Service' });
     <AyPageHeader code="SC-07" title="Câu hỏi thường gặp" />
 
     <div class="flex flex-col gap-2">
-      <article v-for="faq in faqs ?? []" :key="faq.id" class="ay-card !p-0 overflow-hidden">
+      <article v-for="faq in faqs ?? []" :key="faq.id" class="card !p-0 overflow-hidden">
         <h2>
           <button
             type="button"
@@ -25,7 +25,7 @@ useHead({ title: 'Câu hỏi thường gặp — AOYAMA Service' });
             @click="openId = openId === faq.id ? null : faq.id"
           >
             <span class="flex-1 text-[15px] font-semibold">{{ i18n(faq.question) }}</span>
-            <span class="text-[18px] ay-muted" aria-hidden="true">{{ openId === faq.id ? '−' : '+' }}</span>
+            <span class="text-[18px] text-muted" aria-hidden="true">{{ openId === faq.id ? '−' : '+' }}</span>
           </button>
         </h2>
         <div v-if="openId === faq.id" class="border-t border-divider px-4 py-3.5 text-[14px] whitespace-pre-line">

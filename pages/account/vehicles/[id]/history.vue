@@ -51,12 +51,12 @@ useHead({ title: 'Lịch sử dịch vụ' });
         <component
           :is="record.workOrderId ? 'NuxtLink' : 'div'"
           :to="record.workOrderId ? `/service-records/${record.workOrderId}` : undefined"
-          class="ay-card flex flex-wrap items-start gap-3"
+          class="card flex flex-wrap items-start gap-3"
           :class="record.workOrderId ? 'transition-colors hover:bg-accent-100' : ''"
         >
           <div class="min-w-0 flex-1">
             <p class="font-heading text-[15.5px]">{{ record.summary }}</p>
-            <p class="text-[12.5px] ay-muted">
+            <p class="text-[12.5px] text-muted">
               {{ date(record.servicedAt) }}
               <template v-if="record.odometer"> · {{ number(record.odometer) }} km</template>
               · {{ record.type === 'MAINTENANCE' ? 'Bảo dưỡng' : 'Sửa chữa' }}
@@ -64,7 +64,7 @@ useHead({ title: 'Lịch sử dịch vụ' });
             <ul v-if="record.itemNames.length" class="mt-1.5 flex flex-wrap gap-1">
               <li
                 v-for="name in record.itemNames" :key="name"
-                class="ay-tag bg-neutral-200 text-neutral-700"
+                class="tag bg-neutral-200 text-neutral-700"
               >
                 {{ name }}
               </li>
@@ -79,7 +79,7 @@ useHead({ title: 'Lịch sử dịch vụ' });
       <AyButton variant="secondary" size="sm" :disabled="!history.meta.hasPrev" @click="page -= 1">
         Trước
       </AyButton>
-      <span class="self-center text-[13px] ay-muted">
+      <span class="self-center text-[13px] text-muted">
         {{ history.meta.page }} / {{ history.meta.totalPages }}
       </span>
       <AyButton variant="secondary" size="sm" :disabled="!history.meta.hasNext" @click="page += 1">

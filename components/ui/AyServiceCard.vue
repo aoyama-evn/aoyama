@@ -27,7 +27,7 @@ const priceLabel = computed(() =>
 
     <span class="flex-1">
       <span class="block text-[14.5px] font-semibold">{{ i18n(service.name) }}</span>
-      <span class="block text-[12.5px] ay-muted">
+      <span class="block text-[12.5px] text-muted">
         {{ i18n(service.shortDescription) }}
         <template v-if="service.durationMinutes"> · {{ service.durationMinutes }} phút</template>
       </span>

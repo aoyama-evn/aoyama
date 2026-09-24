@@ -69,7 +69,7 @@ useHead({ title: isNew ? 'Thêm xe' : 'Sửa thông tin xe' });
   <div class="mx-auto flex max-w-2xl flex-col gap-5">
     <AyPageHeader code="SC-30" :title="isNew ? 'Thêm xe' : 'Sửa thông tin xe'" back-to="/account/vehicles" />
 
-    <form class="ay-card flex flex-col gap-4" @submit.prevent="save">
+    <form class="card flex flex-col gap-4" @submit.prevent="save">
       <AyVehicleForm v-model="form" :errors="errors" />
       <AyErrorNote :error="error" />
       <div class="flex gap-2">

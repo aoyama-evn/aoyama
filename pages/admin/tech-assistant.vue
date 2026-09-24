@@ -61,21 +61,21 @@ useHead({ title: 'Trợ lý AI kỹ thuật — AOYAMA Admin' });
       </template>
     </AyPageHeader>
 
-    <section class="ay-card grid gap-3 sm:grid-cols-2">
+    <section class="card grid gap-3 sm:grid-cols-2">
       <AyField label="Hãng xe" hint="Không bắt buộc — giúp lọc tài liệu đúng dòng">
         <template #default="{ id }">
-          <input :id="id" v-model="maker" class="ay-input" type="text" placeholder="Honda">
+          <input :id="id" v-model="maker" class="input" type="text" placeholder="Honda">
         </template>
       </AyField>
       <AyField label="Dòng xe">
         <template #default="{ id }">
-          <input :id="id" v-model="model" class="ay-input" type="text" placeholder="PCX 125">
+          <input :id="id" v-model="model" class="input" type="text" placeholder="PCX 125">
         </template>
       </AyField>
     </section>
 
-    <div v-if="turns.length === 0" class="ay-card flex flex-col gap-2">
-      <p class="text-[13.5px] ay-muted">Ví dụ câu hỏi:</p>
+    <div v-if="turns.length === 0" class="card flex flex-col gap-2">
+      <p class="text-[13.5px] text-muted">Ví dụ câu hỏi:</p>
       <ul class="flex flex-col gap-1.5">
         <li v-for="example in EXAMPLES" :key="example">
           <button type="button" class="text-left text-[13.5px] underline" @click="ask(example)">
@@ -90,33 +90,33 @@ useHead({ title: 'Trợ lý AI kỹ thuật — AOYAMA Admin' });
         {{ turn.question }}
       </p>
 
-      <div v-if="turn.pending" class="ay-card text-[13.5px] ay-muted">Đang tra cứu tài liệu…</div>
+      <div v-if="turn.pending" class="card text-[13.5px] text-muted">Đang tra cứu tài liệu…</div>
 
-      <div v-else-if="turn.answer" class="ay-card flex flex-col gap-3">
+      <div v-else-if="turn.answer" class="card flex flex-col gap-3">
         <p class="whitespace-pre-line text-[14px]">{{ turn.answer.answer }}</p>
 
         <div v-if="turn.answer.citations.length">
-          <p class="mb-1.5 text-[12.5px] font-semibold ay-muted">Nguồn trích dẫn</p>
+          <p class="mb-1.5 text-[12.5px] font-semibold text-muted">Nguồn trích dẫn</p>
           <ul class="flex flex-col gap-1.5">
             <li
               v-for="citation in turn.answer.citations" :key="citation.documentId"
               class="rounded-xl bg-neutral-100 px-3 py-2 text-[12.5px]"
             >
               <p class="font-semibold">{{ citation.title }}</p>
-              <p class="ay-muted">{{ citation.excerpt }}</p>
+              <p class="text-muted">{{ citation.excerpt }}</p>
             </li>
           </ul>
         </div>
 
-        <p v-else class="text-[12.5px] ay-muted">
+        <p v-else class="text-[12.5px] text-muted">
           Không tìm thấy tài liệu phù hợp. Hãy bổ sung tài liệu kỹ thuật vào kho để trợ lý trả lời chính xác hơn.
         </p>
       </div>
     </section>
 
-    <div class="ay-card flex gap-2">
+    <div class="card flex gap-2">
       <textarea
-        v-model="question" class="ay-input min-h-[52px] flex-1"
+        v-model="question" class="input min-h-[52px] flex-1"
         placeholder="Nhập câu hỏi kỹ thuật…"
         @keydown.enter.exact.prevent="ask()"
       />

@@ -36,22 +36,22 @@ useHead({ title: `${vehicle.value.plateNumber} — AOYAMA Admin` });
       </template>
     </AyPageHeader>
 
-    <section class="ay-card">
+    <section class="card">
       <dl class="grid gap-2 text-[14px] sm:grid-cols-3">
-        <div><dt class="ay-muted">Hãng / dòng</dt><dd>{{ vehicle.maker }} {{ vehicle.model }}</dd></div>
-        <div><dt class="ay-muted">Dung tích</dt><dd>{{ vehicle.engineCc ? `${vehicle.engineCc}cc` : '—' }}</dd></div>
-        <div><dt class="ay-muted">Số km hiện tại</dt><dd>{{ number(vehicle.currentOdometer) }} km</dd></div>
-        <div><dt class="ay-muted">Năm sản xuất</dt><dd>{{ vehicle.modelYear ?? '—' }}</dd></div>
-        <div><dt class="ay-muted">Màu</dt><dd>{{ vehicle.color ?? '—' }}</dd></div>
-        <div><dt class="ay-muted">Số khung</dt><dd>{{ vehicle.vinNumber ?? '—' }}</dd></div>
-        <div class="sm:col-span-3"><dt class="ay-muted">Chủ xe</dt><dd>{{ vehicle.customer?.name }} · {{ vehicle.customer?.phone }}</dd></div>
+        <div><dt class="text-muted">Hãng / dòng</dt><dd>{{ vehicle.maker }} {{ vehicle.model }}</dd></div>
+        <div><dt class="text-muted">Dung tích</dt><dd>{{ vehicle.engineCc ? `${vehicle.engineCc}cc` : '—' }}</dd></div>
+        <div><dt class="text-muted">Số km hiện tại</dt><dd>{{ number(vehicle.currentOdometer) }} km</dd></div>
+        <div><dt class="text-muted">Năm sản xuất</dt><dd>{{ vehicle.modelYear ?? '—' }}</dd></div>
+        <div><dt class="text-muted">Màu</dt><dd>{{ vehicle.color ?? '—' }}</dd></div>
+        <div><dt class="text-muted">Số khung</dt><dd>{{ vehicle.vinNumber ?? '—' }}</dd></div>
+        <div class="sm:col-span-3"><dt class="text-muted">Chủ xe</dt><dd>{{ vehicle.customer?.name }} · {{ vehicle.customer?.phone }}</dd></div>
         <div v-if="vehicle.note" class="sm:col-span-3">
-          <dt class="ay-muted">Ghi chú</dt><dd class="whitespace-pre-line">{{ vehicle.note }}</dd>
+          <dt class="text-muted">Ghi chú</dt><dd class="whitespace-pre-line">{{ vehicle.note }}</dd>
         </div>
       </dl>
     </section>
 
-    <section class="ay-card">
+    <section class="card">
       <h2 class="mb-3 font-heading text-[16px]">Lịch sử dịch vụ</h2>
 
       <AyLoading v-if="pending" />
@@ -69,7 +69,7 @@ useHead({ title: `${vehicle.value.plateNumber} — AOYAMA Admin` });
         >
           <div class="min-w-0 flex-1">
             <p class="text-[14px] font-semibold">{{ record.summary }}</p>
-            <p class="text-[12.5px] ay-muted">
+            <p class="text-[12.5px] text-muted">
               {{ date(record.servicedAt) }}
               <template v-if="record.odometer"> · {{ number(record.odometer) }} km</template>
               · {{ record.type === 'MAINTENANCE' ? 'Bảo dưỡng' : 'Sửa chữa' }}
@@ -88,7 +88,7 @@ useHead({ title: `${vehicle.value.plateNumber} — AOYAMA Admin` });
 
       <div v-if="history?.meta && history.meta.totalPages > 1" class="mt-3 flex justify-center gap-2">
         <AyButton variant="secondary" size="sm" :disabled="!history.meta.hasPrev" @click="page -= 1">Trước</AyButton>
-        <span class="self-center text-[13px] ay-muted">{{ history.meta.page }} / {{ history.meta.totalPages }}</span>
+        <span class="self-center text-[13px] text-muted">{{ history.meta.page }} / {{ history.meta.totalPages }}</span>
         <AyButton variant="secondary" size="sm" :disabled="!history.meta.hasNext" @click="page += 1">Sau</AyButton>
       </div>
     </section>

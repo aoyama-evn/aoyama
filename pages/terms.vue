@@ -7,7 +7,7 @@ useHead({ title: 'Điều khoản sử dụng — AOYAMA Service' });
   <article class="prose-ay flex max-w-prose flex-col gap-4">
     <AyPageHeader code="SC-09" title="Điều khoản sử dụng" />
 
-    <section class="ay-card flex flex-col gap-3 text-[14px] leading-relaxed">
+    <section class="card flex flex-col gap-3 text-[14px] leading-relaxed">
       <h2 class="font-heading text-[16px]">1. Phạm vi áp dụng</h2>
       <p>
         Điều khoản này áp dụng cho việc sử dụng dịch vụ đặt lịch bảo dưỡng và sửa chữa xe máy trực
@@ -39,7 +39,7 @@ useHead({ title: 'Điều khoản sử dụng — AOYAMA Service' });
       </p>
     </section>
 
-    <p class="text-[12.5px] ay-muted">
+    <p class="text-[12.5px] text-muted">
       Xem thêm <NuxtLink to="/privacy" class="underline">Chính sách dữ liệu</NuxtLink>.
     </p>
   </article>

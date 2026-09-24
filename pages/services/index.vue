@@ -37,8 +37,8 @@ useHead({ title: 'Dịch vụ — AOYAMA Service' });
       <button
         v-for="tab in TABS" :key="tab.value" type="button" role="tab"
         :aria-selected="filter === tab.value"
-        class="ay-btn ay-btn-sm"
-        :class="filter === tab.value ? 'ay-btn-primary' : 'ay-btn-secondary'"
+        class="btn text-[12.5px]"
+        :class="filter === tab.value ? 'btn-primary' : 'btn-secondary'"
         @click="filter = tab.value"
       >
         {{ tab.label }}

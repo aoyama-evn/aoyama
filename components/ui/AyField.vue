@@ -13,12 +13,12 @@ const id = computed(() => props.for ?? `f-${useId()}`);
 
 <template>
   <div class="flex flex-col">
-    <label v-if="label" class="ay-label" :for="id">
+    <label v-if="label" class="label" :for="id">
       {{ label }}
       <span v-if="required" class="text-danger" aria-hidden="true">*</span>
     </label>
     <slot :id="id" :invalid="Boolean(error)" />
-    <p v-if="error" class="ay-error">{{ error }}</p>
-    <p v-else-if="hint" class="ay-hint">{{ hint }}</p>
+    <p v-if="error" class="field-error">{{ error }}</p>
+    <p v-else-if="hint" class="hint">{{ hint }}</p>
   </div>
 </template>

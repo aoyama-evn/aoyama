@@ -85,40 +85,40 @@ useHead({ title: 'Kho tài liệu kỹ thuật — AOYAMA Admin' });
       </template>
     </AyPageHeader>
 
-    <section v-if="adding" class="ay-card grid gap-3 sm:grid-cols-2">
+    <section v-if="adding" class="card grid gap-3 sm:grid-cols-2">
       <AyField label="Tiêu đề" required class="sm:col-span-2">
         <template #default="{ id }">
-          <input :id="id" v-model="form.title" class="ay-input" type="text">
+          <input :id="id" v-model="form.title" class="input" type="text">
         </template>
       </AyField>
 
       <AyField label="Nhóm">
         <template #default="{ id }">
-          <input :id="id" v-model="form.category" class="ay-input" type="text" placeholder="Sổ tay sửa chữa / Mã lỗi">
+          <input :id="id" v-model="form.category" class="input" type="text" placeholder="Sổ tay sửa chữa / Mã lỗi">
         </template>
       </AyField>
 
       <AyField label="Đường dẫn tệp">
         <template #default="{ id }">
-          <input :id="id" v-model="form.fileUrl" class="ay-input" type="url">
+          <input :id="id" v-model="form.fileUrl" class="input" type="url">
         </template>
       </AyField>
 
       <AyField label="Hãng áp dụng" hint="Ngăn cách bằng dấu phẩy">
         <template #default="{ id }">
-          <input :id="id" v-model="form.makers" class="ay-input" type="text" placeholder="Honda, Yamaha">
+          <input :id="id" v-model="form.makers" class="input" type="text" placeholder="Honda, Yamaha">
         </template>
       </AyField>
 
       <AyField label="Dòng xe áp dụng" hint="Ngăn cách bằng dấu phẩy">
         <template #default="{ id }">
-          <input :id="id" v-model="form.models" class="ay-input" type="text" placeholder="PCX 125, NMAX 155">
+          <input :id="id" v-model="form.models" class="input" type="text" placeholder="PCX 125, NMAX 155">
         </template>
       </AyField>
 
       <AyField label="Nội dung văn bản" hint="Dán nội dung để trợ lý tìm kiếm toàn văn" class="sm:col-span-2">
         <template #default="{ id }">
-          <textarea :id="id" v-model="form.content" class="ay-input min-h-[140px]" />
+          <textarea :id="id" v-model="form.content" class="input min-h-[140px]" />
         </template>
       </AyField>
 
@@ -130,7 +130,7 @@ useHead({ title: 'Kho tài liệu kỹ thuật — AOYAMA Admin' });
     <AyFilterBar :has-active-filters="Boolean(keyword)" @reset="keyword = ''">
       <AyField label="Tìm kiếm" class="min-w-[240px] flex-1">
         <template #default="{ id }">
-          <input :id="id" v-model="keyword" class="ay-input" type="search" placeholder="Tiêu đề tài liệu">
+          <input :id="id" v-model="keyword" class="input" type="search" placeholder="Tiêu đề tài liệu">
         </template>
       </AyField>
     </AyFilterBar>
@@ -151,7 +151,7 @@ useHead({ title: 'Kho tài liệu kỹ thuật — AOYAMA Admin' });
       </template>
       <template #cell-indexStatus="{ row }">
         <span
-          class="ay-tag"
+          class="tag"
           :class="row.indexStatus === 'INDEXED' ? 'bg-success-bg text-success' : 'bg-warning-bg text-warning'"
         >
           {{ row.indexStatus === 'INDEXED' ? 'Đã lập chỉ mục' : 'Chờ xử lý' }}

@@ -42,12 +42,12 @@ useHead({ title: 'Báo cáo phụ tùng — AOYAMA Admin' });
     <AyFilterBar>
       <AyField label="Từ ngày">
         <template #default="{ id }">
-          <input :id="id" v-model="range.from" class="ay-input" type="date">
+          <input :id="id" v-model="range.from" class="input" type="date">
         </template>
       </AyField>
       <AyField label="Đến ngày">
         <template #default="{ id }">
-          <input :id="id" v-model="range.to" class="ay-input" type="date">
+          <input :id="id" v-model="range.to" class="input" type="date">
         </template>
       </AyField>
     </AyFilterBar>
@@ -55,7 +55,7 @@ useHead({ title: 'Báo cáo phụ tùng — AOYAMA Admin' });
     <AyLoading v-if="pending" />
 
     <template v-else-if="data">
-      <section class="ay-card">
+      <section class="card">
         <h2 class="mb-3 font-heading text-[16px]">Phụ tùng dùng nhiều nhất</h2>
 
         <AyEmptyState
@@ -70,7 +70,7 @@ useHead({ title: 'Báo cáo phụ tùng — AOYAMA Admin' });
           >
             <span class="w-52 truncate text-[13.5px]">
               {{ row.partName }}
-              <span class="block font-mono text-[11px] ay-muted">{{ row.partCode }}</span>
+              <span class="block font-mono text-[11px] text-muted">{{ row.partCode }}</span>
             </span>
             <div class="h-2 flex-1 overflow-hidden rounded-full bg-neutral-200">
               <div
@@ -79,20 +79,20 @@ useHead({ title: 'Báo cáo phụ tùng — AOYAMA Admin' });
               />
             </div>
             <span class="w-16 text-right font-heading text-[14px]">{{ number(row.quantity) }}</span>
-            <span class="w-28 text-right text-[13px] ay-muted">{{ money(row.amount) }}</span>
+            <span class="w-28 text-right text-[13px] text-muted">{{ money(row.amount) }}</span>
           </li>
         </ul>
       </section>
 
-      <section class="ay-card">
+      <section class="card">
         <h2 class="mb-3 font-heading text-[16px]">
           Phụ tùng sắp hết ({{ data.lowStock.length }})
         </h2>
 
         <AyEmptyState v-if="data.lowStock.length === 0" title="Tồn kho đang ở mức an toàn" />
 
-        <div v-else class="ay-table-wrap !shadow-none">
-          <table class="ay-table">
+        <div v-else class="table-wrap !shadow-none">
+          <table class="table">
             <thead>
               <tr>
                 <th scope="col">Phụ tùng</th>
@@ -106,7 +106,7 @@ useHead({ title: 'Báo cáo phụ tùng — AOYAMA Admin' });
               <tr v-for="row in data.lowStock" :key="row.id">
                 <td>
                   {{ i18n(row.part?.name ?? null) }}
-                  <span class="block font-mono text-[11px] ay-muted">{{ row.part?.code }}</span>
+                  <span class="block font-mono text-[11px] text-muted">{{ row.part?.code }}</span>
                 </td>
                 <td>{{ i18n(row.store?.name ?? null) }}</td>
                 <td class="text-right font-heading text-danger">{{ number(row.quantity) }}</td>

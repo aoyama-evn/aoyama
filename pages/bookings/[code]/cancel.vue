@@ -49,20 +49,20 @@ useHead({ title: `Hủy lịch hẹn ${code}` });
   <div v-if="booking" class="mx-auto flex max-w-md flex-col gap-5">
     <AyPageHeader code="SC-24" title="Hủy lịch hẹn" :back-to="`/bookings/${code}`" />
 
-    <section class="ay-card flex flex-col gap-2">
+    <section class="card flex flex-col gap-2">
       <p class="text-[14px]">
         Bạn đang hủy lịch hẹn <strong>{{ booking.code }}</strong>
         vào <strong>{{ dateTime(booking.scheduledAt) }}</strong>.
       </p>
-      <p class="text-[12.5px] ay-muted">
+      <p class="text-[12.5px] text-muted">
         Chỉ hủy trực tuyến được đến trước giờ hẹn 2 tiếng. Sau mốc đó vui lòng gọi cửa hàng.
       </p>
     </section>
 
-    <section class="ay-card flex flex-col gap-3">
+    <section class="card flex flex-col gap-3">
       <AyField label="Lý do hủy" hint="Giúp cửa hàng cải thiện dịch vụ">
         <template #default="{ id }">
-          <select :id="id" v-model="reason" class="ay-input">
+          <select :id="id" v-model="reason" class="input">
             <option value="">— Không nêu lý do —</option>
             <option v-for="item in REASONS" :key="item" :value="item">{{ item }}</option>
           </select>

@@ -72,7 +72,7 @@ useHead({ title: 'Tài khoản quản trị — AOYAMA Admin' });
     <AyFilterBar :has-active-filters="Boolean(keyword)" @reset="keyword = ''">
       <AyField label="Tìm kiếm" class="min-w-[240px] flex-1">
         <template #default="{ id }">
-          <input :id="id" v-model="keyword" class="ay-input" type="search" placeholder="Tên đăng nhập, họ tên hoặc email">
+          <input :id="id" v-model="keyword" class="input" type="search" placeholder="Tên đăng nhập, họ tên hoặc email">
         </template>
       </AyField>
     </AyFilterBar>
@@ -93,7 +93,7 @@ useHead({ title: 'Tài khoản quản trị — AOYAMA Admin' });
       <template #cell-fullName="{ row }">{{ row.fullName }}</template>
       <template #cell-role="{ row }">
         <span
-          class="ay-tag"
+          class="tag"
           :class="row.role === AdminRole.ADMIN ? 'bg-accent-200 text-accent-800' : 'bg-neutral-200 text-neutral-700'"
         >
           {{ row.role === AdminRole.ADMIN ? 'Quản trị' : 'Nhân viên' }}
@@ -105,12 +105,12 @@ useHead({ title: 'Tài khoản quản trị — AOYAMA Admin' });
       <template #cell-lastLoginAt="{ row }">{{ dateTime(row.lastLoginAt as string) || '—' }}</template>
       <template #cell-isActive="{ row }">
         <span
-          class="ay-tag"
+          class="tag"
           :class="row.isActive ? 'bg-success-bg text-success' : 'bg-neutral-200 text-neutral-600'"
         >
           {{ row.isActive ? 'Hoạt động' : 'Đã khóa' }}
         </span>
-        <span v-if="row.lockedUntil" class="ay-tag mt-1 bg-danger-bg text-danger">tạm khóa</span>
+        <span v-if="row.lockedUntil" class="tag mt-1 bg-danger-bg text-danger">tạm khóa</span>
       </template>
       <template #cell-actions="{ row }">
         <button

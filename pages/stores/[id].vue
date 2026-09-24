@@ -34,22 +34,22 @@ const upcomingHolidays = computed(() => {
     </AyPageHeader>
 
     <div class="grid gap-4 lg:grid-cols-3">
-      <section class="ay-card lg:col-span-2">
+      <section class="card lg:col-span-2">
         <h2 class="mb-2 font-heading text-[16px]">Thông tin cửa hàng</h2>
         <dl class="flex flex-col gap-2 text-[14px]">
-          <div class="flex gap-3"><dt class="w-28 flex-none ay-muted">Địa chỉ</dt><dd>{{ i18n(store.address) }}</dd></div>
-          <div class="flex gap-3"><dt class="w-28 flex-none ay-muted">Điện thoại</dt><dd><a :href="`tel:${store.phone}`" class="hover:underline">{{ store.phone }}</a></dd></div>
-          <div v-if="store.email" class="flex gap-3"><dt class="w-28 flex-none ay-muted">Email</dt><dd>{{ store.email }}</dd></div>
-          <div class="flex gap-3"><dt class="w-28 flex-none ay-muted">Sức tiếp nhận</dt><dd>{{ store.defaultCapacity }} xe / khung giờ</dd></div>
+          <div class="flex gap-3"><dt class="w-28 flex-none text-muted">Địa chỉ</dt><dd>{{ i18n(store.address) }}</dd></div>
+          <div class="flex gap-3"><dt class="w-28 flex-none text-muted">Điện thoại</dt><dd><a :href="`tel:${store.phone}`" class="hover:underline">{{ store.phone }}</a></dd></div>
+          <div v-if="store.email" class="flex gap-3"><dt class="w-28 flex-none text-muted">Email</dt><dd>{{ store.email }}</dd></div>
+          <div class="flex gap-3"><dt class="w-28 flex-none text-muted">Sức tiếp nhận</dt><dd>{{ store.defaultCapacity }} xe / khung giờ</dd></div>
         </dl>
-        <p v-if="i18n(store.description)" class="mt-3 text-[13.5px] ay-muted">{{ i18n(store.description) }}</p>
+        <p v-if="i18n(store.description)" class="mt-3 text-[13.5px] text-muted">{{ i18n(store.description) }}</p>
       </section>
 
-      <section class="ay-card">
+      <section class="card">
         <h2 class="mb-2 font-heading text-[16px]">Giờ làm việc</h2>
         <dl class="flex flex-col gap-1 text-[13.5px]">
           <div v-for="hour in hours" :key="hour.id" class="flex justify-between">
-            <dt :class="hour.isClosed ? 'ay-muted' : ''">{{ WEEKDAYS[hour.weekday] }}</dt>
+            <dt :class="hour.isClosed ? 'text-muted' : ''">{{ WEEKDAYS[hour.weekday] }}</dt>
             <dd :class="hour.isClosed ? 'text-danger' : ''">
               {{ hour.isClosed ? 'Nghỉ' : `${clock(hour.openTime)}–${clock(hour.closeTime)}` }}
             </dd>
@@ -58,7 +58,7 @@ const upcomingHolidays = computed(() => {
 
         <template v-if="upcomingHolidays.length">
           <h3 class="mb-1 mt-4 text-[13px] font-semibold">Ngày nghỉ sắp tới</h3>
-          <ul class="flex flex-col gap-0.5 text-[13px] ay-muted">
+          <ul class="flex flex-col gap-0.5 text-[13px] text-muted">
             <li v-for="holiday in upcomingHolidays" :key="holiday.id">
               {{ holiday.date }}<template v-if="holiday.reason"> · {{ holiday.reason }}</template>
             </li>

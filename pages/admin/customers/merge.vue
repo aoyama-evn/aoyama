@@ -66,18 +66,18 @@ useHead({ title: 'Gộp hồ sơ khách hàng — AOYAMA Admin' });
     <ul v-else class="flex flex-col gap-2">
       <li
         v-for="(pair, index) in pairs ?? []" :key="index"
-        class="ay-card grid gap-3 sm:grid-cols-[1fr_auto_1fr_auto] sm:items-center"
+        class="card grid gap-3 sm:grid-cols-[1fr_auto_1fr_auto] sm:items-center"
       >
         <div>
           <p class="font-semibold">{{ pair.left.name }}</p>
-          <p class="text-[12.5px] ay-muted">
+          <p class="text-[12.5px] text-muted">
             {{ pair.left.phone }} · tạo {{ date(pair.left.createdAt) }}
           </p>
         </div>
-        <span class="hidden text-center ay-muted sm:block" aria-hidden="true">↔</span>
+        <span class="hidden text-center text-muted sm:block" aria-hidden="true">↔</span>
         <div>
           <p class="font-semibold">{{ pair.right.name }}</p>
-          <p class="text-[12.5px] ay-muted">
+          <p class="text-[12.5px] text-muted">
             {{ pair.right.phone }} · tạo {{ date(pair.right.createdAt) }}
           </p>
         </div>
@@ -97,7 +97,7 @@ useHead({ title: 'Gộp hồ sơ khách hàng — AOYAMA Admin' });
       @cancel="selected = null"
     >
       <fieldset v-if="selected" class="mt-3 flex flex-col gap-2">
-        <legend class="ay-label">Giữ lại hồ sơ nào?</legend>
+        <legend class="label">Giữ lại hồ sơ nào?</legend>
         <label
           v-for="candidate in [selected.left, selected.right]" :key="candidate.id"
           class="flex items-start gap-2.5 rounded-xl border px-3 py-2 text-[13.5px]"
@@ -106,7 +106,7 @@ useHead({ title: 'Gộp hồ sơ khách hàng — AOYAMA Admin' });
           <input v-model="keepId" type="radio" :value="candidate.id" class="mt-1 accent-[var(--color-accent)]">
           <span>
             <strong>{{ candidate.name }}</strong>
-            <span class="block ay-muted">
+            <span class="block text-muted">
               {{ candidate.phone }}
               · {{ candidate.isGuest ? 'khách vãng lai' : 'đã đăng ký' }}
               · tạo {{ date(candidate.createdAt) }}

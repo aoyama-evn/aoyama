@@ -27,8 +27,8 @@ useHead({ title: 'Bảng giá tham khảo — AOYAMA Service' });
 
     <section v-for="group in grouped" :key="group.label">
       <h2 class="mb-2 font-heading text-[17px]">{{ group.label }}</h2>
-      <div class="ay-table-wrap">
-        <table class="ay-table">
+      <div class="table-wrap">
+        <table class="table">
           <thead>
             <tr>
               <th scope="col">Dịch vụ</th>
@@ -44,7 +44,7 @@ useHead({ title: 'Bảng giá tham khảo — AOYAMA Service' });
                   {{ i18n(service.name) }}
                 </NuxtLink>
               </td>
-              <td class="hidden text-[13px] ay-muted sm:table-cell">
+              <td class="hidden text-[13px] text-muted sm:table-cell">
                 {{ i18n(service.shortDescription) }}
               </td>
               <td class="text-center whitespace-nowrap">{{ service.durationMinutes }} phút</td>
@@ -57,7 +57,7 @@ useHead({ title: 'Bảng giá tham khảo — AOYAMA Service' });
       </div>
     </section>
 
-    <p class="text-[12.5px] ay-muted">
+    <p class="text-[12.5px] text-muted">
       Giá chưa bao gồm phụ tùng thay thế. Mọi hạng mục phát sinh đều được báo giá và chờ bạn đồng ý
       trước khi thực hiện.
     </p>

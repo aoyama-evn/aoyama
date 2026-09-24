@@ -119,16 +119,16 @@ useHead({ title: isNew ? 'Thêm phụ tùng' : 'Sửa phụ tùng' });
       Thông tin dưới đây do trợ lý AI điền sẵn từ ảnh. Hãy kiểm tra lại trước khi lưu.
     </p>
 
-    <section class="ay-card grid gap-3 sm:grid-cols-2">
+    <section class="card grid gap-3 sm:grid-cols-2">
       <AyField label="Mã phụ tùng" required>
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.code" class="ay-input font-mono" type="text" placeholder="P-OIL-10W30">
+          <input :id="fid" v-model="form.code" class="input font-mono" type="text" placeholder="P-OIL-10W30">
         </template>
       </AyField>
 
       <AyField label="Mã của hãng">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.makerPartNo" class="ay-input font-mono" type="text">
+          <input :id="fid" v-model="form.makerPartNo" class="input font-mono" type="text">
         </template>
       </AyField>
 
@@ -136,37 +136,37 @@ useHead({ title: isNew ? 'Thêm phụ tùng' : 'Sửa phụ tùng' });
 
       <AyField label="Hãng sản xuất">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.maker" class="ay-input" type="text">
+          <input :id="fid" v-model="form.maker" class="input" type="text">
         </template>
       </AyField>
 
       <AyField label="Nhóm">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.category" class="ay-input" type="text" placeholder="OIL / BRAKE / TYRE">
+          <input :id="fid" v-model="form.category" class="input" type="text" placeholder="OIL / BRAKE / TYRE">
         </template>
       </AyField>
 
       <AyField label="Quy cách" class="sm:col-span-2">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.specification" class="ay-input" type="text">
+          <input :id="fid" v-model="form.specification" class="input" type="text">
         </template>
       </AyField>
 
       <AyField label="Đơn vị">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.unit" class="ay-input" type="text">
+          <input :id="fid" v-model="form.unit" class="input" type="text">
         </template>
       </AyField>
 
       <AyField label="Giá nhập (JPY)">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model.number="form.costPrice" class="ay-input" type="number" min="0">
+          <input :id="fid" v-model.number="form.costPrice" class="input" type="number" min="0">
         </template>
       </AyField>
 
       <AyField label="Giá bán (JPY)" :hint="`Biên lợi nhuận ${margin}%`">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model.number="form.sellPrice" class="ay-input" type="number" min="0">
+          <input :id="fid" v-model.number="form.sellPrice" class="input" type="number" min="0">
         </template>
       </AyField>
 
@@ -176,25 +176,25 @@ useHead({ title: isNew ? 'Thêm phụ tùng' : 'Sửa phụ tùng' });
       </label>
     </section>
 
-    <section class="ay-card">
+    <section class="card">
       <h2 class="mb-2 font-heading text-[16px]">Xe tương thích</h2>
       <div class="flex gap-2">
         <input
-          v-model="compatibleInput" class="ay-input flex-1" type="text"
+          v-model="compatibleInput" class="input flex-1" type="text"
           placeholder="Honda PCX 125" aria-label="Thêm xe tương thích"
           @keyup.enter="addCompatible"
         >
         <AyButton variant="secondary" @click="addCompatible">Thêm</AyButton>
       </div>
       <ul v-if="compatible.length" class="mt-2 flex flex-wrap gap-1.5">
-        <li v-for="(item, index) in compatible" :key="item" class="ay-tag bg-neutral-200 text-neutral-700">
+        <li v-for="(item, index) in compatible" :key="item" class="tag bg-neutral-200 text-neutral-700">
           {{ item }}
           <button type="button" :aria-label="`Xóa ${item}`" @click="compatible.splice(index, 1)">×</button>
         </li>
       </ul>
     </section>
 
-    <section class="ay-card">
+    <section class="card">
       <AyImageUpload v-model="images" label="Ảnh phụ tùng" :max="4" />
     </section>
 

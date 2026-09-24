@@ -35,23 +35,23 @@ useHead({ title: 'Đăng nhập quản trị — AOYAMA Service' });
 </script>
 
 <template>
-  <div class="ay-card flex flex-col gap-4">
+  <div class="card flex flex-col gap-4">
     <div>
-      <p class="ay-kicker">SA-01</p>
+      <p class="card-kicker">SA-01</p>
       <h1 class="font-heading text-[20px]">Đăng nhập trang quản trị</h1>
-      <p class="mt-1 text-[13px] ay-muted">Dành cho nhân viên và quản trị viên AOYAMA.</p>
+      <p class="mt-1 text-[13px] text-muted">Dành cho nhân viên và quản trị viên AOYAMA.</p>
     </div>
 
     <form class="flex flex-col gap-3" @submit.prevent="submit">
       <AyField label="Tên đăng nhập" required>
         <template #default="{ id }">
-          <input :id="id" v-model="form.username" class="ay-input" type="text" autocomplete="username" required>
+          <input :id="id" v-model="form.username" class="input" type="text" autocomplete="username" required>
         </template>
       </AyField>
 
       <AyField label="Mật khẩu" required>
         <template #default="{ id }">
-          <input :id="id" v-model="form.password" class="ay-input" type="password" autocomplete="current-password" required>
+          <input :id="id" v-model="form.password" class="input" type="password" autocomplete="current-password" required>
         </template>
       </AyField>
 
@@ -60,7 +60,7 @@ useHead({ title: 'Đăng nhập quản trị — AOYAMA Service' });
       <AyButton type="submit" block :loading="loading">Đăng nhập</AyButton>
     </form>
 
-    <p class="text-center text-[12.5px] ay-muted">
+    <p class="text-center text-[12.5px] text-muted">
       Quên mật khẩu? Liên hệ quản trị viên để được đặt lại.
     </p>
   </div>

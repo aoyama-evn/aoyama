@@ -67,12 +67,12 @@ useHead({ title: 'Dịch vụ — AOYAMA Admin' });
     >
       <AyField label="Từ khóa" class="min-w-[220px] flex-1">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.keyword" class="ay-input" type="search" placeholder="Mã hoặc tên dịch vụ">
+          <input :id="id" v-model="filters.keyword" class="input" type="search" placeholder="Mã hoặc tên dịch vụ">
         </template>
       </AyField>
       <AyField label="Loại">
         <template #default="{ id }">
-          <select :id="id" v-model="filters.type" class="ay-input">
+          <select :id="id" v-model="filters.type" class="input">
             <option value="">Tất cả</option>
             <option :value="ServiceType.MAINTENANCE">Bảo dưỡng</option>
             <option :value="ServiceType.REPAIR">Sửa chữa</option>
@@ -105,7 +105,7 @@ useHead({ title: 'Dịch vụ — AOYAMA Admin' });
         {{ (row as unknown as ServiceItem).quoteOnly ? 'Báo giá riêng' : money(row.basePrice as number) }}
       </template>
       <template #cell-isActive="{ row }">
-        <span class="ay-tag" :class="row.isActive ? 'bg-success-bg text-success' : 'bg-neutral-200 text-neutral-600'">
+        <span class="tag" :class="row.isActive ? 'bg-success-bg text-success' : 'bg-neutral-200 text-neutral-600'">
           {{ row.isActive ? 'Đang bán' : 'Ngừng bán' }}
         </span>
       </template>

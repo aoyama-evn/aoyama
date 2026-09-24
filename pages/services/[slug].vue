@@ -39,14 +39,14 @@ function bookThis(): void {
 
     <div class="grid gap-5 lg:grid-cols-3">
       <div class="flex flex-col gap-5 lg:col-span-2">
-        <section class="ay-card">
+        <section class="card">
           <p class="text-[15px]">{{ i18n(service.shortDescription) }}</p>
-          <p v-if="i18n(service.description)" class="mt-3 whitespace-pre-line text-[14px] ay-muted">
+          <p v-if="i18n(service.description)" class="mt-3 whitespace-pre-line text-[14px] text-muted">
             {{ i18n(service.description) }}
           </p>
         </section>
 
-        <section v-if="service.checklistItems.length" class="ay-card">
+        <section v-if="service.checklistItems.length" class="card">
           <h2 class="mb-2 font-heading text-[16px]">Hạng mục kiểm tra</h2>
           <ul class="flex flex-col gap-1.5">
             <li v-for="(item, index) in service.checklistItems" :key="index" class="flex gap-2 text-[14px]">
@@ -57,28 +57,28 @@ function bookThis(): void {
         </section>
       </div>
 
-      <aside class="ay-card flex h-fit flex-col gap-3">
+      <aside class="card flex h-fit flex-col gap-3">
         <div>
-          <p class="text-[12.5px] ay-muted">Giá tham khảo</p>
+          <p class="text-[12.5px] text-muted">Giá tham khảo</p>
           <p class="font-heading text-[26px]">
             {{ service.quoteOnly ? 'Báo giá riêng' : `~ ${money(service.basePrice)}` }}
           </p>
-          <p v-if="!service.quoteOnly" class="text-[12px] ay-muted">
+          <p v-if="!service.quoteOnly" class="text-[12px] text-muted">
             Giá cuối cùng thay đổi theo dung tích xe và tình trạng thực tế.
           </p>
         </div>
 
         <dl class="flex flex-col gap-1.5 border-t border-divider pt-3 text-[13.5px]">
           <div class="flex justify-between">
-            <dt class="ay-muted">Thời gian ước tính</dt>
+            <dt class="text-muted">Thời gian ước tính</dt>
             <dd>{{ service.durationMinutes }} phút</dd>
           </div>
           <div class="flex justify-between">
-            <dt class="ay-muted">Phân loại</dt>
+            <dt class="text-muted">Phân loại</dt>
             <dd>{{ service.type === 'MAINTENANCE' ? 'Bảo dưỡng' : 'Sửa chữa' }}</dd>
           </div>
           <div v-if="service.maintenanceIntervalMonths" class="flex justify-between">
-            <dt class="ay-muted">Chu kỳ đề xuất</dt>
+            <dt class="text-muted">Chu kỳ đề xuất</dt>
             <dd>{{ service.maintenanceIntervalMonths }} tháng</dd>
           </div>
         </dl>

@@ -89,11 +89,11 @@ useHead({ title: 'Nhập mã xác thực' });
 </script>
 
 <template>
-  <div class="ay-card flex flex-col gap-4">
+  <div class="card flex flex-col gap-4">
     <div>
-      <p class="ay-kicker">SC-19</p>
+      <p class="card-kicker">SC-19</p>
       <h1 class="font-heading text-[20px]">Nhập mã xác thực</h1>
-      <p class="mt-1 text-[13.5px] ay-muted">
+      <p class="mt-1 text-[13.5px] text-muted">
         Chúng tôi đã gửi mã 6 chữ số tới <strong>{{ phone }}</strong>. Mã có hiệu lực 5 phút.
       </p>
     </div>
@@ -103,7 +103,7 @@ useHead({ title: 'Nhập mã xác thực' });
         <template #default="{ id }">
           <input
             :id="id" v-model="code"
-            class="ay-input text-center font-heading text-[26px] tracking-[0.4em]"
+            class="input text-center font-heading text-[26px] tracking-[0.4em]"
             type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code"
             placeholder="······" required
           >
@@ -119,12 +119,12 @@ useHead({ title: 'Nhập mã xác thực' });
 
     <div class="flex flex-col items-center gap-1 text-[13px]">
       <button
-        type="button" class="ay-btn ay-btn-ghost ay-btn-sm"
+        type="button" class="btn btn-ghost text-[12.5px]"
         :disabled="cooldown > 0" @click="resend"
       >
         {{ cooldown > 0 ? `Gửi lại mã sau ${cooldown} giây` : 'Gửi lại mã' }}
       </button>
-      <NuxtLink to="/login" class="ay-muted underline">Đổi số điện thoại khác</NuxtLink>
+      <NuxtLink to="/login" class="text-muted underline">Đổi số điện thoại khác</NuxtLink>
     </div>
   </div>
 </template>

@@ -55,11 +55,11 @@ async function loadStock(partIds: string[]): Promise<void> {
   <div class="flex flex-col gap-2">
     <AyField label="Tìm phụ tùng" hint="Nhập mã hoặc tên, tối thiểu 2 ký tự">
       <template #default="{ id }">
-        <input :id="id" v-model="keyword" class="ay-input" type="search" placeholder="P-OIL-10W30 / dầu máy">
+        <input :id="id" v-model="keyword" class="input" type="search" placeholder="P-OIL-10W30 / dầu máy">
       </template>
     </AyField>
 
-    <p v-if="loading" class="text-[13px] ay-muted">Đang tìm…</p>
+    <p v-if="loading" class="text-[13px] text-muted">Đang tìm…</p>
 
     <ul v-else-if="results.length" class="flex max-h-72 flex-col gap-1 overflow-y-auto">
       <li v-for="part in results" :key="part.id">
@@ -71,13 +71,13 @@ async function loadStock(partIds: string[]): Promise<void> {
         >
           <span class="flex-1">
             <span class="block text-[14px] font-semibold">{{ i18n(part.name) }}</span>
-            <span class="block text-[12px] ay-muted">{{ part.code }} · {{ part.maker ?? '—' }}</span>
+            <span class="block text-[12px] text-muted">{{ part.code }} · {{ part.maker ?? '—' }}</span>
           </span>
           <span class="text-right">
             <span class="block font-heading text-[13.5px]">{{ money(part.sellPrice) }}</span>
             <span
               class="block text-[11.5px]"
-              :class="(stockByPart[part.id] ?? 0) > 0 ? 'ay-muted' : 'text-danger'"
+              :class="(stockByPart[part.id] ?? 0) > 0 ? 'text-muted' : 'text-danger'"
             >
               Tồn {{ stockByPart[part.id] ?? 0 }}
             </span>
@@ -86,7 +86,7 @@ async function loadStock(partIds: string[]): Promise<void> {
       </li>
     </ul>
 
-    <p v-else-if="keyword.trim().length >= 2" class="text-[13px] ay-muted">
+    <p v-else-if="keyword.trim().length >= 2" class="text-[13px] text-muted">
       Không tìm thấy phụ tùng phù hợp.
     </p>
   </div>

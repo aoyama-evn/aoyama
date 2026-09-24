@@ -7,7 +7,7 @@
     <div class="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-10">
       <NuxtLink to="/" class="mb-6 text-center">
         <span class="block font-heading text-[20px] text-accent-700">AOYAMA Service</span>
-        <span class="block text-[11.5px] ay-muted">バイクの整備・修理</span>
+        <span class="block text-[11.5px] text-muted">バイクの整備・修理</span>
       </NuxtLink>
       <slot />
       <div class="mt-6 flex justify-center"><AyLangSwitcher /></div>

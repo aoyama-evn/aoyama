@@ -27,38 +27,38 @@ useHead({ title: `Phiếu dịch vụ ${record.value.code}` });
       </template>
     </AyPageHeader>
 
-    <section class="ay-card flex flex-col gap-2 text-[14px]">
+    <section class="card flex flex-col gap-2 text-[14px]">
       <div class="flex justify-between gap-3">
-        <span class="ay-muted">Xe</span>
+        <span class="text-muted">Xe</span>
         <span>{{ record.vehicle?.plateNumber }} · {{ record.vehicle?.maker }} {{ record.vehicle?.model }}</span>
       </div>
       <div class="flex justify-between gap-3">
-        <span class="ay-muted">Số km khi tiếp nhận</span>
+        <span class="text-muted">Số km khi tiếp nhận</span>
         <span>{{ number(record.intakeOdometer) }} km</span>
       </div>
       <div v-if="record.completedAt" class="flex justify-between gap-3">
-        <span class="ay-muted">Hoàn tất</span>
+        <span class="text-muted">Hoàn tất</span>
         <span>{{ dateTime(record.completedAt) }}</span>
       </div>
       <div v-if="record.deliveredAt" class="flex justify-between gap-3">
-        <span class="ay-muted">Bàn giao</span>
+        <span class="text-muted">Bàn giao</span>
         <span>{{ dateTime(record.deliveredAt) }}</span>
       </div>
     </section>
 
-    <section v-if="record.customerSymptom || record.diagnosisNote" class="ay-card flex flex-col gap-2">
+    <section v-if="record.customerSymptom || record.diagnosisNote" class="card flex flex-col gap-2">
       <h2 class="font-heading text-[16px]">Chẩn đoán</h2>
       <div v-if="record.customerSymptom">
-        <p class="text-[12.5px] ay-muted">Mô tả của bạn</p>
+        <p class="text-[12.5px] text-muted">Mô tả của bạn</p>
         <p class="whitespace-pre-line text-[14px]">{{ record.customerSymptom }}</p>
       </div>
       <div v-if="record.diagnosisNote">
-        <p class="text-[12.5px] ay-muted">Kết luận của kỹ thuật viên</p>
+        <p class="text-[12.5px] text-muted">Kết luận của kỹ thuật viên</p>
         <p class="whitespace-pre-line text-[14px]">{{ record.diagnosisNote }}</p>
       </div>
     </section>
 
-    <section v-if="(record.items ?? []).length" class="ay-card">
+    <section v-if="(record.items ?? []).length" class="card">
       <h2 class="mb-2 font-heading text-[16px]">Hạng mục công việc</h2>
       <ul class="flex flex-col gap-1.5 text-[14px]">
         <li v-for="item in record.items" :key="item.id" class="flex justify-between gap-3">
@@ -68,7 +68,7 @@ useHead({ title: `Phiếu dịch vụ ${record.value.code}` });
       </ul>
     </section>
 
-    <section v-if="(record.parts ?? []).length" class="ay-card">
+    <section v-if="(record.parts ?? []).length" class="card">
       <h2 class="mb-2 font-heading text-[16px]">Phụ tùng đã thay</h2>
       <ul class="flex flex-col gap-1.5 text-[14px]">
         <li v-for="part in record.parts" :key="part.id" class="flex justify-between gap-3">
@@ -78,7 +78,7 @@ useHead({ title: `Phiếu dịch vụ ${record.value.code}` });
       </ul>
     </section>
 
-    <section class="ay-card">
+    <section class="card">
       <AyMoneyTable
         :labor-subtotal="record.laborSubtotal"
         :parts-subtotal="record.partsSubtotal"
@@ -90,7 +90,7 @@ useHead({ title: `Phiếu dịch vụ ${record.value.code}` });
       />
     </section>
 
-    <section v-if="(record.photos ?? []).length" class="ay-card">
+    <section v-if="(record.photos ?? []).length" class="card">
       <h2 class="mb-2 font-heading text-[16px]">Hình ảnh</h2>
       <ul class="grid grid-cols-3 gap-2">
         <li v-for="photo in record.photos" :key="photo.id">

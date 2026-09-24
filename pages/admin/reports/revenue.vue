@@ -48,12 +48,12 @@ useHead({ title: 'Báo cáo doanh thu — AOYAMA Admin' });
     <AyFilterBar>
       <AyField label="Từ ngày">
         <template #default="{ id }">
-          <input :id="id" v-model="range.from" class="ay-input" type="date">
+          <input :id="id" v-model="range.from" class="input" type="date">
         </template>
       </AyField>
       <AyField label="Đến ngày">
         <template #default="{ id }">
-          <input :id="id" v-model="range.to" class="ay-input" type="date">
+          <input :id="id" v-model="range.to" class="input" type="date">
         </template>
       </AyField>
     </AyFilterBar>
@@ -75,7 +75,7 @@ useHead({ title: 'Báo cáo doanh thu — AOYAMA Admin' });
         />
       </div>
 
-      <section class="ay-card">
+      <section class="card">
         <h2 class="mb-3 font-heading text-[16px]">Doanh thu theo ngày</h2>
         <div class="flex h-44 items-end gap-1 overflow-x-auto">
           <div
@@ -87,14 +87,14 @@ useHead({ title: 'Báo cáo doanh thu — AOYAMA Admin' });
               :style="{ height: `${(day.amount / maxDay) * 100}%` }"
               :title="`${day.date}: ${money(day.amount)} · ${day.workOrders} phiếu`"
             />
-            <span class="text-[9.5px] ay-muted">{{ day.date.slice(5) }}</span>
+            <span class="text-[9.5px] text-muted">{{ day.date.slice(5) }}</span>
           </div>
         </div>
         <AyEmptyState v-if="data.byDay.length === 0" title="Chưa có khoản thu nào trong khoảng này" />
       </section>
 
       <div class="grid gap-4 lg:grid-cols-2">
-        <section class="ay-card">
+        <section class="card">
           <h2 class="mb-3 font-heading text-[16px]">Theo hình thức thanh toán</h2>
           <ul class="flex flex-col gap-2">
             <li v-for="row in data.byMethod" :key="row.method" class="flex items-center gap-3">
@@ -111,10 +111,10 @@ useHead({ title: 'Báo cáo doanh thu — AOYAMA Admin' });
           <AyEmptyState v-if="data.byMethod.length === 0" title="Chưa có dữ liệu" />
         </section>
 
-        <section class="ay-card">
+        <section class="card">
           <h2 class="mb-3 font-heading text-[16px]">Chi tiết theo ngày</h2>
           <div class="max-h-72 overflow-y-auto">
-            <table class="ay-table">
+            <table class="table">
               <thead>
                 <tr>
                   <th scope="col">Ngày</th>

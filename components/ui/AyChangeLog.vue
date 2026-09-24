@@ -41,7 +41,7 @@ const ACTOR: Record<string, string> = {
 
       <div class="flex-1">
         <p class="text-[13.5px] font-semibold">{{ entry.action }}</p>
-        <p class="text-[12px] ay-muted">
+        <p class="text-[12px] text-muted">
           {{ dateTime(entry.createdAt) }}
           · {{ entry.actorName || ACTOR[entry.actorType ?? ''] || 'Hệ thống' }}
         </p>

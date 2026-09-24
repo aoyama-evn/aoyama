@@ -67,7 +67,7 @@ useHead({ title: `Đổi lịch hẹn ${code}` });
 
     <div class="sticky bottom-0 -mx-4 border-t border-divider bg-surface px-4 py-3 ay-safe-bottom">
       <div class="flex items-center gap-3">
-        <p class="flex-1 text-[13px] ay-muted">
+        <p class="flex-1 text-[13px] text-muted">
           <template v-if="slot">Thời gian mới: {{ slot.date }} · {{ slot.startTime }}</template>
           <template v-else>Chọn khung giờ mới để tiếp tục</template>
         </p>

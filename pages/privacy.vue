@@ -7,7 +7,7 @@ useHead({ title: 'Chính sách dữ liệu — AOYAMA Service' });
   <article class="flex max-w-prose flex-col gap-4">
     <AyPageHeader code="SC-09" title="Chính sách dữ liệu cá nhân" />
 
-    <section class="ay-card flex flex-col gap-3 text-[14px] leading-relaxed">
+    <section class="card flex flex-col gap-3 text-[14px] leading-relaxed">
       <h2 class="font-heading text-[16px]">1. Dữ liệu chúng tôi thu thập</h2>
       <p>
         Họ tên, số điện thoại, email (nếu có), thông tin phương tiện, lịch sử dịch vụ, và nội dung

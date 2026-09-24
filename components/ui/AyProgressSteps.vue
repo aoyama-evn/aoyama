@@ -1,17 +1,24 @@
 <script setup lang="ts">
 import { WORK_ORDER_FLOW, type WorkOrderStatus } from '~/types/enums';
 
-/** CP-19 Thanh tien do trang thai — SC-26, SA-10. */
+/**
+ * CP-19 Thanh tien do trang thai — SC-26, SA-10.
+ * Ban thiet ke ve dang dong thoi gian doc: cham tron 16px noi bang duong ke 2px.
+ * Moc da qua to mau accent-2, moc dang lam to mau accent kem quang sang,
+ * moc chua toi chi la vong tron rong.
+ */
 const props = defineProps<{
   current: WorkOrderStatus;
   /** Bo qua buoc bao gia khi phieu khong can bao gia. */
   skipQuotation?: boolean;
+  /** Moc thoi gian va ghi chu cho tung trang thai, neu co. */
+  timeline?: Partial<Record<WorkOrderStatus, { at?: string; note?: string | null }>>;
 }>();
 
 const LABELS: Record<WorkOrderStatus, string> = {
   RECEIVED: 'Đã tiếp nhận',
-  DIAGNOSING: 'Đang chẩn đoán',
-  QUOTED: 'Chờ duyệt báo giá',
+  DIAGNOSING: 'Đã chẩn đoán',
+  QUOTED: 'Đã gửi báo giá',
   IN_PROGRESS: 'Đang thực hiện',
   COMPLETED: 'Hoàn tất',
   DELIVERED: 'Đã bàn giao',
@@ -21,60 +28,66 @@ const LABELS: Record<WorkOrderStatus, string> = {
 const steps = computed(() =>
   WORK_ORDER_FLOW.filter((s) => !(props.skipQuotation && s === 'QUOTED')),
 );
-
 const currentIndex = computed(() => steps.value.indexOf(props.current));
 const isCancelled = computed(() => props.current === 'CANCELLED');
+
+function state(index: number): 'done' | 'current' | 'todo' {
+  if (index < currentIndex.value) return 'done';
+  return index === currentIndex.value ? 'current' : 'todo';
+}
 </script>
 
 <template>
-  <div v-if="isCancelled" class="ay-card flex items-center gap-2">
+  <div v-if="isCancelled" class="card flex-row items-center gap-2">
     <AyStatusTag status="CANCELLED" />
-    <p class="text-[13.5px] ay-muted">Phiếu dịch vụ này đã bị hủy.</p>
+    <p class="text-[13.5px] text-muted">Phiếu dịch vụ này đã bị hủy.</p>
   </div>
 
-  <ol v-else class="flex flex-col gap-0 sm:flex-row sm:items-start sm:gap-0">
-    <li
-      v-for="(step, index) in steps"
-      :key="step"
-      class="flex flex-1 items-start gap-3 sm:flex-col sm:items-center sm:text-center"
-    >
-      <div class="flex flex-col items-center sm:w-full sm:flex-row">
+  <ol v-else class="flex flex-col">
+    <li v-for="(step, index) in steps" :key="step" class="flex gap-3">
+      <span class="flex w-[26px] flex-none flex-col items-center">
         <span
-          class="hidden h-0.5 flex-1 sm:block"
-          :class="index === 0 ? 'opacity-0' : index <= currentIndex ? 'bg-accent' : 'bg-neutral-300'"
-          aria-hidden="true"
+          class="rounded-full"
+          style="width: 16px; height: 16px"
+          :style="
+            state(index) === 'done'
+              ? 'background: var(--color-accent-2-600)'
+              : state(index) === 'current'
+                ? 'background: var(--color-accent); box-shadow: 0 0 0 4px var(--color-accent-200)'
+                : 'border: 2px solid var(--color-neutral-400)'
+          "
         />
         <span
-          class="grid h-8 w-8 flex-none place-items-center rounded-full text-[13px] font-semibold"
-          :class="
-            index < currentIndex
-              ? 'bg-accent text-white'
-              : index === currentIndex
-                ? 'bg-accent text-white ring-4 ring-accent-200'
-                : 'bg-neutral-200 ay-muted'
+          v-if="index < steps.length - 1"
+          class="w-0.5 flex-1"
+          style="min-height: 26px"
+          :style="
+            state(index) === 'done'
+              ? 'background: var(--color-accent-2-400)'
+              : 'background: var(--color-neutral-300)'
+          "
+        />
+      </span>
+
+      <span class="pb-4" :class="index === steps.length - 1 ? 'pb-0' : ''">
+        <span
+          class="block text-[14px]"
+          :style="
+            state(index) === 'current'
+              ? 'font-weight: 700; color: var(--color-accent-700)'
+              : state(index) === 'todo'
+                ? 'color: var(--color-neutral-600)'
+                : 'font-weight: 600'
           "
         >
-          <template v-if="index < currentIndex">✓</template>
-          <template v-else>{{ index + 1 }}</template>
+          {{ LABELS[step] }}
         </span>
-        <span
-          class="hidden h-0.5 flex-1 sm:block"
-          :class="index === steps.length - 1 ? 'opacity-0' : index < currentIndex ? 'bg-accent' : 'bg-neutral-300'"
-          aria-hidden="true"
-        />
-        <span
-          class="ml-3 mt-0 h-6 w-0.5 sm:hidden"
-          :class="index === steps.length - 1 ? 'opacity-0' : index < currentIndex ? 'bg-accent' : 'bg-neutral-300'"
-          aria-hidden="true"
-        />
-      </div>
-
-      <p
-        class="pb-4 text-[12.5px] sm:mt-1.5 sm:pb-0"
-        :class="index === currentIndex ? 'font-semibold text-accent-800' : 'ay-muted'"
-      >
-        {{ LABELS[step] }}
-      </p>
+        <span v-if="timeline?.[step]" class="block text-[11.5px] text-muted">
+          {{ timeline[step]?.at }}
+          <template v-if="timeline[step]?.note"> · {{ timeline[step]?.note }}</template>
+        </span>
+        <slot :name="`after-${step}`" />
+      </span>
     </li>
   </ol>
 </template>

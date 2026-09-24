@@ -75,12 +75,12 @@ useHead({ title: 'Nhật ký thông báo — AOYAMA Admin' });
     >
       <AyField label="Người nhận" class="min-w-[180px]">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.recipient" class="ay-input" type="search" placeholder="Số điện thoại hoặc email">
+          <input :id="id" v-model="filters.recipient" class="input" type="search" placeholder="Số điện thoại hoặc email">
         </template>
       </AyField>
       <AyField label="Kênh">
         <template #default="{ id }">
-          <select :id="id" v-model="filters.channel" class="ay-input">
+          <select :id="id" v-model="filters.channel" class="input">
             <option value="">Tất cả</option>
             <option v-for="c in Object.values(NotificationChannel)" :key="c" :value="c">{{ c }}</option>
           </select>
@@ -88,7 +88,7 @@ useHead({ title: 'Nhật ký thông báo — AOYAMA Admin' });
       </AyField>
       <AyField label="Kết quả">
         <template #default="{ id }">
-          <select :id="id" v-model="filters.status" class="ay-input">
+          <select :id="id" v-model="filters.status" class="input">
             <option value="">Tất cả</option>
             <option v-for="s in Object.values(NotificationSendStatus)" :key="s" :value="s">{{ s }}</option>
           </select>
@@ -96,12 +96,12 @@ useHead({ title: 'Nhật ký thông báo — AOYAMA Admin' });
       </AyField>
       <AyField label="Từ ngày">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.from" class="ay-input" type="date">
+          <input :id="id" v-model="filters.from" class="input" type="date">
         </template>
       </AyField>
       <AyField label="Đến ngày">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.to" class="ay-input" type="date">
+          <input :id="id" v-model="filters.to" class="input" type="date">
         </template>
       </AyField>
     </AyFilterBar>
@@ -121,7 +121,7 @@ useHead({ title: 'Nhật ký thông báo — AOYAMA Admin' });
       <template #cell-recipient="{ row }">{{ maskedPhone(row.recipient as string) }}</template>
       <template #cell-status="{ row }"><AyStatusTag :status="row.status as string" /></template>
       <template #cell-body="{ row }">
-        <span class="line-clamp-1 text-[12.5px] ay-muted">{{ row.body }}</span>
+        <span class="line-clamp-1 text-[12.5px] text-muted">{{ row.body }}</span>
       </template>
       <template #cell-actions="{ row }">
         <button
@@ -142,14 +142,14 @@ useHead({ title: 'Nhật ký thông báo — AOYAMA Admin' });
       @cancel="detail = null"
     >
       <dl v-if="detail" class="mt-3 flex flex-col gap-2 text-left text-[13.5px]">
-        <div class="flex justify-between"><dt class="ay-muted">Sự kiện</dt><dd class="font-mono">{{ detail.event }}</dd></div>
-        <div class="flex justify-between"><dt class="ay-muted">Người nhận</dt><dd>{{ detail.recipient }}</dd></div>
-        <div class="flex justify-between"><dt class="ay-muted">Gửi lúc</dt><dd>{{ dateTime(detail.sentAt) || '—' }}</dd></div>
-        <div class="flex justify-between"><dt class="ay-muted">Số lần thử lại</dt><dd>{{ detail.retryCount }}</dd></div>
-        <div v-if="detail.subject"><dt class="ay-muted">Tiêu đề</dt><dd>{{ detail.subject }}</dd></div>
-        <div><dt class="ay-muted">Nội dung</dt><dd class="whitespace-pre-line rounded-xl bg-neutral-100 p-2">{{ detail.body }}</dd></div>
+        <div class="flex justify-between"><dt class="text-muted">Sự kiện</dt><dd class="font-mono">{{ detail.event }}</dd></div>
+        <div class="flex justify-between"><dt class="text-muted">Người nhận</dt><dd>{{ detail.recipient }}</dd></div>
+        <div class="flex justify-between"><dt class="text-muted">Gửi lúc</dt><dd>{{ dateTime(detail.sentAt) || '—' }}</dd></div>
+        <div class="flex justify-between"><dt class="text-muted">Số lần thử lại</dt><dd>{{ detail.retryCount }}</dd></div>
+        <div v-if="detail.subject"><dt class="text-muted">Tiêu đề</dt><dd>{{ detail.subject }}</dd></div>
+        <div><dt class="text-muted">Nội dung</dt><dd class="whitespace-pre-line rounded-xl bg-neutral-100 p-2">{{ detail.body }}</dd></div>
         <div v-if="detail.errorMessage">
-          <dt class="ay-muted">Lỗi</dt>
+          <dt class="text-muted">Lỗi</dt>
           <dd class="text-danger">{{ detail.errorMessage }}</dd>
         </div>
       </dl>

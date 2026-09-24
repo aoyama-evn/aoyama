@@ -39,7 +39,7 @@ useHead({ title: 'Đổi mật khẩu' });
 </script>
 
 <template>
-  <div class="ay-card flex flex-col gap-4">
+  <div class="card flex flex-col gap-4">
     <div>
       <h1 class="font-heading text-[19px]">Đổi mật khẩu</h1>
       <p v-if="auth.user?.mustChangePassword" class="mt-1 text-[13px] text-warning">
@@ -50,19 +50,19 @@ useHead({ title: 'Đổi mật khẩu' });
     <form class="flex flex-col gap-3" @submit.prevent="submit">
       <AyField label="Mật khẩu hiện tại" required>
         <template #default="{ id }">
-          <input :id="id" v-model="form.currentPassword" class="ay-input" type="password" autocomplete="current-password" required>
+          <input :id="id" v-model="form.currentPassword" class="input" type="password" autocomplete="current-password" required>
         </template>
       </AyField>
 
       <AyField label="Mật khẩu mới" required hint="Tối thiểu 8 ký tự">
         <template #default="{ id }">
-          <input :id="id" v-model="form.newPassword" class="ay-input" type="password" autocomplete="new-password" minlength="8" required>
+          <input :id="id" v-model="form.newPassword" class="input" type="password" autocomplete="new-password" minlength="8" required>
         </template>
       </AyField>
 
       <AyField label="Nhập lại mật khẩu mới" required :error="mismatch ? 'Hai mật khẩu chưa khớp' : undefined">
         <template #default="{ id, invalid }">
-          <input :id="id" v-model="form.confirmPassword" class="ay-input" type="password" autocomplete="new-password" :aria-invalid="invalid" required>
+          <input :id="id" v-model="form.confirmPassword" class="input" type="password" autocomplete="new-password" :aria-invalid="invalid" required>
         </template>
       </AyField>
 

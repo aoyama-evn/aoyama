@@ -105,22 +105,22 @@ useHead({ title: isNew ? 'Thêm dịch vụ' : 'Sửa dịch vụ' });
       description="Tên và mô tả nhập cho cả ba ngôn ngữ — thiếu bản dịch nào, hệ thống lùi về tiếng Nhật."
     />
 
-    <section class="ay-card grid gap-3 sm:grid-cols-2">
+    <section class="card grid gap-3 sm:grid-cols-2">
       <AyField label="Mã dịch vụ" required>
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.code" class="ay-input font-mono" type="text" placeholder="SVC-MAINT-PERIODIC">
+          <input :id="fid" v-model="form.code" class="input font-mono" type="text" placeholder="SVC-MAINT-PERIODIC">
         </template>
       </AyField>
 
       <AyField label="Đường dẫn (slug)" required hint="Dùng cho địa chỉ trang dịch vụ">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.slug" class="ay-input font-mono" type="text">
+          <input :id="fid" v-model="form.slug" class="input font-mono" type="text">
         </template>
       </AyField>
 
       <AyField label="Phân loại" required>
         <template #default="{ id: fid }">
-          <select :id="fid" v-model="form.type" class="ay-input">
+          <select :id="fid" v-model="form.type" class="input">
             <option :value="ServiceType.MAINTENANCE">Bảo dưỡng</option>
             <option :value="ServiceType.REPAIR">Sửa chữa</option>
           </select>
@@ -129,7 +129,7 @@ useHead({ title: isNew ? 'Thêm dịch vụ' : 'Sửa dịch vụ' });
 
       <AyField label="Biểu tượng">
         <template #default="{ id: fid }">
-          <select :id="fid" v-model="form.iconKey" class="ay-input">
+          <select :id="fid" v-model="form.iconKey" class="input">
             <option value="">— Không —</option>
             <option v-for="icon in ICONS" :key="icon" :value="icon">{{ icon }}</option>
           </select>
@@ -147,46 +147,46 @@ useHead({ title: isNew ? 'Thêm dịch vụ' : 'Sửa dịch vụ' });
       </div>
     </section>
 
-    <section class="ay-card">
+    <section class="card">
       <div class="mb-2 flex items-baseline justify-between">
         <h2 class="font-heading text-[16px]">Hạng mục kiểm tra</h2>
         <AyButton variant="ghost" size="sm" @click="checklist.push({})">+ Thêm hạng mục</AyButton>
       </div>
       <div v-for="(item, index) in checklist" :key="index" class="mb-2 flex items-end gap-2">
         <AyI18nInput v-model="checklist[index]" class="flex-1" />
-        <button type="button" class="ay-btn ay-btn-ghost ay-btn-sm text-danger" @click="checklist.splice(index, 1)">
+        <button type="button" class="btn btn-ghost text-[12.5px] text-danger" @click="checklist.splice(index, 1)">
           Xóa
         </button>
       </div>
-      <p v-if="checklist.length === 0" class="text-[13px] ay-muted">
+      <p v-if="checklist.length === 0" class="text-[13px] text-muted">
         Chưa có hạng mục nào. Danh sách này hiện trên trang chi tiết dịch vụ của khách.
       </p>
     </section>
 
-    <section class="ay-card grid gap-3 sm:grid-cols-2">
+    <section class="card grid gap-3 sm:grid-cols-2">
       <h2 class="font-heading text-[16px] sm:col-span-2">Thời gian &amp; giá</h2>
 
       <AyField label="Thời gian ước tính (phút)" required>
         <template #default="{ id: fid }">
-          <input :id="fid" v-model.number="form.durationMinutes" class="ay-input" type="number" min="5">
+          <input :id="fid" v-model.number="form.durationMinutes" class="input" type="number" min="5">
         </template>
       </AyField>
 
       <AyField label="Giá cơ sở (JPY)" hint="Giá cho xe dưới 125cc; phân khúc khác đặt ở bảng giá">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model.number="form.basePrice" class="ay-input" type="number" min="0" :disabled="form.quoteOnly">
+          <input :id="fid" v-model.number="form.basePrice" class="input" type="number" min="0" :disabled="form.quoteOnly">
         </template>
       </AyField>
 
       <AyField label="Chu kỳ bảo dưỡng (tháng)" hint="Nguồn để hệ thống nhắc khách đến kỳ">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model.number="form.maintenanceIntervalMonths" class="ay-input" type="number" min="1">
+          <input :id="fid" v-model.number="form.maintenanceIntervalMonths" class="input" type="number" min="1">
         </template>
       </AyField>
 
       <AyField label="Chu kỳ bảo dưỡng (km)">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model.number="form.maintenanceIntervalKm" class="ay-input" type="number" min="1">
+          <input :id="fid" v-model.number="form.maintenanceIntervalKm" class="input" type="number" min="1">
         </template>
       </AyField>
 
@@ -205,7 +205,7 @@ useHead({ title: isNew ? 'Thêm dịch vụ' : 'Sửa dịch vụ' });
 
       <AyField label="Thứ tự hiển thị">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model.number="form.sortOrder" class="ay-input" type="number">
+          <input :id="fid" v-model.number="form.sortOrder" class="input" type="number">
         </template>
       </AyField>
     </section>

@@ -74,40 +74,40 @@ useHead({ title: isNew ? 'Thêm khách hàng' : 'Sửa khách hàng' });
       :back-to="isNew ? '/admin/customers' : `/admin/customers/${id}`"
     />
 
-    <form class="ay-card grid gap-3 sm:grid-cols-2" @submit.prevent="save">
+    <form class="card grid gap-3 sm:grid-cols-2" @submit.prevent="save">
       <AyField label="Số điện thoại" required hint="Là khóa định danh khách hàng (BR-01)">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.phone" class="ay-input" type="tel" required>
+          <input :id="fid" v-model="form.phone" class="input" type="tel" required>
         </template>
       </AyField>
 
       <AyField label="Họ tên" required>
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.name" class="ay-input" type="text" required>
+          <input :id="fid" v-model="form.name" class="input" type="text" required>
         </template>
       </AyField>
 
       <AyField label="Tên kana">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.nameKana" class="ay-input" type="text">
+          <input :id="fid" v-model="form.nameKana" class="input" type="text">
         </template>
       </AyField>
 
       <AyField label="Email">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.email" class="ay-input" type="email">
+          <input :id="fid" v-model="form.email" class="input" type="email">
         </template>
       </AyField>
 
       <AyField label="Địa chỉ" class="sm:col-span-2">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.address" class="ay-input" type="text">
+          <input :id="fid" v-model="form.address" class="input" type="text">
         </template>
       </AyField>
 
       <AyField label="Ngôn ngữ liên lạc">
         <template #default="{ id: fid }">
-          <select :id="fid" v-model="form.language" class="ay-input">
+          <select :id="fid" v-model="form.language" class="input">
             <option value="ja">日本語</option>
             <option value="en">English</option>
             <option value="vi">Tiếng Việt</option>
@@ -117,7 +117,7 @@ useHead({ title: isNew ? 'Thêm khách hàng' : 'Sửa khách hàng' });
 
       <AyField label="Ghi chú nội bộ" class="sm:col-span-2">
         <template #default="{ id: fid }">
-          <textarea :id="fid" v-model="form.internalNote" class="ay-input min-h-[90px]" />
+          <textarea :id="fid" v-model="form.internalNote" class="input min-h-[90px]" />
         </template>
       </AyField>
 

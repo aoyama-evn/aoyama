@@ -81,34 +81,34 @@ useHead({ title: 'Đặt lịch — Bước 3' });
     />
     <BookingSteps :current="3" />
 
-    <section class="ay-card grid gap-3 sm:grid-cols-2">
+    <section class="card grid gap-3 sm:grid-cols-2">
       <h2 class="font-heading text-[16px] sm:col-span-2">Thông tin liên hệ</h2>
 
       <AyField label="Họ tên" required :error="errors.contactName">
         <template #default="{ id, invalid }">
-          <input :id="id" v-model="booking.contactName" class="ay-input" type="text" :aria-invalid="invalid" autocomplete="name">
+          <input :id="id" v-model="booking.contactName" class="input" type="text" :aria-invalid="invalid" autocomplete="name">
         </template>
       </AyField>
 
       <AyField label="Số điện thoại" required :error="errors.contactPhone" hint="Dùng để nhận mã lịch hẹn và nhắc lịch qua SMS">
         <template #default="{ id, invalid }">
-          <input :id="id" v-model="booking.contactPhone" class="ay-input" type="tel" :aria-invalid="invalid" autocomplete="tel" placeholder="090-1234-5678">
+          <input :id="id" v-model="booking.contactPhone" class="input" type="tel" :aria-invalid="invalid" autocomplete="tel" placeholder="090-1234-5678">
         </template>
       </AyField>
 
       <AyField label="Email" hint="Không bắt buộc" class="sm:col-span-2">
         <template #default="{ id }">
-          <input :id="id" v-model="booking.contactEmail" class="ay-input" type="email" autocomplete="email">
+          <input :id="id" v-model="booking.contactEmail" class="input" type="email" autocomplete="email">
         </template>
       </AyField>
     </section>
 
-    <section class="ay-card flex flex-col gap-3">
+    <section class="card flex flex-col gap-3">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <h2 class="font-heading text-[16px]">Thông tin xe</h2>
         <button
           v-if="myVehicles.length > 0"
-          type="button" class="ay-btn ay-btn-ghost ay-btn-sm"
+          type="button" class="btn btn-ghost text-[12.5px]"
           @click="useExistingVehicle ? clearVehicleSelection() : (useExistingVehicle = true)"
         >
           {{ useExistingVehicle ? 'Khai báo xe khác' : 'Chọn xe đã lưu' }}
@@ -125,19 +125,19 @@ useHead({ title: 'Đặt lịch — Bước 3' });
           @click="pickVehicle(vehicle)"
         >
           <span class="font-heading text-[15px]">{{ vehicle.plateNumber }}</span>
-          <span class="text-[12.5px] ay-muted">{{ vehicle.maker }} {{ vehicle.model }}</span>
+          <span class="text-[12.5px] text-muted">{{ vehicle.maker }} {{ vehicle.model }}</span>
         </button>
       </div>
 
       <AyVehicleForm v-else v-model="booking.vehicle" :errors="errors" />
     </section>
 
-    <section class="ay-card flex flex-col gap-3">
+    <section class="card flex flex-col gap-3">
       <h2 class="font-heading text-[16px]">Mô tả tình trạng xe</h2>
       <AyField hint="Không bắt buộc, nhưng mô tả càng rõ thì cửa hàng chuẩn bị càng tốt">
         <template #default="{ id }">
           <textarea
-            :id="id" v-model="booking.symptomDescription" class="ay-input min-h-[110px]"
+            :id="id" v-model="booking.symptomDescription" class="input min-h-[110px]"
             placeholder="Ví dụ: xe kêu lạ khi phanh gấp, phanh trước không ăn"
           />
         </template>

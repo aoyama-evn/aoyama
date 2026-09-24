@@ -102,12 +102,12 @@ useHead({ title: 'Nhập / xuất kho — AOYAMA Admin' });
       description="Mọi thay đổi tồn kho đều để lại một dòng ở đây. Xuất kho cho phiếu dịch vụ được ghi tự động khi phiếu hoàn tất."
     />
 
-    <section class="ay-card grid gap-3 lg:grid-cols-4">
+    <section class="card grid gap-3 lg:grid-cols-4">
       <h2 class="font-heading text-[16px] lg:col-span-4">Ghi biến động mới</h2>
 
       <AyField label="Cửa hàng" required>
         <template #default="{ id }">
-          <select :id="id" v-model="form.storeId" class="ay-input">
+          <select :id="id" v-model="form.storeId" class="input">
             <option value="">— Chọn —</option>
             <option v-for="store in stores ?? []" :key="store.id" :value="store.id">
               {{ i18n(store.name) }}
@@ -118,7 +118,7 @@ useHead({ title: 'Nhập / xuất kho — AOYAMA Admin' });
 
       <AyField label="Loại" required>
         <template #default="{ id }">
-          <select :id="id" v-model="form.type" class="ay-input">
+          <select :id="id" v-model="form.type" class="input">
             <option v-for="(label, value) in TYPE_LABELS" :key="value" :value="value">{{ label }}</option>
           </select>
         </template>
@@ -130,13 +130,13 @@ useHead({ title: 'Nhập / xuất kho — AOYAMA Admin' });
         :hint="isAdjust ? 'Nhập số âm để giảm tồn sau kiểm kê' : undefined"
       >
         <template #default="{ id }">
-          <input :id="id" v-model.number="form.quantity" class="ay-input" type="number" :min="isAdjust ? undefined : 1">
+          <input :id="id" v-model.number="form.quantity" class="input" type="number" :min="isAdjust ? undefined : 1">
         </template>
       </AyField>
 
       <AyField v-if="form.type === 'IN'" label="Đơn giá nhập">
         <template #default="{ id }">
-          <input :id="id" v-model.number="form.unitCost" class="ay-input" type="number" min="0">
+          <input :id="id" v-model.number="form.unitCost" class="input" type="number" min="0">
         </template>
       </AyField>
 
@@ -149,7 +149,7 @@ useHead({ title: 'Nhập / xuất kho — AOYAMA Admin' });
 
       <AyField label="Lý do" class="lg:col-span-2">
         <template #default="{ id }">
-          <input :id="id" v-model="form.reason" class="ay-input" type="text" placeholder="Nhập hàng từ nhà cung cấp, kiểm kê cuối tháng…">
+          <input :id="id" v-model="form.reason" class="input" type="text" placeholder="Nhập hàng từ nhà cung cấp, kiểm kê cuối tháng…">
         </template>
       </AyField>
 
@@ -166,7 +166,7 @@ useHead({ title: 'Nhập / xuất kho — AOYAMA Admin' });
     >
       <AyField label="Cửa hàng">
         <template #default="{ id }">
-          <select :id="id" v-model="filters.storeId" class="ay-input">
+          <select :id="id" v-model="filters.storeId" class="input">
             <option value="">Tất cả</option>
             <option v-for="store in stores ?? []" :key="store.id" :value="store.id">
               {{ i18n(store.name) }}
@@ -176,7 +176,7 @@ useHead({ title: 'Nhập / xuất kho — AOYAMA Admin' });
       </AyField>
       <AyField label="Loại">
         <template #default="{ id }">
-          <select :id="id" v-model="filters.type" class="ay-input">
+          <select :id="id" v-model="filters.type" class="input">
             <option value="">Tất cả</option>
             <option v-for="(label, value) in TYPE_LABELS" :key="value" :value="value">{{ label }}</option>
           </select>
@@ -195,7 +195,7 @@ useHead({ title: 'Nhập / xuất kho — AOYAMA Admin' });
       <template #cell-createdAt="{ row }">{{ dateTime(row.createdAt as string) }}</template>
       <template #cell-part="{ row }">
         {{ i18n((row as unknown as InventoryTransaction).part?.name ?? null) }}
-        <span class="block font-mono text-[11.5px] ay-muted">
+        <span class="block font-mono text-[11.5px] text-muted">
           {{ (row as unknown as InventoryTransaction).part?.code }}
         </span>
       </template>
@@ -210,7 +210,7 @@ useHead({ title: 'Nhập / xuất kho — AOYAMA Admin' });
       </template>
       <template #cell-quantityAfter="{ row }">{{ number(row.quantityAfter as number) }}</template>
       <template #cell-reason="{ row }">
-        <span class="text-[13px] ay-muted">{{ row.reason ?? '—' }}</span>
+        <span class="text-[13px] text-muted">{{ row.reason ?? '—' }}</span>
       </template>
     </AyDataTable>
   </div>

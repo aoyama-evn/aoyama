@@ -99,10 +99,10 @@ useHead({ title: isNew ? 'Thêm phương tiện' : 'Sửa phương tiện' });
       :back-to="isNew ? '/admin/vehicles' : `/admin/vehicles/${id}`"
     />
 
-    <section v-if="isNew" class="ay-card flex flex-col gap-2">
+    <section v-if="isNew" class="card flex flex-col gap-2">
       <AyField label="Chủ xe" required :error="errors.customer" hint="Tìm theo tên hoặc số điện thoại">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="customerKeyword" class="ay-input" type="search">
+          <input :id="fid" v-model="customerKeyword" class="input" type="search">
         </template>
       </AyField>
 
@@ -115,13 +115,13 @@ useHead({ title: isNew ? 'Thêm phương tiện' : 'Sửa phương tiện' });
             @click="customerId = customer.id; customerKeyword = customer.name"
           >
             <span class="flex-1">{{ customer.name }}</span>
-            <span class="ay-muted">{{ customer.phone }}</span>
+            <span class="text-muted">{{ customer.phone }}</span>
           </button>
         </li>
       </ul>
     </section>
 
-    <form class="ay-card flex flex-col gap-4" @submit.prevent="save">
+    <form class="card flex flex-col gap-4" @submit.prevent="save">
       <AyVehicleForm v-model="form" :errors="errors" />
       <AyErrorNote :error="error" />
       <div class="flex gap-2">

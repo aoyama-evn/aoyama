@@ -16,12 +16,12 @@ const hint = computed(() =>
 
 <template>
   <div class="grid min-h-screen place-items-center bg-neutral-200 px-4">
-    <div class="ay-card w-full max-w-md text-center">
+    <div class="card w-full max-w-md text-center">
       <p class="font-heading text-[56px] leading-none text-accent-300">
         {{ error?.statusCode ?? 500 }}
       </p>
       <h1 class="mt-2 font-heading text-[20px]">{{ title }}</h1>
-      <p class="mt-2 text-[13.5px] ay-muted">{{ hint }}</p>
+      <p class="mt-2 text-[13.5px] text-muted">{{ hint }}</p>
       <div class="mt-5 flex justify-center gap-2">
         <AyButton variant="secondary" size="sm" @click="clearError({ redirect: '/' })">
           Về trang chủ

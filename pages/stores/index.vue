@@ -15,9 +15,9 @@ useHead({ title: 'Cửa hàng — AOYAMA Service' });
     <AyPageHeader code="SC-05" title="Cửa hàng" description="Chọn cửa hàng gần bạn để xem giờ làm việc và đặt lịch." />
 
     <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-      <article v-for="store in stores ?? []" :key="store.id" class="ay-card flex flex-col gap-2">
+      <article v-for="store in stores ?? []" :key="store.id" class="card flex flex-col gap-2">
         <h2 class="font-heading text-[16px]">{{ i18n(store.name) }}</h2>
-        <p class="text-[13px] ay-muted">{{ i18n(store.address) }}</p>
+        <p class="text-[13px] text-muted">{{ i18n(store.address) }}</p>
         <p class="text-[13.5px]">
           <a :href="`tel:${store.phone}`" class="hover:underline">{{ store.phone }}</a>
         </p>

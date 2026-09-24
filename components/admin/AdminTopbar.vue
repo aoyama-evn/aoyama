@@ -1,24 +1,70 @@
 <script setup lang="ts">
 import type { Store } from '~/types/models';
 
-/** CP-05 Thanh tieu de trang quan tri — chon cua hang, tai khoan, dang xuat. */
+/**
+ * CP-05 Thanh tieu de trang quan tri.
+ * Ban thiet ke: nen trang, ten man hinh font-heading 16px ben trai; ben phai la
+ * nhan chon cua hang, so thong bao va vong tron chu cai dau cua tai khoan.
+ */
 const auth = useAuthStore();
 const ui = useUiStore();
 const api = useApi();
 const router = useRouter();
-
-const { data: stores } = await useAsyncData('admin-stores', () =>
-  api.get<Store[]>('/admin/stores'),
-);
-
+const route = useRoute();
 const { i18n } = useFormat();
-const menuOpen = ref(false);
 
-/**
- * Tai khoan gan voi mot cua hang thi khoa lua chon theo cua hang do — OQ-02
- * chua chot co bat buoc gioi han hay khong, nen phia giao dien lam chat truoc.
- */
+const { data: stores } = await useAsyncData('admin-stores', () => api.get<Store[]>('/admin/stores'));
+
+/** Tai khoan gan voi mot cua hang thi khoa lua chon theo cua hang do (OQ-02). */
 const canSwitchStore = computed(() => !auth.user?.storeId);
+const storeMenuOpen = ref(false);
+const accountMenuOpen = ref(false);
+
+const activeStoreName = computed(() => {
+  const found = (stores.value ?? []).find((s) => s.id === ui.activeStoreId);
+  return found ? i18n(found.name) : 'Tất cả cửa hàng';
+});
+
+const initials = computed(() => {
+  const name = auth.user?.name || auth.user?.username || 'AY';
+  return name
+    .split(/\s+/)
+    .slice(-2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join('');
+});
+
+/** Ten man hinh lay tu tieu de trang, khong phai go lai o tung cho. */
+const TITLES: Record<string, string> = {
+  '/admin': 'Bảng điều khiển',
+  '/admin/bookings': 'Lịch hẹn',
+  '/admin/bookings/calendar': 'Lịch theo ngày',
+  '/admin/bookings/new': 'Đặt lịch thay khách',
+  '/admin/scan': 'Quét mã QR',
+  '/admin/work-orders': 'Phiếu dịch vụ',
+  '/admin/quotations': 'Báo giá',
+  '/admin/customers': 'Khách hàng',
+  '/admin/vehicles': 'Phương tiện',
+  '/admin/services': 'Dịch vụ',
+  '/admin/pricing': 'Bảng giá',
+  '/admin/parts': 'Phụ tùng',
+  '/admin/inventory': 'Tồn kho',
+  '/admin/stores': 'Cửa hàng',
+  '/admin/reports': 'Báo cáo',
+  '/admin/users': 'Tài khoản quản trị',
+  '/admin/settings': 'Cấu hình hệ thống',
+  '/admin/audit-logs': 'Nhật ký thao tác',
+};
+
+const screenTitle = computed(() => {
+  const path = route.path.replace(/\/$/, '');
+  if (TITLES[path]) return TITLES[path];
+  // Tuyen con: lay muc cha dai nhat khop duoc.
+  const parent = Object.keys(TITLES)
+    .filter((key) => path.startsWith(key))
+    .sort((a, b) => b.length - a.length)[0];
+  return parent ? TITLES[parent] : 'Trang quản trị';
+});
 
 onMounted(() => {
   ui.restoreActiveStore();
@@ -36,49 +82,88 @@ async function logout(): Promise<void> {
 </script>
 
 <template>
-  <header class="flex items-center gap-3 border-b border-divider bg-surface px-4 py-2.5">
-    <slot name="title" />
+  <header
+    class="flex items-center gap-3.5 px-5 py-3"
+    style="background: #fff; border-bottom: 1px solid var(--color-divider)"
+  >
+    <h1 class="font-heading text-[16px]">{{ screenTitle }}</h1>
 
-    <div class="ml-auto flex items-center gap-2">
-      <label class="hidden items-center gap-1.5 text-[12.5px] sm:flex">
-        <span class="ay-muted">Cửa hàng</span>
-        <select
-          class="ay-input h-9 min-h-0 w-auto py-1 text-[13px]"
-          :value="ui.activeStoreId ?? ''"
-          :disabled="!canSwitchStore"
-          @change="ui.setActiveStore(($event.target as HTMLSelectElement).value || null)"
-        >
-          <option value="">Tất cả cửa hàng</option>
-          <option v-for="store in stores ?? []" :key="store.id" :value="store.id">
-            {{ i18n(store.name) }}
-          </option>
-        </select>
-      </label>
-
-      <AyLangSwitcher />
-
+    <div class="ml-auto flex items-center gap-2.5">
+      <!-- Chon cua hang -->
       <div class="relative">
         <button
           type="button"
-          class="ay-btn ay-btn-secondary ay-btn-sm"
-          :aria-expanded="menuOpen"
-          @click="menuOpen = !menuOpen"
+          class="tag tag-neutral"
+          :disabled="!canSwitchStore"
+          :aria-expanded="storeMenuOpen"
+          @click="storeMenuOpen = !storeMenuOpen"
         >
-          {{ auth.user?.name || auth.user?.username || 'Tài khoản' }}
+          Cửa hàng: {{ activeStoreName }} ▾
         </button>
-        <div
-          v-if="menuOpen"
-          class="absolute right-0 z-30 mt-1 w-56 overflow-hidden rounded-xl bg-surface shadow-card"
+
+        <ul
+          v-if="storeMenuOpen"
+          class="absolute right-0 z-30 mt-1 w-56 overflow-hidden rounded-xl py-1"
+          style="background: #fff; box-shadow: var(--shadow-sm)"
         >
-          <p class="border-b border-divider px-3 py-2 text-[12px] ay-muted">
+          <li>
+            <button
+              type="button"
+              class="w-full px-3 py-2 text-left text-[13px] hover:bg-[var(--color-accent-100)]"
+              @click="ui.setActiveStore(null); storeMenuOpen = false"
+            >
+              Tất cả cửa hàng
+            </button>
+          </li>
+          <li v-for="store in stores ?? []" :key="store.id">
+            <button
+              type="button"
+              class="w-full px-3 py-2 text-left text-[13px] hover:bg-[var(--color-accent-100)]"
+              @click="ui.setActiveStore(store.id); storeMenuOpen = false"
+            >
+              {{ i18n(store.name) }}
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <AyLangSwitcher />
+
+      <!-- Tai khoan -->
+      <div class="relative">
+        <button
+          type="button"
+          class="grid place-items-center rounded-full text-[11px] font-bold"
+          style="width: 30px; height: 30px; background: var(--color-accent-300)"
+          :aria-expanded="accountMenuOpen"
+          :aria-label="auth.user?.name || 'Tài khoản'"
+          @click="accountMenuOpen = !accountMenuOpen"
+        >
+          {{ initials }}
+        </button>
+
+        <div
+          v-if="accountMenuOpen"
+          class="absolute right-0 z-30 mt-1 w-56 overflow-hidden rounded-xl"
+          style="background: #fff; box-shadow: var(--shadow-sm)"
+        >
+          <p
+            class="px-3 py-2 text-[12px] text-muted"
+            style="border-bottom: 1px solid var(--color-divider)"
+          >
+            {{ auth.user?.name }} ·
             {{ auth.user?.adminRole === 'ADMIN' ? 'Quản trị viên' : 'Nhân viên' }}
           </p>
-          <NuxtLink to="/admin/change-password" class="block px-3 py-2.5 text-[14px] hover:bg-accent-100">
+          <NuxtLink
+            to="/admin/change-password"
+            class="block px-3 py-2.5 text-[13.5px] hover:bg-[var(--color-accent-100)]"
+          >
             Đổi mật khẩu
           </NuxtLink>
           <button
             type="button"
-            class="w-full px-3 py-2.5 text-left text-[14px] text-danger hover:bg-danger-bg"
+            class="w-full px-3 py-2.5 text-left text-[13.5px]"
+            style="color: var(--color-danger)"
             @click="logout"
           >
             Đăng xuất

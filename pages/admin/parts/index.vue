@@ -71,12 +71,12 @@ useHead({ title: 'Phụ tùng — AOYAMA Admin' });
     >
       <AyField label="Từ khóa" class="min-w-[220px] flex-1">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.keyword" class="ay-input" type="search" placeholder="Mã, tên hoặc mã hãng">
+          <input :id="id" v-model="filters.keyword" class="input" type="search" placeholder="Mã, tên hoặc mã hãng">
         </template>
       </AyField>
       <AyField label="Nhóm">
         <template #default="{ id }">
-          <select :id="id" v-model="filters.category" class="ay-input">
+          <select :id="id" v-model="filters.category" class="input">
             <option value="">Tất cả</option>
             <option v-for="category in categories ?? []" :key="category" :value="category">{{ category }}</option>
           </select>
@@ -97,14 +97,14 @@ useHead({ title: 'Phụ tùng — AOYAMA Admin' });
         <NuxtLink :to="`/admin/parts/${row.id}/edit`" class="font-semibold hover:underline">
           {{ i18n((row as unknown as Part).name) }}
         </NuxtLink>
-        <span v-if="!row.isActive" class="ay-tag ml-2 bg-neutral-200 text-neutral-600">ngừng dùng</span>
+        <span v-if="!row.isActive" class="tag ml-2 bg-neutral-200 text-neutral-600">ngừng dùng</span>
       </template>
       <template #cell-maker="{ row }">{{ row.maker ?? '—' }}</template>
       <template #cell-category="{ row }">{{ row.category ?? '—' }}</template>
       <template #cell-sellPrice="{ row }">{{ money(row.sellPrice as number) }}</template>
       <template #cell-createdSource="{ row }">
-        <span v-if="row.createdSource === 'AI_IMAGE'" class="ay-tag bg-teal-100 text-teal-800">AI</span>
-        <span v-else class="text-[12.5px] ay-muted">Thủ công</span>
+        <span v-if="row.createdSource === 'AI_IMAGE'" class="tag bg-teal-100 text-teal-800">AI</span>
+        <span v-else class="text-[12.5px] text-muted">Thủ công</span>
       </template>
       <template #cell-actions="{ row }">
         <button

@@ -79,15 +79,15 @@ useHead({ title: 'Phản hồi báo giá' });
 
     <div class="flex gap-2">
       <button
-        type="button" class="ay-btn flex-1"
-        :class="mode === 'ACCEPT' ? 'ay-btn-primary' : 'ay-btn-secondary'"
+        type="button" class="btn flex-1"
+        :class="mode === 'ACCEPT' ? 'btn-primary' : 'btn-secondary'"
         @click="mode = 'ACCEPT'"
       >
         Đồng ý
       </button>
       <button
-        type="button" class="ay-btn flex-1"
-        :class="mode === 'REJECT' ? 'ay-btn-danger' : 'ay-btn-secondary'"
+        type="button" class="btn flex-1"
+        :class="mode === 'REJECT' ? 'btn-danger' : 'btn-secondary'"
         @click="mode = 'REJECT'"
       >
         Từ chối
@@ -95,7 +95,7 @@ useHead({ title: 'Phản hồi báo giá' });
     </div>
 
     <template v-if="mode === 'ACCEPT'">
-      <section v-if="requiredItems.length" class="ay-card">
+      <section v-if="requiredItems.length" class="card">
         <h2 class="mb-2 font-heading text-[16px]">Hạng mục bắt buộc</h2>
         <ul class="flex flex-col gap-1.5 text-[14px]">
           <li v-for="item in requiredItems" :key="item.id" class="flex justify-between gap-3">
@@ -105,9 +105,9 @@ useHead({ title: 'Phản hồi báo giá' });
         </ul>
       </section>
 
-      <section v-if="optionalItems.length" class="ay-card">
+      <section v-if="optionalItems.length" class="card">
         <h2 class="mb-1 font-heading text-[16px]">Hạng mục tùy chọn</h2>
-        <p class="mb-2 text-[12.5px] ay-muted">Bỏ chọn những hạng mục bạn chưa muốn làm lần này.</p>
+        <p class="mb-2 text-[12.5px] text-muted">Bỏ chọn những hạng mục bạn chưa muốn làm lần này.</p>
         <ul class="flex flex-col gap-2">
           <li v-for="item in optionalItems" :key="item.id">
             <label class="flex items-start gap-2.5 text-[14px]">
@@ -118,7 +118,7 @@ useHead({ title: 'Phản hồi báo giá' });
               >
               <span class="flex-1">
                 {{ item.name }}
-                <span v-if="item.description" class="block text-[12.5px] ay-muted">{{ item.description }}</span>
+                <span v-if="item.description" class="block text-[12.5px] text-muted">{{ item.description }}</span>
               </span>
               <span class="whitespace-nowrap">{{ money(item.unitPrice * item.quantity) }}</span>
             </label>
@@ -126,16 +126,16 @@ useHead({ title: 'Phản hồi báo giá' });
         </ul>
       </section>
 
-      <section class="ay-card flex items-center justify-between">
+      <section class="card flex items-center justify-between">
         <span class="font-heading text-[16px]">Tổng theo lựa chọn của bạn</span>
         <span class="font-heading text-[22px]">{{ money(selectedTotal) }}</span>
       </section>
     </template>
 
-    <section v-else class="ay-card">
+    <section v-else class="card">
       <AyField label="Lý do từ chối" hint="Giúp cửa hàng điều chỉnh báo giá phù hợp hơn">
         <template #default="{ id }">
-          <select :id="id" v-model="rejectReason" class="ay-input">
+          <select :id="id" v-model="rejectReason" class="input">
             <option value="">— Không nêu lý do —</option>
             <option value="Chi phí cao hơn dự kiến">Chi phí cao hơn dự kiến</option>
             <option value="Muốn tham khảo thêm">Muốn tham khảo thêm</option>
@@ -148,7 +148,7 @@ useHead({ title: 'Phản hồi báo giá' });
 
     <AyField label="Ghi chú gửi cửa hàng" hint="Không bắt buộc">
       <template #default="{ id }">
-        <textarea :id="id" v-model="comment" class="ay-input min-h-[90px]" />
+        <textarea :id="id" v-model="comment" class="input min-h-[90px]" />
       </template>
     </AyField>
 

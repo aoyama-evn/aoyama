@@ -118,7 +118,7 @@ useHead({ title: 'Khung giờ nhận xe — AOYAMA Admin' });
       </template>
     </AyPageHeader>
 
-    <section v-for="day in byWeekday" :key="day.weekday" class="ay-card">
+    <section v-for="day in byWeekday" :key="day.weekday" class="card">
       <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
         <h2 class="font-heading text-[15px]">{{ day.label }}</h2>
         <div class="flex gap-1">
@@ -129,19 +129,19 @@ useHead({ title: 'Khung giờ nhận xe — AOYAMA Admin' });
         </div>
       </div>
 
-      <p v-if="day.rows.length === 0" class="text-[13px] ay-muted">
+      <p v-if="day.rows.length === 0" class="text-[13px] text-muted">
         Chưa có khung giờ — cửa hàng sẽ không nhận đặt lịch vào thứ này.
       </p>
 
       <ul v-else class="flex flex-col gap-2">
         <li v-for="(slot, index) in day.rows" :key="index" class="flex flex-wrap items-center gap-2">
-          <input v-model="slot.startTime" class="ay-input h-10 min-h-0 w-auto py-1" type="time" aria-label="Giờ bắt đầu">
-          <span class="ay-muted">–</span>
-          <input v-model="slot.endTime" class="ay-input h-10 min-h-0 w-auto py-1" type="time" aria-label="Giờ kết thúc">
+          <input v-model="slot.startTime" class="input h-10 min-h-0 w-auto py-1" type="time" aria-label="Giờ bắt đầu">
+          <span class="text-muted">–</span>
+          <input v-model="slot.endTime" class="input h-10 min-h-0 w-auto py-1" type="time" aria-label="Giờ kết thúc">
 
           <label class="flex items-center gap-1.5 text-[13px]">
-            <span class="ay-muted">Số chỗ</span>
-            <input v-model.number="slot.capacity" class="ay-input h-10 min-h-0 w-20 py-1 text-center" type="number" min="0">
+            <span class="text-muted">Số chỗ</span>
+            <input v-model.number="slot.capacity" class="input h-10 min-h-0 w-20 py-1 text-center" type="number" min="0">
           </label>
 
           <label class="flex items-center gap-1.5 text-[13px]">

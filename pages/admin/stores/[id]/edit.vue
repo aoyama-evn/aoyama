@@ -85,16 +85,16 @@ useHead({ title: isNew ? 'Thêm cửa hàng' : 'Sửa cửa hàng' });
       code="SA-33" :title="isNew ? 'Thêm cửa hàng' : 'Sửa cửa hàng'" back-to="/admin/stores"
     />
 
-    <section class="ay-card grid gap-3 sm:grid-cols-2">
+    <section class="card grid gap-3 sm:grid-cols-2">
       <AyField label="Mã cửa hàng" required>
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.code" class="ay-input font-mono" type="text" placeholder="AY-HAMAMATSU">
+          <input :id="fid" v-model="form.code" class="input font-mono" type="text" placeholder="AY-HAMAMATSU">
         </template>
       </AyField>
 
       <AyField label="Số điện thoại" required>
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.phone" class="ay-input" type="tel">
+          <input :id="fid" v-model="form.phone" class="input" type="tel">
         </template>
       </AyField>
 
@@ -104,31 +104,31 @@ useHead({ title: isNew ? 'Thêm cửa hàng' : 'Sửa cửa hàng' });
 
       <AyField label="Email">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.email" class="ay-input" type="email">
+          <input :id="fid" v-model="form.email" class="input" type="email">
         </template>
       </AyField>
 
       <AyField label="Sức tiếp nhận mặc định" hint="Số xe tối đa mỗi khung giờ khi chưa cấu hình riêng">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model.number="form.defaultCapacity" class="ay-input" type="number" min="1">
+          <input :id="fid" v-model.number="form.defaultCapacity" class="input" type="number" min="1">
         </template>
       </AyField>
 
       <AyField label="Vĩ độ">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.latitude" class="ay-input" type="text" placeholder="34.7108000">
+          <input :id="fid" v-model="form.latitude" class="input" type="text" placeholder="34.7108000">
         </template>
       </AyField>
 
       <AyField label="Kinh độ">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.longitude" class="ay-input" type="text" placeholder="137.7261000">
+          <input :id="fid" v-model="form.longitude" class="input" type="text" placeholder="137.7261000">
         </template>
       </AyField>
 
       <AyField label="Thứ tự hiển thị">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model.number="form.sortOrder" class="ay-input" type="number">
+          <input :id="fid" v-model.number="form.sortOrder" class="input" type="number">
         </template>
       </AyField>
 

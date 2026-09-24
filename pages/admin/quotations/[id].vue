@@ -58,9 +58,9 @@ useHead({ title: `Báo giá ${quotation.value.code} — AOYAMA Admin` });
       </template>
     </AyPageHeader>
 
-    <section class="ay-card">
-      <div class="ay-table-wrap !shadow-none">
-        <table class="ay-table">
+    <section class="card">
+      <div class="table-wrap !shadow-none">
+        <table class="table">
           <thead>
             <tr>
               <th scope="col">Nội dung</th>
@@ -77,10 +77,10 @@ useHead({ title: `Báo giá ${quotation.value.code} — AOYAMA Admin` });
             >
               <td>
                 {{ item.name }}
-                <span v-if="item.isOptional" class="ay-tag ml-1 bg-info-bg text-info">tùy chọn</span>
+                <span v-if="item.isOptional" class="tag ml-1 bg-info-bg text-info">tùy chọn</span>
                 <AyAiBadge v-if="item.suggestedByAi" class="ml-1" />
               </td>
-              <td class="text-center text-[12px] ay-muted">{{ item.kind }}</td>
+              <td class="text-center text-[12px] text-muted">{{ item.kind }}</td>
               <td class="text-right">{{ money(item.unitPrice) }}</td>
               <td class="text-center">{{ item.quantity }}</td>
               <td class="text-right">{{ money(item.lineTotal) }}</td>
@@ -91,7 +91,7 @@ useHead({ title: `Báo giá ${quotation.value.code} — AOYAMA Admin` });
     </section>
 
     <div class="grid gap-4 sm:grid-cols-2">
-      <section class="ay-card">
+      <section class="card">
         <AyMoneyTable
           :subtotal="quotation.subtotal"
           :discount-amount="quotation.discountAmount"
@@ -101,26 +101,26 @@ useHead({ title: `Báo giá ${quotation.value.code} — AOYAMA Admin` });
         />
       </section>
 
-      <section class="ay-card flex flex-col gap-2 text-[13.5px]">
+      <section class="card flex flex-col gap-2 text-[13.5px]">
         <div class="flex justify-between">
-          <span class="ay-muted">Ngày gửi</span><span>{{ dateTime(quotation.sentAt) || '—' }}</span>
+          <span class="text-muted">Ngày gửi</span><span>{{ dateTime(quotation.sentAt) || '—' }}</span>
         </div>
         <div class="flex justify-between">
-          <span class="ay-muted">Khách phản hồi</span><span>{{ dateTime(quotation.respondedAt) || '—' }}</span>
+          <span class="text-muted">Khách phản hồi</span><span>{{ dateTime(quotation.respondedAt) || '—' }}</span>
         </div>
         <div class="flex justify-between">
-          <span class="ay-muted">Hiệu lực đến</span><span>{{ date(quotation.validUntil) || '—' }}</span>
+          <span class="text-muted">Hiệu lực đến</span><span>{{ date(quotation.validUntil) || '—' }}</span>
         </div>
         <div v-if="quotation.rejectReason">
-          <span class="ay-muted">Lý do từ chối</span>
+          <span class="text-muted">Lý do từ chối</span>
           <p>{{ quotation.rejectReason }}</p>
         </div>
         <div v-if="quotation.customerComment">
-          <span class="ay-muted">Khách ghi chú</span>
+          <span class="text-muted">Khách ghi chú</span>
           <p>{{ quotation.customerComment }}</p>
         </div>
         <div class="mt-1 border-t border-divider pt-2">
-          <span class="ay-muted">Đường dẫn khách xem</span>
+          <span class="text-muted">Đường dẫn khách xem</span>
           <p class="break-all font-mono text-[11.5px]">{{ publicUrl }}</p>
         </div>
       </section>

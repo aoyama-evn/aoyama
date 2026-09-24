@@ -28,7 +28,7 @@ function isEmpty(code: LanguageCode): boolean {
 
 <template>
   <div class="flex flex-col">
-    <span v-if="label" class="ay-label">
+    <span v-if="label" class="label">
       {{ label }}<span v-if="required" class="text-danger" aria-hidden="true">*</span>
     </span>
 
@@ -40,7 +40,7 @@ function isEmpty(code: LanguageCode): boolean {
         role="tab"
         :aria-selected="active === tab.code"
         class="rounded-full px-3 py-1 text-[12.5px] font-semibold transition-colors"
-        :class="active === tab.code ? 'bg-accent-200 text-accent-800' : 'ay-muted hover:bg-neutral-200'"
+        :class="active === tab.code ? 'bg-accent-200 text-accent-800' : 'text-muted hover:bg-neutral-200'"
         @click="active = tab.code"
       >
         {{ tab.label }}
@@ -50,13 +50,13 @@ function isEmpty(code: LanguageCode): boolean {
 
     <textarea
       v-if="multiline"
-      class="ay-input min-h-[96px]"
+      class="input min-h-[96px]"
       :value="modelValue?.[active] ?? ''"
       @input="update(active, ($event.target as HTMLTextAreaElement).value)"
     />
     <input
       v-else
-      class="ay-input"
+      class="input"
       type="text"
       :value="modelValue?.[active] ?? ''"
       @input="update(active, ($event.target as HTMLInputElement).value)"

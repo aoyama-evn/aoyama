@@ -39,7 +39,7 @@ useHead({ title: 'Phương tiện — AOYAMA Admin' });
     <AyFilterBar :has-active-filters="Boolean(keyword)" @reset="keyword = ''">
       <AyField label="Tìm kiếm" class="min-w-[240px] flex-1">
         <template #default="{ id }">
-          <input :id="id" v-model="keyword" class="ay-input" type="search" placeholder="Biển số, hãng, dòng xe, tên hoặc SĐT chủ xe">
+          <input :id="id" v-model="keyword" class="input" type="search" placeholder="Biển số, hãng, dòng xe, tên hoặc SĐT chủ xe">
         </template>
       </AyField>
     </AyFilterBar>

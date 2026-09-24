@@ -95,7 +95,7 @@ useHead({ title: 'Ghi nhận thanh toán — AOYAMA Admin' });
       </template>
     </AyPageHeader>
 
-    <section class="ay-card">
+    <section class="card">
       <AyMoneyTable
         :labor-subtotal="workOrder.laborSubtotal"
         :parts-subtotal="workOrder.partsSubtotal"
@@ -107,18 +107,18 @@ useHead({ title: 'Ghi nhận thanh toán — AOYAMA Admin' });
       />
     </section>
 
-    <section v-if="remaining > 0" class="ay-card grid gap-3 sm:grid-cols-2">
+    <section v-if="remaining > 0" class="card grid gap-3 sm:grid-cols-2">
       <h2 class="font-heading text-[16px] sm:col-span-2">Thu tiền</h2>
 
       <AyField label="Số tiền" required :hint="`Còn phải thu ${money(remaining)}`">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model.number="form.amount" class="ay-input" type="number" min="1" :max="remaining">
+          <input :id="fid" v-model.number="form.amount" class="input" type="number" min="1" :max="remaining">
         </template>
       </AyField>
 
       <AyField label="Hình thức" required>
         <template #default="{ id: fid }">
-          <select :id="fid" v-model="form.method" class="ay-input">
+          <select :id="fid" v-model="form.method" class="input">
             <option v-for="(label, value) in METHOD_LABELS" :key="value" :value="value">{{ label }}</option>
           </select>
         </template>
@@ -126,13 +126,13 @@ useHead({ title: 'Ghi nhận thanh toán — AOYAMA Admin' });
 
       <AyField label="Số biên lai">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.receiptNo" class="ay-input" type="text">
+          <input :id="fid" v-model="form.receiptNo" class="input" type="text">
         </template>
       </AyField>
 
       <AyField label="Ghi chú">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.note" class="ay-input" type="text">
+          <input :id="fid" v-model="form.note" class="input" type="text">
         </template>
       </AyField>
 
@@ -147,11 +147,11 @@ useHead({ title: 'Ghi nhận thanh toán — AOYAMA Admin' });
       </div>
     </section>
 
-    <div v-else class="ay-card text-center text-[14px] text-success">
+    <div v-else class="card text-center text-[14px] text-success">
       Phiếu đã thu đủ {{ money(workOrder.totalAmount) }}.
     </div>
 
-    <section class="ay-card">
+    <section class="card">
       <h2 class="mb-3 font-heading text-[16px]">Các lần thu</h2>
 
       <AyEmptyState v-if="(payments ?? []).length === 0" title="Chưa có lần thu nào" />
@@ -163,10 +163,10 @@ useHead({ title: 'Ghi nhận thanh toán — AOYAMA Admin' });
           :class="payment.isVoided ? 'opacity-55 line-through' : ''"
         >
           <span class="font-heading text-[15px]">{{ money(payment.amount) }}</span>
-          <span class="ay-muted">{{ METHOD_LABELS[payment.method] }}</span>
-          <span class="ay-muted">{{ dateTime(payment.paidAt) }}</span>
+          <span class="text-muted">{{ METHOD_LABELS[payment.method] }}</span>
+          <span class="text-muted">{{ dateTime(payment.paidAt) }}</span>
           <span v-if="payment.receiptNo" class="font-mono text-[12px]">#{{ payment.receiptNo }}</span>
-          <span v-if="payment.isVoided" class="ay-tag bg-neutral-200 text-neutral-600">đã hủy</span>
+          <span v-if="payment.isVoided" class="tag bg-neutral-200 text-neutral-600">đã hủy</span>
           <button
             v-else type="button" class="ml-auto text-[12.5px] text-danger underline"
             @click="voidTarget = payment"
@@ -188,7 +188,7 @@ useHead({ title: 'Ghi nhận thanh toán — AOYAMA Admin' });
     >
       <AyField label="Lý do hủy" required class="mt-3">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="voidReason" class="ay-input" type="text">
+          <input :id="fid" v-model="voidReason" class="input" type="text">
         </template>
       </AyField>
     </AyConfirmDialog>

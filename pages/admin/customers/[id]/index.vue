@@ -48,31 +48,31 @@ useHead({ title: `${data.value.customer.name} — AOYAMA Admin` });
     </AyPageHeader>
 
     <div class="grid gap-4 lg:grid-cols-3">
-      <section class="ay-card lg:col-span-2">
+      <section class="card lg:col-span-2">
         <h2 class="mb-2 font-heading text-[16px]">Thông tin</h2>
         <dl class="grid gap-2 text-[14px] sm:grid-cols-2">
-          <div><dt class="ay-muted">Điện thoại</dt><dd>{{ data.customer.phone }}</dd></div>
-          <div><dt class="ay-muted">Email</dt><dd>{{ data.customer.email ?? '—' }}</dd></div>
-          <div><dt class="ay-muted">Tên kana</dt><dd>{{ data.customer.nameKana ?? '—' }}</dd></div>
-          <div><dt class="ay-muted">Địa chỉ</dt><dd>{{ data.customer.address ?? '—' }}</dd></div>
-          <div><dt class="ay-muted">Ngôn ngữ</dt><dd>{{ data.customer.language }}</dd></div>
-          <div><dt class="ay-muted">Loại</dt><dd>{{ data.customer.isGuest ? 'Khách vãng lai' : 'Đã đăng ký' }}</dd></div>
-          <div><dt class="ay-muted">Nhận SMS</dt><dd>{{ data.customer.notifySms ? 'Có' : 'Không' }}</dd></div>
-          <div><dt class="ay-muted">Ngày tạo</dt><dd>{{ date(data.customer.createdAt) }}</dd></div>
+          <div><dt class="text-muted">Điện thoại</dt><dd>{{ data.customer.phone }}</dd></div>
+          <div><dt class="text-muted">Email</dt><dd>{{ data.customer.email ?? '—' }}</dd></div>
+          <div><dt class="text-muted">Tên kana</dt><dd>{{ data.customer.nameKana ?? '—' }}</dd></div>
+          <div><dt class="text-muted">Địa chỉ</dt><dd>{{ data.customer.address ?? '—' }}</dd></div>
+          <div><dt class="text-muted">Ngôn ngữ</dt><dd>{{ data.customer.language }}</dd></div>
+          <div><dt class="text-muted">Loại</dt><dd>{{ data.customer.isGuest ? 'Khách vãng lai' : 'Đã đăng ký' }}</dd></div>
+          <div><dt class="text-muted">Nhận SMS</dt><dd>{{ data.customer.notifySms ? 'Có' : 'Không' }}</dd></div>
+          <div><dt class="text-muted">Ngày tạo</dt><dd>{{ date(data.customer.createdAt) }}</dd></div>
         </dl>
       </section>
 
-      <section class="ay-card">
+      <section class="card">
         <h2 class="mb-2 font-heading text-[16px]">Ghi chú nội bộ</h2>
-        <textarea v-model="note" class="ay-input min-h-[120px]" placeholder="Chỉ nhân viên thấy" />
+        <textarea v-model="note" class="input min-h-[120px]" placeholder="Chỉ nhân viên thấy" />
         <AyButton variant="secondary" size="sm" class="mt-2" @click="saveNote">Lưu ghi chú</AyButton>
       </section>
     </div>
 
-    <section class="ay-card">
+    <section class="card">
       <div class="mb-3 flex items-baseline justify-between">
         <h2 class="font-heading text-[16px]">Phương tiện ({{ data.vehicles.items.length }})</h2>
-        <NuxtLink :to="`/admin/vehicles/new/edit?customerId=${id}`" class="ay-btn ay-btn-ghost ay-btn-sm">
+        <NuxtLink :to="`/admin/vehicles/new/edit?customerId=${id}`" class="btn btn-ghost text-[12.5px]">
           + Thêm xe
         </NuxtLink>
       </div>
@@ -87,15 +87,15 @@ useHead({ title: `${data.value.customer.name} — AOYAMA Admin` });
           >
             <span class="flex-1">
               <span class="block font-heading text-[15px]">{{ vehicle.plateNumber }}</span>
-              <span class="block text-[12.5px] ay-muted">{{ vehicle.maker }} {{ vehicle.model }}</span>
+              <span class="block text-[12.5px] text-muted">{{ vehicle.maker }} {{ vehicle.model }}</span>
             </span>
-            <span class="text-[12.5px] ay-muted">{{ number(vehicle.currentOdometer) }} km</span>
+            <span class="text-[12.5px] text-muted">{{ number(vehicle.currentOdometer) }} km</span>
           </NuxtLink>
         </li>
       </ul>
     </section>
 
-    <section v-if="data.bookings?.items.length" class="ay-card">
+    <section v-if="data.bookings?.items.length" class="card">
       <h2 class="mb-3 font-heading text-[16px]">Lịch hẹn gần đây</h2>
       <ul class="flex flex-col gap-1.5">
         <li v-for="booking in data.bookings.items" :key="booking.id">

@@ -131,19 +131,19 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
 
     <div class="grid gap-4 lg:grid-cols-3">
       <div class="flex flex-col gap-4 lg:col-span-2">
-        <section class="ay-card">
+        <section class="card">
           <h2 class="mb-2 font-heading text-[16px]">Thông tin lịch hẹn</h2>
           <dl class="grid gap-2 text-[14px] sm:grid-cols-2">
-            <div><dt class="ay-muted">Thời gian</dt><dd class="font-semibold">{{ dateTime(booking.scheduledAt) }} ({{ clock(booking.slotStartTime) }}–{{ clock(booking.slotEndTime) }})</dd></div>
-            <div><dt class="ay-muted">Cửa hàng</dt><dd>{{ i18n(booking.store?.name ?? null) }}</dd></div>
-            <div><dt class="ay-muted">Khách hàng</dt><dd>{{ booking.contactName }} · {{ booking.contactPhone }}</dd></div>
-            <div><dt class="ay-muted">Email</dt><dd>{{ booking.contactEmail ?? '—' }}</dd></div>
-            <div><dt class="ay-muted">Xe</dt><dd>{{ booking.vehicle ? `${booking.vehicle.plateNumber} · ${booking.vehicle.maker} ${booking.vehicle.model}` : 'Chưa khai báo' }}</dd></div>
-            <div><dt class="ay-muted">Nguồn</dt><dd>{{ booking.createdByAdmin ? 'Nhân viên đặt thay' : 'Khách tự đặt' }}</dd></div>
+            <div><dt class="text-muted">Thời gian</dt><dd class="font-semibold">{{ dateTime(booking.scheduledAt) }} ({{ clock(booking.slotStartTime) }}–{{ clock(booking.slotEndTime) }})</dd></div>
+            <div><dt class="text-muted">Cửa hàng</dt><dd>{{ i18n(booking.store?.name ?? null) }}</dd></div>
+            <div><dt class="text-muted">Khách hàng</dt><dd>{{ booking.contactName }} · {{ booking.contactPhone }}</dd></div>
+            <div><dt class="text-muted">Email</dt><dd>{{ booking.contactEmail ?? '—' }}</dd></div>
+            <div><dt class="text-muted">Xe</dt><dd>{{ booking.vehicle ? `${booking.vehicle.plateNumber} · ${booking.vehicle.maker} ${booking.vehicle.model}` : 'Chưa khai báo' }}</dd></div>
+            <div><dt class="text-muted">Nguồn</dt><dd>{{ booking.createdByAdmin ? 'Nhân viên đặt thay' : 'Khách tự đặt' }}</dd></div>
           </dl>
 
           <div v-if="booking.symptomDescription" class="mt-3 border-t border-divider pt-3">
-            <p class="text-[12.5px] ay-muted">Mô tả của khách</p>
+            <p class="text-[12.5px] text-muted">Mô tả của khách</p>
             <p class="whitespace-pre-line text-[14px]">{{ booking.symptomDescription }}</p>
           </div>
 
@@ -154,34 +154,34 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
           </ul>
         </section>
 
-        <section class="ay-card">
+        <section class="card">
           <h2 class="mb-2 font-heading text-[16px]">Dịch vụ đã đặt</h2>
           <ul class="flex flex-col gap-1.5 text-[14px]">
             <li v-for="line in booking.services ?? []" :key="line.id" class="flex justify-between gap-3">
-              <span>{{ line.serviceName }} <span class="ay-muted">· {{ line.estimatedMinutes }} phút</span></span>
+              <span>{{ line.serviceName }} <span class="text-muted">· {{ line.estimatedMinutes }} phút</span></span>
               <span>{{ line.estimatedPrice ? money(line.estimatedPrice) : 'báo giá riêng' }}</span>
             </li>
           </ul>
         </section>
 
-        <section v-if="diagnosis && diagnosis.findings.length" class="ay-card">
+        <section v-if="diagnosis && diagnosis.findings.length" class="card">
           <div class="mb-2 flex items-center gap-2">
             <h2 class="font-heading text-[16px]">Chẩn đoán AI của khách</h2>
             <AyAiBadge />
           </div>
           <ul class="flex flex-col gap-2">
             <li v-for="(finding, i) in diagnosis.findings" :key="i" class="flex items-start gap-3 text-[14px]">
-              <span class="ay-tag bg-teal-100 text-teal-800">{{ Math.round(finding.matchPercent) }}%</span>
+              <span class="tag bg-teal-100 text-teal-800">{{ Math.round(finding.matchPercent) }}%</span>
               <span>
                 <strong>{{ finding.label }}</strong>
-                <span v-if="finding.description" class="block text-[12.5px] ay-muted">{{ finding.description }}</span>
+                <span v-if="finding.description" class="block text-[12.5px] text-muted">{{ finding.description }}</span>
               </span>
             </li>
           </ul>
-          <p class="mt-2 text-[12px] ay-muted">Kết quả tham khảo — kỹ thuật viên kết luận sau khi kiểm tra thực tế.</p>
+          <p class="mt-2 text-[12px] text-muted">Kết quả tham khảo — kỹ thuật viên kết luận sau khi kiểm tra thực tế.</p>
         </section>
 
-        <section v-if="(history?.items ?? []).length" class="ay-card">
+        <section v-if="(history?.items ?? []).length" class="card">
           <h2 class="mb-2 font-heading text-[16px]">Lịch sử gần nhất của xe</h2>
           <ul class="flex flex-col gap-1.5 text-[13.5px]">
             <li v-for="record in history?.items ?? []" :key="record.id" class="flex justify-between gap-3">
@@ -196,7 +196,7 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
       </div>
 
       <div class="flex flex-col gap-4">
-        <section v-if="workOrder" class="ay-card">
+        <section v-if="workOrder" class="card">
           <h2 class="mb-2 font-heading text-[16px]">Phiếu dịch vụ</h2>
           <p class="font-mono text-[13px]">{{ workOrder.code }}</p>
           <AyStatusTag :status="workOrder.status" class="mt-1" />
@@ -205,13 +205,13 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
           </AyButton>
         </section>
 
-        <section class="ay-card">
+        <section class="card">
           <h2 class="mb-2 font-heading text-[16px]">Ghi chú nội bộ</h2>
-          <textarea v-model="adminNote" class="ay-input min-h-[100px]" placeholder="Chỉ nhân viên thấy nội dung này" />
+          <textarea v-model="adminNote" class="input min-h-[100px]" placeholder="Chỉ nhân viên thấy nội dung này" />
           <AyButton variant="secondary" size="sm" class="mt-2" @click="saveNote">Lưu ghi chú</AyButton>
         </section>
 
-        <section class="ay-card">
+        <section class="card">
           <h2 class="mb-3 font-heading text-[16px]">Nhật ký thay đổi</h2>
           <AyChangeLog :entries="historyEntries" />
         </section>
@@ -239,7 +239,7 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
     >
       <AyField v-if="confirmAction === 'CANCEL'" label="Lý do hủy" class="mt-3">
         <template #default="{ id: fieldId }">
-          <input :id="fieldId" v-model="cancelReason" class="ay-input" type="text">
+          <input :id="fieldId" v-model="cancelReason" class="input" type="text">
         </template>
       </AyField>
     </AyConfirmDialog>

@@ -78,7 +78,7 @@ useHead({ title: 'Cấu hình hệ thống — AOYAMA Admin' });
       </template>
     </AyPageHeader>
 
-    <section v-for="[group, items] in grouped" :key="group" class="ay-card">
+    <section v-for="[group, items] in grouped" :key="group" class="card">
       <h2 class="mb-3 font-heading text-[16px]">{{ GROUP_LABELS[group] ?? group }}</h2>
 
       <ul class="flex flex-col gap-3">
@@ -88,7 +88,7 @@ useHead({ title: 'Cấu hình hệ thống — AOYAMA Admin' });
         >
           <div>
             <p class="text-[14px] font-semibold">{{ setting.description ?? setting.key }}</p>
-            <p class="font-mono text-[11.5px] ay-muted">{{ setting.key }}</p>
+            <p class="font-mono text-[11.5px] text-muted">{{ setting.key }}</p>
           </div>
 
           <label v-if="setting.valueType === 'BOOLEAN'" class="flex items-center gap-2 text-[13.5px]">
@@ -103,7 +103,7 @@ useHead({ title: 'Cấu hình hệ thống — AOYAMA Admin' });
 
           <input
             v-else-if="setting.valueType === 'NUMBER'"
-            class="ay-input" type="number"
+            class="input" type="number"
             :value="draft[setting.key]"
             :disabled="!setting.isEditable"
             :aria-label="setting.description ?? setting.key"
@@ -112,7 +112,7 @@ useHead({ title: 'Cấu hình hệ thống — AOYAMA Admin' });
 
           <input
             v-else
-            class="ay-input" type="text"
+            class="input" type="text"
             :value="draft[setting.key]"
             :disabled="!setting.isEditable"
             :aria-label="setting.description ?? setting.key"

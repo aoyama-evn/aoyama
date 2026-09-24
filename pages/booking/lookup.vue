@@ -36,11 +36,11 @@ useHead({ title: 'Tra cứu lịch hẹn' });
       description="Nhập mã lịch hẹn cùng số điện thoại đã dùng khi đặt. Không cần đăng nhập."
     />
 
-    <form class="ay-card flex flex-col gap-3" @submit.prevent="lookup">
+    <form class="card flex flex-col gap-3" @submit.prevent="lookup">
       <AyField label="Mã lịch hẹn" required>
         <template #default="{ id }">
           <input
-            :id="id" v-model="code" class="ay-input font-heading tracking-widest"
+            :id="id" v-model="code" class="input font-heading tracking-widest"
             type="text" placeholder="AY-XXXXXXXX" autocomplete="off" required
           >
         </template>
@@ -48,7 +48,7 @@ useHead({ title: 'Tra cứu lịch hẹn' });
 
       <AyField label="Số điện thoại" required hint="Đúng số đã dùng khi đặt lịch">
         <template #default="{ id }">
-          <input :id="id" v-model="phone" class="ay-input" type="tel" placeholder="090-1234-5678" required>
+          <input :id="id" v-model="phone" class="input" type="tel" placeholder="090-1234-5678" required>
         </template>
       </AyField>
 
@@ -57,7 +57,7 @@ useHead({ title: 'Tra cứu lịch hẹn' });
       <AyButton type="submit" block :loading="loading">Tra cứu</AyButton>
     </form>
 
-    <p class="text-center text-[13px] ay-muted">
+    <p class="text-center text-[13px] text-muted">
       Có tài khoản?
       <NuxtLink to="/login" class="underline">Đăng nhập</NuxtLink>
       để xem toàn bộ lịch hẹn và lịch sử bảo dưỡng.

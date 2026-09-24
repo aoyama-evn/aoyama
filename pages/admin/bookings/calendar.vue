@@ -77,17 +77,17 @@ useHead({ title: 'Lịch hẹn theo ngày — AOYAMA Admin' });
       </template>
     </AyPageHeader>
 
-    <div class="ay-card flex flex-wrap items-center gap-3">
+    <div class="card flex flex-wrap items-center gap-3">
       <div class="flex gap-1">
         <button
-          type="button" class="ay-btn ay-btn-sm"
-          :class="mode === 'DAY' ? 'ay-btn-primary' : 'ay-btn-secondary'" @click="mode = 'DAY'"
+          type="button" class="btn text-[12.5px]"
+          :class="mode === 'DAY' ? 'btn-primary' : 'btn-secondary'" @click="mode = 'DAY'"
         >
           Ngày
         </button>
         <button
-          type="button" class="ay-btn ay-btn-sm"
-          :class="mode === 'WEEK' ? 'ay-btn-primary' : 'ay-btn-secondary'" @click="mode = 'WEEK'"
+          type="button" class="btn text-[12.5px]"
+          :class="mode === 'WEEK' ? 'btn-primary' : 'btn-secondary'" @click="mode = 'WEEK'"
         >
           Tuần
         </button>
@@ -95,19 +95,19 @@ useHead({ title: 'Lịch hẹn theo ngày — AOYAMA Admin' });
 
       <div class="flex items-center gap-2">
         <AyButton variant="secondary" size="sm" @click="shift(-1)">←</AyButton>
-        <input v-model="anchor" class="ay-input h-9 min-h-0 w-auto py-1" type="date">
+        <input v-model="anchor" class="input h-9 min-h-0 w-auto py-1" type="date">
         <AyButton variant="secondary" size="sm" @click="shift(1)">→</AyButton>
       </div>
 
-      <p v-if="!ui.activeStoreId" class="ml-auto text-[12.5px] ay-muted">
+      <p v-if="!ui.activeStoreId" class="ml-auto text-[12.5px] text-muted">
         Đang xem: {{ i18n(stores?.find((s) => s.id === storeId)?.name ?? null) }}
       </p>
     </div>
 
     <AyLoading v-if="pending" />
 
-    <div v-else class="ay-table-wrap">
-      <table class="ay-table">
+    <div v-else class="table-wrap">
+      <table class="table">
         <thead>
           <tr>
             <th scope="col" class="w-20">Giờ</th>

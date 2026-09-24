@@ -14,9 +14,9 @@ useHead({ title: 'Phiên đăng nhập đã hết hạn' });
 
 <template>
   <div class="grid min-h-screen place-items-center bg-neutral-200 px-4">
-    <div class="ay-card w-full max-w-md text-center">
+    <div class="card w-full max-w-md text-center">
       <h1 class="font-heading text-[20px]">Phiên đăng nhập đã hết hạn</h1>
-      <p class="mt-2 text-[13.5px] ay-muted">
+      <p class="mt-2 text-[13.5px] text-muted">
         Vì lý do an toàn, phiên làm việc tự kết thúc sau một thời gian không hoạt động.
         Vui lòng đăng nhập lại để tiếp tục.
       </p>

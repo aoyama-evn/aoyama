@@ -65,12 +65,12 @@ useHead({ title: 'Phiếu dịch vụ — AOYAMA Admin' });
     <AyFilterBar :has-active-filters="hasFilters" @reset="reset">
       <AyField label="Từ khóa" class="min-w-[200px] flex-1">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.keyword" class="ay-input" type="search" placeholder="Mã phiếu, tên khách, biển số">
+          <input :id="id" v-model="filters.keyword" class="input" type="search" placeholder="Mã phiếu, tên khách, biển số">
         </template>
       </AyField>
       <AyField label="Trạng thái phiếu">
         <template #default="{ id }">
-          <select :id="id" v-model="filters.status" class="ay-input">
+          <select :id="id" v-model="filters.status" class="input">
             <option value="">Tất cả</option>
             <option v-for="s in Object.values(WorkOrderStatus)" :key="s" :value="s">{{ s }}</option>
           </select>
@@ -78,7 +78,7 @@ useHead({ title: 'Phiếu dịch vụ — AOYAMA Admin' });
       </AyField>
       <AyField label="Thanh toán">
         <template #default="{ id }">
-          <select :id="id" v-model="filters.paymentStatus" class="ay-input">
+          <select :id="id" v-model="filters.paymentStatus" class="input">
             <option value="">Tất cả</option>
             <option v-for="s in Object.values(PaymentStatus)" :key="s" :value="s">{{ s }}</option>
           </select>

@@ -184,12 +184,12 @@ useHead({ title: 'Đặt lịch thay khách — AOYAMA Admin' });
     />
 
     <div class="grid gap-4 lg:grid-cols-2">
-      <section class="ay-card flex flex-col gap-3">
+      <section class="card flex flex-col gap-3">
         <h2 class="font-heading text-[16px]">Khách hàng</h2>
 
         <AyField label="Số điện thoại" required hint="Nhập để tìm hồ sơ khách đã có">
           <template #default="{ id }">
-            <input :id="id" v-model="form.contactPhone" class="ay-input" type="tel" placeholder="090-1234-5678">
+            <input :id="id" v-model="form.contactPhone" class="input" type="tel" placeholder="090-1234-5678">
           </template>
         </AyField>
 
@@ -203,23 +203,23 @@ useHead({ title: 'Đặt lịch thay khách — AOYAMA Admin' });
 
         <AyField label="Họ tên" required>
           <template #default="{ id }">
-            <input :id="id" v-model="form.contactName" class="ay-input" type="text">
+            <input :id="id" v-model="form.contactName" class="input" type="text">
           </template>
         </AyField>
 
         <AyField label="Email">
           <template #default="{ id }">
-            <input :id="id" v-model="form.contactEmail" class="ay-input" type="email">
+            <input :id="id" v-model="form.contactEmail" class="input" type="email">
           </template>
         </AyField>
       </section>
 
-      <section class="ay-card flex flex-col gap-3">
+      <section class="card flex flex-col gap-3">
         <h2 class="font-heading text-[16px]">Cửa hàng &amp; dịch vụ</h2>
 
         <AyField label="Cửa hàng" required>
           <template #default="{ id }">
-            <select :id="id" v-model="form.storeId" class="ay-input">
+            <select :id="id" v-model="form.storeId" class="input">
               <option value="">— Chọn cửa hàng —</option>
               <option v-for="store in refs?.stores ?? []" :key="store.id" :value="store.id">
                 {{ i18n(store.name) }}
@@ -229,7 +229,7 @@ useHead({ title: 'Đặt lịch thay khách — AOYAMA Admin' });
         </AyField>
 
         <div>
-          <span class="ay-label">Dịch vụ</span>
+          <span class="label">Dịch vụ</span>
           <ul class="flex max-h-56 flex-col gap-1 overflow-y-auto">
             <li v-for="service in refs?.services ?? []" :key="service.id">
               <label class="flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-[13.5px] hover:bg-accent-100">
@@ -239,7 +239,7 @@ useHead({ title: 'Đặt lịch thay khách — AOYAMA Admin' });
                   @change="toggleService(service.id)"
                 >
                 <span class="flex-1">{{ i18n(service.name) }}</span>
-                <span class="ay-muted">{{ service.quoteOnly ? 'báo giá' : money(service.basePrice) }}</span>
+                <span class="text-muted">{{ service.quoteOnly ? 'báo giá' : money(service.basePrice) }}</span>
               </label>
             </li>
           </ul>
@@ -247,20 +247,20 @@ useHead({ title: 'Đặt lịch thay khách — AOYAMA Admin' });
       </section>
     </div>
 
-    <section class="ay-card flex flex-col gap-3">
+    <section class="card flex flex-col gap-3">
       <h2 class="font-heading text-[16px]">Thông tin xe</h2>
 
       <div v-if="customerVehicles.length" class="flex flex-wrap gap-2">
         <button
           v-for="v in customerVehicles" :key="v.id" type="button"
-          class="ay-btn ay-btn-sm"
-          :class="selectedVehicleId === v.id ? 'ay-btn-primary' : 'ay-btn-secondary'"
+          class="btn text-[12.5px]"
+          :class="selectedVehicleId === v.id ? 'btn-primary' : 'btn-secondary'"
           @click="pickVehicle(v.id)"
         >
           {{ v.plateNumber }}
         </button>
         <button
-          type="button" class="ay-btn ay-btn-ghost ay-btn-sm"
+          type="button" class="btn btn-ghost text-[12.5px]"
           @click="selectedVehicleId = ''"
         >
           Khai báo xe mới
@@ -270,20 +270,20 @@ useHead({ title: 'Đặt lịch thay khách — AOYAMA Admin' });
       <AyVehicleForm v-if="!selectedVehicleId" v-model="vehicle" />
     </section>
 
-    <section class="ay-card">
+    <section class="card">
       <h2 class="mb-3 font-heading text-[16px]">Ngày &amp; khung giờ</h2>
       <AySlotPicker v-model="slot" :days="days" :loading="loadingSlots" />
     </section>
 
-    <section class="ay-card grid gap-3 sm:grid-cols-2">
+    <section class="card grid gap-3 sm:grid-cols-2">
       <AyField label="Mô tả tình trạng xe">
         <template #default="{ id }">
-          <textarea :id="id" v-model="form.symptomDescription" class="ay-input min-h-[90px]" />
+          <textarea :id="id" v-model="form.symptomDescription" class="input min-h-[90px]" />
         </template>
       </AyField>
       <AyField label="Ghi chú nội bộ">
         <template #default="{ id }">
-          <textarea :id="id" v-model="form.adminNote" class="ay-input min-h-[90px]" />
+          <textarea :id="id" v-model="form.adminNote" class="input min-h-[90px]" />
         </template>
       </AyField>
     </section>

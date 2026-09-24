@@ -75,11 +75,11 @@ useHead({ title: 'Đặt lại lịch bảo dưỡng' });
       description="Giữ nguyên cửa hàng, dịch vụ và thông tin xe của lần trước — bạn chỉ cần chọn thời gian mới."
     />
 
-    <section class="ay-card flex flex-col gap-2">
+    <section class="card flex flex-col gap-2">
       <h2 class="font-heading text-[16px]">Lần trước</h2>
-      <p class="text-[13.5px] ay-muted">{{ dateTime(previous.scheduledAt) }}</p>
+      <p class="text-[13.5px] text-muted">{{ dateTime(previous.scheduledAt) }}</p>
       <ul class="flex flex-wrap gap-1.5">
-        <li v-for="line in previous.services ?? []" :key="line.id" class="ay-tag bg-neutral-200 text-neutral-700">
+        <li v-for="line in previous.services ?? []" :key="line.id" class="tag bg-neutral-200 text-neutral-700">
           {{ line.serviceName }}
         </li>
       </ul>

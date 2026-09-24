@@ -52,19 +52,19 @@ useHead({ title: 'Xe của tôi' });
     </AyEmptyState>
 
     <ul v-else class="grid gap-3 md:grid-cols-2">
-      <li v-for="vehicle in vehicles ?? []" :key="vehicle.id" class="ay-card flex flex-col gap-2">
+      <li v-for="vehicle in vehicles ?? []" :key="vehicle.id" class="card flex flex-col gap-2">
         <div>
           <p class="font-heading text-[18px]">{{ vehicle.plateNumber }}</p>
-          <p class="text-[13.5px] ay-muted">
+          <p class="text-[13.5px] text-muted">
             {{ vehicle.maker }} {{ vehicle.model }}
             <template v-if="vehicle.engineCc"> · {{ vehicle.engineCc }}cc</template>
           </p>
         </div>
 
         <dl class="flex gap-4 text-[13px]">
-          <div><dt class="ay-muted">Số km</dt><dd>{{ number(vehicle.currentOdometer) }}</dd></div>
-          <div v-if="vehicle.modelYear"><dt class="ay-muted">Năm</dt><dd>{{ vehicle.modelYear }}</dd></div>
-          <div v-if="vehicle.color"><dt class="ay-muted">Màu</dt><dd>{{ vehicle.color }}</dd></div>
+          <div><dt class="text-muted">Số km</dt><dd>{{ number(vehicle.currentOdometer) }}</dd></div>
+          <div v-if="vehicle.modelYear"><dt class="text-muted">Năm</dt><dd>{{ vehicle.modelYear }}</dd></div>
+          <div v-if="vehicle.color"><dt class="text-muted">Màu</dt><dd>{{ vehicle.color }}</dd></div>
         </dl>
 
         <div class="mt-auto flex flex-wrap gap-2 pt-2">

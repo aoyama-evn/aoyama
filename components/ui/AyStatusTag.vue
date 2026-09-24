@@ -65,12 +65,12 @@ const TONES: Record<string, Tone> = {
 };
 
 const TONE_CLASS: Record<Tone, string> = {
-  neutral: 'bg-neutral-200 text-neutral-700',
-  info: 'bg-info-bg text-info',
-  success: 'bg-success-bg text-success',
-  warning: 'bg-warning-bg text-warning',
-  danger: 'bg-danger-bg text-danger',
-  accent: 'bg-accent-200 text-accent-800',
+  neutral: 'tag-neutral',
+  info: 'tag-accent-2',
+  success: 'tag-success',
+  warning: 'tag-accent',
+  danger: 'tag-danger',
+  accent: 'tag-accent',
 };
 
 const label = computed(() => LABELS[props.status] ?? props.status);
@@ -78,7 +78,7 @@ const toneClass = computed(() => TONE_CLASS[TONES[props.status] ?? 'neutral']);
 </script>
 
 <template>
-  <span class="ay-tag" :class="toneClass">
+  <span class="tag" :class="toneClass">
     <span
       class="h-1.5 w-1.5 rounded-full bg-current opacity-70"
       aria-hidden="true"
