@@ -1,0 +1,50 @@
+{
+  "common": {
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "search": "検索",
+    "back": "戻る",
+    "next": "次へ",
+    "confirm": "確認",
+    "loading": "読み込み中…",
+    "noData": "データがありません",
+    "all": "すべて",
+    "yes": "はい",
+    "no": "いいえ"
+  },
+  "nav": {
+    "services": "サービス",
+    "pricing": "料金表",
+    "stores": "店舗",
+    "faq": "よくある質問",
+    "contact": "お問い合わせ",
+    "booking": "予約する",
+    "login": "ログイン",
+    "account": "マイページ"
+  },
+  "booking": {
+    "step1": "サービスと店舗の選択",
+    "step2": "日時の選択",
+    "step3": "車両情報",
+    "confirm": "確認",
+    "code": "予約番号",
+    "scheduledAt": "予約日時",
+    "slotsRemaining": "残り{count}枠",
+    "slotFull": "満枠"
+  },
+  "status": {
+    "PENDING": "確認待ち",
+    "CONFIRMED": "確定",
+    "RECEIVED": "受付済み",
+    "DONE": "完了",
+    "CANCELLED": "キャンセル",
+    "NO_SHOW": "来店なし"
+  },
+  "ai": {
+    "badge": "AIによる提案",
+    "matchPercent": "一致度 {percent}%",
+    "disclaimer": "参考情報です。実際の点検後に整備士が判断します。"
+  }
+}

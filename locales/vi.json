@@ -1,0 +1,50 @@
+{
+  "common": {
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "search": "Tìm kiếm",
+    "back": "Quay lại",
+    "next": "Tiếp tục",
+    "confirm": "Xác nhận",
+    "loading": "Đang tải…",
+    "noData": "Chưa có dữ liệu",
+    "all": "Tất cả",
+    "yes": "Có",
+    "no": "Không"
+  },
+  "nav": {
+    "services": "Dịch vụ",
+    "pricing": "Bảng giá",
+    "stores": "Cửa hàng",
+    "faq": "Hỏi đáp",
+    "contact": "Liên hệ",
+    "booking": "Đặt lịch",
+    "login": "Đăng nhập",
+    "account": "Tài khoản"
+  },
+  "booking": {
+    "step1": "Chọn dịch vụ & cửa hàng",
+    "step2": "Chọn ngày & giờ",
+    "step3": "Thông tin xe",
+    "confirm": "Xác nhận",
+    "code": "Mã lịch hẹn",
+    "scheduledAt": "Thời gian hẹn",
+    "slotsRemaining": "Còn {count} chỗ",
+    "slotFull": "Hết chỗ"
+  },
+  "status": {
+    "PENDING": "Chờ xác nhận",
+    "CONFIRMED": "Đã xác nhận",
+    "RECEIVED": "Đã tiếp nhận",
+    "DONE": "Hoàn tất",
+    "CANCELLED": "Đã hủy",
+    "NO_SHOW": "Khách không đến"
+  },
+  "ai": {
+    "badge": "Gợi ý bởi AI",
+    "matchPercent": "Mức độ khớp {percent}%",
+    "disclaimer": "Đây là gợi ý tham khảo, kỹ thuật viên kết luận sau khi kiểm tra thực tế."
+  }
+}

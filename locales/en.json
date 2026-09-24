@@ -1,0 +1,50 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "back": "Back",
+    "next": "Next",
+    "confirm": "Confirm",
+    "loading": "Loading…",
+    "noData": "No data yet",
+    "all": "All",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "nav": {
+    "services": "Services",
+    "pricing": "Pricing",
+    "stores": "Stores",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "booking": "Book now",
+    "login": "Log in",
+    "account": "Account"
+  },
+  "booking": {
+    "step1": "Service & store",
+    "step2": "Date & time",
+    "step3": "Vehicle details",
+    "confirm": "Confirm",
+    "code": "Booking code",
+    "scheduledAt": "Appointment",
+    "slotsRemaining": "{count} slots left",
+    "slotFull": "Full"
+  },
+  "status": {
+    "PENDING": "Awaiting confirmation",
+    "CONFIRMED": "Confirmed",
+    "RECEIVED": "Vehicle received",
+    "DONE": "Completed",
+    "CANCELLED": "Cancelled",
+    "NO_SHOW": "No show"
+  },
+  "ai": {
+    "badge": "AI suggestion",
+    "matchPercent": "{percent}% match",
+    "disclaimer": "A suggestion only. A technician confirms after inspecting the bike."
+  }
+}
