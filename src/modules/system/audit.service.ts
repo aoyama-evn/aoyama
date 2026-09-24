@@ -39,7 +39,8 @@ export class AuditService {
         action: input.action,
         entity: input.entity,
         entityId: input.entityId ?? null,
-        changes: input.changes ?? null,
+        // jsonb — TypeORM khong suy duoc kieu cho cot nay khi dung insert().
+        changes: (input.changes ?? null) as never,
         ipAddress: input.ipAddress ?? null,
         userAgent: input.userAgent ?? null,
       });

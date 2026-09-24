@@ -1,0 +1,558 @@
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
+import { PageDto } from 'src/common/dto';
+import {
+  InventoryTxType,
+  NotificationChannel,
+  NotificationEvent,
+  PaymentStatus,
+  ServiceType,
+  WORK_ORDER_TRANSITIONS,
+  WorkOrderStatus,
+} from 'src/common/enums';
+import { applyTax, formatAppDateTime, sumLines, yen } from 'src/common/utils';
+import { Actor, BookingsService } from 'src/modules/bookings/bookings.service';
+import { CustomersService } from 'src/modules/customers/customers.service';
+import { NotificationsService } from 'src/modules/notifications/notifications.service';
+import { InventoryService } from 'src/modules/parts/inventory.service';
+import { SettingsService, SETTING_KEYS } from 'src/modules/system/settings.service';
+import { VehiclesService } from 'src/modules/vehicles/vehicles.service';
+import {
+  AddPhotoDto,
+  IntakeDto,
+  UpdateAmountsDto,
+  UpdateDiagnosisDto,
+  UpdateProgressDto,
+  WorkOrderQueryDto,
+} from './dto/work-order.dto';
+import { WorkOrder } from './entities/work-order.entity';
+import { WorkOrderItem } from './entities/work-order-item.entity';
+import { WorkOrderPart } from './entities/work-order-part.entity';
+import { WorkOrderPhoto } from './entities/work-order-photo.entity';
+import { WorkOrderStatusHistory } from './entities/work-order-status-history.entity';
+
+/** M-06 — Phieu dich vu. SA-08..SA-11, SC-26, SC-32. */
+@Injectable()
+export class WorkOrdersService {
+  private readonly logger = new Logger(WorkOrdersService.name);
+
+  constructor(
+    @InjectRepository(WorkOrder) private readonly repo: Repository<WorkOrder>,
+    @InjectRepository(WorkOrderItem) private readonly itemRepo: Repository<WorkOrderItem>,
+    @InjectRepository(WorkOrderPart) private readonly partRepo: Repository<WorkOrderPart>,
+    @InjectRepository(WorkOrderPhoto) private readonly photoRepo: Repository<WorkOrderPhoto>,
+    @InjectRepository(WorkOrderStatusHistory)
+    private readonly historyRepo: Repository<WorkOrderStatusHistory>,
+    private readonly dataSource: DataSource,
+    private readonly bookings: BookingsService,
+    private readonly customers: CustomersService,
+    private readonly vehicles: VehiclesService,
+    private readonly inventory: InventoryService,
+    private readonly notifications: NotificationsService,
+    private readonly settings: SettingsService,
+  ) {}
+
+  // ---------------- Tiep nhan xe (SA-08) ----------------
+
+  /**
+   * FR-WO-01, FR-WO-03 — mo phieu khi xe vao xuong.
+   * Lich hen chuyen sang RECEIVED trong cung giao dich de khong co truong hop
+   * phieu da mo ma lich hen van con o trang thai cu.
+   */
+  async intake(dto: IntakeDto, actor: Actor): Promise<WorkOrder> {
+    if (dto.intakePhotoUrls.length === 0) {
+      throw new BadRequestException({
+        code: 'INTAKE_PHOTO_REQUIRED',
+        message: 'Can it nhat mot anh hien trang xe khi tiep nhan',
+      });
+    }
+
+    let customerId = dto.customerId ?? null;
+    let vehicleId = dto.vehicleId ?? null;
+    let storeId = dto.storeId ?? null;
+    let customerSymptom = dto.customerSymptom ?? null;
+
+    if (dto.bookingId) {
+      const booking = await this.bookings.findById(dto.bookingId);
+      customerId = booking.customerId;
+      vehicleId = dto.vehicleId ?? booking.vehicleId;
+      storeId = booking.storeId;
+      customerSymptom = dto.customerSymptom ?? booking.symptomDescription;
+
+      const existing = await this.repo.findOne({ where: { bookingId: booking.id } });
+      if (existing) {
+        throw new BadRequestException({
+          code: 'WORK_ORDER_EXISTS',
+          message: 'Lich hen nay da co phieu dich vu',
+          details: { workOrderId: existing.id },
+        });
+      }
+    }
+
+    if (!customerId || !vehicleId || !storeId) {
+      throw new BadRequestException({
+        code: 'INTAKE_MISSING_DATA',
+        message: 'Can day du khach hang, xe va cua hang de mo phieu dich vu',
+      });
+    }
+
+    const resolvedCustomerId = customerId;
+    const resolvedVehicleId = vehicleId;
+    const resolvedStoreId = storeId;
+
+    const workOrder = await this.dataSource.transaction(async (manager) => {
+      const entity = manager.getRepository(WorkOrder).create({
+        code: await this.nextCode(),
+        bookingId: dto.bookingId ?? null,
+        customerId: resolvedCustomerId,
+        vehicleId: resolvedVehicleId,
+        storeId: resolvedStoreId,
+        status: WorkOrderStatus.RECEIVED,
+        paymentStatus: PaymentStatus.UNPAID,
+        intakeOdometer: dto.intakeOdometer,
+        intakeFuelLevel: dto.intakeFuelLevel ?? null,
+        intakeNote: dto.intakeNote ?? null,
+        customerSymptom,
+        receivedById: actor.id ?? null,
+        taxRate: this.settings.getNumber(SETTING_KEYS.TAX_RATE_PERCENT, undefined, 10),
+      });
+      const saved = await manager.getRepository(WorkOrder).save(entity);
+
+      await manager.getRepository(WorkOrderPhoto).save(
+        dto.intakePhotoUrls.map((url) =>
+          manager.getRepository(WorkOrderPhoto).create({
+            workOrderId: saved.id,
+            stage: 'INTAKE',
+            url,
+            visibleToCustomer: false,
+            uploadedById: actor.id ?? null,
+          }),
+        ),
+      );
+
+      await manager.getRepository(WorkOrderStatusHistory).save(
+        manager.getRepository(WorkOrderStatusHistory).create({
+          workOrderId: saved.id,
+          fromStatus: null,
+          toStatus: WorkOrderStatus.RECEIVED,
+          actorId: actor.id ?? null,
+          note: 'Tiep nhan xe',
+        }),
+      );
+
+      return saved;
+    });
+
+    if (dto.bookingId) {
+      await this.bookings.markReceived(dto.bookingId, actor);
+    }
+    await this.vehicles.updateOdometer(resolvedVehicleId, dto.intakeOdometer);
+
+    return this.findById(workOrder.id);
+  }
+
+  // ---------------- Doc ----------------
+
+  async findById(id: string): Promise<WorkOrder> {
+    const workOrder = await this.repo.findOne({
+      where: { id },
+      relations: {
+        customer: true,
+        vehicle: true,
+        store: true,
+        booking: true,
+        items: { service: true },
+        parts: true,
+        photos: true,
+        statusHistories: true,
+      },
+      order: { items: { sortOrder: 'ASC' }, statusHistories: { createdAt: 'ASC' } },
+    });
+    if (!workOrder) {
+      throw new NotFoundException({
+        code: 'WORK_ORDER_NOT_FOUND',
+        message: 'Khong tim thay phieu dich vu',
+      });
+    }
+    return workOrder;
+  }
+
+  async findByBooking(bookingId: string): Promise<WorkOrder | null> {
+    return this.repo.findOne({
+      where: { bookingId },
+      relations: { items: true, parts: true, photos: true, statusHistories: true },
+    });
+  }
+
+  /** SA-09 — danh sach phieu dich vu. */
+  async search(query: WorkOrderQueryDto): Promise<PageDto<WorkOrder>> {
+    const qb = this.repo
+      .createQueryBuilder('w')
+      .leftJoinAndSelect('w.customer', 'c')
+      .leftJoinAndSelect('w.vehicle', 'v')
+      .leftJoinAndSelect('w.store', 's');
+
+    if (query.storeId) qb.andWhere('w.store_id = :storeId', { storeId: query.storeId });
+    if (query.status) qb.andWhere('w.status = :status', { status: query.status });
+    if (query.paymentStatus) {
+      qb.andWhere('w.payment_status = :ps', { ps: query.paymentStatus });
+    }
+    if (query.from) qb.andWhere('w.created_at >= :from', { from: query.from });
+    if (query.to) qb.andWhere('w.created_at <= :to', { to: query.to });
+    if (query.keyword) {
+      qb.andWhere(
+        '(w.code ILIKE :kw OR c.name ILIKE :kw OR c.phone ILIKE :kw OR v.plate_number ILIKE :kw)',
+        { kw: `%${query.keyword}%` },
+      );
+    }
+
+    const [items, total] = await qb
+      .orderBy('w.created_at', query.sortOrder)
+      .skip(query.skip)
+      .take(query.limit)
+      .getManyAndCount();
+    return new PageDto(items, total, query);
+  }
+
+  /** SC-26 — tien do rut gon cho khach, chi gom moc va anh duoc phep hien. */
+  async getPublicProgress(bookingCode: string) {
+    const booking = await this.bookings.findByCode(bookingCode);
+    const workOrder = await this.findByBooking(booking.id);
+    if (!workOrder) {
+      return {
+        bookingCode,
+        bookingStatus: booking.status,
+        hasWorkOrder: false,
+      };
+    }
+    return {
+      bookingCode,
+      bookingStatus: booking.status,
+      hasWorkOrder: true,
+      status: workOrder.status,
+      progressPercent: workOrder.progressPercent,
+      progressNote: workOrder.progressNote,
+      estimatedCompletionAt: workOrder.estimatedCompletionAt,
+      timeline: (workOrder.statusHistories ?? [])
+        .filter((h) => h.visibleToCustomer)
+        .map((h) => ({ status: h.toStatus, at: h.createdAt, note: h.note })),
+      photos: (workOrder.photos ?? [])
+        .filter((p) => p.visibleToCustomer)
+        .map((p) => ({ url: p.url, caption: p.caption, stage: p.stage })),
+    };
+  }
+
+  // ---------------- Chan doan va hang muc (SA-11) ----------------
+
+  /**
+   * FR-WO-04..06 — ghi chan doan, thay toan bo hang muc va phu tung.
+   * Thay ca danh sach thay vi vá tung dong: man hinh SA-11 gui len trang thai
+   * cuoi cung cua bang, nen cach nay khop voi thao tac nguoi dung va tranh
+   * tinh trang dong da xoa o giao dien van con trong CSDL.
+   */
+  async updateDiagnosis(id: string, dto: UpdateDiagnosisDto, actor: Actor): Promise<WorkOrder> {
+    const workOrder = await this.findById(id);
+    if ([WorkOrderStatus.DELIVERED, WorkOrderStatus.CANCELLED].includes(workOrder.status)) {
+      throw new BadRequestException({
+        code: 'WORK_ORDER_CLOSED',
+        message: 'Phieu da dong, khong sua duoc',
+      });
+    }
+
+    await this.dataSource.transaction(async (manager) => {
+      if (dto.diagnosisNote !== undefined) workOrder.diagnosisNote = dto.diagnosisNote;
+      if (dto.diagnosisCause !== undefined) workOrder.diagnosisCause = dto.diagnosisCause;
+      if (dto.assignedTechnicianId !== undefined) {
+        workOrder.assignedTechnicianId = dto.assignedTechnicianId;
+      }
+
+      if (dto.items) {
+        await manager.getRepository(WorkOrderItem).delete({ workOrderId: id });
+        await manager.getRepository(WorkOrderItem).save(
+          dto.items.map((item, index) =>
+            manager.getRepository(WorkOrderItem).create({
+              ...item,
+              id: undefined,
+              workOrderId: id,
+              sortOrder: item.sortOrder ?? index,
+            }),
+          ),
+        );
+      }
+
+      if (dto.parts) {
+        await manager.getRepository(WorkOrderPart).delete({ workOrderId: id });
+        await manager.getRepository(WorkOrderPart).save(
+          dto.parts.map((part) =>
+            manager.getRepository(WorkOrderPart).create({ ...part, id: undefined, workOrderId: id }),
+          ),
+        );
+      }
+
+      // Buoc ghi chan doan dau tien dua phieu sang DIAGNOSING.
+      if (workOrder.status === WorkOrderStatus.RECEIVED) {
+        workOrder.status = WorkOrderStatus.DIAGNOSING;
+        workOrder.diagnosingAt = new Date();
+        await manager.getRepository(WorkOrderStatusHistory).save(
+          manager.getRepository(WorkOrderStatusHistory).create({
+            workOrderId: id,
+            fromStatus: WorkOrderStatus.RECEIVED,
+            toStatus: WorkOrderStatus.DIAGNOSING,
+            actorId: actor.id ?? null,
+          }),
+        );
+      }
+
+      await manager.getRepository(WorkOrder).save(workOrder);
+    });
+
+    await this.recalculateAmounts(id);
+    return this.findById(id);
+  }
+
+  /** BR-38 — tinh lai tong tien tu hang muc va phu tung hien co. */
+  async recalculateAmounts(id: string): Promise<WorkOrder> {
+    const workOrder = await this.repo.findOneOrFail({
+      where: { id },
+      relations: { items: true, parts: true },
+    });
+
+    const laborSubtotal = sumLines(
+      (workOrder.items ?? []).map((i) => ({ unitPrice: i.unitPrice, quantity: i.quantity })),
+    );
+    const partsSubtotal = sumLines(
+      (workOrder.parts ?? []).map((p) => ({ unitPrice: p.unitPrice, quantity: p.quantity })),
+    );
+    const beforeTax = Math.max(0, laborSubtotal + partsSubtotal - workOrder.discountAmount);
+    const taxAmount = applyTax(beforeTax, workOrder.taxRate);
+
+    workOrder.laborSubtotal = laborSubtotal;
+    workOrder.partsSubtotal = partsSubtotal;
+    workOrder.taxAmount = taxAmount;
+    workOrder.totalAmount = yen(beforeTax + taxAmount);
+
+    return this.repo.save(workOrder);
+  }
+
+  async updateAmounts(id: string, dto: UpdateAmountsDto): Promise<WorkOrder> {
+    const workOrder = await this.findById(id);
+    if (dto.discountAmount !== undefined) workOrder.discountAmount = dto.discountAmount;
+    if (dto.taxRate !== undefined) workOrder.taxRate = dto.taxRate;
+    await this.repo.save(workOrder);
+    return this.recalculateAmounts(id);
+  }
+
+  // ---------------- Tien do va anh ----------------
+
+  async updateProgress(id: string, dto: UpdateProgressDto): Promise<WorkOrder> {
+    await this.findById(id);
+    await this.repo.update(id, {
+      progressPercent: dto.progressPercent,
+      progressNote: dto.progressNote ?? null,
+      estimatedCompletionAt: dto.estimatedCompletionAt ? new Date(dto.estimatedCompletionAt) : null,
+    });
+    return this.findById(id);
+  }
+
+  async addPhoto(id: string, dto: AddPhotoDto, actor: Actor): Promise<WorkOrderPhoto> {
+    await this.findById(id);
+    return this.photoRepo.save(
+      this.photoRepo.create({
+        workOrderId: id,
+        stage: dto.stage,
+        url: dto.url,
+        caption: dto.caption ?? null,
+        visibleToCustomer: dto.visibleToCustomer ?? false,
+        uploadedById: actor.id ?? null,
+      }),
+    );
+  }
+
+  async removePhoto(id: string, photoId: string): Promise<void> {
+    await this.photoRepo.delete({ id: photoId, workOrderId: id });
+  }
+
+  // ---------------- Chuyen trang thai ----------------
+
+  /**
+   * RD muc 5.2. Hai buoc co tac dung phu quan trong:
+   * COMPLETED tru kho phu tung va ghi lich su xe (BR-30, BR-42);
+   * CANCELLED hoan lai kho neu da tru.
+   */
+  async changeStatus(
+    id: string,
+    to: WorkOrderStatus,
+    actor: Actor,
+    note?: string,
+  ): Promise<WorkOrder> {
+    const workOrder = await this.findById(id);
+    const allowed = WORK_ORDER_TRANSITIONS[workOrder.status];
+    if (!allowed.includes(to)) {
+      throw new BadRequestException({
+        code: 'INVALID_STATUS_TRANSITION',
+        message: `Khong the chuyen phieu tu ${workOrder.status} sang ${to}`,
+        details: { from: workOrder.status, to, allowed },
+      });
+    }
+
+    const from = workOrder.status;
+    workOrder.status = to;
+
+    switch (to) {
+      case WorkOrderStatus.IN_PROGRESS:
+        workOrder.startedAt = workOrder.startedAt ?? new Date();
+        break;
+      case WorkOrderStatus.COMPLETED:
+        workOrder.completedAt = new Date();
+        workOrder.progressPercent = 100;
+        break;
+      case WorkOrderStatus.DELIVERED:
+        workOrder.deliveredAt = new Date();
+        break;
+      case WorkOrderStatus.CANCELLED:
+        workOrder.cancelledAt = new Date();
+        workOrder.cancelReason = note ?? null;
+        break;
+      default:
+        break;
+    }
+
+    await this.repo.save(workOrder);
+    await this.historyRepo.save(
+      this.historyRepo.create({
+        workOrderId: id,
+        fromStatus: from,
+        toStatus: to,
+        actorId: actor.id ?? null,
+        note: note ?? null,
+      }),
+    );
+
+    if (to === WorkOrderStatus.COMPLETED) {
+      await this.onCompleted(workOrder, actor);
+    }
+    if (to === WorkOrderStatus.CANCELLED && workOrder.stockDeducted) {
+      await this.inventory.returnForWorkOrder(workOrder.id, actor.id ?? null);
+      await this.repo.update(id, { stockDeducted: false });
+    }
+    if (to === WorkOrderStatus.DELIVERED) {
+      await this.onDelivered(workOrder, actor);
+    }
+
+    return this.findById(id);
+  }
+
+  /** BR-30, BR-42 — tru kho, ghi lich su xe va bao khach xe da xong. */
+  private async onCompleted(workOrder: WorkOrder, actor: Actor): Promise<void> {
+    const full = await this.findById(workOrder.id);
+
+    if (!full.stockDeducted && (full.parts ?? []).length > 0) {
+      await this.inventory.deductForWorkOrder(
+        full.id,
+        full.storeId,
+        (full.parts ?? [])
+          .filter((p) => p.partId)
+          .map((p) => ({ partId: p.partId as string, quantity: p.quantity })),
+        actor.id ?? null,
+      );
+      await this.repo.update(full.id, { stockDeducted: true });
+    }
+
+    await this.vehicles.addHistory({
+      vehicleId: full.vehicleId,
+      workOrderId: full.id,
+      storeId: full.storeId,
+      servicedAt: full.completedAt ?? new Date(),
+      type: inferServiceType(full),
+      summary: (full.items ?? []).map((i) => i.name).join(', ').slice(0, 250) || 'Dich vu',
+      detail: full.diagnosisNote,
+      odometer: full.intakeOdometer,
+      totalAmount: full.totalAmount,
+      itemNames: (full.items ?? []).map((i) => i.name),
+    });
+
+    await this.scheduleNextMaintenance(full);
+    await this.notifyCustomer(full, NotificationEvent.WORK_ORDER_COMPLETED);
+  }
+
+  private async onDelivered(workOrder: WorkOrder, actor: Actor): Promise<void> {
+    if (workOrder.bookingId) {
+      try {
+        await this.bookings.markDone(workOrder.bookingId, actor);
+      } catch (error) {
+        this.logger.warn(`Khong dong duoc lich hen cua phieu ${workOrder.code}`);
+      }
+    }
+    await this.notifyCustomer(workOrder, NotificationEvent.VEHICLE_DELIVERED);
+  }
+
+  /**
+   * AI-05 — de xuat ky bao duong tiep theo tu chu ky cua dich vu da lam.
+   * Chi tao khi phieu co hang muc bao duong; du lieu nay la nguon cua FR-NOT-05.
+   */
+  private async scheduleNextMaintenance(workOrder: WorkOrder): Promise<void> {
+    const months = this.settings.getNumber(
+      SETTING_KEYS.MAINTENANCE_DEFAULT_INTERVAL_MONTHS,
+      undefined,
+      6,
+    );
+    const km = this.settings.getNumber(SETTING_KEYS.MAINTENANCE_DEFAULT_INTERVAL_KM, undefined, 3000);
+
+    const base = workOrder.completedAt ?? new Date();
+    const due = new Date(base);
+    due.setMonth(due.getMonth() + months);
+
+    await this.vehicles.upsertSchedule({
+      vehicleId: workOrder.vehicleId,
+      dueDate: due.toISOString().slice(0, 10),
+      dueOdometer: workOrder.intakeOdometer + km,
+    });
+  }
+
+  private async notifyCustomer(workOrder: WorkOrder, event: NotificationEvent): Promise<void> {
+    try {
+      const customer = await this.customers.findById(workOrder.customerId);
+      if (!customer.notifySms) return;
+      await this.notifications.send({
+        event,
+        channel: NotificationChannel.SMS,
+        language: customer.language,
+        recipient: customer.phone,
+        customerId: customer.id,
+        variables: {
+          customerName: customer.name,
+          workOrderCode: workOrder.code,
+          totalAmount: workOrder.totalAmount.toLocaleString('ja-JP'),
+          completedAt: formatAppDateTime(workOrder.completedAt ?? new Date()),
+        },
+        relatedType: 'WorkOrder',
+        relatedId: workOrder.id,
+      });
+    } catch (error) {
+      this.logger.error(`Khong gui duoc thong bao ${event} cho phieu ${workOrder.code}`);
+    }
+  }
+
+  /** Ma phieu dang WO-yyyyMMdd-nnn, tang theo ngay. */
+  private async nextCode(): Promise<string> {
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const count = await this.repo
+      .createQueryBuilder('w')
+      .where('w.code LIKE :prefix', { prefix: `WO-${today}-%` })
+      .getCount();
+    return `WO-${today}-${String(count + 1).padStart(3, '0')}`;
+  }
+
+  async markPaymentStatus(id: string, status: PaymentStatus, paidAmount: number): Promise<void> {
+    await this.repo.update(id, { paymentStatus: status, paidAmount });
+  }
+}
+
+/** Phieu co hang muc bao duong thi ghi lich su la bao duong, con lai la sua chua. */
+function inferServiceType(workOrder: WorkOrder): ServiceType {
+  const hasMaintenance = (workOrder.items ?? []).some(
+    (item) => item.service?.type === ServiceType.MAINTENANCE,
+  );
+  return hasMaintenance ? ServiceType.MAINTENANCE : ServiceType.REPAIR;
+}
