@@ -11,18 +11,32 @@ Tài liệu nguồn: [`RD-2026-001`](../evn-ict-challenges-2026-docs/docs/01-Din
 
 | Thành phần | Phiên bản | Ghi chú |
 | --- | --- | --- |
-| Node.js | **20 LTS trở lên** | Bắt buộc — máy đang dùng Node 16 sẽ không chạy được |
-| PostgreSQL | 16 | Hoặc dùng `docker compose up -d` kèm sẵn |
+| Node.js | **20 LTS trở lên** | Node 16 không chạy được |
+| PostgreSQL | 16 | Dùng Docker, hoặc bản portable đã cài sẵn (xem dưới) |
 | Docker | tùy chọn | Chỉ để chạy PostgreSQL và Adminer |
+
+### Môi trường đã dựng sẵn trên máy này
+
+Máy không có quyền quản trị nên Node và PostgreSQL được cài **bản portable** trong
+`%USERPROFILE%\tools` — gỡ chỉ cần xóa thư mục:
+
+```powershell
+# Đưa Node 20 lên đầu PATH cho phiên làm việc hiện tại
+$env:Path = "$env:USERPROFILE\tools\node-v20.18.1-win-x64;" + $env:Path
+
+# Khởi động / dừng PostgreSQL (dữ liệu nằm ở ~\tools\pgdata)
+& "$env:USERPROFILE\tools\pgsql\bin\pg_ctl.exe" -D "$env:USERPROFILE\tools\pgdata" -l "$env:USERPROFILE\tools\pgdata.log" -o "-p 5432" start
+& "$env:USERPROFILE\tools\pgsql\bin\pg_ctl.exe" -D "$env:USERPROFILE\tools\pgdata" stop
+```
 
 ## Chạy lần đầu
 
 ```bash
 cp .env.example .env          # sửa JWT_SECRET và JWT_REFRESH_SECRET
-docker compose up -d          # PostgreSQL :5432, Adminer :8080
+docker compose up -d          # PostgreSQL :5432, Adminer :8080 (bỏ qua nếu dùng bản portable)
 npm install
-npm run seed                  # nạp dữ liệu khởi tạo
-npm run start:dev             # API tại http://localhost:3001/api/v1
+npm run start:dev             # lần chạy đầu tạo bảng, API tại http://localhost:3001/api/v1
+npm run seed                  # nạp dữ liệu khởi tạo (chạy sau khi bảng đã có)
 ```
 
 Tài liệu API (Swagger): <http://localhost:3001/api/v1/docs>
