@@ -252,7 +252,7 @@ export class AiService {
     if (query.category) qb.andWhere('d.category = :category', { category: query.category });
 
     const [items, total] = await qb
-      .orderBy('d.created_at', 'DESC')
+      .orderBy('d.createdAt', 'DESC')
       .skip(query.skip)
       .take(query.limit)
       .getManyAndCount();

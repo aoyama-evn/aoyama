@@ -61,7 +61,7 @@ export class VehiclesService {
       );
     }
     const [items, total] = await qb
-      .orderBy('v.created_at', 'DESC')
+      .orderBy('v.createdAt', 'DESC')
       .skip(query.skip)
       .take(query.limit)
       .getManyAndCount();

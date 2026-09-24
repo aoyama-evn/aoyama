@@ -167,7 +167,7 @@ export class NotificationsService {
     if (query.to) qb.andWhere('log.created_at <= :to', { to: query.to });
 
     const [items, total] = await qb
-      .orderBy('log.created_at', 'DESC')
+      .orderBy('log.createdAt', 'DESC')
       .skip(query.skip)
       .take(query.limit)
       .getManyAndCount();

@@ -74,7 +74,7 @@ export class CatalogService {
       qb.andWhere('(s.code ILIKE :kw OR s.name::text ILIKE :kw)', { kw: `%${query.keyword}%` });
     }
     const [items, total] = await qb
-      .orderBy('s.sort_order', 'ASC')
+      .orderBy('s.sortOrder', 'ASC')
       .addOrderBy('s.code', 'ASC')
       .skip(query.skip)
       .take(query.limit)

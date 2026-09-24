@@ -205,7 +205,7 @@ export class WorkOrdersService {
     }
 
     const [items, total] = await qb
-      .orderBy('w.created_at', query.sortOrder)
+      .orderBy('w.createdAt', query.sortOrder)
       .skip(query.skip)
       .take(query.limit)
       .getManyAndCount();
@@ -258,54 +258,70 @@ export class WorkOrdersService {
     }
 
     await this.dataSource.transaction(async (manager) => {
-      if (dto.diagnosisNote !== undefined) workOrder.diagnosisNote = dto.diagnosisNote;
-      if (dto.diagnosisCause !== undefined) workOrder.diagnosisCause = dto.diagnosisCause;
-      if (dto.assignedTechnicianId !== undefined) {
-        workOrder.assignedTechnicianId = dto.assignedTechnicianId;
-      }
-
+      /**
+       * Dung insert() va update() thay vi save() tren thuc the da nap kem quan he:
+       * WorkOrder khai bao cascade cho items va parts, nen save() se ghi de bang
+       * ban sao cu dang nam trong bo nho va lam hong du lieu vua thay.
+       */
       if (dto.items) {
         await manager.getRepository(WorkOrderItem).delete({ workOrderId: id });
-        await manager.getRepository(WorkOrderItem).save(
-          dto.items.map((item, index) =>
-            manager.getRepository(WorkOrderItem).create({
-              ...item,
-              id: undefined,
+        if (dto.items.length > 0) {
+          await manager.getRepository(WorkOrderItem).insert(
+            dto.items.map((item, index) => ({
               workOrderId: id,
+              serviceId: item.serviceId ?? null,
+              name: item.name,
+              description: item.description ?? null,
+              unitPrice: item.unitPrice,
+              quantity: item.quantity,
+              laborMinutes: item.laborMinutes ?? null,
+              suggestedByAi: item.suggestedByAi ?? false,
+              isDone: item.isDone ?? false,
               sortOrder: item.sortOrder ?? index,
-            }),
-          ),
-        );
+            })),
+          );
+        }
       }
 
       if (dto.parts) {
         await manager.getRepository(WorkOrderPart).delete({ workOrderId: id });
-        await manager
-          .getRepository(WorkOrderPart)
-          .save(
-            dto.parts.map((part) =>
-              manager
-                .getRepository(WorkOrderPart)
-                .create({ ...part, id: undefined, workOrderId: id }),
-            ),
+        if (dto.parts.length > 0) {
+          await manager.getRepository(WorkOrderPart).insert(
+            dto.parts.map((part) => ({
+              workOrderId: id,
+              partId: part.partId ?? null,
+              partName: part.partName,
+              partCode: part.partCode ?? null,
+              unitPrice: part.unitPrice,
+              quantity: part.quantity,
+              suggestedByAi: part.suggestedByAi ?? false,
+            })),
           );
+        }
+      }
+
+      const patch: Partial<WorkOrder> = {};
+      if (dto.diagnosisNote !== undefined) patch.diagnosisNote = dto.diagnosisNote;
+      if (dto.diagnosisCause !== undefined) patch.diagnosisCause = dto.diagnosisCause;
+      if (dto.assignedTechnicianId !== undefined) {
+        patch.assignedTechnicianId = dto.assignedTechnicianId;
       }
 
       // Buoc ghi chan doan dau tien dua phieu sang DIAGNOSING.
       if (workOrder.status === WorkOrderStatus.RECEIVED) {
-        workOrder.status = WorkOrderStatus.DIAGNOSING;
-        workOrder.diagnosingAt = new Date();
-        await manager.getRepository(WorkOrderStatusHistory).save(
-          manager.getRepository(WorkOrderStatusHistory).create({
-            workOrderId: id,
-            fromStatus: WorkOrderStatus.RECEIVED,
-            toStatus: WorkOrderStatus.DIAGNOSING,
-            actorId: actor.id ?? null,
-          }),
-        );
+        patch.status = WorkOrderStatus.DIAGNOSING;
+        patch.diagnosingAt = new Date();
+        await manager.getRepository(WorkOrderStatusHistory).insert({
+          workOrderId: id,
+          fromStatus: WorkOrderStatus.RECEIVED,
+          toStatus: WorkOrderStatus.DIAGNOSING,
+          actorId: actor.id ?? null,
+        });
       }
 
-      await manager.getRepository(WorkOrder).save(workOrder);
+      if (Object.keys(patch).length > 0) {
+        await manager.getRepository(WorkOrder).update(id, patch);
+      }
     });
 
     await this.recalculateAmounts(id);
@@ -328,19 +344,23 @@ export class WorkOrdersService {
     const beforeTax = Math.max(0, laborSubtotal + partsSubtotal - workOrder.discountAmount);
     const taxAmount = applyTax(beforeTax, workOrder.taxRate);
 
-    workOrder.laborSubtotal = laborSubtotal;
-    workOrder.partsSubtotal = partsSubtotal;
-    workOrder.taxAmount = taxAmount;
-    workOrder.totalAmount = yen(beforeTax + taxAmount);
-
-    return this.repo.save(workOrder);
+    // update() thay vi save(): thuc the vua nap co quan he cascade, save() se
+    // ghi lai ca items va parts mot cach thua thai.
+    await this.repo.update(id, {
+      laborSubtotal,
+      partsSubtotal,
+      taxAmount,
+      totalAmount: yen(beforeTax + taxAmount),
+    });
+    return this.repo.findOneOrFail({ where: { id } });
   }
 
   async updateAmounts(id: string, dto: UpdateAmountsDto): Promise<WorkOrder> {
-    const workOrder = await this.findById(id);
-    if (dto.discountAmount !== undefined) workOrder.discountAmount = dto.discountAmount;
-    if (dto.taxRate !== undefined) workOrder.taxRate = dto.taxRate;
-    await this.repo.save(workOrder);
+    await this.findById(id);
+    const patch: Partial<WorkOrder> = {};
+    if (dto.discountAmount !== undefined) patch.discountAmount = dto.discountAmount;
+    if (dto.taxRate !== undefined) patch.taxRate = dto.taxRate;
+    if (Object.keys(patch).length > 0) await this.repo.update(id, patch);
     return this.recalculateAmounts(id);
   }
 
@@ -398,37 +418,39 @@ export class WorkOrdersService {
     }
 
     const from = workOrder.status;
-    workOrder.status = to;
+    // update() thay vi save(): thuc the nap kem quan he cascade, save() se ghi
+    // de lai items va parts bang ban sao dang nam trong bo nho.
+    const patch: Partial<WorkOrder> = { status: to };
 
     switch (to) {
       case WorkOrderStatus.IN_PROGRESS:
-        workOrder.startedAt = workOrder.startedAt ?? new Date();
+        patch.startedAt = workOrder.startedAt ?? new Date();
         break;
       case WorkOrderStatus.COMPLETED:
-        workOrder.completedAt = new Date();
-        workOrder.progressPercent = 100;
+        patch.completedAt = new Date();
+        patch.progressPercent = 100;
         break;
       case WorkOrderStatus.DELIVERED:
-        workOrder.deliveredAt = new Date();
+        patch.deliveredAt = new Date();
         break;
       case WorkOrderStatus.CANCELLED:
-        workOrder.cancelledAt = new Date();
-        workOrder.cancelReason = note ?? null;
+        patch.cancelledAt = new Date();
+        patch.cancelReason = note ?? null;
         break;
       default:
         break;
     }
 
-    await this.repo.save(workOrder);
-    await this.historyRepo.save(
-      this.historyRepo.create({
-        workOrderId: id,
-        fromStatus: from,
-        toStatus: to,
-        actorId: actor.id ?? null,
-        note: note ?? null,
-      }),
-    );
+    await this.repo.update(id, patch);
+    Object.assign(workOrder, patch);
+
+    await this.historyRepo.insert({
+      workOrderId: id,
+      fromStatus: from,
+      toStatus: to,
+      actorId: actor.id ?? null,
+      note: note ?? null,
+    });
 
     if (to === WorkOrderStatus.COMPLETED) {
       await this.onCompleted(workOrder, actor);

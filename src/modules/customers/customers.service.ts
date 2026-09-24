@@ -6,6 +6,9 @@ import { normalizePhone } from 'src/common/utils';
 import { Vehicle } from 'src/modules/vehicles/entities/vehicle.entity';
 import { Customer } from './entities/customer.entity';
 
+/** Cac truong cho phep sap xep o SA-15 — ten thuoc tinh, khong phai ten cot. */
+const SORTABLE = ['createdAt', 'name', 'phone', 'lastLoginAt'];
+
 /** M-09 — Quan ly khach hang. SA-15..SA-18, va sinh ho so tu luong dat lich. */
 @Injectable()
 export class CustomersService {
@@ -79,7 +82,12 @@ export class CustomersService {
     if (query.isActive !== undefined) qb.andWhere('c.is_active = :a', { a: query.isActive });
 
     const [items, total] = await qb
-      .orderBy(`c.${query.sortBy ?? 'created_at'}`, query.sortOrder)
+      // Chi cho sap xep theo truong da biet: TypeORM tra cuu theo ten thuoc tinh,
+      // va nhan chuoi tu do o day se mo duong cho tiem cau lenh.
+      .orderBy(
+        `c.${SORTABLE.includes(query.sortBy ?? '') ? query.sortBy : 'createdAt'}`,
+        query.sortOrder,
+      )
       .skip(query.skip)
       .take(query.limit)
       .getManyAndCount();

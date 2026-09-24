@@ -170,7 +170,7 @@ export class InventoryService {
     if (query.type) qb.andWhere('t.type = :type', { type: query.type });
 
     const [items, total] = await qb
-      .orderBy('t.created_at', 'DESC')
+      .orderBy('t.createdAt', 'DESC')
       .skip(query.skip)
       .take(query.limit)
       .getManyAndCount();

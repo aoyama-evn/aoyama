@@ -171,7 +171,7 @@ export class QuotationsService {
     }
 
     const [items, total] = await qb
-      .orderBy('q.created_at', 'DESC')
+      .orderBy('q.createdAt', 'DESC')
       .skip(query.skip)
       .take(query.limit)
       .getManyAndCount();

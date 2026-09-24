@@ -2,9 +2,17 @@ import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { json, urlencoded } from 'express';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters';
+
+/**
+ * Anh hien trang xe va anh gui cho tro ly AI duoc truyen duoi dang data URL,
+ * nen gioi han 100kb mac dinh cua Express la qua chat. Khi chuyen sang luu tru
+ * tep rieng thi ha con so nay xuong.
+ */
+const BODY_LIMIT = '15mb';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
@@ -19,6 +27,8 @@ async function bootstrap(): Promise<void> {
 
   app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
   app.enableCors({ origin: corsOrigins, credentials: true });
+  app.use(json({ limit: BODY_LIMIT }));
+  app.use(urlencoded({ extended: true, limit: BODY_LIMIT }));
 
   app.useGlobalPipes(
     new ValidationPipe({

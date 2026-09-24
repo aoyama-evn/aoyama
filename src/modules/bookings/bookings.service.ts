@@ -225,7 +225,7 @@ export class BookingsService {
     const qb = this.baseQuery().where('b.customer_id = :customerId', { customerId });
     this.applyFilters(qb, query);
     const [items, total] = await qb
-      .orderBy('b.scheduled_at', 'DESC')
+      .orderBy('b.scheduledAt', 'DESC')
       .skip(query.skip)
       .take(query.limit)
       .getManyAndCount();
@@ -243,7 +243,7 @@ export class BookingsService {
       );
     }
     const [items, total] = await qb
-      .orderBy('b.scheduled_at', query.sortOrder)
+      .orderBy('b.scheduledAt', query.sortOrder)
       .skip(query.skip)
       .take(query.limit)
       .getManyAndCount();
@@ -259,7 +259,7 @@ export class BookingsService {
       .andWhere('b.scheduled_at >= :start', { start })
       .andWhere('b.scheduled_at < :end', { end })
       .andWhere('b.status != :cancelled', { cancelled: BookingStatus.CANCELLED })
-      .orderBy('b.scheduled_at', 'ASC')
+      .orderBy('b.scheduledAt', 'ASC')
       .getMany();
   }
 
