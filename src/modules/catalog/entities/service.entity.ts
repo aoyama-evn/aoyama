@@ -41,10 +41,10 @@ export class Service extends SoftDeletableEntity {
   @Column({ name: 'quote_only', default: false })
   quoteOnly!: boolean;
 
-  @Column({ name: 'icon_key', length: 32, nullable: true })
+  @Column({ type: 'varchar', name: 'icon_key', length: 32, nullable: true })
   iconKey!: string | null;
 
-  @Column({ name: 'image_url', length: 512, nullable: true })
+  @Column({ type: 'varchar', name: 'image_url', length: 512, nullable: true })
   imageUrl!: string | null;
 
   @Column({ name: 'is_active', default: true })

@@ -28,6 +28,6 @@ export class Inventory extends BaseEntity {
   @Column({ name: 'min_quantity', type: 'int', default: 0 })
   minQuantity!: number;
 
-  @Column({ name: 'location_note', length: 128, nullable: true })
+  @Column({ type: 'varchar', name: 'location_note', length: 128, nullable: true })
   locationNote!: string | null;
 }

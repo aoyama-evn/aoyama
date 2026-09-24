@@ -41,13 +41,13 @@ export class AiDiagnosis extends BaseEntity {
   @Column({ type: 'enum', enum: Language, default: Language.JA })
   language!: Language;
 
-  @Column({ name: 'vehicle_maker', length: 64, nullable: true })
+  @Column({ type: 'varchar', name: 'vehicle_maker', length: 64, nullable: true })
   vehicleMaker!: string | null;
 
-  @Column({ name: 'vehicle_model', length: 64, nullable: true })
+  @Column({ type: 'varchar', name: 'vehicle_model', length: 64, nullable: true })
   vehicleModel!: string | null;
 
-  @Column({ name: 'service_intent', length: 16, nullable: true })
+  @Column({ type: 'varchar', name: 'service_intent', length: 16, nullable: true })
   serviceIntent!: string | null;
 
   @Column({ type: 'jsonb', default: () => "'[]'" })
@@ -60,10 +60,10 @@ export class AiDiagnosis extends BaseEntity {
   summaryText!: string | null;
 
   /** PENDING | COMPLETED | FAILED — FAILED khi dich vu AI khong phan hoi. */
-  @Column({ length: 16, default: 'PENDING' })
+  @Column({ type: 'varchar', length: 16, default: 'PENDING' })
   status!: string;
 
-  @Column({ name: 'model_name', length: 64, nullable: true })
+  @Column({ type: 'varchar', name: 'model_name', length: 64, nullable: true })
   modelName!: string | null;
 
   @Column({ name: 'latency_ms', type: 'int', nullable: true })

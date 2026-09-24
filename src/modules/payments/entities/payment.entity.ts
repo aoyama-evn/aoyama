@@ -27,7 +27,7 @@ export class Payment extends BaseEntity {
   @Column({ name: 'paid_at', type: 'timestamptz' })
   paidAt!: Date;
 
-  @Column({ name: 'receipt_no', length: 64, nullable: true })
+  @Column({ type: 'varchar', name: 'receipt_no', length: 64, nullable: true })
   receiptNo!: string | null;
 
   @Column({ name: 'received_by_id', type: 'uuid', nullable: true })

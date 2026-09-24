@@ -28,7 +28,7 @@ export class NotificationLog extends BaseEntity {
   @Column({ length: 128 })
   recipient!: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   subject!: string | null;
 
   @Column({ type: 'text' })
@@ -47,10 +47,10 @@ export class NotificationLog extends BaseEntity {
   retryCount!: number;
 
   /** Ma tham chieu tu nha cung cap SMS/SMTP de doi soat chi phi (OQ-06). */
-  @Column({ name: 'provider_message_id', length: 128, nullable: true })
+  @Column({ type: 'varchar', name: 'provider_message_id', length: 128, nullable: true })
   providerMessageId!: string | null;
 
-  @Column({ name: 'related_type', length: 32, nullable: true })
+  @Column({ type: 'varchar', name: 'related_type', length: 32, nullable: true })
   relatedType!: string | null;
 
   @Column({ name: 'related_id', type: 'uuid', nullable: true })

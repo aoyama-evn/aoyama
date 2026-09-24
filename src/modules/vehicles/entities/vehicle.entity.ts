@@ -29,10 +29,10 @@ export class Vehicle extends SoftDeletableEntity {
   @Column({ name: 'engine_cc', type: 'int', nullable: true })
   engineCc!: number | null;
 
-  @Column({ length: 32, nullable: true })
+  @Column({ type: 'varchar', length: 32, nullable: true })
   color!: string | null;
 
-  @Column({ name: 'vin_number', length: 64, nullable: true })
+  @Column({ type: 'varchar', name: 'vin_number', length: 64, nullable: true })
   vinNumber!: string | null;
 
   @Column({ name: 'current_odometer', type: 'int', nullable: true })

@@ -19,7 +19,7 @@ export class NotificationTemplate extends BaseEntity {
   language!: Language;
 
   /** Chi dung cho kenh EMAIL. */
-  @Column({ length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   subject!: string | null;
 
   /** Noi dung co bien dang {{bookingCode}}, {{storeName}}, {{scheduledAt}}. */

@@ -12,7 +12,7 @@ export class AuditLog extends BaseEntity {
   @Column({ name: 'actor_id', type: 'uuid', nullable: true })
   actorId!: string | null;
 
-  @Column({ name: 'actor_name', length: 128, nullable: true })
+  @Column({ type: 'varchar', name: 'actor_name', length: 128, nullable: true })
   actorName!: string | null;
 
   /** ADMIN | CUSTOMER | SYSTEM */
@@ -32,9 +32,9 @@ export class AuditLog extends BaseEntity {
   @Column({ name: 'changes', type: 'jsonb', nullable: true })
   changes!: Record<string, unknown> | null;
 
-  @Column({ name: 'ip_address', length: 64, nullable: true })
+  @Column({ type: 'varchar', name: 'ip_address', length: 64, nullable: true })
   ipAddress!: string | null;
 
-  @Column({ name: 'user_agent', length: 255, nullable: true })
+  @Column({ type: 'varchar', name: 'user_agent', length: 255, nullable: true })
   userAgent!: string | null;
 }

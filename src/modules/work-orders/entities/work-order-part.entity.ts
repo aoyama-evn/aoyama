@@ -21,10 +21,10 @@ export class WorkOrderPart extends BaseEntity {
   part!: Part | null;
 
   /** Chup lai ten va gia ban tai thoi diem dung — lich su khong doi theo bang gia. */
-  @Column({ name: 'part_name', length: 255 })
+  @Column({ type: 'varchar', name: 'part_name', length: 255 })
   partName!: string;
 
-  @Column({ name: 'part_code', length: 64, nullable: true })
+  @Column({ type: 'varchar', name: 'part_code', length: 64, nullable: true })
   partCode!: string | null;
 
   @Column({ name: 'unit_price', type: 'int', default: 0 })

@@ -16,6 +16,6 @@ export class StoreHoliday extends BaseEntity {
   @Column({ type: 'date' })
   date!: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   reason!: string | null;
 }

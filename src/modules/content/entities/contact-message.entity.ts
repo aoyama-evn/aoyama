@@ -6,19 +6,19 @@ import { Language } from 'src/common/enums';
 @Entity('contact_messages')
 @Index(['isHandled', 'createdAt'])
 export class ContactMessage extends BaseEntity {
-  @Column({ length: 128 })
+  @Column({ type: 'varchar', length: 128 })
   name!: string;
 
-  @Column({ length: 20, nullable: true })
+  @Column({ type: 'varchar', length: 20, nullable: true })
   phone!: string | null;
 
-  @Column({ length: 128, nullable: true })
+  @Column({ type: 'varchar', length: 128, nullable: true })
   email!: string | null;
 
   @Column({ name: 'store_id', type: 'uuid', nullable: true })
   storeId!: string | null;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   subject!: string | null;
 
   @Column({ type: 'text' })

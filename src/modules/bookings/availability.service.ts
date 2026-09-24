@@ -181,7 +181,7 @@ export class AvailabilityService {
       .select('b.slot_start_time', 'slotStartTime')
       .addSelect('COUNT(*)', 'count')
       .where('b.store_id = :storeId', { storeId })
-      .andWhere(`(b.scheduled_at AT TIME ZONE :tz)::date = :date`, { tz: APP_TZ, date })
+      .andWhere(`CAST(b.scheduled_at AT TIME ZONE :tz AS date) = :date`, { tz: APP_TZ, date })
       .andWhere('b.status IN (:...statuses)', { statuses: BOOKING_OPEN_STATUSES })
       .groupBy('b.slot_start_time')
       .getRawMany<{ slotStartTime: string; count: string }>();

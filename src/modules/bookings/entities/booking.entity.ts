@@ -64,7 +64,7 @@ export class Booking extends BaseEntity {
   @Column({ name: 'contact_phone', length: 20 })
   contactPhone!: string;
 
-  @Column({ name: 'contact_email', length: 128, nullable: true })
+  @Column({ type: 'varchar', name: 'contact_email', length: 128, nullable: true })
   contactEmail!: string | null;
 
   /** Mo ta trieu chung khach tu nhap o SC-14. */
@@ -90,7 +90,7 @@ export class Booking extends BaseEntity {
   rebookedFromId!: string | null;
 
   // ---- Ma QR (FR-QR-01..03) ----
-  @Column({ name: 'qr_token', length: 64, nullable: true, unique: true })
+  @Column({ type: 'varchar', name: 'qr_token', length: 64, nullable: true, unique: true })
   qrToken!: string | null;
 
   @Column({ name: 'qr_issued_at', type: 'timestamptz', nullable: true })
@@ -116,7 +116,7 @@ export class Booking extends BaseEntity {
   cancelReason!: string | null;
 
   /** CUSTOMER hoac ADMIN — de thong ke ty le huy theo nguon (FR-RPT-04). */
-  @Column({ name: 'cancelled_by', length: 16, nullable: true })
+  @Column({ type: 'varchar', name: 'cancelled_by', length: 16, nullable: true })
   cancelledBy!: string | null;
 
   @Column({ name: 'reminder_sent_at', type: 'timestamptz', nullable: true })

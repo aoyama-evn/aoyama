@@ -11,7 +11,7 @@ export class Faq extends SoftDeletableEntity {
   @Column({ type: 'jsonb' })
   answer!: I18nText;
 
-  @Column({ length: 64, nullable: true })
+  @Column({ type: 'varchar', length: 64, nullable: true })
   category!: string | null;
 
   @Column({ name: 'is_active', default: true })

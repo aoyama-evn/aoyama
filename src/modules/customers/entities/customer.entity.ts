@@ -10,16 +10,16 @@ import { Vehicle } from 'src/modules/vehicles/entities/vehicle.entity';
 @Entity('customers')
 export class Customer extends SoftDeletableEntity {
   @Index({ unique: true })
-  @Column({ length: 20 })
+  @Column({ type: 'varchar', length: 20 })
   phone!: string;
 
   @Column({ length: 128 })
   name!: string;
 
-  @Column({ name: 'name_kana', length: 128, nullable: true })
+  @Column({ type: 'varchar', name: 'name_kana', length: 128, nullable: true })
   nameKana!: string | null;
 
-  @Column({ length: 128, nullable: true })
+  @Column({ type: 'varchar', length: 128, nullable: true })
   email!: string | null;
 
   @Column({ type: 'text', nullable: true })

@@ -27,6 +27,6 @@ export class OtpCode extends BaseEntity {
   @Column({ name: 'consumed_at', type: 'timestamptz', nullable: true })
   consumedAt!: Date | null;
 
-  @Column({ name: 'ip_address', length: 64, nullable: true })
+  @Column({ type: 'varchar', name: 'ip_address', length: 64, nullable: true })
   ipAddress!: string | null;
 }

@@ -13,16 +13,16 @@ export class Part extends SoftDeletableEntity {
   @Column({ type: 'jsonb' })
   name!: I18nText;
 
-  @Column({ length: 128, nullable: true })
+  @Column({ type: 'varchar', length: 128, nullable: true })
   maker!: string | null;
 
-  @Column({ name: 'maker_part_no', length: 64, nullable: true })
+  @Column({ type: 'varchar', name: 'maker_part_no', length: 64, nullable: true })
   makerPartNo!: string | null;
 
-  @Column({ length: 64, nullable: true })
+  @Column({ type: 'varchar', length: 64, nullable: true })
   category!: string | null;
 
-  @Column({ length: 128, nullable: true })
+  @Column({ type: 'varchar', length: 128, nullable: true })
   specification!: string | null;
 
   @Column({ length: 16, default: 'pcs' })

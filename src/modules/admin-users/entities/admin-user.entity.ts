@@ -11,19 +11,19 @@ import { Store } from 'src/modules/stores/entities/store.entity';
 @Entity('admin_users')
 export class AdminUser extends SoftDeletableEntity {
   @Index({ unique: true })
-  @Column({ length: 64 })
+  @Column({ type: 'varchar', length: 64 })
   username!: string;
 
-  @Column({ length: 128, nullable: true })
+  @Column({ type: 'varchar', length: 128, nullable: true })
   email!: string | null;
 
-  @Column({ name: 'password_hash', length: 255 })
+  @Column({ type: 'varchar', name: 'password_hash', length: 255 })
   passwordHash!: string;
 
   @Column({ name: 'full_name', length: 128 })
   fullName!: string;
 
-  @Column({ length: 32, nullable: true })
+  @Column({ type: 'varchar', length: 32, nullable: true })
   phone!: string | null;
 
   @Column({ type: 'enum', enum: AdminRole, default: AdminRole.STAFF })

@@ -19,10 +19,10 @@ export class SystemSetting extends BaseEntity {
   @Column({ name: 'value_type', length: 16, default: 'STRING' })
   valueType!: string;
 
-  @Column({ length: 64, nullable: true })
+  @Column({ type: 'varchar', length: 64, nullable: true })
   group!: string | null;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   description!: string | null;
 
   /** false khi tham so chi doc, vi du phien ban ung dung. */

@@ -98,11 +98,11 @@ export class ReportsService {
     const byDay = await this.paymentRepo
       .createQueryBuilder('p')
       .leftJoin('p.workOrder', 'w')
-      .select(`(p.paid_at AT TIME ZONE :tz)::date`, 'date')
+      .select(`CAST(p.paid_at AT TIME ZONE :tz AS date)`, 'date')
       .addSelect('SUM(p.amount)', 'amount')
       .addSelect('COUNT(DISTINCT p.work_order_id)', 'workOrders')
       .where('p.is_voided = false')
-      .andWhere(`(p.paid_at AT TIME ZONE :tz)::date BETWEEN :from AND :to`, {
+      .andWhere(`CAST(p.paid_at AT TIME ZONE :tz AS date) BETWEEN :from AND :to`, {
         tz: APP_TZ,
         from: range.from,
         to: range.to,
@@ -119,7 +119,7 @@ export class ReportsService {
       .select('p.method', 'method')
       .addSelect('SUM(p.amount)', 'amount')
       .where('p.is_voided = false')
-      .andWhere(`(p.paid_at AT TIME ZONE :tz)::date BETWEEN :from AND :to`, {
+      .andWhere(`CAST(p.paid_at AT TIME ZONE :tz AS date) BETWEEN :from AND :to`, {
         tz: APP_TZ,
         from: range.from,
         to: range.to,
@@ -135,7 +135,7 @@ export class ReportsService {
       .where('w.status IN (:...statuses)', {
         statuses: [WorkOrderStatus.COMPLETED, WorkOrderStatus.DELIVERED],
       })
-      .andWhere(`(w.completed_at AT TIME ZONE :tz)::date BETWEEN :from AND :to`, {
+      .andWhere(`CAST(w.completed_at AT TIME ZONE :tz AS date) BETWEEN :from AND :to`, {
         tz: APP_TZ,
         from: range.from,
         to: range.to,
@@ -174,7 +174,7 @@ export class ReportsService {
       .where('w.status IN (:...statuses)', {
         statuses: [WorkOrderStatus.COMPLETED, WorkOrderStatus.DELIVERED],
       })
-      .andWhere(`(w.completed_at AT TIME ZONE :tz)::date BETWEEN :from AND :to`, {
+      .andWhere(`CAST(w.completed_at AT TIME ZONE :tz AS date) BETWEEN :from AND :to`, {
         tz: APP_TZ,
         from: range.from,
         to: range.to,
@@ -230,7 +230,7 @@ export class ReportsService {
 
   private async bookingsByDay(range: ReportRange) {
     const rows = await this.rangeQuery(range)
-      .select(`(b.scheduled_at AT TIME ZONE :tz)::date`, 'date')
+      .select(`CAST(b.scheduled_at AT TIME ZONE :tz AS date)`, 'date')
       .addSelect('COUNT(*)', 'count')
       .setParameter('tz', APP_TZ)
       .groupBy('date')
@@ -244,7 +244,7 @@ export class ReportsService {
       .createQueryBuilder('w')
       .select('w.status', 'status')
       .addSelect('COUNT(*)', 'count')
-      .where(`(w.created_at AT TIME ZONE :tz)::date BETWEEN :from AND :to`, {
+      .where(`CAST(w.created_at AT TIME ZONE :tz AS date) BETWEEN :from AND :to`, {
         tz: APP_TZ,
         from: range.from,
         to: range.to,
@@ -258,7 +258,7 @@ export class ReportsService {
       .createQueryBuilder('w')
       .select('AVG(EXTRACT(EPOCH FROM (w.delivered_at - w.created_at)) / 3600)', 'hours')
       .where('w.delivered_at IS NOT NULL')
-      .andWhere(`(w.created_at AT TIME ZONE :tz)::date BETWEEN :from AND :to`, {
+      .andWhere(`CAST(w.created_at AT TIME ZONE :tz AS date) BETWEEN :from AND :to`, {
         tz: APP_TZ,
         from: range.from,
         to: range.to,
@@ -278,7 +278,7 @@ export class ReportsService {
       .leftJoin('p.workOrder', 'w')
       .select('COALESCE(SUM(p.amount), 0)', 'total')
       .where('p.is_voided = false')
-      .andWhere(`(p.paid_at AT TIME ZONE :tz)::date BETWEEN :from AND :to`, {
+      .andWhere(`CAST(p.paid_at AT TIME ZONE :tz AS date) BETWEEN :from AND :to`, {
         tz: APP_TZ,
         from: range.from,
         to: range.to,
@@ -291,7 +291,7 @@ export class ReportsService {
   private rangeQuery(range: ReportRange) {
     const qb = this.bookingRepo
       .createQueryBuilder('b')
-      .where(`(b.scheduled_at AT TIME ZONE :tz)::date BETWEEN :from AND :to`, {
+      .where(`CAST(b.scheduled_at AT TIME ZONE :tz AS date) BETWEEN :from AND :to`, {
         tz: APP_TZ,
         from: range.from,
         to: range.to,
@@ -303,7 +303,7 @@ export class ReportsService {
   private async countBookingsOnDate(date: string, storeId?: string): Promise<number> {
     const qb = this.bookingRepo
       .createQueryBuilder('b')
-      .where(`(b.scheduled_at AT TIME ZONE :tz)::date = :date`, { tz: APP_TZ, date })
+      .where(`CAST(b.scheduled_at AT TIME ZONE :tz AS date) = :date`, { tz: APP_TZ, date })
       .andWhere('b.status != :cancelled', { cancelled: BookingStatus.CANCELLED });
     if (storeId) qb.andWhere('b.store_id = :storeId', { storeId });
     return qb.getCount();

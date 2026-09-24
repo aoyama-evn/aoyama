@@ -8,10 +8,10 @@ import { SoftDeletableEntity } from 'src/common/entities/base.entity';
 @Entity('knowledge_documents')
 @Index(['category'])
 export class KnowledgeDocument extends SoftDeletableEntity {
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   title!: string;
 
-  @Column({ length: 64, nullable: true })
+  @Column({ type: 'varchar', length: 64, nullable: true })
   category!: string | null;
 
   /** Hang va dong xe tai lieu ap dung — de loc khi tra cuu. */
@@ -21,10 +21,10 @@ export class KnowledgeDocument extends SoftDeletableEntity {
   @Column({ name: 'applicable_models', type: 'jsonb', default: () => "'[]'" })
   applicableModels!: string[];
 
-  @Column({ name: 'file_url', length: 512, nullable: true })
+  @Column({ type: 'varchar', name: 'file_url', length: 512, nullable: true })
   fileUrl!: string | null;
 
-  @Column({ name: 'file_type', length: 16, nullable: true })
+  @Column({ type: 'varchar', name: 'file_type', length: 16, nullable: true })
   fileType!: string | null;
 
   /** Noi dung da boc tach de tim kiem toan van. */

@@ -23,7 +23,7 @@ export class Store extends SoftDeletableEntity {
   @Column({ length: 32 })
   phone!: string;
 
-  @Column({ length: 128, nullable: true })
+  @Column({ type: 'varchar', length: 128, nullable: true })
   email!: string | null;
 
   @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })

@@ -22,7 +22,7 @@ export class WorkOrderPhoto extends BaseEntity {
   @Column({ length: 512 })
   url!: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   caption!: string | null;
 
   /** true khi anh duoc hien tren man theo doi tien do cua khach (SC-26). */
