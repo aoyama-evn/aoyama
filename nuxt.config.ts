@@ -3,7 +3,16 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
   devtools: { enabled: true },
 
-  modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt', '@vueuse/nuxt', '@nuxtjs/i18n'],
+  modules: ['@pinia/nuxt', '@vueuse/nuxt', '@nuxtjs/i18n'],
+
+  // Dung PostCSS san co cua Nuxt thay vi module @nuxtjs/tailwindcss: module do
+  // nap cau hinh ngoai tien trinh Vite va bao loi import.meta tren du an ESM.
+  postcss: {
+    plugins: {
+      tailwindcss: {},
+      autoprefixer: {},
+    },
+  },
 
   css: ['~/assets/css/main.css'],
 
@@ -21,6 +30,8 @@ export default defineNuxtConfig({
   },
 
   // C-02 — ba ngon ngu, mac dinh tieng Nhat.
+  // @nuxtjs/i18n v9 doc tep ngon ngu trong thu muc i18n/, nen langDir tinh
+  // tuong doi tu do (i18n/locales).
   i18n: {
     strategy: 'no_prefix',
     defaultLocale: 'ja',
@@ -31,6 +42,7 @@ export default defineNuxtConfig({
     ],
     langDir: 'locales',
     lazy: true,
+    bundle: { optimizeTranslationDirective: false },
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: 'aoyama_lang',

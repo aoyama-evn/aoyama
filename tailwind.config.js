@@ -1,10 +1,14 @@
-import type { Config } from 'tailwindcss';
-
 /**
  * Bang mau va font tro thang toi bien CSS trong assets/css/main.css,
  * de doi bo design token chi can sua mot cho.
+ *
+ * Giu dinh dang .js thay vi .ts: @nuxtjs/tailwindcss nap tep nay ngoai tien
+ * trinh Vite, va ban .ts gay loi "Cannot use 'import.meta' outside a module"
+ * trong du an dat "type": "module".
+ *
+ * @type {import('tailwindcss').Config}
  */
-export default <Partial<Config>>{
+export default {
   content: [
     './components/**/*.{vue,js,ts}',
     './layouts/**/*.vue',

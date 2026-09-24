@@ -14,6 +14,13 @@ Tài liệu nguồn: [`SM-2026-001`](../evn-ict-challenges-2026-docs/docs/02-Dan
 | Node.js | **20.12 LTS trở lên** | Bắt buộc — Nuxt CLI không chạy trên Node 16 |
 | Backend | đang chạy | Mặc định `http://localhost:3001/api/v1` |
 
+> **Máy đã cài sẵn Node 20 bản portable** tại `%USERPROFILE%\tools\node-v20.18.1-win-x64`
+> (không cần quyền quản trị, gỡ chỉ cần xóa thư mục). Trước khi chạy lệnh npm, đưa nó lên đầu PATH:
+>
+> ```powershell
+> $env:Path = "$env:USERPROFILE\tools\node-v20.18.1-win-x64;" + $env:Path
+> ```
+
 ## Chạy lần đầu
 
 ```bash
