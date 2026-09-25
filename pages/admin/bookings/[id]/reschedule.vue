@@ -7,6 +7,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { dateTime } = useFormat();
 
 const id = route.params.id as string;
@@ -44,7 +45,7 @@ async function submit(): Promise<void> {
       startTime: slot.value.startTime,
       reason: reason.value || undefined,
     });
-    ui.success('Đã đổi lịch hẹn', 'Khách đã nhận SMS về thời gian mới.');
+    ui.success(t('sa05r.done'), t('sa05r.doneSub'));
     await navigateTo(`/admin/bookings/${id}`);
   } catch (err) {
     error.value = normalizeError(err);
@@ -53,19 +54,20 @@ async function submit(): Promise<void> {
   }
 }
 
-useHead({ title: 'Đổi lịch hẹn — AOYAMA Admin' });
+setScreenTitle(() => t('sa05r.title'));
+useHead({ title: () => `${t('sa05r.title')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div v-if="booking" class="admin-form">
     <AyPageHeader
-      code="SA-05" title="Đổi lịch hẹn" :back-to="`/admin/bookings/${id}`"
-      :description="`${booking.code} · hiện tại ${dateTime(booking.scheduledAt)}`"
+      code="SA-05" :title="$t('sa05r.title')" :back-to="`/admin/bookings/${id}`"
+      :description="$t('sa05r.current', { code: booking.code, at: dateTime(booking.scheduledAt) })"
     />
 
     <AySlotPicker v-model="slot" :days="days" :loading="loading" />
 
-    <AyField label="Lý do đổi lịch" hint="Ghi vào nhật ký thay đổi của lịch hẹn">
+    <AyField :label="$t('sa05r.reason')" :hint="$t('sa05r.reasonHint')">
       <template #default="{ id: fieldId }">
         <input :id="fieldId" v-model="reason" class="input" type="text">
       </template>
@@ -74,8 +76,8 @@ useHead({ title: 'Đổi lịch hẹn — AOYAMA Admin' });
     <AyErrorNote :error="error" />
 
     <div class="admin-actions">
-      <AyButton :to="`/admin/bookings/${id}`" variant="secondary">Hủy</AyButton>
-      <AyButton :disabled="!slot" :loading="submitting" @click="submit">Xác nhận đổi lịch</AyButton>
+      <AyButton :to="`/admin/bookings/${id}`" variant="secondary">{{ $t('common.cancel') }}</AyButton>
+      <AyButton :disabled="!slot" :loading="submitting" @click="submit">{{ $t('sa05r.submit') }}</AyButton>
     </div>
   </div>
 </template>

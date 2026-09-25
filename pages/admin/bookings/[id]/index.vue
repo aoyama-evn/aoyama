@@ -12,6 +12,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { i18n, money, dateTime, dayLabel, clock, number } = useFormat();
 
 const id = route.params.id as string;
@@ -20,9 +21,11 @@ const { data: booking, refresh } = await useAsyncData(`admin-booking-${id}`, () 
   api.get<Booking>(`/admin/bookings/${id}`),
 );
 
-if (!booking.value) throw createError({ statusCode: 404, statusMessage: 'Không tìm thấy lịch hẹn' });
+if (!booking.value) {
+  throw createError({ statusCode: 404, statusMessage: t('sc22.notFound') });
+}
 
-setScreenTitle(() => `Chi tiết lịch hẹn ${booking.value?.code ?? ''}`);
+setScreenTitle(() => t('sa05.title', { code: booking.value?.code ?? '' }));
 
 /** FR-AI-12 — hien lai ket qua chan doan AI khach da lam truoc khi dat lich. */
 const { data: diagnosis } = await useAsyncData(`admin-booking-diag-${id}`, () =>
@@ -73,13 +76,13 @@ async function act(): Promise<void> {
   try {
     if (confirmAction.value === 'CONFIRM') {
       await api.put(`/admin/bookings/${id}/confirm`);
-      ui.success('Đã xác nhận lịch hẹn', 'Mã QR đã được sinh và SMS đã gửi cho khách.');
+      ui.success(t('sa05.confirmed'), t('sa05.confirmedSub'));
     } else if (confirmAction.value === 'CANCEL') {
       await api.put(`/admin/bookings/${id}/cancel`, { reason: cancelReason.value || undefined });
-      ui.success('Đã hủy lịch hẹn');
+      ui.success(t('sa05.cancelled'));
     } else {
       await api.put(`/admin/bookings/${id}/no-show`);
-      ui.success('Đã đánh dấu khách không đến');
+      ui.success(t('sa05.markedNoShow'));
     }
     confirmAction.value = null;
     await refresh();
@@ -93,7 +96,7 @@ async function act(): Promise<void> {
 async function saveNote(): Promise<void> {
   try {
     await api.put(`/admin/bookings/${id}/note`, { note: adminNote.value });
-    ui.success('Đã lưu ghi chú');
+    ui.success(t('sa05.noteSaved'));
   } catch (error) {
     ui.error(normalizeError(error).message);
   }
@@ -114,13 +117,16 @@ const historyEntries = computed(() =>
     actorType: h.actorType,
     action:
       h.action === 'RESCHEDULE'
-        ? `Đổi lịch${h.previousScheduledAt ? ` (từ ${dateTime(h.previousScheduledAt)})` : ''}`
-        : `${h.fromStatus ?? 'Tạo mới'} → ${h.toStatus}`,
+        ? t('sa05.rescheduled') +
+          (h.previousScheduledAt
+            ? t('sa05.rescheduledFrom', { from: dateTime(h.previousScheduledAt) })
+            : '')
+        : `${h.fromStatus ? t(`status.${h.fromStatus}`) : t('sa05.createdLog')} → ${t(`status.${h.toStatus}`)}`,
     detail: h.note,
   })),
 );
 
-useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
+useHead({ title: () => `${t('sa05.headTitle', { code: booking.value?.code ?? '' })} — AOYAMA Admin` });
 </script>
 
 <template>
@@ -128,24 +134,24 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
     <!-- Ba the tom tat -->
     <div class="grid gap-[13px]" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr))">
       <div class="card gap-1" style="background: #fff">
-        <div class="card-kicker">Khách hàng</div>
+        <div class="card-kicker">{{ $t('sa03.colCustomer') }}</div>
         <p class="text-[14px] font-semibold">{{ booking.contactName }}</p>
         <p class="text-muted text-[12px]">
           {{ booking.contactPhone }}
           <template v-if="booking.contactEmail"> · {{ booking.contactEmail }}</template>
         </p>
         <p class="text-muted text-[12px]">
-          {{ booking.createdByAdmin ? 'Nhân viên đặt thay' : 'Khách tự đặt' }}
+          {{ booking.createdByAdmin ? $t('sa05.byAdmin') : $t('sa05.bySelf') }}
         </p>
       </div>
 
       <div class="card gap-1" style="background: #fff">
-        <div class="card-kicker">Xe</div>
+        <div class="card-kicker">{{ $t('sa03.colVehicle') }}</div>
         <p class="text-[14px] font-semibold">
           <template v-if="booking.vehicle">
             {{ booking.vehicle.maker }} {{ booking.vehicle.model }}
           </template>
-          <template v-else>Chưa khai báo</template>
+          <template v-else>{{ $t('common.notDeclared') }}</template>
         </p>
         <p v-if="booking.vehicle" class="text-muted text-[12px]">
           {{ booking.vehicle.plateNumber }}
@@ -156,7 +162,7 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
       </div>
 
       <div class="card gap-1" style="background: #fff">
-        <div class="card-kicker">Thời gian &amp; cửa hàng</div>
+        <div class="card-kicker">{{ $t('sa08.whenStore') }}</div>
         <p class="text-[14px] font-semibold">
           {{ dayLabel(booking.scheduledAt) }}
           {{ clock(booking.slotStartTime) }}–{{ clock(booking.slotEndTime) }}
@@ -167,10 +173,10 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
 
     <!-- Phieu dich vu va bao gia lien ket -->
     <section class="card gap-[11px]" style="background: #fff">
-      <h5>Phiếu dịch vụ &amp; báo giá liên kết</h5>
+      <h5>{{ $t('sa05.linked') }}</h5>
 
       <p v-if="!linked?.workOrder" class="text-muted text-[12.5px]">
-        Chưa có phiếu dịch vụ. Phiếu và báo giá được tạo sau khi tiếp nhận xe.
+        {{ $t('sa05.noWorkOrder') }}
       </p>
 
       <div
@@ -179,7 +185,7 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
         style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr))"
       >
         <NuxtLink :to="`/admin/work-orders/${linked.workOrder.id}`" class="ay-doc">
-          <span class="card-kicker">Phiếu dịch vụ</span>
+          <span class="card-kicker">{{ $t('sa09.title') }}</span>
           <span class="font-heading text-[16px]">{{ linked.workOrder.code }}</span>
           <span class="flex flex-wrap items-center gap-2">
             <AyStatusTag :status="linked.workOrder.status" />
@@ -194,7 +200,7 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
           :to="`/admin/quotations/${linked.quotation.id}`"
           class="ay-doc"
         >
-          <span class="card-kicker">Báo giá</span>
+          <span class="card-kicker">{{ $t('sa10.quotes') }}</span>
           <span class="flex items-baseline justify-between gap-2">
             <span class="font-heading text-[16px]">
               {{ linked.quotation.code }} · v{{ linked.quotation.version }}
@@ -203,9 +209,9 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
           </span>
           <span class="text-muted text-[11.5px]">
             <template v-if="linked.quotation.sentAt">
-              Gửi khách {{ dateTime(linked.quotation.sentAt) }}
+              {{ $t('sa05.sentAt', { at: dateTime(linked.quotation.sentAt) }) }}
             </template>
-            <template v-else>Chưa gửi khách</template>
+            <template v-else>{{ $t('sa05.notSent') }}</template>
           </span>
         </NuxtLink>
       </div>
@@ -214,22 +220,22 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
     <div class="grid gap-[13px]" style="grid-template-columns: repeat(auto-fit, minmax(330px, 1fr))">
       <!-- Dich vu da dat -->
       <section class="card gap-2.5" style="background: #fff">
-        <h5>Dịch vụ đã đặt</h5>
+        <h5>{{ $t('sa08.bookedServices') }}</h5>
         <table class="table" style="min-width: 270px">
           <tbody>
             <tr v-for="line in booking.services ?? []" :key="line.id">
               <td>
                 {{ line.serviceName }}
-                <span class="text-muted">· {{ line.estimatedMinutes }} phút</span>
+                <span class="text-muted">· {{ $t('common.minutesFull', { n: line.estimatedMinutes }) }}</span>
               </td>
               <td class="text-right">
-                {{ line.estimatedPrice ? money(line.estimatedPrice) : 'báo giá riêng' }}
+                {{ line.estimatedPrice ? money(line.estimatedPrice) : $t('common.quotePrivate') }}
               </td>
             </tr>
           </tbody>
         </table>
         <div class="flex justify-between text-[13px]">
-          <span class="text-muted">Tham khảo</span>
+          <span class="text-muted">{{ $t('sa08.reference') }}</span>
           <strong>{{ money(estimatedTotal) }}</strong>
         </div>
 
@@ -238,11 +244,11 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
           class="pt-2.5 text-[13px]"
           style="border-top: 1px solid var(--color-divider)"
         >
-          <p class="text-muted mb-1 text-[11px]">Mô tả của khách</p>
+          <p class="text-muted mb-1 text-[11px]">{{ $t('sa07.symptom') }}</p>
           <p class="whitespace-pre-line">“{{ booking.symptomDescription }}”</p>
           <ul v-if="booking.symptomPhotoUrls.length" class="mt-2 flex flex-wrap gap-2">
             <li v-for="(url, index) in booking.symptomPhotoUrls" :key="index">
-              <img :src="url" alt="Ảnh khách gửi" class="h-20 w-20 rounded-xl object-cover" />
+              <img :src="url" :alt="$t('sa05.photoAlt')" class="h-20 w-20 rounded-xl object-cover" />
             </li>
           </ul>
 
@@ -268,7 +274,7 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
       >
         <div class="flex items-center gap-2">
           <span class="tag" style="background: var(--color-accent-2-500); color: #fff">
-            ✦ Gợi ý bởi AI
+            {{ $t('ai.badgeShort') }}
           </span>
           <span class="text-[11px]" style="color: var(--color-accent-2-800)">
             {{ diagnosis.vehicleMaker }} {{ diagnosis.vehicleModel }}
@@ -298,32 +304,31 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
         </div>
 
         <p class="text-[11.5px] leading-[1.45]" style="color: var(--color-accent-2-800)">
-          Kết quả AI kèm hội thoại, ảnh và ghi âm được đính vào lịch hẹn này (FR-AI-12). Cần kỹ
-          thuật viên kiểm tra thực tế trước khi báo giá.
+          {{ $t('sa08.aiNote') }}
         </p>
       </section>
     </div>
 
     <div class="grid gap-[13px]" style="grid-template-columns: repeat(auto-fit, minmax(330px, 1fr))">
       <section class="card gap-[7px]" style="background: #fff">
-        <h5>Ghi chú nội bộ</h5>
+        <h5>{{ $t('sa05.internalNote') }}</h5>
         <textarea
           v-model="adminNote"
           class="input"
           style="min-height: 70px"
-          placeholder="Chỉ nhân viên thấy nội dung này"
+          :placeholder="$t('sa05.internalHint')"
         />
         <button
           type="button"
           class="btn btn-secondary self-end text-[12.5px]"
           @click="saveNote"
         >
-          Lưu ghi chú
+          {{ $t('sa05.saveNote') }}
         </button>
       </section>
 
       <section v-if="(history?.items ?? []).length" class="card gap-2" style="background: #fff">
-        <h5>Lịch sử gần nhất của xe</h5>
+        <h5>{{ $t('sa05.vehicleHistory') }}</h5>
         <ul class="flex flex-col gap-1.5 text-[13.5px]">
           <li
             v-for="record in history?.items ?? []"
@@ -340,7 +345,7 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
       </section>
 
       <section class="card gap-2" style="background: #fff">
-        <h5>Nhật ký thay đổi</h5>
+        <h5>{{ $t('sa05.changeLog') }}</h5>
         <AyChangeLog :entries="historyEntries" />
       </section>
     </div>
@@ -356,7 +361,7 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
         class="btn btn-secondary text-[13px]"
         style="min-height: 48px; padding-inline: 20px"
       >
-        Đổi lịch
+        {{ $t('sa05.reschedule') }}
       </NuxtLink>
       <button
         v-if="booking.status === 'CONFIRMED'"
@@ -365,7 +370,7 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
         style="min-height: 48px"
         @click="confirmAction = 'NO_SHOW'"
       >
-        Khách không đến
+        {{ $t('sa05.noShow') }}
       </button>
       <button
         v-if="canCancel"
@@ -374,7 +379,7 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
         style="min-height: 48px; padding-inline: 20px"
         @click="confirmAction = 'CANCEL'"
       >
-        Hủy lịch hẹn
+        {{ $t('sa05.cancel') }}
       </button>
       <button
         v-if="canConfirm"
@@ -383,7 +388,7 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
         style="min-height: 48px; padding-inline: 26px"
         @click="confirmAction = 'CONFIRM'"
       >
-        Xác nhận
+        {{ $t('sa05.confirm') }}
       </button>
       <NuxtLink
         v-if="canIntake"
@@ -391,7 +396,7 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
         class="btn btn-primary text-[15px]"
         style="min-height: 48px; padding-inline: 26px"
       >
-        Tiếp nhận xe
+        {{ $t('sa05.intake') }}
       </NuxtLink>
     </div>
 
@@ -399,24 +404,24 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
       :open="confirmAction !== null"
       :title="
         confirmAction === 'CONFIRM'
-          ? 'Xác nhận lịch hẹn'
+          ? $t('sa05.askConfirm')
           : confirmAction === 'CANCEL'
-            ? 'Hủy lịch hẹn'
-            : 'Đánh dấu khách không đến'
+            ? $t('sa05.cancel')
+            : $t('sa05.askNoShow')
       "
       :message="
         confirmAction === 'CONFIRM'
-          ? 'Hệ thống sẽ sinh mã QR và gửi SMS xác nhận cho khách.'
+          ? $t('sa05.askConfirmBody')
           : confirmAction === 'CANCEL'
-            ? 'Lịch hẹn sẽ bị hủy và khách nhận được SMS thông báo.'
-            : 'Lịch hẹn chuyển sang trạng thái khách không đến và không mở phiếu dịch vụ được nữa.'
+            ? $t('sa05.askCancelBody')
+            : $t('sa05.askNoShowBody')
       "
       :danger="confirmAction !== 'CONFIRM'"
       :loading="busy"
       @confirm="act"
       @cancel="confirmAction = null"
     >
-      <AyField v-if="confirmAction === 'CANCEL'" label="Lý do hủy" class="mt-3">
+      <AyField v-if="confirmAction === 'CANCEL'" :label="$t('sc24.reasonLabel')" class="mt-3">
         <template #default="{ id: fieldId }">
           <input :id="fieldId" v-model="cancelReason" class="input" type="text" />
         </template>
