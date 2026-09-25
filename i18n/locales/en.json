@@ -272,7 +272,8 @@
     "newPwHint": "at least 10 characters",
     "repeatPw": "Repeat the password",
     "submit": "Set password",
-    "title": "Set a new password"
+    "title": "Set a new password",
+    "tooShort": "The password must be at least 10 characters"
   },
   "sa01d": {
     "currentPw": "Current password",
@@ -463,6 +464,7 @@
     "colTotal": "Total",
     "empty": "No work orders match these filters",
     "scanCta": "Scan to receive",
+    "searchPlaceholder": "Work order, customer name, plate",
     "title": "Work orders"
   },
   "sa10": {
@@ -931,6 +933,59 @@
     "title": "Stock in / out / adjustment",
     "type": "Type",
     "unitCost": "Unit cost"
+  },
+  "sa30": {
+    "askAria": "Technical question",
+    "askPlaceholder": "Type a technical question…",
+    "context": "Context: {label} ✕",
+    "example1": "Front brake pad replacement procedure for a PCX 125",
+    "example2": "What does the FI light flashing 8 times mean on a Honda Wave?",
+    "example3": "Rear wheel bolt torque specification for a Super Cub",
+    "examples": "Example questions:",
+    "helpful": "👍 Helpful",
+    "kbCta": "Technical documents →",
+    "maker": "Make",
+    "makerHint": "helps narrow the documents to the right model",
+    "model": "Model",
+    "noSource": "No matching document found. Add technical documents so the assistant can answer more accurately.",
+    "notHelpful": "👎 Not really",
+    "noted": "Recorded as not helpful",
+    "panelTitle": "Technical assistant",
+    "recent": "Recent questions",
+    "searching": "Searching the documents…",
+    "source": "Source:",
+    "thanks": "Thank you — recorded as helpful",
+    "title": "Technical AI assistant",
+    "unavailable": "The technical assistant is unavailable right now."
+  },
+  "sa31k": {
+    "addCta": "Add a document",
+    "added": "Document added",
+    "allBikes": "All bikes",
+    "askDelete": "Delete this document",
+    "askDeleteBody": "The technical assistant will no longer cite this document.",
+    "assistantCta": "Technical assistant",
+    "categoryPlaceholder": "Service manual / Fault codes",
+    "colAdded": "Added",
+    "colAppliesTo": "Applies to",
+    "colIndex": "Indexing",
+    "commaHint": "Separate with commas",
+    "content": "Text content",
+    "contentHint": "Paste the text so the assistant can search it in full",
+    "deleted": "Document deleted",
+    "empty": "The document library is empty",
+    "emptyHint": "How well the technical assistant works depends on having documents in digital form.",
+    "fileUrl": "File URL",
+    "indexed": "Indexed",
+    "lead": "These are the documents the technical assistant cites. With no documents, it answers that it has no data rather than guessing.",
+    "makers": "Applicable makes",
+    "models": "Applicable models",
+    "needTitle": "The document needs a title",
+    "queued": "Queued",
+    "save": "Save the document",
+    "searchPlaceholder": "Document title",
+    "title": "Technical documents",
+    "titleField": "Title"
   },
   "sa32": {
     "active": "Active",
@@ -1705,6 +1760,7 @@
     "videoTooLong": "That video is longer than {n} seconds"
   },
   "validate": {
+    "email": "Please enter an email address",
     "emailBad": "That email address is not valid",
     "maker": "Please enter the make",
     "model": "Please enter the model",

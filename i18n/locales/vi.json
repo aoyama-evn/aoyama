@@ -272,7 +272,8 @@
     "newPwHint": "ít nhất 10 ký tự",
     "repeatPw": "Nhập lại mật khẩu",
     "submit": "Đặt mật khẩu",
-    "title": "Đặt mật khẩu mới"
+    "title": "Đặt mật khẩu mới",
+    "tooShort": "Mật khẩu cần ít nhất 10 ký tự"
   },
   "sa01d": {
     "currentPw": "Mật khẩu hiện tại",
@@ -463,6 +464,7 @@
     "colTotal": "Tổng tiền",
     "empty": "Không có phiếu dịch vụ nào khớp bộ lọc",
     "scanCta": "Quét mã tiếp nhận",
+    "searchPlaceholder": "Mã phiếu, tên khách, biển số",
     "title": "Phiếu dịch vụ"
   },
   "sa10": {
@@ -931,6 +933,59 @@
     "title": "Nhập / xuất / điều chỉnh kho",
     "type": "Loại",
     "unitCost": "Đơn giá nhập"
+  },
+  "sa30": {
+    "askAria": "Câu hỏi kỹ thuật",
+    "askPlaceholder": "Nhập câu hỏi kỹ thuật…",
+    "context": "Ngữ cảnh: {label} ✕",
+    "example1": "Quy trình thay má phanh trước PCX 125",
+    "example2": "Mã lỗi FI nháy 8 lần trên Honda Wave nghĩa là gì",
+    "example3": "Thông số lực siết bu lông bánh sau Super Cub",
+    "examples": "Ví dụ câu hỏi:",
+    "helpful": "👍 Hữu ích",
+    "kbCta": "Kho tài liệu kỹ thuật →",
+    "maker": "Hãng xe",
+    "makerHint": "giúp lọc tài liệu đúng dòng",
+    "model": "Dòng xe",
+    "noSource": "Không tìm thấy tài liệu phù hợp. Hãy bổ sung tài liệu kỹ thuật vào kho để trợ lý trả lời chính xác hơn.",
+    "notHelpful": "👎 Không",
+    "noted": "Đã ghi nhận chưa hữu ích",
+    "panelTitle": "Trợ lý kỹ thuật",
+    "recent": "Câu hỏi gần đây",
+    "searching": "Đang tra cứu tài liệu…",
+    "source": "Nguồn:",
+    "thanks": "Cảm ơn, đã ghi nhận hữu ích",
+    "title": "Trợ lý AI kỹ thuật",
+    "unavailable": "Không truy vấn được trợ lý kỹ thuật lúc này."
+  },
+  "sa31k": {
+    "addCta": "Thêm tài liệu",
+    "added": "Đã thêm tài liệu",
+    "allBikes": "Mọi xe",
+    "askDelete": "Xóa tài liệu",
+    "askDeleteBody": "Trợ lý kỹ thuật sẽ không còn trích dẫn tài liệu này.",
+    "assistantCta": "Trợ lý kỹ thuật",
+    "categoryPlaceholder": "Sổ tay sửa chữa / Mã lỗi",
+    "colAdded": "Ngày thêm",
+    "colAppliesTo": "Áp dụng cho",
+    "colIndex": "Lập chỉ mục",
+    "commaHint": "Ngăn cách bằng dấu phẩy",
+    "content": "Nội dung văn bản",
+    "contentHint": "Dán nội dung để trợ lý tìm kiếm toàn văn",
+    "deleted": "Đã xóa tài liệu",
+    "empty": "Kho tài liệu còn trống",
+    "emptyHint": "Khả thi của trợ lý kỹ thuật phụ thuộc vào việc có tài liệu dạng số hay không.",
+    "fileUrl": "Đường dẫn tệp",
+    "indexed": "Đã lập chỉ mục",
+    "lead": "Nguồn trích dẫn cho trợ lý AI kỹ thuật. Không có tài liệu, trợ lý sẽ trả lời là chưa có dữ liệu thay vì suy đoán.",
+    "makers": "Hãng áp dụng",
+    "models": "Dòng xe áp dụng",
+    "needTitle": "Cần tiêu đề tài liệu",
+    "queued": "Chờ xử lý",
+    "save": "Lưu tài liệu",
+    "searchPlaceholder": "Tiêu đề tài liệu",
+    "title": "Kho tài liệu kỹ thuật",
+    "titleField": "Tiêu đề"
   },
   "sa32": {
     "active": "Hoạt động",
@@ -1705,6 +1760,7 @@
     "videoTooLong": "Video dài quá {n} giây"
   },
   "validate": {
+    "email": "Vui lòng nhập email",
     "emailBad": "Email không hợp lệ",
     "maker": "Vui lòng nhập hãng xe",
     "model": "Vui lòng nhập dòng xe",

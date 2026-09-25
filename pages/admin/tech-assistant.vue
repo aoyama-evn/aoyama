@@ -8,6 +8,7 @@ import type { TechAnswer } from '~/types/models';
  */
 definePageMeta({ layout: 'admin', middleware: 'admin' });
 
+const { t } = useI18n();
 const api = useApi();
 const ui = useUiStore();
 
@@ -18,7 +19,7 @@ interface Turn {
   helpful: boolean | null;
 }
 
-setScreenTitle('Trợ lý AI kỹ thuật');
+setScreenTitle(() => t('sa30.title'));
 
 const question = ref('');
 const maker = ref('');
@@ -32,11 +33,11 @@ const turns = ref<Turn[]>([]);
 const RECENT_KEY = 'aoyama_tech_questions';
 const recent = ref<string[]>([]);
 
-const EXAMPLES = [
-  'Quy trình thay má phanh trước PCX 125',
-  'Mã lỗi FI nháy 8 lần trên Honda Wave nghĩa là gì',
-  'Thông số lực siết bu lông bánh sau Super Cub',
-];
+const EXAMPLES = computed(() => [
+  t('sa30.example1'),
+  t('sa30.example2'),
+  t('sa30.example3'),
+]);
 
 onMounted(() => {
   try {
@@ -76,7 +77,7 @@ async function ask(text?: string): Promise<void> {
     });
   } catch (error) {
     ui.error(normalizeError(error).message);
-    turn.answer = { answer: 'Không truy vấn được trợ lý kỹ thuật lúc này.', citations: [] };
+    turn.answer = { answer: t('sa30.unavailable'), citations: [] };
   } finally {
     turn.pending = false;
   }
@@ -85,10 +86,10 @@ async function ask(text?: string): Promise<void> {
 /** FR-TEC-07 — danh gia cau tra loi de cai thien kho tai lieu. */
 function rate(turn: Turn, helpful: boolean): void {
   turn.helpful = helpful;
-  ui.success(helpful ? 'Cảm ơn, đã ghi nhận hữu ích' : 'Đã ghi nhận chưa hữu ích');
+  ui.success(helpful ? t('sa30.thanks') : t('sa30.noted'));
 }
 
-useHead({ title: 'Trợ lý AI kỹ thuật — AOYAMA Admin' });
+useHead({ title: () => `${t('sa30.title')} — AOYAMA Admin` });
 </script>
 
 <template>
@@ -98,24 +99,24 @@ useHead({ title: 'Trợ lý AI kỹ thuật — AOYAMA Admin' });
   >
     <section class="card gap-3" style="background: #fff">
       <div class="flex flex-wrap items-center gap-2.5">
-        <h5>Trợ lý kỹ thuật</h5>
+        <h5>{{ $t('sa30.panelTitle') }}</h5>
         <button
           v-if="contextLabel"
           type="button"
           class="tag tag-accent-2 ml-auto"
           @click="maker = ''; model = ''"
         >
-          Ngữ cảnh: {{ contextLabel }} ✕
+          {{ $t('sa30.context', { label: contextLabel }) }}
         </button>
       </div>
 
       <div class="grid gap-2.5 sm:grid-cols-2">
-        <AyField label="Hãng xe" hint="giúp lọc tài liệu đúng dòng">
+        <AyField :label="$t('sa30.maker')" :hint="$t('sa30.makerHint')">
           <template #default="{ id }">
             <input :id="id" v-model="maker" class="input" type="text" placeholder="Honda" />
           </template>
         </AyField>
-        <AyField label="Dòng xe">
+        <AyField :label="$t('sa30.model')">
           <template #default="{ id }">
             <input :id="id" v-model="model" class="input" type="text" placeholder="Lead 125" />
           </template>
@@ -124,7 +125,7 @@ useHead({ title: 'Trợ lý AI kỹ thuật — AOYAMA Admin' });
 
       <div class="flex flex-col gap-3">
         <div v-if="turns.length === 0" class="flex flex-col gap-2">
-          <p class="text-muted text-[13px]">Ví dụ câu hỏi:</p>
+          <p class="text-muted text-[13px]">{{ $t('sa30.examples') }}</p>
           <button
             v-for="example in EXAMPLES"
             :key="example"
@@ -140,7 +141,7 @@ useHead({ title: 'Trợ lý AI kỹ thuật — AOYAMA Admin' });
         <template v-for="(turn, index) in turns" :key="index">
           <p class="ay-bubble-me">{{ turn.question }}</p>
 
-          <p v-if="turn.pending" class="ay-bubble-bot text-muted">Đang tra cứu tài liệu…</p>
+          <p v-if="turn.pending" class="ay-bubble-bot text-muted">{{ $t('sa30.searching') }}</p>
 
           <div v-else-if="turn.answer" class="ay-bubble-bot flex flex-col gap-2.5">
             <p class="whitespace-pre-line text-[13.5px] leading-[1.55]">{{ turn.answer.answer }}</p>
@@ -160,14 +161,13 @@ useHead({ title: 'Trợ lý AI kỹ thuật — AOYAMA Admin' });
                 <path d="M14 3v4h4" />
               </svg>
               <span>
-                <strong>Nguồn:</strong> {{ citation.title }}
+                <strong>{{ $t('sa30.source') }}</strong> {{ citation.title }}
                 <span v-if="citation.excerpt" class="text-muted block">{{ citation.excerpt }}</span>
               </span>
             </div>
 
             <p v-if="turn.answer.citations.length === 0" class="text-muted text-[12px]">
-              Không tìm thấy tài liệu phù hợp. Hãy bổ sung tài liệu kỹ thuật vào kho để trợ lý trả
-              lời chính xác hơn.
+              {{ $t('sa30.noSource') }}
             </p>
 
             <div class="flex gap-2">
@@ -177,7 +177,7 @@ useHead({ title: 'Trợ lý AI kỹ thuật — AOYAMA Admin' });
                 :style="turn.helpful === true ? 'border-color: var(--color-accent)' : ''"
                 @click="rate(turn, true)"
               >
-                👍 Hữu ích
+                {{ $t('sa30.helpful') }}
               </button>
               <button
                 type="button"
@@ -185,7 +185,7 @@ useHead({ title: 'Trợ lý AI kỹ thuật — AOYAMA Admin' });
                 :style="turn.helpful === false ? 'border-color: var(--color-accent)' : ''"
                 @click="rate(turn, false)"
               >
-                👎 Không
+                {{ $t('sa30.notHelpful') }}
               </button>
             </div>
           </div>
@@ -196,8 +196,8 @@ useHead({ title: 'Trợ lý AI kỹ thuật — AOYAMA Admin' });
         <input
           v-model="question"
           class="input flex-1"
-          placeholder="Nhập câu hỏi kỹ thuật…"
-          aria-label="Câu hỏi kỹ thuật"
+          :placeholder="$t('sa30.askPlaceholder')"
+          :aria-label="$t('sa30.askAria')"
           @keydown.enter.exact.prevent="ask()"
         />
         <button
@@ -206,14 +206,14 @@ useHead({ title: 'Trợ lý AI kỹ thuật — AOYAMA Admin' });
           :disabled="!question.trim()"
           @click="ask()"
         >
-          Gửi
+          {{ $t('sc10.send') }}
         </button>
       </div>
     </section>
 
     <div class="flex flex-col gap-[13px]">
       <section v-if="recent.length" class="card gap-2" style="background: #fff">
-        <h5>Câu hỏi gần đây</h5>
+        <h5>{{ $t('sa30.recent') }}</h5>
         <button
           v-for="item in recent"
           :key="item"
@@ -227,7 +227,7 @@ useHead({ title: 'Trợ lý AI kỹ thuật — AOYAMA Admin' });
       </section>
 
       <NuxtLink to="/admin/knowledge-base" class="btn btn-secondary text-[13px]">
-        Kho tài liệu kỹ thuật →
+        {{ $t('sa30.kbCta') }}
       </NuxtLink>
     </div>
   </div>

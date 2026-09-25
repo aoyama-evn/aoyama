@@ -22,7 +22,7 @@ const errorText = ref<string | null>(null);
 async function submit(): Promise<void> {
   errorText.value = null;
   if (password.value.length < 10) {
-    errorText.value = 'Mật khẩu cần ít nhất 10 ký tự';
+    errorText.value = t('sa01c.tooShort');
     return;
   }
   if (password.value !== confirm.value) {

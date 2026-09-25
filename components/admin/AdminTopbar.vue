@@ -48,7 +48,7 @@ async function logout(): Promise<void> {
       type="button"
       class="btn -ml-1 p-2 lg:hidden"
       style="background: transparent; color: var(--color-neutral-800)"
-      aria-label="Mở điều hướng"
+      :aria-label="$t('adm.nav.open')"
       @click="emit('open-nav')"
     >
       <svg

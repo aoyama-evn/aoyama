@@ -6,6 +6,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { date } = useFormat();
 
 const keyword = ref('');
@@ -25,7 +26,7 @@ const deleteTarget = ref<KnowledgeDocument | null>(null);
 
 async function save(): Promise<void> {
   if (!form.title.trim()) {
-    ui.warning('Cần tiêu đề tài liệu');
+    ui.warning(t('sa31k.needTitle'));
     return;
   }
   saving.value = true;
@@ -38,7 +39,7 @@ async function save(): Promise<void> {
       fileUrl: form.fileUrl.trim() || undefined,
       content: form.content.trim() || undefined,
     });
-    ui.success('Đã thêm tài liệu');
+    ui.success(t('sa31k.added'));
     Object.assign(form, { title: '', category: '', makers: '', models: '', fileUrl: '', content: '' });
     adding.value = false;
     await refresh();
@@ -53,7 +54,7 @@ async function remove(): Promise<void> {
   if (!deleteTarget.value) return;
   try {
     await api.del(`/admin/ai/knowledge-base/${deleteTarget.value.id}`);
-    ui.success('Đã xóa tài liệu');
+    ui.success(t('sa31k.deleted'));
     deleteTarget.value = null;
     await refresh();
   } catch (error) {
@@ -61,76 +62,79 @@ async function remove(): Promise<void> {
   }
 }
 
-const COLUMNS = [
-  { key: 'title', label: 'Tiêu đề' },
-  { key: 'category', label: 'Nhóm', width: '140px' },
-  { key: 'applicableMakers', label: 'Áp dụng cho', width: '200px' },
-  { key: 'indexStatus', label: 'Lập chỉ mục', width: '130px' },
-  { key: 'createdAt', label: 'Ngày thêm', width: '130px' },
+const COLUMNS = computed(() => [
+  { key: 'title', label: t('sa31k.titleField') },
+  { key: 'category', label: t('sa25.colCategory'), width: '140px' },
+  { key: 'applicableMakers', label: t('sa31k.colAppliesTo'), width: '200px' },
+  { key: 'indexStatus', label: t('sa31k.colIndex'), width: '130px' },
+  { key: 'createdAt', label: t('sa31k.colAdded'), width: '130px' },
   { key: 'actions', label: '', width: '80px' },
-];
+]);
 
-useHead({ title: 'Kho tài liệu kỹ thuật — AOYAMA Admin' });
+setScreenTitle(() => t('sa31k.title'));
+useHead({ title: () => `${t('sa31k.title')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
     <AyPageHeader
-      code="SA-31" title="Kho tài liệu kỹ thuật"
-      description="Nguồn trích dẫn cho trợ lý AI kỹ thuật. Không có tài liệu, trợ lý sẽ trả lời là chưa có dữ liệu thay vì suy đoán."
+      code="SA-31" :title="$t('sa31k.title')"
+      :description="$t('sa31k.lead')"
     >
       <template #actions>
-        <AyButton to="/admin/tech-assistant" variant="secondary" size="sm">Trợ lý kỹ thuật</AyButton>
-        <AyButton size="sm" @click="adding = !adding">{{ adding ? 'Đóng' : 'Thêm tài liệu' }}</AyButton>
+        <AyButton to="/admin/tech-assistant" variant="secondary" size="sm">{{ $t('sa31k.assistantCta') }}</AyButton>
+        <AyButton size="sm" @click="adding = !adding">
+          {{ adding ? $t('common.close') : $t('sa31k.addCta') }}
+        </AyButton>
       </template>
     </AyPageHeader>
 
     <section v-if="adding" class="card grid gap-3 sm:grid-cols-2">
-      <AyField label="Tiêu đề" required class="sm:col-span-2">
+      <AyField :label="$t('sa31k.titleField')" required class="sm:col-span-2">
         <template #default="{ id }">
           <input :id="id" v-model="form.title" class="input" type="text">
         </template>
       </AyField>
 
-      <AyField label="Nhóm">
+      <AyField :label="$t('sa25.colCategory')">
         <template #default="{ id }">
-          <input :id="id" v-model="form.category" class="input" type="text" placeholder="Sổ tay sửa chữa / Mã lỗi">
+          <input :id="id" v-model="form.category" class="input" type="text" :placeholder="$t('sa31k.categoryPlaceholder')">
         </template>
       </AyField>
 
-      <AyField label="Đường dẫn tệp">
+      <AyField :label="$t('sa31k.fileUrl')">
         <template #default="{ id }">
           <input :id="id" v-model="form.fileUrl" class="input" type="url">
         </template>
       </AyField>
 
-      <AyField label="Hãng áp dụng" hint="Ngăn cách bằng dấu phẩy">
+      <AyField :label="$t('sa31k.makers')" :hint="$t('sa31k.commaHint')">
         <template #default="{ id }">
           <input :id="id" v-model="form.makers" class="input" type="text" placeholder="Honda, Yamaha">
         </template>
       </AyField>
 
-      <AyField label="Dòng xe áp dụng" hint="Ngăn cách bằng dấu phẩy">
+      <AyField :label="$t('sa31k.models')" :hint="$t('sa31k.commaHint')">
         <template #default="{ id }">
           <input :id="id" v-model="form.models" class="input" type="text" placeholder="PCX 125, NMAX 155">
         </template>
       </AyField>
 
-      <AyField label="Nội dung văn bản" hint="Dán nội dung để trợ lý tìm kiếm toàn văn" class="sm:col-span-2">
+      <AyField :label="$t('sa31k.content')" :hint="$t('sa31k.contentHint')" class="sm:col-span-2">
         <template #default="{ id }">
           <textarea :id="id" v-model="form.content" class="input min-h-[140px]" />
         </template>
       </AyField>
 
       <div class="sm:col-span-2">
-        <AyButton :loading="saving" @click="save">Lưu tài liệu</AyButton>
+        <AyButton :loading="saving" @click="save">{{ $t('sa31k.save') }}</AyButton>
       </div>
     </section>
 
     <AyFilterBar :has-active-filters="Boolean(keyword)" @reset="keyword = ''">
-      <AyField label="Tìm kiếm" class="min-w-[240px] flex-1">
+      <AyField :label="$t('common.search')" class="min-w-[240px] flex-1">
         <template #default="{ id }">
-          <input :id="id" v-model="keyword" class="input" type="search" placeholder="Tiêu đề tài liệu">
+          <input :id="id" v-model="keyword" class="input" type="search" :placeholder="$t('sa31k.searchPlaceholder')">
         </template>
       </AyField>
     </AyFilterBar>
@@ -140,21 +144,21 @@ useHead({ title: 'Kho tài liệu kỹ thuật — AOYAMA Admin' });
       :rows="data?.items ?? []"
       :meta="data?.meta ?? null"
       :loading="pending"
-      empty-title="Kho tài liệu còn trống"
-      empty-hint="Khả thi của trợ lý kỹ thuật phụ thuộc vào việc có tài liệu dạng số hay không (OQ-08)."
+      :empty-title="$t('sa31k.empty')"
+      :empty-hint="$t('sa31k.emptyHint')"
       @update:page="page = $event"
     >
       <template #cell-title="{ row }"><span class="font-semibold">{{ row.title }}</span></template>
       <template #cell-category="{ row }">{{ row.category ?? '—' }}</template>
       <template #cell-applicableMakers="{ row }">
-        {{ ((row.applicableMakers as string[]) ?? []).join(', ') || 'Mọi xe' }}
+        {{ ((row.applicableMakers as string[]) ?? []).join(', ') || $t('sa31k.allBikes') }}
       </template>
       <template #cell-indexStatus="{ row }">
         <span
           class="tag"
           :class="row.indexStatus === 'INDEXED' ? 'bg-success-bg text-success' : 'bg-warning-bg text-warning'"
         >
-          {{ row.indexStatus === 'INDEXED' ? 'Đã lập chỉ mục' : 'Chờ xử lý' }}
+          {{ row.indexStatus === 'INDEXED' ? $t('sa31k.indexed') : $t('sa31k.queued') }}
         </span>
       </template>
       <template #cell-createdAt="{ row }">{{ date(row.createdAt as string) }}</template>
@@ -163,16 +167,16 @@ useHead({ title: 'Kho tài liệu kỹ thuật — AOYAMA Admin' });
           type="button" class="text-[12.5px] text-danger underline"
           @click.stop="deleteTarget = row as unknown as KnowledgeDocument"
         >
-          Xóa
+          {{ $t('common.delete') }}
         </button>
       </template>
     </AyDataTable>
 
     <AyConfirmDialog
       :open="Boolean(deleteTarget)"
-      title="Xóa tài liệu"
-      message="Trợ lý kỹ thuật sẽ không còn trích dẫn tài liệu này."
-      confirm-label="Xóa"
+      :title="$t('sa31k.askDelete')"
+      :message="$t('sa31k.askDeleteBody')"
+      :confirm-label="$t('common.delete')"
       danger
       @confirm="remove"
       @cancel="deleteTarget = null"

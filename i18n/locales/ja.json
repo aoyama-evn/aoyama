@@ -272,7 +272,8 @@
     "newPwHint": "10文字以上",
     "repeatPw": "パスワードの再入力",
     "submit": "パスワードを設定",
-    "title": "新しいパスワードの設定"
+    "title": "新しいパスワードの設定",
+    "tooShort": "パスワードは10文字以上にしてください"
   },
   "sa01d": {
     "currentPw": "現在のパスワード",
@@ -463,6 +464,7 @@
     "colTotal": "合計金額",
     "empty": "条件に合う整備伝票がありません",
     "scanCta": "QRで受け付ける",
+    "searchPlaceholder": "伝票番号・お客様名・ナンバー",
     "title": "整備伝票"
   },
   "sa10": {
@@ -931,6 +933,59 @@
     "title": "入庫・出庫・棚卸調整",
     "type": "種別",
     "unitCost": "仕入単価"
+  },
+  "sa30": {
+    "askAria": "技術的な質問",
+    "askPlaceholder": "技術的な質問を入力…",
+    "context": "対象車種：{label} ✕",
+    "example1": "PCX 125 のフロントブレーキパッド交換手順",
+    "example2": "ホンダ Wave の FI ランプ8回点滅は何を示しますか",
+    "example3": "スーパーカブのリアホイールボルトの締め付けトルク",
+    "examples": "質問の例：",
+    "helpful": "👍 役に立った",
+    "kbCta": "技術資料庫 →",
+    "maker": "メーカー",
+    "makerHint": "該当車種の資料に絞り込めます",
+    "model": "車種",
+    "noSource": "該当する資料が見つかりませんでした。技術資料を追加すると、より正確に回答できます。",
+    "notHelpful": "👎 いまひとつ",
+    "noted": "役に立たなかったと記録しました",
+    "panelTitle": "技術アシスタント",
+    "recent": "最近の質問",
+    "searching": "資料を検索しています…",
+    "source": "出典：",
+    "thanks": "ありがとうございます。役に立ったと記録しました",
+    "title": "技術アシスタント（AI）",
+    "unavailable": "現在、技術アシスタントに接続できません。"
+  },
+  "sa31k": {
+    "addCta": "資料を追加",
+    "added": "資料を追加しました",
+    "allBikes": "すべての車種",
+    "askDelete": "資料を削除しますか",
+    "askDeleteBody": "技術アシスタントはこの資料を引用しなくなります。",
+    "assistantCta": "技術アシスタント",
+    "categoryPlaceholder": "整備マニュアル / 故障コード",
+    "colAdded": "追加日",
+    "colAppliesTo": "対象",
+    "colIndex": "インデックス",
+    "commaHint": "カンマ区切り",
+    "content": "本文",
+    "contentHint": "全文検索できるよう本文を貼り付けてください",
+    "deleted": "資料を削除しました",
+    "empty": "資料庫は空です",
+    "emptyHint": "技術アシスタントの精度は、デジタル化された資料があるかどうかで決まります。",
+    "fileUrl": "ファイルのURL",
+    "indexed": "インデックス済み",
+    "lead": "技術アシスタントが引用する資料です。資料がない場合、アシスタントは推測せず「データがありません」と答えます。",
+    "makers": "対象メーカー",
+    "models": "対象車種",
+    "needTitle": "資料のタイトルを入力してください",
+    "queued": "処理待ち",
+    "save": "資料を保存",
+    "searchPlaceholder": "資料のタイトル",
+    "title": "技術資料庫",
+    "titleField": "タイトル"
   },
   "sa32": {
     "active": "営業中",
@@ -1705,6 +1760,7 @@
     "videoTooLong": "動画が{n}秒を超えています"
   },
   "validate": {
+    "email": "メールアドレスを入力してください",
     "emailBad": "メールアドレスの形式が正しくありません",
     "maker": "メーカーを入力してください",
     "model": "車種を入力してください",

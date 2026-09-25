@@ -17,7 +17,7 @@ const errorText = ref<string | null>(null);
 async function submit(): Promise<void> {
   errorText.value = null;
   if (!email.value.trim()) {
-    errorText.value = 'Vui lòng nhập email';
+    errorText.value = t('validate.email');
     return;
   }
   sending.value = true;

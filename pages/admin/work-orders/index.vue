@@ -69,7 +69,7 @@ useHead({ title: () => `${t('sa09.title')} — AOYAMA Admin` });
     <AyFilterBar :has-active-filters="hasFilters" @reset="reset">
       <AyField :label="$t('common.keyword')" class="min-w-[200px] flex-1">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.keyword" class="input" type="search" placeholder="Mã phiếu, tên khách, biển số">
+          <input :id="id" v-model="filters.keyword" class="input" type="search" :placeholder="$t('sa09.searchPlaceholder')">
         </template>
       </AyField>
       <AyField :label="$t('sa02.colStatus')">
