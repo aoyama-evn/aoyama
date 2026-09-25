@@ -29,11 +29,10 @@
 
     /**
      * Vo may cua khung dien thoai. Bang mau cua he thong dung cho giao dien,
-     * chua co tong du toi cho mot than may, nen hai mau nay dat rieng o day:
-     * ca hai deu nguoc tu neutral-900 (#2e2b25) cua he thong.
+     * tong toi nhat la neutral-900 (#2e2b25) van con nga nau — chua du toi cho
+     * mot than may, nen mau nay dat rieng o day.
      */
     --ay-device-shell: #16140f;
-    --ay-device-edge: #55503f;
   }
 
   /**
@@ -250,35 +249,28 @@
       padding: 16px 16px 24px;
     }
 
-    /** Vo may: canh ngoai sang, than toi, bong do sau — dung nhu ban thiet ke. */
+    /**
+     * Vo may — dung thong so ban thiet ke: rong 392px, vien 11px, bo tron 46px
+     * ngoai va 36px trong. Vien phang mot mau, khong danh bong kim loai.
+     */
     .ay-device-frame {
       position: relative;
       display: block;
-      /* 370px man hinh cua ban thiet ke + 19px vo may moi ben. */
-      width: 408px;
+      width: 392px;
       flex: none;
-      border-radius: 60px;
-      background: linear-gradient(
-        150deg,
-        var(--ay-device-edge) 0%,
-        var(--ay-device-shell) 30%,
-        var(--ay-device-shell) 68%,
-        var(--ay-device-edge) 100%
-      );
-      padding: 19px;
+      border-radius: 46px;
+      background: var(--ay-device-shell);
+      padding: 11px;
       box-shadow:
-        0 38px 72px -22px rgb(22 20 15 / 55%),
-        0 10px 24px -8px rgb(22 20 15 / 38%),
-        inset 0 0 0 1.5px rgb(255 255 255 / 12%),
-        inset 0 0 0 5px rgb(22 20 15 / 85%);
+        0 28px 56px -18px rgb(22 20 15 / 42%),
+        0 6px 16px -6px rgb(22 20 15 / 26%);
     }
 
     .ay-device-screen {
-      height: min(772px, calc(100dvh - 78px));  /* 16 tren + 24 duoi + 19 x 2 vo */
+      height: min(772px, calc(100dvh - 62px));  /* 16 tren + 24 duoi + 11 x 2 vien */
       min-height: 0;
       flex: none;
-      border-radius: 42px;
-      box-shadow: inset 0 0 0 1px rgb(22 20 15 / 65%);
+      border-radius: 36px;
     }
 
     .ay-device-statusbar {
