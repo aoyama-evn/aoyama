@@ -5,6 +5,7 @@ import type { ApiError, I18nText, Part } from '~/types/models';
 definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const route = useRoute();
+const { t } = useI18n();
 const api = useApi();
 const ui = useUiStore();
 
@@ -73,7 +74,7 @@ const margin = computed(() =>
 
 async function save(): Promise<void> {
   if (!form.code.trim() || !(form.name.ja || form.name.en || form.name.vi)) {
-    ui.warning('Cần mã phụ tùng và ít nhất một bản dịch tên');
+    ui.warning(t('sa26.needFields'));
     return;
   }
   saving.value = true;
@@ -90,7 +91,7 @@ async function save(): Promise<void> {
     };
     if (isNew) await api.post('/admin/parts', body);
     else await api.put(`/admin/parts/${id}`, body);
-    ui.success(isNew ? 'Đã thêm phụ tùng' : 'Đã lưu phụ tùng');
+    ui.success(isNew ? t('sa26.added') : t('sa26.saved'));
     await navigateTo('/admin/parts');
   } catch (err) {
     error.value = normalizeError(err);
@@ -99,13 +100,16 @@ async function save(): Promise<void> {
   }
 }
 
-useHead({ title: isNew ? 'Thêm phụ tùng' : 'Sửa phụ tùng' });
+setScreenTitle(() => (isNew ? t('sa26.addTitle') : t('sa26.editTitle')));
+useHead({ title: () => (isNew ? t('sa26.addTitle') : t('sa26.editTitle')) });
 </script>
 
 <template>
   <div class="admin-form">
     <AyPageHeader
-      code="SA-26" :title="isNew ? 'Thêm phụ tùng' : 'Sửa phụ tùng'" back-to="/admin/parts"
+      code="SA-26"
+      :title="isNew ? $t('sa26.addTitle') : $t('sa26.editTitle')"
+      back-to="/admin/parts"
     >
       <template #actions>
         <AyAiBadge v-if="form.createdSource === 'AI_IMAGE'" />
@@ -116,55 +120,55 @@ useHead({ title: isNew ? 'Thêm phụ tùng' : 'Sửa phụ tùng' });
       v-if="form.createdSource === 'AI_IMAGE' && isNew"
       class="rounded-xl bg-olive-100 px-3 py-2.5 text-[13px] text-olive-800"
     >
-      Thông tin dưới đây do trợ lý AI điền sẵn từ ảnh. Hãy kiểm tra lại trước khi lưu.
+      {{ $t('sa26.aiPrefill') }}
     </p>
 
     <section class="card admin-grid" style="background: #fff">
-      <AyField label="Mã phụ tùng" required>
+      <AyField :label="$t('sa26.code')" required>
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.code" class="input font-mono" type="text" placeholder="P-OIL-10W30">
         </template>
       </AyField>
 
-      <AyField label="Mã của hãng">
+      <AyField :label="$t('sa26.makerPartNo')">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.makerPartNo" class="input font-mono" type="text">
         </template>
       </AyField>
 
-      <div class="ay-col-full"><AyI18nInput v-model="form.name" label="Tên phụ tùng" required /></div>
+      <div class="ay-col-full"><AyI18nInput v-model="form.name" :label="$t('sa26.nameLabel')" required /></div>
 
-      <AyField label="Hãng sản xuất">
+      <AyField :label="$t('sa26.maker')">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.maker" class="input" type="text">
         </template>
       </AyField>
 
-      <AyField label="Nhóm">
+      <AyField :label="$t('sa25.colCategory')">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.category" class="input" type="text" placeholder="OIL / BRAKE / TYRE">
         </template>
       </AyField>
 
-      <AyField label="Quy cách" class="ay-col-full">
+      <AyField :label="$t('sa26.spec')" class="ay-col-full">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.specification" class="input" type="text">
         </template>
       </AyField>
 
-      <AyField label="Đơn vị">
+      <AyField :label="$t('sa26.unit')">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.unit" class="input" type="text">
         </template>
       </AyField>
 
-      <AyField label="Giá nhập (JPY)">
+      <AyField :label="$t('sa26.costPrice')">
         <template #default="{ id: fid }">
           <input :id="fid" v-model.number="form.costPrice" class="input" type="number" min="0">
         </template>
       </AyField>
 
-      <AyField label="Giá bán (JPY)" :hint="`Biên lợi nhuận ${margin}%`">
+      <AyField :label="$t('sa26.sellPrice')" :hint="$t('sa26.margin', { n: margin })">
         <template #default="{ id: fid }">
           <input :id="fid" v-model.number="form.sellPrice" class="input" type="number" min="0">
         </template>
@@ -172,37 +176,37 @@ useHead({ title: isNew ? 'Thêm phụ tùng' : 'Sửa phụ tùng' });
 
       <label class="flex items-center gap-2.5 self-end text-[14px]">
         <input v-model="form.isActive" type="checkbox" class="h-4 w-4 accent-[var(--color-accent)]">
-        Đang sử dụng
+        {{ $t('sa26.inUse') }}
       </label>
     </section>
 
     <section class="card" style="background: #fff">
-      <h2 class="mb-2 font-heading text-[16px]">Xe tương thích</h2>
+      <h2 class="mb-2 font-heading text-[16px]">{{ $t('sa26.compatible') }}</h2>
       <div class="flex gap-2">
         <input
           v-model="compatibleInput" class="input flex-1" type="text"
-          placeholder="Honda PCX 125" aria-label="Thêm xe tương thích"
+          placeholder="Honda PCX 125" :aria-label="$t('sa26.addCompatible')"
           @keyup.enter="addCompatible"
         >
-        <AyButton variant="secondary" @click="addCompatible">Thêm</AyButton>
+        <AyButton variant="secondary" @click="addCompatible">{{ $t('sa26.add') }}</AyButton>
       </div>
       <ul v-if="compatible.length" class="mt-2 flex flex-wrap gap-1.5">
         <li v-for="(item, index) in compatible" :key="item" class="tag bg-neutral-200 text-neutral-700">
           {{ item }}
-          <button type="button" :aria-label="`Xóa ${item}`" @click="compatible.splice(index, 1)">×</button>
+          <button type="button" :aria-label="$t('sa26.removeItem', { name: item })" @click="compatible.splice(index, 1)">×</button>
         </li>
       </ul>
     </section>
 
     <section class="card" style="background: #fff">
-      <AyImageUpload v-model="images" label="Ảnh phụ tùng" :max="4" />
+      <AyImageUpload v-model="images" :label="$t('sa26.photos')" :max="4" />
     </section>
 
     <AyErrorNote :error="error" />
 
     <div class="admin-actions">
-      <AyButton to="/admin/parts" variant="secondary">Hủy</AyButton>
-      <AyButton :loading="saving" @click="save">Lưu</AyButton>
+      <AyButton to="/admin/parts" variant="secondary">{{ $t('common.cancel') }}</AyButton>
+      <AyButton :loading="saving" @click="save">{{ $t('common.save') }}</AyButton>
     </div>
   </div>
 </template>

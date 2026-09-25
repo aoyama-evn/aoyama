@@ -7,6 +7,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { i18n, money, dateTime, number } = useFormat();
 
 const { data: stores } = await useAsyncData('tx-stores', () => api.get<Store[]>('/admin/stores'));
@@ -47,9 +48,12 @@ function pickPart(part: Part): void {
 
 const isAdjust = computed(() => form.type === InventoryTxType.ADJUST);
 
+/** Cac loai bien dong kho; nhan lay tu tep ngon ngu. */
+const TX_TYPES = Object.values(InventoryTxType);
+
 async function submit(): Promise<void> {
   if (!form.storeId || !form.partId) {
-    ui.warning('Chọn cửa hàng và phụ tùng trước');
+    ui.warning(t('sa29.needPart'));
     return;
   }
   saving.value = true;
@@ -62,7 +66,7 @@ async function submit(): Promise<void> {
       unitCost: form.unitCost ?? undefined,
       reason: form.reason || undefined,
     });
-    ui.success('Đã ghi biến động kho');
+    ui.success(t('sa29.recorded'));
     form.partId = '';
     form.partLabel = '';
     form.quantity = 1;
@@ -75,24 +79,18 @@ async function submit(): Promise<void> {
   }
 }
 
-const TYPE_LABELS: Record<string, string> = {
-  IN: 'Nhập kho',
-  OUT: 'Xuất kho',
-  ADJUST: 'Điều chỉnh',
-  RETURN: 'Hoàn kho',
-};
-
 const COLUMNS = [
-  { key: 'createdAt', label: 'Thời điểm', width: '150px' },
-  { key: 'part', label: 'Phụ tùng' },
-  { key: 'store', label: 'Cửa hàng', width: '170px' },
-  { key: 'type', label: 'Loại', width: '110px' },
-  { key: 'quantityChange', label: 'Thay đổi', align: 'right' as const, width: '100px' },
-  { key: 'quantityAfter', label: 'Tồn sau', align: 'right' as const, width: '100px' },
-  { key: 'reason', label: 'Lý do' },
+  { key: 'createdAt', label: t('sa29.colWhen'), width: '150px' },
+  { key: 'part', label: t('sa28.colPart') },
+  { key: 'store', label: t('sa03.colStore'), width: '170px' },
+  { key: 'type', label: t('sa29.type'), width: '110px' },
+  { key: 'quantityChange', label: t('sa29.colChange'), align: 'right' as const, width: '100px' },
+  { key: 'quantityAfter', label: t('sa29.colAfter'), align: 'right' as const, width: '100px' },
+  { key: 'reason', label: t('sa29.reason') },
 ];
 
-useHead({ title: 'Nhập / xuất kho — AOYAMA Admin' });
+setScreenTitle(() => t('sa29.headTitle'));
+useHead({ title: () => `${t('sa29.headTitle')} — AOYAMA Admin` });
 </script>
 
 <template>
@@ -100,17 +98,17 @@ useHead({ title: 'Nhập / xuất kho — AOYAMA Admin' });
     <AdminStoreBar />
 
     <AyPageHeader
-      code="SA-29" title="Nhập / xuất / điều chỉnh kho" back-to="/admin/inventory"
-      description="Mọi thay đổi tồn kho đều để lại một dòng ở đây. Xuất kho cho phiếu dịch vụ được ghi tự động khi phiếu hoàn tất."
+      code="SA-29" :title="$t('sa29.title')" back-to="/admin/inventory"
+      :description="$t('sa29.lead')"
     />
 
     <section class="card grid gap-3 lg:grid-cols-4">
-      <h2 class="font-heading text-[16px] lg:col-span-4">Ghi biến động mới</h2>
+      <h2 class="font-heading text-[16px] lg:col-span-4">{{ $t('sa29.newEntry') }}</h2>
 
-      <AyField label="Cửa hàng" required>
+      <AyField :label="$t('sa03.colStore')" required>
         <template #default="{ id }">
           <select :id="id" v-model="form.storeId" class="input">
-            <option value="">— Chọn —</option>
+            <option value="">{{ $t('sa29.pickOne') }}</option>
             <option v-for="store in stores ?? []" :key="store.id" :value="store.id">
               {{ i18n(store.name) }}
             </option>
@@ -118,25 +116,27 @@ useHead({ title: 'Nhập / xuất kho — AOYAMA Admin' });
         </template>
       </AyField>
 
-      <AyField label="Loại" required>
+      <AyField :label="$t('sa29.type')" required>
         <template #default="{ id }">
           <select :id="id" v-model="form.type" class="input">
-            <option v-for="(label, value) in TYPE_LABELS" :key="value" :value="value">{{ label }}</option>
+            <option v-for="value in TX_TYPES" :key="value" :value="value">
+              {{ $t(`stockType.${value}`) }}
+            </option>
           </select>
         </template>
       </AyField>
 
       <AyField
-        :label="isAdjust ? 'Chênh lệch (có thể âm)' : 'Số lượng'"
+        :label="isAdjust ? $t('sa29.delta') : $t('sa29.qty')"
         required
-        :hint="isAdjust ? 'Nhập số âm để giảm tồn sau kiểm kê' : undefined"
+        :hint="isAdjust ? $t('sa29.deltaHint') : undefined"
       >
         <template #default="{ id }">
           <input :id="id" v-model.number="form.quantity" class="input" type="number" :min="isAdjust ? undefined : 1">
         </template>
       </AyField>
 
-      <AyField v-if="form.type === 'IN'" label="Đơn giá nhập">
+      <AyField v-if="form.type === 'IN'" :label="$t('sa29.unitCost')">
         <template #default="{ id }">
           <input :id="id" v-model.number="form.unitCost" class="input" type="number" min="0">
         </template>
@@ -145,19 +145,19 @@ useHead({ title: 'Nhập / xuất kho — AOYAMA Admin' });
       <div class="lg:col-span-2">
         <AyPartPicker :store-id="form.storeId || null" @select="pickPart" />
         <p v-if="form.partLabel" class="mt-1 text-[13px]">
-          Đã chọn: <strong>{{ form.partLabel }}</strong>
+          {{ $t('sa29.picked') }} <strong>{{ form.partLabel }}</strong>
         </p>
       </div>
 
-      <AyField label="Lý do" class="lg:col-span-2">
+      <AyField :label="$t('sa29.reason')" class="lg:col-span-2">
         <template #default="{ id }">
-          <input :id="id" v-model="form.reason" class="input" type="text" placeholder="Nhập hàng từ nhà cung cấp, kiểm kê cuối tháng…">
+          <input :id="id" v-model="form.reason" class="input" type="text" :placeholder="$t('sa29.reasonPlaceholder')">
         </template>
       </AyField>
 
       <div class="lg:col-span-4">
         <AyButton :loading="saving" :disabled="!form.storeId || !form.partId" @click="submit">
-          Ghi biến động
+          {{ $t('sa29.record') }}
         </AyButton>
       </div>
     </section>
@@ -166,21 +166,23 @@ useHead({ title: 'Nhập / xuất kho — AOYAMA Admin' });
       :has-active-filters="Boolean(filters.storeId || filters.type)"
       @reset="filters.storeId = ''; filters.type = ''"
     >
-      <AyField label="Cửa hàng">
+      <AyField :label="$t('sa03.colStore')">
         <template #default="{ id }">
           <select :id="id" v-model="filters.storeId" class="input">
-            <option value="">Tất cả</option>
+            <option value="">{{ $t('common.all') }}</option>
             <option v-for="store in stores ?? []" :key="store.id" :value="store.id">
               {{ i18n(store.name) }}
             </option>
           </select>
         </template>
       </AyField>
-      <AyField label="Loại">
+      <AyField :label="$t('sa29.type')">
         <template #default="{ id }">
           <select :id="id" v-model="filters.type" class="input">
-            <option value="">Tất cả</option>
-            <option v-for="(label, value) in TYPE_LABELS" :key="value" :value="value">{{ label }}</option>
+            <option value="">{{ $t('common.all') }}</option>
+            <option v-for="value in TX_TYPES" :key="value" :value="value">
+              {{ $t(`stockType.${value}`) }}
+            </option>
           </select>
         </template>
       </AyField>
@@ -191,7 +193,7 @@ useHead({ title: 'Nhập / xuất kho — AOYAMA Admin' });
       :rows="data?.items ?? []"
       :meta="data?.meta ?? null"
       :loading="pending"
-      empty-title="Chưa có biến động kho nào"
+      :empty-title="$t('sa29.empty')"
       @update:page="page = $event"
     >
       <template #cell-createdAt="{ row }">{{ dateTime(row.createdAt as string) }}</template>
@@ -204,7 +206,7 @@ useHead({ title: 'Nhập / xuất kho — AOYAMA Admin' });
       <template #cell-store="{ row }">
         {{ i18n((row as unknown as InventoryTransaction).store?.name ?? null) }}
       </template>
-      <template #cell-type="{ row }">{{ TYPE_LABELS[row.type as string] }}</template>
+      <template #cell-type="{ row }">{{ $t(`stockType.${row.type}`) }}</template>
       <template #cell-quantityChange="{ row }">
         <span :class="(row.quantityChange as number) >= 0 ? 'text-success' : 'text-danger'">
           {{ (row.quantityChange as number) > 0 ? '+' : '' }}{{ number(row.quantityChange as number) }}

@@ -7,6 +7,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 const api = useApi();
 const ui = useUiStore();
 const route = useRoute();
+const { t } = useI18n();
 const { i18n, money, number } = useFormat();
 
 const filters = reactive({
@@ -47,7 +48,7 @@ async function saveMin(): Promise<void> {
       partId: editing.value.partId,
       minQuantity: minQuantity.value,
     });
-    ui.success('Đã cập nhật ngưỡng cảnh báo');
+    ui.success(t('sa28.minSaved'));
     editing.value = null;
     await refresh();
   } catch (error) {
@@ -56,25 +57,26 @@ async function saveMin(): Promise<void> {
 }
 
 const COLUMNS = [
-  { key: 'part', label: 'Phụ tùng' },
-  { key: 'store', label: 'Cửa hàng', width: '180px' },
-  { key: 'quantity', label: 'Tồn', align: 'right' as const, width: '90px' },
-  { key: 'minQuantity', label: 'Ngưỡng', align: 'right' as const, width: '90px' },
-  { key: 'value', label: 'Giá trị tồn', align: 'right' as const, width: '130px' },
+  { key: 'part', label: t('sa28.colPart') },
+  { key: 'store', label: t('sa03.colStore'), width: '180px' },
+  { key: 'quantity', label: t('sa28.colQty'), align: 'right' as const, width: '90px' },
+  { key: 'minQuantity', label: t('sa28.colMin'), align: 'right' as const, width: '90px' },
+  { key: 'value', label: t('sa28.colValue'), align: 'right' as const, width: '130px' },
   { key: 'actions', label: '', width: '110px' },
 ];
 
-useHead({ title: 'Tồn kho — AOYAMA Admin' });
+setScreenTitle(() => t('sa28.title'));
+useHead({ title: () => `${t('sa28.title')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div class="flex flex-col gap-[15px]">
     <AdminStoreBar />
 
-    <AyPageHeader code="SA-28" title="Tồn kho theo cửa hàng">
+    <AyPageHeader code="SA-28" :title="$t('sa28.byStore')">
       <template #actions>
         <AyButton to="/admin/inventory/transactions" variant="secondary" size="sm">
-          Nhập / xuất kho
+          {{ $t('sa28.moveCta') }}
         </AyButton>
       </template>
     </AyPageHeader>
@@ -83,14 +85,14 @@ useHead({ title: 'Tồn kho — AOYAMA Admin' });
       :has-active-filters="Boolean(filters.keyword || filters.lowStockOnly)"
       @reset="filters.keyword = ''; filters.lowStockOnly = false"
     >
-      <AyField label="Từ khóa" class="min-w-[220px] flex-1">
+      <AyField :label="$t('common.keyword')" class="min-w-[220px] flex-1">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.keyword" class="input" type="search" placeholder="Mã hoặc tên phụ tùng">
+          <input :id="id" v-model="filters.keyword" class="input" type="search" :placeholder="$t('sa28.searchPlaceholder')">
         </template>
       </AyField>
       <label class="flex items-center gap-2 self-end pb-2.5 text-[13.5px]">
         <input v-model="filters.lowStockOnly" type="checkbox" class="h-4 w-4 accent-[var(--color-accent)]">
-        Chỉ hiện phụ tùng sắp hết
+        {{ $t('sa28.lowOnly') }}
       </label>
     </AyFilterBar>
 
@@ -99,8 +101,8 @@ useHead({ title: 'Tồn kho — AOYAMA Admin' });
       :rows="data?.items ?? []"
       :meta="data?.meta ?? null"
       :loading="pending"
-      empty-title="Chưa có dữ liệu tồn kho"
-      empty-hint="Nhập kho lần đầu để bắt đầu theo dõi."
+      :empty-title="$t('sa28.empty')"
+      :empty-hint="$t('sa28.emptyHint')"
       @update:page="page = $event"
     >
       <template #cell-part="{ row }">
@@ -124,20 +126,20 @@ useHead({ title: 'Tồn kho — AOYAMA Admin' });
       </template>
       <template #cell-actions="{ row }">
         <button type="button" class="text-[12.5px] underline" @click.stop="startEdit(row as unknown as Inventory)">
-          Đặt ngưỡng
+          {{ $t('sa28.setMin') }}
         </button>
       </template>
     </AyDataTable>
 
     <AyConfirmDialog
       :open="Boolean(editing)"
-      title="Ngưỡng cảnh báo tồn kho"
-      message="Khi tồn xuống bằng hoặc thấp hơn ngưỡng, phụ tùng sẽ hiện trong cảnh báo ở bảng điều khiển."
-      confirm-label="Lưu"
+      :title="$t('sa28.askMin')"
+      :message="$t('sa28.askMinBody')"
+      :confirm-label="$t('common.save')"
       @confirm="saveMin"
       @cancel="editing = null"
     >
-      <AyField label="Ngưỡng cảnh báo" class="mt-3">
+      <AyField :label="$t('sa28.minLabel')" class="mt-3">
         <template #default="{ id: fid }">
           <input :id="fid" v-model.number="minQuantity" class="input" type="number" min="0">
         </template>
