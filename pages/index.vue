@@ -15,19 +15,21 @@ const { data } = await useAsyncData('home-services', () =>
 );
 
 /** Lich hen sap toi chi co y nghia voi thanh vien, nen goi rieng. */
-const { data: upcoming } = await useAsyncData(
+const { data: upcomingData } = await useAsyncData(
   'home-upcoming',
   async () => {
-    if (!auth.isCustomer) return null;
+    if (!auth.isCustomer) return { booking: null as Booking | null };
     const page = await api.get<Page<Booking>>('/account/bookings', {
       upcoming: true,
       limit: 1,
       sortOrder: 'ASC',
     });
-    return page.items[0] ?? null;
+    return { booking: page.items[0] ?? null };
   },
   { watch: [() => auth.isCustomer] },
 );
+
+const upcoming = computed(() => upcomingData.value?.booking ?? null);
 
 useHead({ title: 'AOYAMA Service — Bảo dưỡng & sửa chữa xe máy' });
 

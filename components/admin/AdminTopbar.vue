@@ -10,6 +10,8 @@ const api = useApi();
 const router = useRouter();
 const title = useScreenTitle();
 
+const emit = defineEmits<{ (e: 'open-nav'): void }>();
+
 const accountMenuOpen = ref(false);
 
 const initials = computed(() => {
@@ -38,9 +40,24 @@ async function logout(): Promise<void> {
 
 <template>
   <header
-    class="flex flex-none items-center gap-3.5 px-[22px] py-[13px]"
+    class="admin-topbar flex flex-none items-center gap-3.5"
     style="background: #fff; border-bottom: 1px solid var(--color-divider)"
   >
+    <button
+      type="button"
+      class="btn -ml-1 p-2 lg:hidden"
+      style="background: transparent; color: var(--color-neutral-800)"
+      aria-label="Mở điều hướng"
+      @click="emit('open-nav')"
+    >
+      <svg
+        width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2.75" stroke-linecap="round" aria-hidden="true"
+      >
+        <path d="M4 7h16M4 12h16M4 17h16" />
+      </svg>
+    </button>
+
     <h1 class="font-heading text-[16px]">{{ title }}</h1>
 
     <div class="ml-auto flex items-center gap-2.5">

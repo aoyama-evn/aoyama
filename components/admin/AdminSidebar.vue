@@ -56,7 +56,7 @@ function isActive(item: NavItem): boolean {
 <template>
   <aside
     class="flex flex-col gap-1 overflow-y-auto px-3 py-[18px]"
-    style="width: 186px; background: var(--color-neutral-900)"
+    style="background: var(--color-neutral-900)"
   >
     <NuxtLink
       to="/admin"

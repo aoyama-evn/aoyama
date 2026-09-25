@@ -226,8 +226,11 @@
     overscroll-behavior: contain;
   }
 
-  /** Thanh trang thai chi co y nghia khi dang ve khung may. */
-  .ay-device-statusbar {
+  /** Thanh trang thai va cac chi tiet vo may chi hien khi dang ve khung. */
+  .ay-device-statusbar,
+  .ay-device-notch,
+  .ay-device-home,
+  .ay-device-btn {
     display: none;
   }
 
@@ -241,25 +244,100 @@
       padding: 24px 16px;
     }
 
+    /**
+     * Vo may: vien ngoai mau kim loai sang, vien trong toi, giua la man hinh.
+     * Ba lop nay la thu lam khung trong giong mot chiec dien thoai that chu
+     * khong phai mot hinh chu nhat bo tron.
+     */
     .ay-device-frame {
+      position: relative;
       display: block;
       width: 392px;
       flex: none;
-      border-radius: 46px;
-      background: var(--color-neutral-900);
-      padding: 11px;
-      box-shadow: var(--shadow-lg);
+      border-radius: 52px;
+      background: linear-gradient(
+        150deg,
+        var(--color-neutral-500) 0%,
+        var(--color-neutral-800) 26%,
+        var(--color-neutral-900) 58%,
+        var(--color-neutral-700) 100%
+      );
+      padding: 13px;
+      box-shadow:
+        0 32px 64px -20px rgb(32 30 29 / 45%),
+        0 8px 20px -8px rgb(32 30 29 / 30%),
+        inset 0 0 0 1px rgb(255 255 255 / 14%);
     }
 
     .ay-device-screen {
-      height: min(772px, calc(100dvh - 70px));
+      height: min(772px, calc(100dvh - 78px));
       min-height: 0;
       flex: none;
-      border-radius: 36px;
+      border-radius: 40px;
+      /* Chua cho vach cham nha o day, de noi dung khong de len no. */
+      padding-bottom: 18px;
+      box-shadow: inset 0 0 0 1px rgb(32 30 29 / 55%);
     }
 
     .ay-device-statusbar {
       display: flex;
+    }
+
+    /* Tai tho dang vien thuoc, de len khoang trong giua thanh trang thai. */
+    .ay-device-notch {
+      display: block;
+      position: absolute;
+      left: 50%;
+      top: 8px;
+      z-index: 5;
+      width: 108px;
+      height: 26px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: var(--color-neutral-900);
+    }
+
+    /* Vach cham nha o day man hinh. */
+    .ay-device-home {
+      display: block;
+      position: absolute;
+      left: 50%;
+      bottom: 7px;
+      z-index: 5;
+      width: 122px;
+      height: 4px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: var(--color-neutral-400);
+      pointer-events: none;
+    }
+
+    /* Nut nguon ben phai, hai nut am luong ben trai. */
+    .ay-device-btn {
+      display: block;
+      position: absolute;
+      width: 3px;
+      border-radius: 4px;
+      background: linear-gradient(
+        180deg,
+        var(--color-neutral-600),
+        var(--color-neutral-800)
+      );
+    }
+    .ay-device-btn-power {
+      right: -3px;
+      top: 168px;
+      height: 74px;
+    }
+    .ay-device-btn-up {
+      left: -3px;
+      top: 142px;
+      height: 46px;
+    }
+    .ay-device-btn-down {
+      left: -3px;
+      top: 196px;
+      height: 46px;
     }
   }
 
@@ -280,9 +358,103 @@
     cursor: pointer;
   }
 
+  /* ---------- Khung trang quan tri ---------- */
+
+  /**
+   * Ban thiet ke ve trang quan tri thanh mot tam the bo tron 26px noi tren nen
+   * neutral-200. Kich thuoc trong ban thiet ke la 1220px, nhung day la ung dung
+   * cho may tinh nen tam the gian theo be rong that: co vien tu 1024px tro len,
+   * va chi chan lai o 1720px de bang du lieu khong bi keo qua dai tren man 1920.
+   */
+  .admin-page {
+    display: flex;
+    min-height: 100dvh;
+    justify-content: center;
+    background: var(--color-neutral-200);
+  }
+
+  .admin-shell {
+    display: flex;
+    width: 100%;
+    min-height: 100dvh;
+    background: var(--color-neutral-100);
+  }
+
   /** Vung chinh cua trang quan tri dung nen sang hon de the noi len. */
   .admin-surface {
     background: var(--color-neutral-100);
+  }
+
+  /** Thanh dieu huong: rong theo ban thiet ke, noi rong mot chut o man rat to. */
+  .admin-nav {
+    width: 186px;
+    flex: none;
+  }
+
+  /** Dem cua thanh tieu de va vung noi dung, gian dan theo co man hinh. */
+  .admin-topbar {
+    padding: 13px 18px;
+  }
+  .admin-main {
+    padding: 18px 18px 26px;
+  }
+
+  /* Laptop nho tu 1024px: bat dau ve tam the co vien. */
+  @media (min-width: 1024px) {
+    .admin-page {
+      padding: 18px;
+    }
+    .admin-shell {
+      min-height: calc(100dvh - 36px);
+      overflow: hidden;
+      border-radius: 26px;
+      box-shadow: var(--shadow-lg);
+    }
+    .admin-topbar {
+      padding: 13px 22px;
+    }
+    .admin-main {
+      padding: 20px 22px 28px;
+    }
+  }
+
+  /* Laptop 13–14 inch va MacBook: noi rong dem mot bac. */
+  @media (min-width: 1440px) {
+    .admin-page {
+      padding: 24px;
+    }
+    .admin-shell {
+      min-height: calc(100dvh - 48px);
+    }
+    .admin-nav {
+      width: 204px;
+    }
+    .admin-topbar {
+      padding: 15px 28px;
+    }
+    .admin-main {
+      padding: 24px 28px 32px;
+    }
+  }
+
+  /* Man hinh 1920 tro len: chan be rong lai va noi rong dem lan cuoi. */
+  @media (min-width: 1760px) {
+    .admin-page {
+      padding: 32px;
+    }
+    .admin-shell {
+      max-width: 1720px;
+      min-height: calc(100dvh - 64px);
+    }
+    .admin-nav {
+      width: 224px;
+    }
+    .admin-topbar {
+      padding: 16px 34px;
+    }
+    .admin-main {
+      padding: 28px 34px 38px;
+    }
   }
 }
 
