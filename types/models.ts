@@ -374,8 +374,15 @@ export interface WorkOrder {
 export interface PublicProgress {
   bookingCode: string;
   bookingStatus: BookingStatus;
+  /** SC-26 ve ca chang lich hen tren cung mot dong thoi gian. */
+  bookingTimeline: { status: BookingStatus; at: string; note: string | null }[];
+  hasQr: boolean;
+  vehicle: { maker: string; model: string; plateNumber: string } | null;
   hasWorkOrder: boolean;
   status?: WorkOrderStatus;
+  intakeOdometer?: number;
+  intakeFuelLevel?: number | null;
+  totalAmount?: number;
   progressPercent?: number;
   progressNote?: string | null;
   estimatedCompletionAt?: string | null;

@@ -8,7 +8,19 @@ import { ServiceType } from '~/types/enums';
  * dong tieu de chu nho viet hoa va cac dong dang vien thuoc.
  */
 const api = useApi();
+const route = useRoute();
+const booking = useBookingStore();
 const { i18n, money } = useFormat();
+
+/**
+ * SC-12 cho "+ Them hang muc khac" quay ve day, nen man hinh co them che do
+ * chon: moi dong thanh mot o danh dau va co thanh xac nhan o duoi.
+ */
+const picking = computed(() => route.query.pick === '1');
+
+onMounted(() => {
+  if (picking.value) booking.restore();
+});
 
 const { data: services } = await useAsyncData('services', () => api.get<ServiceItem[]>('/services'));
 
@@ -98,19 +110,39 @@ useHead({ title: 'Dịch vụ — AOYAMA Service' });
         {{ group.label }}
       </p>
 
-      <NuxtLink
-        v-for="service in group.items"
-        :key="service.id"
-        :to="`/services/${service.slug}`"
-        class="ay-row"
-      >
-        <AyServiceIcon :icon-key="service.iconKey" />
-        <span class="min-w-0 flex-1">
-          <span class="block text-[14px] font-semibold">{{ i18n(service.name) }}</span>
-          <span class="text-muted block truncate text-[11.5px]">{{ subtitle(service) }}</span>
-        </span>
-        <span class="whitespace-nowrap font-heading text-[13.5px]">{{ priceLabel(service) }}</span>
-      </NuxtLink>
+      <template v-for="service in group.items" :key="service.id">
+        <label
+          v-if="picking"
+          class="ay-row cursor-pointer"
+          :style="
+            booking.selectedServiceIds.includes(service.id)
+              ? 'background: var(--color-accent-200)'
+              : undefined
+          "
+        >
+          <input
+            type="checkbox"
+            class="h-4 w-4 flex-none"
+            style="accent-color: var(--color-accent)"
+            :checked="booking.selectedServiceIds.includes(service.id)"
+            @change="booking.toggleService(service)"
+          />
+          <span class="min-w-0 flex-1">
+            <span class="block text-[14px] font-semibold">{{ i18n(service.name) }}</span>
+            <span class="text-muted block truncate text-[11.5px]">{{ subtitle(service) }}</span>
+          </span>
+          <span class="whitespace-nowrap font-heading text-[13.5px]">{{ priceLabel(service) }}</span>
+        </label>
+
+        <NuxtLink v-else :to="`/services/${service.slug}`" class="ay-row">
+          <AyServiceIcon :icon-key="service.iconKey" />
+          <span class="min-w-0 flex-1">
+            <span class="block text-[14px] font-semibold">{{ i18n(service.name) }}</span>
+            <span class="text-muted block truncate text-[11.5px]">{{ subtitle(service) }}</span>
+          </span>
+          <span class="whitespace-nowrap font-heading text-[13.5px]">{{ priceLabel(service) }}</span>
+        </NuxtLink>
+      </template>
     </section>
 
     <AyEmptyState
@@ -121,6 +153,20 @@ useHead({ title: 'Dịch vụ — AOYAMA Service' });
       <AyButton to="/contact" variant="secondary" size="sm">Liên hệ cửa hàng</AyButton>
     </AyEmptyState>
 
-    <NuxtLink to="/" class="btn btn-ghost self-start px-1 text-[13px]">← Quay lại</NuxtLink>
+    <NuxtLink
+      v-if="picking"
+      to="/booking/step1"
+      class="btn btn-primary btn-block"
+      style="min-height: 48px; font-size: 15px; margin: 0"
+    >
+      Xong · {{ booking.selectedServiceIds.length }} hạng mục
+    </NuxtLink>
+
+    <NuxtLink
+      :to="picking ? '/booking/step1' : '/'"
+      class="btn btn-ghost self-start px-1 text-[13px]"
+    >
+      ← Quay lại
+    </NuxtLink>
   </div>
 </template>

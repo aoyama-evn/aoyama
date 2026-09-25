@@ -8,7 +8,7 @@ import type { Booking, Page, ServiceItem } from '~/types/models';
  */
 const api = useApi();
 const auth = useAuthStore();
-const { i18n, money, slotRange } = useFormat();
+const { i18n, money } = useFormat();
 
 const { data } = await useAsyncData('home-services', () =>
   api.get<ServiceItem[]>('/services/featured'),
@@ -107,31 +107,8 @@ function priceLabel(service: ServiceItem): string {
     </section>
 
     <!-- SC-01a: lich hen sap toi cua thanh vien -->
-    <div
-      v-if="auth.isCustomer && upcoming"
-      style="background: var(--color-surface); border-radius: 24px; overflow: hidden"
-    >
-      <NuxtLink
-        :to="`/bookings/${upcoming.code}/progress`"
-        class="flex flex-col gap-1.5 p-3.5 text-left"
-      >
-        <span class="flex items-center justify-between gap-2.5">
-          <span class="card-kicker">Lịch hẹn sắp tới</span>
-          <AyStatusTag :status="upcoming.status" />
-        </span>
-        <span class="text-[14px] font-semibold">{{ slotRange(upcoming) }}</span>
-        <span class="text-muted text-[11.5px]">
-          {{ i18n(upcoming.store?.name ?? null) }}
-          <template v-if="upcoming.services?.length"> · {{ upcoming.services[0].serviceName }}</template>
-        </span>
-        <span v-if="upcoming.vehicle" class="text-muted text-[11.5px]">
-          {{ upcoming.vehicle.modelName }} · {{ upcoming.vehicle.plateNumber }}
-        </span>
-      </NuxtLink>
-      <div
-        class="flex justify-end px-3.5 pb-3 pt-2.5"
-        style="border-top: 1px solid var(--color-divider)"
-      >
+    <AyBookingCard v-if="auth.isCustomer && upcoming" :booking="upcoming" kicker="Lịch hẹn sắp tới">
+      <template #actions>
         <NuxtLink
           to="/account/bookings"
           class="btn btn-ghost px-1 text-[12.5px]"
@@ -139,11 +116,11 @@ function priceLabel(service: ServiceItem): string {
         >
           Lịch hẹn của tôi →
         </NuxtLink>
-      </div>
-    </div>
+      </template>
+    </AyBookingCard>
 
     <!-- SC-01: khach chua dang nhap tra cuu bang ma -->
-    <div v-else-if="!auth.isCustomer" class="card gap-1.5">
+    <div v-if="!auth.isCustomer" class="card gap-1.5">
       <div class="card-kicker">Đã có mã lịch hẹn?</div>
       <p class="text-[13px]" style="color: var(--color-neutral-700)">
         Tra cứu bằng mã lịch hẹn và số điện thoại — không cần đăng nhập.

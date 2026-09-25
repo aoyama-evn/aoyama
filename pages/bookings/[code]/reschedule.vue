@@ -1,78 +1,213 @@
 <script setup lang="ts">
-import type { ApiError, Booking, DayAvailability } from '~/types/models';
+import type { ApiError, Booking, DayAvailability, ServiceItem, Store } from '~/types/models';
 
-/** SC-23 Doi lich hen — FR-BOOK-14, BR-05, BR-06. */
+/**
+ * SC-23 Cap nhat lich hen — FR-BOOK-14, BR-05, BR-06.
+ * Ban thiet ke cho sua ca hang muc, cua hang, ngay gio, so km va ghi chu trong
+ * mot lan luu; ly do thay doi la bat buoc.
+ */
 definePageMeta({ middleware: 'auth' });
 
 const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
-const { dateTime } = useFormat();
+const { i18n, money } = useFormat();
 
 const code = route.params.code as string;
-const { data: booking } = await useAsyncData(`resched-${code}`, () =>
-  api.get<Booking>(`/bookings/${code}`),
-);
+
+const { data } = await useAsyncData(`resched-${code}`, async () => {
+  const [booking, services, stores] = await Promise.all([
+    api.get<Booking>(`/bookings/${code}`),
+    api.get<ServiceItem[]>('/services'),
+    api.get<Store[]>('/stores'),
+  ]);
+  return { booking, services, stores };
+});
+
+const booking = computed(() => data.value?.booking ?? null);
 
 const days = ref<DayAvailability[]>([]);
 const slot = ref<{ date: string; startTime: string } | null>(null);
+const storeId = ref<string>('');
+const selectedIds = ref<string[]>([]);
+const odometer = ref<number | null>(null);
+const note = ref('');
+const reason = ref('');
 const loading = ref(true);
 const submitting = ref(false);
 const error = ref<ApiError | null>(null);
+const reasonError = ref<string | null>(null);
 
-onMounted(async () => {
-  if (!booking.value) return;
+async function loadAvailability(): Promise<void> {
+  if (!storeId.value) return;
+  loading.value = true;
   try {
     days.value = await api.get<DayAvailability[]>('/bookings/availability', {
-      storeId: booking.value.storeId,
+      storeId: storeId.value,
       from: new Date().toISOString().slice(0, 10),
-      days: 21,
+      days: 45,
     });
   } finally {
     loading.value = false;
   }
+}
+
+onMounted(async () => {
+  const current = booking.value;
+  if (!current) return;
+  storeId.value = current.storeId;
+  selectedIds.value = (current.services ?? [])
+    .map((line) => line.serviceId)
+    .filter((id): id is string => Boolean(id));
+  odometer.value = current.vehicle?.currentOdometer ?? null;
+  note.value = current.symptomDescription ?? '';
+  await loadAvailability();
 });
 
+watch(storeId, () => {
+  slot.value = null;
+  void loadAvailability();
+});
+
+function toggle(id: string): void {
+  selectedIds.value = selectedIds.value.includes(id)
+    ? selectedIds.value.filter((x) => x !== id)
+    : [...selectedIds.value, id];
+}
+
 async function submit(): Promise<void> {
-  if (!booking.value || !slot.value) return;
+  const current = booking.value;
+  if (!current) return;
+
+  reasonError.value = null;
+  if (!reason.value.trim()) {
+    reasonError.value = 'Vui lòng cho biết lý do thay đổi';
+    return;
+  }
+  if (selectedIds.value.length === 0) {
+    error.value = {
+      statusCode: 400,
+      code: 'NO_SERVICE',
+      message: 'Hãy giữ lại ít nhất một hạng mục dịch vụ',
+    };
+    return;
+  }
+
   submitting.value = true;
   error.value = null;
   try {
-    await api.put(`/bookings/${booking.value.id}/reschedule`, {
-      date: slot.value.date,
-      startTime: slot.value.startTime,
+    await api.put(`/bookings/${current.id}/reschedule`, {
+      date: slot.value?.date ?? current.scheduledAt.slice(0, 10),
+      startTime: slot.value?.startTime ?? current.slotStartTime.slice(0, 5),
+      storeId: storeId.value,
+      serviceIds: selectedIds.value,
+      odometer: odometer.value ?? undefined,
+      symptomDescription: note.value,
+      reason: reason.value.trim(),
     });
-    ui.success('Đã đổi lịch hẹn', 'Chúng tôi đã gửi SMS xác nhận thời gian mới.');
-    await navigateTo(`/bookings/${code}`);
-  } catch (err) {
-    error.value = normalizeError(err);
+    ui.success('Đã lưu thay đổi', 'Chúng tôi đã gửi thông báo xác nhận cho bạn.');
+    await navigateTo('/account/bookings');
+  } catch (caught) {
+    error.value = normalizeError(caught);
   } finally {
     submitting.value = false;
   }
 }
 
-useHead({ title: `Đổi lịch hẹn ${code}` });
+useHead({ title: `Cập nhật lịch hẹn ${code}` });
 </script>
 
 <template>
-  <div v-if="booking" class="mx-auto flex max-w-3xl flex-col gap-5">
-    <AyPageHeader
-      code="SC-23" title="Đổi lịch hẹn" :back-to="`/bookings/${code}`"
-      :description="`Lịch hiện tại: ${dateTime(booking.scheduledAt)}`"
-    />
+  <div v-if="booking" class="flex flex-col gap-3.5 pb-4 pt-1">
+    <div class="flex flex-wrap items-center justify-between gap-2.5">
+      <div>
+        <p class="text-muted text-[11px]">Đang cập nhật</p>
+        <p class="font-heading text-[18px]">{{ booking.code }}</p>
+      </div>
+      <AyStatusTag :status="booking.status" />
+    </div>
 
-    <AySlotPicker v-model="slot" :days="days" :loading="loading" />
+    <section class="flex flex-col gap-2.5">
+      <h5>Hạng mục dịch vụ</h5>
+      <label
+        v-for="service in data?.services ?? []"
+        :key="service.id"
+        class="flex cursor-pointer items-start gap-[11px] px-3.5 py-3"
+        style="border-radius: 20px"
+        :style="
+          selectedIds.includes(service.id)
+            ? 'background: var(--color-surface)'
+            : 'background: var(--color-neutral-100)'
+        "
+      >
+        <input
+          type="checkbox"
+          class="mt-[3px] h-4 w-4 flex-none"
+          style="accent-color: var(--color-accent)"
+          :checked="selectedIds.includes(service.id)"
+          @change="toggle(service.id)"
+        />
+        <span class="min-w-0 flex-1">
+          <span class="block text-[14px]" :class="selectedIds.includes(service.id) ? 'font-semibold' : ''">
+            {{ i18n(service.name) }}
+          </span>
+          <span class="text-muted block text-[11.5px]">{{ service.durationMinutes }} mins</span>
+        </span>
+        <span class="whitespace-nowrap font-heading text-[14px]">
+          {{ service.quoteOnly ? 'báo giá' : money(service.basePrice) }}
+        </span>
+      </label>
+    </section>
+
+    <AyField for="store" label="Cửa hàng">
+      <select id="store" v-model="storeId" class="input">
+        <option v-for="store in data?.stores ?? []" :key="store.id" :value="store.id">
+          {{ i18n(store.name) }}
+        </option>
+      </select>
+    </AyField>
+
+    <section class="flex flex-col gap-2.5">
+      <h5>Ngày &amp; khung giờ</h5>
+      <AySlotPicker v-model="slot" :days="days" :loading="loading" />
+    </section>
+
+    <AyField for="odo" label="Số km hiện tại">
+      <input id="odo" v-model.number="odometer" class="input" type="number" inputmode="numeric" min="0" />
+    </AyField>
+
+    <AyField for="note" label="Ghi chú thêm cho cửa hàng">
+      <textarea id="note" v-model="note" class="input" style="min-height: 74px" maxlength="1000" />
+    </AyField>
+
+    <AyField for="reason" label="Lý do thay đổi" required :error="reasonError ?? undefined">
+      <input
+        id="reason"
+        v-model="reason"
+        class="input"
+        placeholder="vd: bận công việc, muốn đổi sang buổi chiều"
+      />
+    </AyField>
 
     <AyErrorNote :error="error" />
 
-    <div class="sticky bottom-0 -mx-4 border-t border-divider bg-surface px-4 py-3 ay-safe-bottom">
-      <div class="flex items-center gap-3">
-        <p class="flex-1 text-[13px] text-muted">
-          <template v-if="slot">Thời gian mới: {{ slot.date }} · {{ slot.startTime }}</template>
-          <template v-else>Chọn khung giờ mới để tiếp tục</template>
-        </p>
-        <AyButton :disabled="!slot" :loading="submitting" @click="submit">Xác nhận đổi lịch</AyButton>
-      </div>
+    <div class="flex flex-wrap gap-2">
+      <NuxtLink
+        to="/account/bookings"
+        class="btn btn-secondary flex-1 text-[14px]"
+        style="min-height: 48px; margin: 0"
+      >
+        Hủy bỏ
+      </NuxtLink>
+      <button
+        type="button"
+        class="btn btn-primary flex-1 text-[14px]"
+        style="min-height: 48px; margin: 0"
+        :disabled="submitting"
+        @click="submit"
+      >
+        {{ submitting ? 'Đang lưu…' : 'Lưu thay đổi' }}
+      </button>
     </div>
   </div>
 </template>

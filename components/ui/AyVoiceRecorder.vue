@@ -2,6 +2,9 @@
 /** CP-15 Nut ghi am — SC-10. Ghi toi da 120 giay, nghe lai, ghi lai. */
 const MAX_SECONDS = 120;
 
+/** SC-10 ve nut ghi am thanh mot the nho canh o soan. */
+defineProps<{ compact?: boolean }>();
+
 const emit = defineEmits<{ (e: 'recorded', payload: { dataUrl: string; seconds: number }): void }>();
 
 const ui = useUiStore();
@@ -69,14 +72,21 @@ const display = computed(() => {
 
 <template>
   <div class="flex flex-wrap items-center gap-2">
-    <AyButton v-if="!recording && !audioUrl" variant="secondary" size="sm" @click="start">
-      <template #icon>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
-          <path d="M12 3v12M12 19v2M8 8v6M16 7v8M4 10v2M20 10v2" />
-        </svg>
-      </template>
-      Ghi âm mô tả
-    </AyButton>
+    <button
+      v-if="!recording && !audioUrl"
+      type="button"
+      class="btn btn-secondary gap-1.5"
+      :class="compact ? 'text-[12px]' : 'text-[12.5px]'"
+      @click="start"
+    >
+      <svg
+        width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2.75" stroke-linecap="round" aria-hidden="true"
+      >
+        <path d="M12 3v12M12 19v2M8 8v6M16 7v8M4 10v2M20 10v2" />
+      </svg>
+      {{ compact ? 'Giọng nói' : 'Ghi âm mô tả' }}
+    </button>
 
     <template v-if="recording">
       <span class="tag bg-danger-bg text-danger">

@@ -57,6 +57,26 @@ export const useBookingStore = defineStore('booking', () => {
     () => step2Complete.value && contactName.value.trim().length > 0 && contactPhone.value.trim().length > 0,
   );
 
+  /** SC-10a va SC-12a — chon mot xe da co trong ho so thanh vien. */
+  function setVehicle(picked: {
+    id?: string;
+    plateNumber: string;
+    maker: string;
+    model: string;
+    engineCc?: number | null;
+    currentOdometer?: number | null;
+  }): void {
+    vehicle.value = {
+      vehicleId: picked.id,
+      plateNumber: picked.plateNumber,
+      maker: picked.maker,
+      model: picked.model,
+      engineCc: picked.engineCc ?? null,
+      odometer: picked.currentOdometer ?? null,
+    };
+    persist();
+  }
+
   function toggleService(service: ServiceItem): void {
     if (selectedServiceIds.value.includes(service.id)) {
       selectedServiceIds.value = selectedServiceIds.value.filter((id) => id !== service.id);
@@ -196,6 +216,7 @@ export const useBookingStore = defineStore('booking', () => {
     step1Complete,
     step2Complete,
     step3Complete,
+    setVehicle,
     toggleService,
     applyDiagnosis,
     toPayload,

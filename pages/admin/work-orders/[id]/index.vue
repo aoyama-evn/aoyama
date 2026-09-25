@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import type { ProgressStep } from '~/components/ui/AyProgressSteps.vue';
 import type { Payment, Quotation, WorkOrder } from '~/types/models';
-import { WorkOrderStatus } from '~/types/enums';
+import { WORK_ORDER_FLOW, WorkOrderStatus } from '~/types/enums';
 
 /** SA-10 Chi tiet phieu dich vu — FR-WO-02, FR-WO-07..16. */
 definePageMeta({ layout: 'admin', middleware: 'admin' });
@@ -120,6 +121,29 @@ const remaining = computed(() =>
   workOrder.value ? workOrder.value.totalAmount - workOrder.value.paidAmount : 0,
 );
 
+const WORK_ORDER_LABELS: Record<string, string> = {
+  RECEIVED: 'Đã tiếp nhận',
+  DIAGNOSING: 'Đã chẩn đoán',
+  QUOTED: 'Đang báo giá',
+  IN_PROGRESS: 'Đang tiến hành',
+  COMPLETED: 'Đã xong',
+  DELIVERED: 'Đã bàn giao',
+  CANCELLED: 'Đã hủy',
+};
+
+/** CP-19 — moc tien do cua phieu, bo buoc bao gia khi phieu khong can bao gia. */
+const progressSteps = computed<ProgressStep[]>(() => {
+  const order = WORK_ORDER_FLOW.filter(
+    (status) => status !== 'QUOTED' || (quotations.value ?? []).length > 0,
+  );
+  const current = order.indexOf(workOrder.value?.status ?? 'RECEIVED');
+  return order.map((status, index) => ({
+    key: status,
+    label: WORK_ORDER_LABELS[status],
+    state: index < current ? 'done' : index === current ? 'current' : 'todo',
+  }));
+});
+
 useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
 </script>
 
@@ -141,7 +165,7 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
       </template>
     </AyPageHeader>
 
-    <AyProgressSteps :current="workOrder.status" :skip-quotation="(quotations ?? []).length === 0" />
+    <AyProgressSteps :steps="progressSteps" />
 
     <div class="flex flex-wrap gap-2">
       <AyButton

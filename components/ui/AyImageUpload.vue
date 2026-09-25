@@ -1,7 +1,14 @@
 <script setup lang="ts">
 /** CP-14 O tai anh — keo tha, xem truoc, gioi han dung luong va loai tep. */
 const props = withDefaults(
-  defineProps<{ modelValue: string[]; max?: number; maxSizeMb?: number; label?: string }>(),
+  defineProps<{
+    modelValue: string[];
+    max?: number;
+    maxSizeMb?: number;
+    label?: string;
+    /** SC-10 ve o gui anh thanh mot nut nho canh o soan, khong phai o keo tha. */
+    compact?: boolean;
+  }>(),
   { max: 5, maxSizeMb: 8 },
 );
 const emit = defineEmits<{ (e: 'update:modelValue', v: string[]): void }>();
@@ -52,7 +59,23 @@ function remove(index: number): void {
 </script>
 
 <template>
-  <div class="flex flex-col gap-2">
+  <label v-if="compact" class="btn btn-secondary cursor-pointer gap-1.5 text-[12px]">
+    <svg
+      width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+    >
+      <rect x="3" y="5" width="18" height="14" rx="3" />
+      <circle cx="9" cy="10" r="1.6" />
+      <path d="m5 17 5-4.5 4 3.5 2.5-2 2.5 3" />
+    </svg>
+    Ảnh ({{ modelValue.length }}/{{ max }})
+    <input
+      type="file" class="sr-only" multiple :accept="ACCEPT.join(',')"
+      @change="handleFiles(($event.target as HTMLInputElement).files)"
+    >
+  </label>
+
+  <div v-else class="flex flex-col gap-2">
     <span v-if="label" class="label">{{ label }}</span>
 
     <div

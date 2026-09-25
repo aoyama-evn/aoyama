@@ -1,18 +1,26 @@
 <script setup lang="ts">
-import type { ApiError } from '~/types/models';
-
-/** SC-17 Dang ky — FR-AUTH-01. */
-definePageMeta({ layout: 'auth' });
-
+/**
+ * SC-17 Dang ky khach hang — FR-AUTH-01.
+ * Ban thiet ke chi hoi ho ten, so dien thoai, email va o dong y dieu khoan;
+ * xac thuc bang OTP o SC-19.
+ */
 const api = useApi();
 
 const form = reactive({ name: '', phone: '', email: '' });
-const agreed = ref(false);
+const agreed = ref(true);
 const loading = ref(false);
-const error = ref<ApiError | null>(null);
+const errors = reactive<Record<string, string>>({});
 
 async function submit(): Promise<void> {
-  error.value = null;
+  Object.keys(errors).forEach((key) => delete errors[key]);
+  if (!form.name.trim()) errors.name = 'Vui lòng nhập họ tên';
+  if (!form.phone.trim()) errors.phone = 'Vui lòng nhập số điện thoại';
+  if (form.email.trim() && !/^\S+@\S+\.\S+$/.test(form.email.trim())) {
+    errors.email = 'Email không hợp lệ';
+  }
+  if (!agreed.value) errors.agreed = 'Bạn cần đồng ý với điều khoản để tiếp tục';
+  if (Object.keys(errors).length > 0) return;
+
   loading.value = true;
   try {
     await api.post('/auth/otp/request', { phone: form.phone.trim(), purpose: 'REGISTER' });
@@ -23,8 +31,8 @@ async function submit(): Promise<void> {
     });
     if (form.email.trim()) query.set('email', form.email.trim());
     await navigateTo(`/verify-otp?${query}`);
-  } catch (err) {
-    error.value = normalizeError(err);
+  } catch (caught) {
+    errors.phone = normalizeError(caught).message;
   } finally {
     loading.value = false;
   }
@@ -34,53 +42,56 @@ useHead({ title: 'Đăng ký — AOYAMA Service' });
 </script>
 
 <template>
-  <div class="card flex flex-col gap-4">
-    <div>
-      <p class="card-kicker">SC-17</p>
-      <h1 class="font-heading text-[20px]">Đăng ký tài khoản</h1>
-      <p class="mt-1 text-[13.5px] text-muted">
-        Có tài khoản, bạn xem được toàn bộ lịch sử bảo dưỡng của xe và đặt lại lịch chỉ với vài chạm.
-      </p>
-    </div>
+  <form class="flex flex-col gap-3 pb-4 pt-2" @submit.prevent="submit">
+    <h3>Đăng ký</h3>
 
-    <form class="flex flex-col gap-3" @submit.prevent="submit">
-      <AyField label="Họ tên" required>
-        <template #default="{ id }">
-          <input :id="id" v-model="form.name" class="input" type="text" autocomplete="name" required>
-        </template>
-      </AyField>
+    <AyField for="name" label="Họ tên" required :error="errors.name">
+      <input id="name" v-model="form.name" class="input" autocomplete="name" placeholder="Nguyễn Văn A" />
+    </AyField>
 
-      <AyField label="Số điện thoại" required hint="Dùng để đăng nhập và nhận thông báo">
-        <template #default="{ id }">
-          <input :id="id" v-model="form.phone" class="input" type="tel" placeholder="090-1234-5678" autocomplete="tel" required>
-        </template>
-      </AyField>
+    <AyField for="phone" label="Số điện thoại" required :error="errors.phone">
+      <input
+        id="phone"
+        v-model="form.phone"
+        class="input"
+        type="tel"
+        inputmode="tel"
+        autocomplete="tel"
+        placeholder="090-1234-5678"
+      />
+    </AyField>
 
-      <AyField label="Email" hint="Không bắt buộc">
-        <template #default="{ id }">
-          <input :id="id" v-model="form.email" class="input" type="email" autocomplete="email">
-        </template>
-      </AyField>
+    <AyField for="email" label="Email" :error="errors.email">
+      <input
+        id="email"
+        v-model="form.email"
+        class="input"
+        type="email"
+        autocomplete="email"
+        placeholder="nguyenvana@example.com"
+      />
+    </AyField>
 
-      <label class="flex items-start gap-2.5 text-[13px]">
-        <input v-model="agreed" type="checkbox" class="mt-1 h-4 w-4 accent-[var(--color-accent)]">
-        <span>
-          Tôi đồng ý với
-          <NuxtLink to="/terms" class="underline" target="_blank">Điều khoản</NuxtLink> và
-          <NuxtLink to="/privacy" class="underline" target="_blank">Chính sách dữ liệu</NuxtLink>.
-        </span>
-      </label>
+    <label class="flex cursor-pointer items-start gap-2.5 text-[12.5px]">
+      <input v-model="agreed" type="checkbox" class="mt-[3px]" />
+      <span>
+        Tôi đồng ý với <NuxtLink to="/terms">điều khoản sử dụng</NuxtLink> và
+        <NuxtLink to="/privacy">chính sách dữ liệu</NuxtLink>.
+      </span>
+    </label>
+    <p v-if="errors.agreed" class="field-error">{{ errors.agreed }}</p>
 
-      <AyErrorNote :error="error" />
+    <button
+      type="submit"
+      class="btn btn-primary btn-block"
+      style="min-height: 48px; font-size: 15px; margin: 0"
+      :disabled="loading"
+    >
+      {{ loading ? 'Đang gửi…' : 'Đăng ký & nhận mã OTP' }}
+    </button>
 
-      <AyButton type="submit" block :loading="loading" :disabled="!agreed || !form.name.trim() || !form.phone.trim()">
-        Gửi mã xác thực
-      </AyButton>
-    </form>
-
-    <p class="text-center text-[13px] text-muted">
-      Đã có tài khoản?
-      <NuxtLink to="/login" class="underline">Đăng nhập</NuxtLink>
-    </p>
-  </div>
+    <NuxtLink to="/login" class="btn btn-ghost self-center text-[13px]">
+      Đã có tài khoản? Đăng nhập
+    </NuxtLink>
+  </form>
 </template>

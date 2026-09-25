@@ -1,7 +1,14 @@
 <script setup lang="ts">
-import type { DayAvailability } from '~/types/models';
+import type { DayAvailability, Store } from '~/types/models';
 
-/** SC-13 Dat lich buoc 2 — FR-BOOK-04, FR-BOOK-05, BR-07, BR-08. */
+/**
+ * SC-13 Dat lich buoc 2 (khach) va SC-13a (thanh vien) —
+ * FR-BOOK-04, FR-BOOK-05, BR-07, BR-08.
+ *
+ * Ban thiet ke dat viec chon cua hang o buoc nay, ngay tren lich thang, vi
+ * khung gio trong phu thuoc cua hang. Nut tiep theo nam trong dong noi dung
+ * chu khong ghim duoi man hinh.
+ */
 const api = useApi();
 const booking = useBookingStore();
 const { i18n, date: fmtDate } = useFormat();
@@ -11,8 +18,14 @@ const loading = ref(true);
 /** Nap ca thang de lich thang co du du lieu tung ngay. */
 const rangeFrom = ref(fmtDate(new Date(), 'yyyy-MM-dd'));
 
+const { data: stores } = await useAsyncData('booking-stores', () => api.get<Store[]>('/stores'));
+
 async function load(): Promise<void> {
-  if (!booking.storeId) return;
+  if (!booking.storeId) {
+    days.value = [];
+    loading.value = false;
+    return;
+  }
   loading.value = true;
   try {
     days.value = await api.get<DayAvailability[]>('/bookings/availability', {
@@ -27,15 +40,32 @@ async function load(): Promise<void> {
 
 onMounted(async () => {
   booking.restore();
-  if (!booking.step1Complete) {
+  if (booking.selectedServiceIds.length === 0) {
     await navigateTo('/booking/step1');
     return;
+  }
+  if (!booking.storeId && (stores.value ?? []).length === 1) {
+    booking.storeId = stores.value![0].id;
   }
   await load();
 });
 
 watch(rangeFrom, load);
+watch(
+  () => booking.storeId,
+  () => {
+    // Doi cua hang thi khung gio da chon khong con dung nua.
+    booking.slot = null;
+    booking.persist();
+    void load();
+  },
+);
 watch(() => booking.slot, () => booking.persist(), { deep: true });
+
+function pickStore(store: Store): void {
+  booking.storeId = store.id;
+  booking.store = store;
+}
 
 /** Du kien hoan thanh = gio bat dau + tong thoi luong dich vu da chon. */
 const estimatedEnd = computed(() => {
@@ -49,7 +79,7 @@ useHead({ title: 'Đặt lịch — Bước 2' });
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 pb-24">
+  <div class="flex flex-col gap-[15px] pb-4">
     <BookingSteps :current="2" />
 
     <!-- Nhac lai lua chon o buoc 1 -->
@@ -57,9 +87,40 @@ useHead({ title: 'Đặt lịch — Bước 2' });
       <div class="card-kicker">Bước 1 đã chọn</div>
       <div class="text-[13px]">
         {{ booking.selectedServices.map((s) => i18n(s.name)).join(' · ') || 'Chưa chọn dịch vụ' }}
-        <template v-if="booking.store"> — {{ i18n(booking.store.name) }}</template>
       </div>
     </div>
+
+    <section class="flex flex-col gap-2.5">
+      <h5>Chọn cửa hàng</h5>
+      <label
+        v-for="store in stores ?? []"
+        :key="store.id"
+        class="radio gap-[11px] px-3.5 py-3"
+        style="border-radius: 20px"
+        :style="
+          booking.storeId === store.id
+            ? 'background: var(--color-surface)'
+            : 'background: var(--color-neutral-100)'
+        "
+      >
+        <input
+          type="radio"
+          name="store"
+          :checked="booking.storeId === store.id"
+          @change="pickStore(store)"
+        />
+        <span class="dot" />
+        <span class="min-w-0 flex-1">
+          <span
+            class="block text-[14px]"
+            :class="booking.storeId === store.id ? 'font-semibold' : ''"
+          >
+            {{ i18n(store.name) }}
+          </span>
+          <span class="text-muted block truncate text-[11.5px]">{{ i18n(store.address) }}</span>
+        </span>
+      </label>
+    </section>
 
     <AySlotPicker
       v-model="booking.slot"
@@ -67,31 +128,28 @@ useHead({ title: 'Đặt lịch — Bước 2' });
       :loading="loading"
       @need-range="rangeFrom = $event"
     />
-  </div>
 
-  <div
-    class="fixed inset-x-0 bottom-0 z-30 ay-safe-bottom"
-    style="background: var(--color-bg); border-top: 1px solid var(--color-divider)"
-  >
-    <div class="sp-shell flex flex-col gap-2 px-4 py-3">
-      <div v-if="booking.slot" class="flex justify-between text-[12.5px]">
-        <span class="text-muted">Dự kiến hoàn thành</span>
-        <strong v-if="estimatedEnd">≈ {{ estimatedEnd }} ({{ booking.estimatedMinutes }} phút)</strong>
-        <strong v-else>—</strong>
-      </div>
-      <div v-else class="text-[12.5px] text-muted">Chọn một khung giờ để tiếp tục</div>
-
-      <NuxtLink
-        to="/booking/step3"
-        class="btn btn-primary btn-cta"
-        :class="booking.step2Complete ? '' : 'pointer-events-none opacity-50'"
-        :aria-disabled="!booking.step2Complete"
-      >
-        Tiếp theo →
-      </NuxtLink>
-      <NuxtLink to="/booking/step1" class="btn btn-ghost self-center text-[13px]">
-        ← Quay lại
-      </NuxtLink>
+    <div
+      class="flex justify-between pt-3 text-[12.5px]"
+      style="border-top: 1px solid var(--color-divider)"
+    >
+      <span class="text-muted">Dự kiến hoàn thành</span>
+      <strong v-if="estimatedEnd">≈ {{ estimatedEnd }} ({{ booking.estimatedMinutes }} phút)</strong>
+      <strong v-else>—</strong>
     </div>
+
+    <NuxtLink
+      to="/booking/step3"
+      class="btn btn-primary btn-block"
+      style="min-height: 48px; font-size: 15px; margin: 0"
+      :class="booking.step2Complete ? '' : 'pointer-events-none opacity-50'"
+      :aria-disabled="!booking.step2Complete"
+    >
+      Tiếp theo →
+    </NuxtLink>
+
+    <NuxtLink to="/booking/step1" class="btn btn-ghost self-center text-[13px]">
+      ← Quay lại
+    </NuxtLink>
   </div>
 </template>

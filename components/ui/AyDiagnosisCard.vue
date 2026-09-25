@@ -1,54 +1,114 @@
 <script setup lang="ts">
-import type { DiagnosisFinding } from '~/types/models';
+import type { DiagnosisFinding, ServiceItem } from '~/types/models';
 
 /**
- * CP-16 The ket qua AI — SC-11.
- * Luon kem nhan "Goi y boi AI" va muc do khop, de khach hieu day la de xuat
- * chu khong phai ket luan (RK-01).
+ * CP-16 The ket qua chan doan AI — SC-11.
+ * Ban thiet ke: khung vien dut mau accent-2, mot thanh ty le cho moi kha nang,
+ * o dich vu de xuat tren nen trang, roi cau nhac day chi la goi y (RK-01).
  */
-defineProps<{ finding: DiagnosisFinding; rank: number }>();
-const emit = defineEmits<{ (e: 'book', finding: DiagnosisFinding): void }>();
+const props = defineProps<{
+  findings: DiagnosisFinding[];
+  vehicleLabel?: string | null;
+}>();
 
-const SEVERITY: Record<string, { label: string; class: string }> = {
-  HIGH: { label: 'Nên xử lý sớm', class: 'bg-danger-bg text-danger' },
-  MEDIUM: { label: 'Nên kiểm tra', class: 'bg-warning-bg text-warning' },
-  LOW: { label: 'Theo dõi thêm', class: 'bg-info-bg text-info' },
-};
+const emit = defineEmits<{ (e: 'book', serviceCodes: string[] | undefined): void }>();
+
+const api = useApi();
+const { i18n, money } = useFormat();
+
+/** Dich vu de xuat lay tu kha nang cao nhat. */
+const top = computed(() =>
+  [...props.findings].sort((a, b) => b.matchPercent - a.matchPercent)[0] ?? null,
+);
+
+const { data: services } = await useAsyncData('diagnosis-services', () =>
+  api.get<ServiceItem[]>('/services'),
+);
+
+const suggested = computed(() => {
+  const codes = top.value?.suggestedServiceCodes ?? [];
+  return (services.value ?? []).find((service) => codes.includes(service.code)) ?? null;
+});
+
+function pct(value: number): number {
+  return Math.min(100, Math.max(0, Math.round(value)));
+}
 </script>
 
 <template>
-  <article class="card flex flex-col gap-2">
-    <header class="flex items-start justify-between gap-3">
-      <h3 class="font-heading text-[15.5px]">
-        <span class="text-muted">{{ rank }}.</span> {{ finding.label }}
-      </h3>
-      <AyAiBadge :confidence="finding.matchPercent" />
-    </header>
-
-    <div>
-      <div class="h-2 w-full overflow-hidden rounded-full bg-neutral-200">
-        <div
-          class="h-full rounded-full bg-accent-500"
-          :style="{ width: `${Math.min(100, Math.max(0, finding.matchPercent))}%` }"
-          role="progressbar"
-          :aria-valuenow="finding.matchPercent"
-          aria-valuemin="0"
-          aria-valuemax="100"
-          :aria-label="`Mức độ khớp ${finding.matchPercent}%`"
-        />
-      </div>
-      <p class="mt-1 text-[12px] text-muted">Mức độ khớp {{ Math.round(finding.matchPercent) }}%</p>
+  <article
+    class="flex flex-col gap-[11px] self-start p-3.5"
+    style="
+      max-width: 92%;
+      border: 1.5px dashed var(--color-accent-2-400);
+      background: var(--color-accent-2-100);
+      border-radius: 22px 22px 22px 8px;
+    "
+  >
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="tag" style="background: var(--color-accent-2-500); color: #fff">
+        ✦ Kết quả chẩn đoán
+      </span>
+      <span v-if="vehicleLabel" class="text-[11px]" style="color: var(--color-accent-2-800)">
+        {{ vehicleLabel }}
+      </span>
     </div>
 
-    <p v-if="finding.description" class="text-[13.5px]">{{ finding.description }}</p>
+    <div class="flex flex-col gap-2.5">
+      <div v-for="(finding, index) in findings" :key="index">
+        <div class="mb-1 flex justify-between text-[13px] font-semibold">
+          <span>{{ finding.label }}</span>
+          <span>{{ pct(finding.matchPercent) }} %</span>
+        </div>
+        <div
+          class="overflow-hidden"
+          style="height: 7px; border-radius: 999px; background: var(--color-accent-2-200)"
+          role="progressbar"
+          :aria-valuenow="pct(finding.matchPercent)"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          :aria-label="`${finding.label}: ${pct(finding.matchPercent)}%`"
+        >
+          <div
+            style="height: 100%; border-radius: 999px; background: var(--color-accent-2-600)"
+            :style="{ width: `${pct(finding.matchPercent)}%` }"
+          />
+        </div>
+        <p v-if="finding.description" class="mt-1 text-[11.5px] leading-[1.45]">
+          {{ finding.description }}
+        </p>
+      </div>
+    </div>
 
-    <footer class="flex flex-wrap items-center gap-2">
-      <span v-if="finding.severity" class="tag" :class="SEVERITY[finding.severity]?.class">
-        {{ SEVERITY[finding.severity]?.label }}
+    <div
+      v-if="suggested"
+      class="flex items-center justify-between gap-2.5 px-3 py-2.5"
+      style="background: #fff; border-radius: 16px"
+    >
+      <span class="leading-[1.35]">
+        <span class="block text-[13px] font-semibold">{{ i18n(suggested.name) }}</span>
+        <span class="text-muted block text-[11px]">
+          Dịch vụ đề xuất · {{ suggested.durationMinutes }} mins
+        </span>
       </span>
-      <AyButton variant="ghost" size="sm" class="ml-auto" @click="emit('book', finding)">
-        Đặt lịch với dịch vụ này →
-      </AyButton>
-    </footer>
+      <span class="whitespace-nowrap font-heading text-[15px]">
+        {{ suggested.quoteOnly ? 'báo giá' : `~ ${money(suggested.basePrice)}` }}
+      </span>
+    </div>
+
+    <p class="text-[11px] leading-[1.45]" style="color: var(--color-accent-2-800)">
+      Gợi ý bởi AI — cần kỹ thuật viên kiểm tra thực tế.
+    </p>
+
+    <div class="flex flex-wrap gap-2">
+      <button
+        type="button"
+        class="btn btn-primary text-[12.5px]"
+        style="min-height: 42px"
+        @click="emit('book', top?.suggestedServiceCodes)"
+      >
+        Đặt lịch dịch vụ này
+      </button>
+    </div>
   </article>
 </template>

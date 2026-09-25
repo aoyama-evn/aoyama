@@ -11,6 +11,8 @@ const props = withDefaults(
     loading?: boolean;
     /** Buoc go dung chuoi nay de xac nhan — dung cho thao tac rat nguy hiem. */
     confirmPhrase?: string;
+    /** Lop phu chi de xem, khong co lua chon nao de bo — vi du o xem ma QR. */
+    hideCancel?: boolean;
   }>(),
   { confirmLabel: 'Xác nhận', cancelLabel: 'Hủy bỏ' },
 );
@@ -43,7 +45,9 @@ watch(() => props.open, (open) => { if (open) typed.value = ''; });
         </div>
 
         <div class="mt-5 flex justify-end gap-2">
-          <AyButton variant="secondary" size="sm" @click="emit('cancel')">{{ cancelLabel }}</AyButton>
+          <AyButton v-if="!hideCancel" variant="secondary" size="sm" @click="emit('cancel')">
+            {{ cancelLabel }}
+          </AyButton>
           <AyButton
             :variant="danger ? 'danger' : 'primary'"
             size="sm"

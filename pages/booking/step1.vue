@@ -1,222 +1,277 @@
 <script setup lang="ts">
-import type { ServiceItem, Store } from '~/types/models';
+import type { Vehicle } from '~/types/models';
 
-/** SC-12 Dat lich buoc 1 — FR-BOOK-02, FR-BOOK-03. Bo cuc theo ban thiet ke. */
+/**
+ * SC-12 Dat lich buoc 1 (khach) va SC-12a (thanh vien) — FR-BOOK-02, FR-BOOK-03.
+ *
+ * Ban thiet ke chia buoc nay thanh hai luong:
+ *  - den tu tro ly AI: mo ta hien tuong, gui anh hoac ghi am, roi bam phan tich;
+ *  - den tu danh muc: chi con o ghi chu them.
+ * Cua hang khong chon o day ma o buoc 2, dung nhu ban thiet ke.
+ */
 const api = useApi();
-const route = useRoute();
+const auth = useAuthStore();
 const booking = useBookingStore();
-const { i18n, money } = useFormat();
+const ui = useUiStore();
+const { i18n, money, number } = useFormat();
 
-const { data } = await useAsyncData('booking-step1', async () => {
-  const [services, stores] = await Promise.all([
-    api.get<ServiceItem[]>('/services'),
-    api.get<Store[]>('/stores'),
-  ]);
-  return { services, stores };
-});
+const analysing = ref(false);
 
-/** Bo loc hai nut o dau man: Bao duong / Sua chua. Bo chon ca hai = xem tat ca. */
-const kinds = ref<Set<'MAINTENANCE' | 'REPAIR'>>(new Set());
+const { data: myVehicles } = await useAsyncData(
+  'book-vehicles',
+  () => (auth.isCustomer ? api.get<Vehicle[]>('/account/vehicles') : Promise.resolve([])),
+  { watch: [() => auth.isCustomer] },
+);
 
 onMounted(() => {
   booking.restore();
-  const fromQuery = route.query.storeId as string | undefined;
-  if (fromQuery) booking.storeId = fromQuery;
-  if (!booking.storeId && data.value?.stores.length === 1) {
-    booking.storeId = data.value.stores[0].id;
-  }
-  // Dan tu chan doan AI sang thi mo san nhom sua chua.
-  if (booking.aiDiagnosisId) kinds.value.add('REPAIR');
 });
 
-watch(() => booking.storeId, () => booking.persist());
+/** Luong AI khi khach den tu SC-10 hoac tu bam nut phan tich o day. */
+const aiFlow = computed(() => Boolean(booking.aiDiagnosisId) || booking.symptomPhotoUrls.length > 0);
+
+const KINDS = [
+  { value: 'MAINTENANCE' as const, label: 'Bảo dưỡng' },
+  { value: 'REPAIR' as const, label: 'Sửa chữa' },
+];
+
+/** BR — chon ca hai nhom thi loai dich vu cua lich hen la BOTH. */
+const kinds = computed<Set<'MAINTENANCE' | 'REPAIR'>>(() => {
+  if (booking.serviceType === 'BOTH') return new Set(['MAINTENANCE', 'REPAIR']);
+  return new Set([booking.serviceType as 'MAINTENANCE' | 'REPAIR']);
+});
 
 function toggleKind(kind: 'MAINTENANCE' | 'REPAIR'): void {
   const next = new Set(kinds.value);
   if (next.has(kind)) next.delete(kind);
   else next.add(kind);
-  kinds.value = next;
+  if (next.size === 2) booking.serviceType = 'BOTH';
+  else if (next.size === 1) booking.serviceType = [...next][0];
+  booking.persist();
 }
 
-const visibleServices = computed(() => {
-  const all = data.value?.services ?? [];
-  if (kinds.value.size === 0) return all;
-  return all.filter((s) => kinds.value.has(s.type as 'MAINTENANCE' | 'REPAIR'));
-});
-
-function subtitle(service: ServiceItem): string {
-  const en = service.name.en ?? '';
-  const duration = service.quoteOnly ? 'báo giá riêng' : `${service.durationMinutes} phút`;
-  return [en, duration].filter(Boolean).join(' · ');
+function pickVehicle(item: Vehicle): void {
+  booking.setVehicle(item);
 }
 
-const selectedStore = computed(() =>
-  (data.value?.stores ?? []).find((s) => s.id === booking.storeId) ?? null,
-);
+function vehicleLine(item: Vehicle): string {
+  const parts = [item.plateNumber];
+  if (item.currentOdometer !== null) parts.push(`${number(item.currentOdometer)} km`);
+  if (item.modelYear) parts.push(`đời ${item.modelYear}`);
+  return parts.filter(Boolean).join(' · ');
+}
+
+/** SC-12 — bam "AI phan tich van de" thi gui mo ta sang phien chan doan. */
+async function analyse(): Promise<void> {
+  if (!booking.symptomDescription.trim() && booking.symptomPhotoUrls.length === 0) {
+    ui.warning('Hãy mô tả hiện tượng hoặc gửi ảnh trước khi phân tích');
+    return;
+  }
+  analysing.value = true;
+  try {
+    const session = await api.post<{ id: string }>('/ai/diagnosis/sessions', {
+      sessionKey: `book-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      serviceIntent: booking.serviceType === 'BOTH' ? undefined : booking.serviceType,
+      vehicleMaker: booking.vehicle.maker || undefined,
+      vehicleModel: booking.vehicle.model || undefined,
+    });
+    booking.aiDiagnosisId = session.id;
+    booking.persist();
+    await navigateTo('/chat');
+  } catch (error) {
+    ui.error(normalizeError(error).message, 'Bạn vẫn có thể đặt lịch và mô tả trực tiếp tại cửa hàng.');
+  } finally {
+    analysing.value = false;
+  }
+}
 
 useHead({ title: 'Đặt lịch — Bước 1' });
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 pb-24">
+  <div class="flex flex-col gap-[15px] pb-4">
     <BookingSteps :current="1" />
 
-    <!-- Dan tu chan doan AI -->
-    <div
-      v-if="booking.aiDiagnosisId"
-      class="flex gap-2 px-3.5 py-2.5 text-[12px]"
-      style="
-        background: var(--color-accent-2-100);
-        border-radius: 18px;
-        color: var(--color-accent-2-800);
-      "
-    >
-      <span aria-hidden="true">✦</span>
-      <span>Đến từ chẩn đoán AI — dịch vụ gợi ý đã được chọn sẵn.</span>
-    </div>
+    <!-- SC-12a: chon xe tu ho so -->
+    <section v-if="auth.isCustomer && (myVehicles ?? []).length" class="flex flex-col gap-2.5">
+      <h5>Chọn xe của bạn</h5>
+      <label
+        v-for="item in myVehicles ?? []"
+        :key="item.id"
+        class="radio gap-[11px] px-3.5 py-3"
+        style="border-radius: 20px"
+        :style="
+          booking.vehicle.vehicleId === item.id
+            ? 'background: var(--color-accent-200)'
+            : 'background: var(--color-surface)'
+        "
+      >
+        <input
+          type="radio"
+          name="bookbike"
+          :checked="booking.vehicle.vehicleId === item.id"
+          @change="pickVehicle(item)"
+        />
+        <span class="dot" />
+        <span class="min-w-0 flex-1">
+          <span
+            class="block text-[14px]"
+            :class="booking.vehicle.vehicleId === item.id ? 'font-semibold' : ''"
+          >
+            {{ item.maker }} {{ item.model }}
+          </span>
+          <span class="text-muted block truncate text-[11.5px]">{{ vehicleLine(item) }}</span>
+        </span>
+      </label>
+      <NuxtLink
+        to="/account/vehicles/new/edit"
+        class="btn btn-secondary btn-block text-[13px]"
+        style="margin: 0; min-height: 44px"
+      >
+        + Thêm xe khác
+      </NuxtLink>
+    </section>
 
     <section>
       <h5 class="mb-2.5">Bạn cần dịch vụ nào?</h5>
       <div class="flex gap-2.5">
         <button
+          v-for="kind in KINDS"
+          :key="kind.value"
           type="button"
           class="btn btn-secondary flex-1 gap-2 text-[13.5px]"
           :style="
-            kinds.has('MAINTENANCE')
+            kinds.has(kind.value)
               ? 'border-color: var(--color-accent); color: var(--color-accent-700)'
               : ''
           "
-          :aria-pressed="kinds.has('MAINTENANCE')"
-          @click="toggleKind('MAINTENANCE')"
+          :aria-pressed="kinds.has(kind.value)"
+          @click="toggleKind(kind.value)"
         >
-          Bảo dưỡng
-        </button>
-        <button
-          type="button"
-          class="btn btn-secondary flex-1 gap-2 text-[13.5px]"
-          :style="
-            kinds.has('REPAIR')
-              ? 'border-color: var(--color-accent); color: var(--color-accent-700)'
-              : ''
-          "
-          :aria-pressed="kinds.has('REPAIR')"
-          @click="toggleKind('REPAIR')"
-        >
-          Sửa chữa
+          {{ kind.label }}
         </button>
       </div>
     </section>
 
-    <section class="flex flex-col gap-2.5">
-      <h5>Chọn hạng mục</h5>
-
-      <label
-        v-for="service in visibleServices"
-        :key="service.id"
-        class="flex cursor-pointer items-start gap-3 px-3.5 py-3"
-        style="border-radius: 20px"
-        :style="
-          booking.selectedServiceIds.includes(service.id)
-            ? 'background: var(--color-surface)'
-            : 'background: var(--color-neutral-100)'
-        "
+    <!-- Luong AI -->
+    <section v-if="aiFlow" class="flex flex-col gap-2.5">
+      <h5>Mô tả hiện tượng của xe</h5>
+      <textarea
+        v-model="booking.symptomDescription"
+        class="input"
+        style="min-height: 92px"
+        maxlength="1000"
+        placeholder="vd: xe kêu lạ khi phanh gấp, phanh trước không ăn"
+        @change="booking.persist()"
+      />
+      <div class="flex flex-wrap gap-2">
+        <AyImageUpload v-model="booking.symptomPhotoUrls" :max="5" compact />
+        <AyVoiceRecorder compact @recorded="booking.symptomDescription += ' (có ghi âm kèm theo)'" />
+      </div>
+      <p v-if="booking.symptomPhotoUrls.length" class="text-muted text-[11.5px]">
+        {{ booking.symptomPhotoUrls.length }} tệp · tối đa 5 ảnh
+      </p>
+      <button
+        type="button"
+        class="btn btn-primary btn-block gap-2.5 text-[14px]"
+        style="min-height: 48px; margin: 0; background: var(--color-accent-2-600)"
+        :disabled="analysing"
+        @click="analyse"
       >
-        <input
-          type="checkbox"
-          class="mt-0.5 h-4 w-4 flex-none"
-          style="accent-color: var(--color-accent)"
-          :checked="booking.selectedServiceIds.includes(service.id)"
-          @change="booking.toggleService(service)"
+        <svg
+          width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
         >
-        <span class="min-w-0 flex-1">
-          <span
-            class="block text-[14px]"
-            :class="booking.selectedServiceIds.includes(service.id) ? 'font-semibold' : ''"
+          <path d="M12 3v3M12 18v3M3 12h3M18 12h3" />
+          <circle cx="12" cy="12" r="4" />
+        </svg>
+        AI phân tích vấn đề
+      </button>
+    </section>
+
+    <!-- Luong danh muc -->
+    <section v-else class="flex flex-col gap-2.5">
+      <h5>
+        Ghi chú thêm
+        <span class="text-muted font-body text-[11.5px]">không bắt buộc</span>
+      </h5>
+      <textarea
+        v-model="booking.symptomDescription"
+        class="input"
+        style="min-height: 76px"
+        maxlength="1000"
+        placeholder="vd: xe đã chạy 18.400 km, muốn kiểm tra thêm lốp"
+        @change="booking.persist()"
+      />
+    </section>
+
+    <section class="flex flex-col gap-2.5">
+      <div class="flex items-baseline justify-between gap-2.5">
+        <h5>Hạng mục đã chọn</h5>
+        <NuxtLink
+          :to="aiFlow ? '/chat' : '/services?pick=1'"
+          class="btn btn-ghost px-1"
+          aria-label="Sửa hạng mục"
+          title="Sửa hạng mục"
+        >
+          <svg
+            width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
           >
-            {{ i18n(service.name) }}
-          </span>
-          <span class="block truncate text-[11.5px] text-muted">{{ subtitle(service) }}</span>
+            <path d="M18 3 21 6l-9.5 9.5H8v-3.5L18 3Z" />
+          </svg>
+        </NuxtLink>
+      </div>
+
+      <div
+        v-for="service in booking.selectedServices"
+        :key="service.id"
+        class="flex items-start gap-[11px] px-3.5 py-3"
+        style="background: var(--color-surface); border-radius: 18px"
+      >
+        <span v-if="aiFlow" class="tag tag-accent-2 mt-0.5 text-[10px]">✦ AI</span>
+        <span class="min-w-0 flex-1">
+          <span class="block text-[14px] font-semibold">{{ i18n(service.name) }}</span>
+          <span class="text-muted block text-[11.5px]">{{ service.durationMinutes }} phút</span>
         </span>
         <span class="whitespace-nowrap font-heading text-[14px]">
-          {{ service.quoteOnly ? 'báo giá' : money(service.basePrice) }}
-        </span>
-      </label>
-
-      <p v-if="visibleServices.length === 0" class="text-[13px] text-muted">
-        Không có hạng mục nào trong nhóm đã chọn.
-      </p>
-    </section>
-
-    <section class="flex flex-col gap-2.5">
-      <h5>Chọn cửa hàng</h5>
-
-      <label
-        v-for="store in data?.stores ?? []"
-        :key="store.id"
-        class="radio gap-3 px-3.5 py-3"
-        style="border-radius: 20px"
-        :style="
-          booking.storeId === store.id
-            ? 'background: var(--color-surface)'
-            : 'background: var(--color-neutral-100)'
-        "
-      >
-        <input
-          type="radio"
-          name="store"
-          :value="store.id"
-          :checked="booking.storeId === store.id"
-          @change="booking.storeId = store.id"
-        >
-        <span class="dot" />
-        <span class="min-w-0 flex-1">
-          <span
-            class="block text-[14px]"
-            :class="booking.storeId === store.id ? 'font-semibold' : ''"
-          >
-            {{ i18n(store.name) }}
-          </span>
-          <span class="block truncate text-[11.5px] text-muted">{{ i18n(store.address) }}</span>
-        </span>
-      </label>
-    </section>
-  </div>
-
-  <!-- Thanh tong tien va nut tiep theo, ghim duoi man -->
-  <div
-    class="fixed inset-x-0 bottom-0 z-30 ay-safe-bottom"
-    style="background: var(--color-bg); border-top: 1px solid var(--color-divider)"
-  >
-    <div class="sp-shell flex flex-col gap-2 px-4 py-3">
-      <div class="flex items-baseline justify-between">
-        <span class="text-[12px] text-muted">
-          Tổng giá tham khảo · tạm tính
-          <template v-if="booking.estimatedMinutes"> · {{ booking.estimatedMinutes }} phút</template>
-        </span>
-        <span class="font-heading text-[21px]">
-          {{
-            booking.hasQuoteOnly && booking.estimatedTotal === 0
-              ? 'báo giá'
-              : money(booking.estimatedTotal)
-          }}
+          {{ service.quoteOnly ? 'báo giá' : `~ ${money(service.basePrice)}` }}
         </span>
       </div>
 
-      <NuxtLink
-        to="/booking/step2"
-        class="btn btn-primary btn-cta"
-        :class="booking.step1Complete ? '' : 'pointer-events-none opacity-50'"
-        :aria-disabled="!booking.step1Complete"
-      >
-        Tiếp theo →
-      </NuxtLink>
+      <p v-if="booking.selectedServices.length === 0" class="text-muted text-[12.5px]">
+        Chưa chọn hạng mục nào.
+      </p>
 
-      <p v-if="!booking.step1Complete" class="text-[11.5px]" style="color: var(--color-danger)">
-        Hãy chọn ít nhất một hạng mục và một cửa hàng.
-      </p>
-      <p v-else-if="selectedStore" class="text-[11.5px] text-muted">
-        {{ booking.selectedServiceIds.length }} hạng mục · {{ i18n(selectedStore.name) }}
-      </p>
-    </div>
+      <NuxtLink
+        to="/services?pick=1"
+        class="btn btn-secondary btn-block text-[13px]"
+        style="margin: 0; min-height: 44px"
+      >
+        + Thêm hạng mục khác
+      </NuxtLink>
+    </section>
+
+    <p
+      class="pt-3 text-[12.5px] leading-[1.5]"
+      style="border-top: 1px solid var(--color-divider); color: var(--color-neutral-700)"
+    >
+      <template v-if="aiFlow">
+        Giá sẽ được ước tính sau khi AI phân tích và kỹ thuật viên kiểm tra thực tế.
+      </template>
+      <template v-else>Giá sẽ được ước tính sau khi kỹ thuật viên kiểm tra thực tế.</template>
+    </p>
+
+    <NuxtLink
+      to="/booking/step2"
+      class="btn btn-primary btn-block"
+      style="min-height: 48px; font-size: 15px; margin: 0"
+      :class="booking.selectedServiceIds.length ? '' : 'pointer-events-none opacity-50'"
+      :aria-disabled="booking.selectedServiceIds.length === 0"
+    >
+      Tiếp theo →
+    </NuxtLink>
+
+    <NuxtLink to="/" class="btn btn-ghost self-center text-[13px]">← Quay lại</NuxtLink>
   </div>
 </template>

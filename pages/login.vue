@@ -1,28 +1,32 @@
 <script setup lang="ts">
-import type { ApiError } from '~/types/models';
-
-/** SC-18 Dang nhap bang so dien thoai — FR-AUTH-02. */
-definePageMeta({ layout: 'auth' });
-
+/**
+ * SC-18 Dang nhap khach hang — FR-AUTH-02.
+ * Chi can so dien thoai; ma OTP nhap o SC-19. Hai the duoi cung la loi moi
+ * dang ky va tra cuu khong can tai khoan, dung nhu ban thiet ke.
+ */
 const api = useApi();
-const route = useRoute();
+const ui = useUiStore();
 
 const phone = ref('');
-const loading = ref(false);
-const error = ref<ApiError | null>(null);
+const sending = ref(false);
+const error = ref<string | null>(null);
 
 async function requestOtp(): Promise<void> {
   error.value = null;
-  loading.value = true;
+  if (!phone.value.trim()) {
+    error.value = 'Vui lòng nhập số điện thoại';
+    return;
+  }
+  sending.value = true;
   try {
     await api.post('/auth/otp/request', { phone: phone.value.trim(), purpose: 'LOGIN' });
-    const query = new URLSearchParams({ phone: phone.value.trim(), purpose: 'LOGIN' });
-    if (route.query.redirect) query.set('redirect', String(route.query.redirect));
+    const query = new URLSearchParams({ phone: phone.value.trim(), purpose: 'LOGIN' }).toString();
     await navigateTo(`/verify-otp?${query}`);
-  } catch (err) {
-    error.value = normalizeError(err);
+  } catch (caught) {
+    error.value = normalizeError(caught).message;
+    ui.error(error.value);
   } finally {
-    loading.value = false;
+    sending.value = false;
   }
 }
 
@@ -30,39 +34,66 @@ useHead({ title: 'Đăng nhập — AOYAMA Service' });
 </script>
 
 <template>
-  <div class="card flex flex-col gap-4">
-    <div>
-      <p class="card-kicker">SC-18</p>
-      <h1 class="font-heading text-[20px]">Đăng nhập</h1>
-      <p class="mt-1 text-[13.5px] text-muted">
-        Nhập số điện thoại, chúng tôi gửi mã xác thực qua SMS. Không cần nhớ mật khẩu.
+  <form class="flex flex-col gap-3.5 pb-4 pt-2" @submit.prevent="requestOtp">
+    <h3>Đăng nhập</h3>
+
+    <AyField for="phone" label="Số điện thoại" required :error="error ?? undefined">
+      <input
+        id="phone"
+        v-model="phone"
+        class="input"
+        type="tel"
+        inputmode="tel"
+        autocomplete="tel"
+        placeholder="090-1234-5678"
+      />
+    </AyField>
+
+    <button
+      type="submit"
+      class="btn btn-primary btn-block"
+      style="min-height: 48px; font-size: 15px; margin: 0"
+      :disabled="sending"
+    >
+      {{ sending ? 'Đang gửi…' : 'Gửi mã đăng nhập' }}
+    </button>
+
+    <div
+      class="flex flex-col gap-1.5 p-3"
+      style="background: var(--color-accent-2-100); border-radius: 20px"
+    >
+      <p class="text-[13px] font-semibold">Chưa có tài khoản?</p>
+      <p class="text-[12px] leading-[1.5]" style="color: var(--color-accent-2-800)">
+        Đăng ký để lưu hồ sơ xe, xem lịch sử dịch vụ và nhận nhắc bảo dưỡng.
       </p>
+      <NuxtLink
+        to="/register"
+        class="btn btn-secondary self-start text-[12.5px]"
+        style="
+          min-height: 44px;
+          border-color: var(--color-accent-2-500);
+          color: var(--color-accent-2-800);
+        "
+      >
+        Đăng ký →
+      </NuxtLink>
     </div>
 
-    <form class="flex flex-col gap-3" @submit.prevent="requestOtp">
-      <AyField label="Số điện thoại" required>
-        <template #default="{ id }">
-          <input
-            :id="id" v-model="phone" class="input" type="tel"
-            placeholder="090-1234-5678" autocomplete="tel" required
-          >
-        </template>
-      </AyField>
-
-      <AyErrorNote :error="error" />
-
-      <AyButton type="submit" block :loading="loading" :disabled="!phone.trim()">
-        Gửi mã xác thực
-      </AyButton>
-    </form>
-
-    <p class="text-center text-[13px] text-muted">
-      Chưa có tài khoản?
-      <NuxtLink to="/register" class="underline">Đăng ký</NuxtLink>
-    </p>
-    <p class="text-center text-[13px] text-muted">
-      Chỉ muốn tra cứu một lịch hẹn?
-      <NuxtLink to="/booking/lookup" class="underline">Tra cứu bằng mã</NuxtLink>
-    </p>
-  </div>
+    <div
+      class="flex flex-col gap-1.5 p-3"
+      style="background: var(--color-accent-100); border-radius: 20px"
+    >
+      <p class="text-[13px] font-semibold">Chỉ muốn xem lịch hẹn?</p>
+      <p class="text-[12px] leading-[1.5]" style="color: var(--color-neutral-700)">
+        Tra cứu bằng mã lịch hẹn và số điện thoại — không cần tài khoản.
+      </p>
+      <NuxtLink
+        to="/booking/lookup"
+        class="btn btn-secondary self-start text-[12.5px]"
+        style="min-height: 44px"
+      >
+        Tra cứu lịch hẹn →
+      </NuxtLink>
+    </div>
+  </form>
 </template>

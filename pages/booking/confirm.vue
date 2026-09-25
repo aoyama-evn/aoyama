@@ -5,7 +5,8 @@ import type { ApiError, Booking, Store } from '~/types/models';
 const api = useApi();
 const booking = useBookingStore();
 const ui = useUiStore();
-const { i18n, money, date: fmtDate } = useFormat();
+const auth = useAuthStore();
+const { i18n, money, dayLabel } = useFormat();
 
 const store = ref<Store | null>(null);
 const submitting = ref(false);
@@ -23,9 +24,13 @@ onMounted(async () => {
   }
 });
 
+/** "2026/10/08 (T5) · 09:00 – 10:00" nhu ban thiet ke. */
 const slotLabel = computed(() => {
   if (!booking.slot) return '—';
-  return `${fmtDate(booking.slot.date, 'yyyy/MM/dd (EEE)')} · ${booking.slot.startTime}`;
+  const [h, m] = booking.slot.startTime.split(':').map(Number);
+  const end = h * 60 + m + 60;
+  const endText = `${String(Math.floor(end / 60) % 24).padStart(2, '0')}:${String(end % 60).padStart(2, '0')}`;
+  return `${dayLabel(booking.slot.date)} · ${booking.slot.startTime} – ${endText}`;
 });
 
 const estimatedEnd = computed(() => {
@@ -110,6 +115,15 @@ useHead({ title: 'Đặt lịch — Xác nhận' });
       </div>
     </div>
 
+    <div
+      v-if="auth.isCustomer"
+      class="p-3 text-[12.5px] leading-[1.55]"
+      style="background: var(--color-accent-2-100); border-radius: 20px; color: var(--color-accent-2-800)"
+    >
+      Lịch hẹn sẽ được lưu vào tài khoản <strong>{{ booking.contactName }}</strong> —
+      bạn có thể theo dõi tiến độ và xem lại lịch sử bất cứ lúc nào.
+    </div>
+
     <div class="flex items-baseline justify-between px-0.5 py-1">
       <span class="text-[12px] text-muted">Tổng giá tham khảo</span>
       <span class="font-heading text-[23px]">{{ money(booking.estimatedTotal) }}</span>
@@ -127,7 +141,9 @@ useHead({ title: 'Đặt lịch — Xác nhận' });
       {{ submitting ? 'Đang gửi…' : 'Xác nhận đặt lịch' }}
     </button>
 
-    <p class="text-center text-[11px] text-muted">
+    <NuxtLink to="/" class="btn btn-ghost self-center text-[13px]">Hủy đặt lịch</NuxtLink>
+
+    <p class="text-muted text-center text-[11px]">
       Bấm xác nhận nghĩa là bạn đồng ý với
       <NuxtLink to="/terms">Điều khoản</NuxtLink> và
       <NuxtLink to="/privacy">Chính sách dữ liệu</NuxtLink>.
