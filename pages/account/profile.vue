@@ -11,6 +11,7 @@ definePageMeta({ middleware: 'auth' });
 const api = useApi();
 const ui = useUiStore();
 const auth = useAuthStore();
+const { t } = useI18n();
 const { date } = useFormat();
 
 const { data: profile } = await useAsyncData('profile', () =>
@@ -58,7 +59,7 @@ async function save(): Promise<void> {
       email: form.email.trim() || undefined,
       address: form.address.trim() || undefined,
     });
-    ui.success('Đã lưu thay đổi');
+    ui.success(t('common.saved'));
     if (profile.value) {
       profile.value = {
         ...profile.value,
@@ -84,7 +85,7 @@ async function logout(): Promise<void> {
   }
 }
 
-useHead({ title: 'Hồ sơ cá nhân' });
+useHead({ title: () => t('sc33.title') });
 </script>
 
 <template>
@@ -98,16 +99,18 @@ useHead({ title: 'Hồ sơ cá nhân' });
         {{ initial }}
       </span>
       <div class="leading-[1.3]">
-        <p class="font-heading text-[17px]">{{ form.name || 'Tài khoản' }}</p>
-        <p v-if="memberSince" class="text-muted text-[11.5px]">Thành viên từ {{ memberSince }}</p>
+        <p class="font-heading text-[17px]">{{ form.name || $t('sc33.account') }}</p>
+        <p v-if="memberSince" class="text-muted text-[11.5px]">
+          {{ $t('sc33.memberSince', { year: memberSince }) }}
+        </p>
       </div>
     </div>
 
-    <AyField for="name" label="Họ tên" required>
+    <AyField for="name" :label="$t('sc14.fullName')" required>
       <input id="name" v-model="form.name" class="input" autocomplete="name" />
     </AyField>
 
-    <AyField for="phone" label="Số điện thoại" hint="định danh tài khoản">
+    <AyField for="phone" :label="$t('sc14.phone')" :hint="$t('sc33.phoneHint')">
       <input
         id="phone"
         class="input"
@@ -117,15 +120,15 @@ useHead({ title: 'Hồ sơ cá nhân' });
       />
     </AyField>
 
-    <AyField for="kana" label="Tên kana (tùy chọn)">
+    <AyField for="kana" :label="$t('sc33.kana')">
       <input id="kana" v-model="form.nameKana" class="input" />
     </AyField>
 
-    <AyField for="email" label="Email (tùy chọn)">
+    <AyField for="email" :label="$t('sc33.email')">
       <input id="email" v-model="form.email" class="input" type="email" autocomplete="email" />
     </AyField>
 
-    <AyField for="address" label="Địa chỉ (tùy chọn)">
+    <AyField for="address" :label="$t('sc33.address')">
       <input id="address" v-model="form.address" class="input" placeholder="—" />
     </AyField>
 
@@ -139,7 +142,7 @@ useHead({ title: 'Hồ sơ cá nhân' });
       :disabled="saving"
       @click="save"
     >
-      {{ saving ? 'Đang lưu…' : 'Lưu thay đổi' }}
+      {{ saving ? $t('common.saving') : $t('common.saveChanges') }}
     </button>
 
     <div class="mt-0.5 pt-3.5" style="border-top: 1px solid var(--color-divider)">
@@ -156,15 +159,15 @@ useHead({ title: 'Hồ sơ cá nhân' });
           <path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9" />
           <path d="M14 8l4 4-4 4M18 12H8" />
         </svg>
-        Đăng xuất
+        {{ $t('sc33.logout') }}
       </button>
     </div>
 
     <AyConfirmDialog
       :open="logoutOpen"
-      title="Đăng xuất khỏi tài khoản?"
-      confirm-label="Đăng xuất"
-      cancel-label="Đóng"
+      :title="$t('sc33.logoutAsk')"
+      :confirm-label="$t('sc33.logout')"
+      :cancel-label="$t('common.close')"
       @confirm="logout"
       @cancel="logoutOpen = false"
     />

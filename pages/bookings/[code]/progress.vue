@@ -10,6 +10,7 @@ import type { PublicProgress } from '~/types/models';
 const route = useRoute();
 const api = useApi();
 const auth = useAuthStore();
+const { t } = useI18n();
 const { dateTime, money, number } = useFormat();
 
 const code = route.params.code as string;
@@ -42,13 +43,13 @@ onBeforeUnmount(() => {
 
 /** Bay moc cua ban thiet ke, theo dung thu tu. */
 const FLOW = [
-  { key: 'PENDING', label: 'Chờ xác nhận', kind: 'booking' as const },
-  { key: 'CONFIRMED', label: 'Đã xác nhận', kind: 'booking' as const },
-  { key: 'RECEIVED', label: 'Đã tiếp nhận', kind: 'work' as const },
-  { key: 'QUOTED', label: 'Đang báo giá', kind: 'work' as const },
-  { key: 'IN_PROGRESS', label: 'Đang tiến hành', kind: 'work' as const },
-  { key: 'COMPLETED', label: 'Đã xong', kind: 'work' as const },
-  { key: 'DELIVERED', label: 'Đã bàn giao', kind: 'work' as const },
+  { key: 'PENDING', kind: 'booking' as const },
+  { key: 'CONFIRMED', kind: 'booking' as const },
+  { key: 'RECEIVED', kind: 'work' as const },
+  { key: 'QUOTED', kind: 'work' as const },
+  { key: 'IN_PROGRESS', kind: 'work' as const },
+  { key: 'COMPLETED', kind: 'work' as const },
+  { key: 'DELIVERED', kind: 'work' as const },
 ];
 
 const cancelled = computed(
@@ -75,7 +76,7 @@ const steps = computed<ProgressStep[]>(() => {
     const stamp = stamps.get(step.key);
     return {
       key: step.key,
-      label: step.label,
+      label: t(`flow.${step.key}`),
       at: stamp ? dateTime(stamp.at) : null,
       note: stamp?.note ?? null,
       state: index < currentIndex ? 'done' : index === currentIndex ? 'current' : 'todo',
@@ -86,35 +87,35 @@ const steps = computed<ProgressStep[]>(() => {
 const fuelLabel = computed(() => {
   const level = progress.value?.intakeFuelLevel;
   if (level === null || level === undefined) return null;
-  return `nhiên liệu ${level}/4`;
+  return t('sc26.fuel', { n: level });
 });
 
-useHead({ title: `Tiến độ ${code}` });
+useHead({ title: () => t('sc26.headTitle', { code }) });
 </script>
 
 <template>
   <div v-if="progress" class="flex flex-col gap-4 pb-4 pt-1">
     <div>
-      <h4 class="mb-1.5">Theo dõi tiến độ</h4>
-      <p class="text-muted text-[11px]">Mã lịch hẹn</p>
+      <h4 class="mb-1.5">{{ $t('sc26.title') }}</h4>
+      <p class="text-muted text-[11px]">{{ $t('sc16.codeLabel') }}</p>
       <p class="font-heading text-[19px]">{{ progress.bookingCode }}</p>
     </div>
 
     <div v-if="progress.vehicle" class="card gap-1.5" style="background: var(--color-neutral-100)">
-      <div class="card-kicker">Xe của bạn</div>
+      <div class="card-kicker">{{ $t('sc26.yourVehicle') }}</div>
       <p class="text-[13px]">
         {{ progress.vehicle.maker }} {{ progress.vehicle.model }} ·
         {{ progress.vehicle.plateNumber }}
       </p>
       <p v-if="progress.intakeOdometer" class="text-muted text-[11.5px]">
-        Tiếp nhận {{ number(progress.intakeOdometer) }} km
+        {{ $t('sc26.intake', { km: number(progress.intakeOdometer) }) }}
         <template v-if="fuelLabel"> · {{ fuelLabel }}</template>
       </p>
     </div>
 
     <div v-if="cancelled" class="card flex-row items-center gap-2">
       <AyStatusTag status="CANCELLED" />
-      <p class="text-muted text-[13.5px]">Lịch hẹn này đã bị hủy.</p>
+      <p class="text-muted text-[13.5px]">{{ $t('sc26.cancelled') }}</p>
     </div>
 
     <AyProgressSteps v-else :steps="steps">
@@ -135,13 +136,13 @@ useHead({ title: `Tiến độ ${code}` });
             <rect x="3" y="14" width="7" height="7" rx="2" />
             <path d="M14 14h3v3M21 21h.01M17 21h.01M21 17h.01" />
           </svg>
-          Xem mã QR
+          {{ $t('sc26.showQr') }}
         </button>
       </template>
 
       <template #after-QUOTED>
         <span v-if="progress.totalAmount" class="text-muted text-[11.5px]">
-          {{ money(progress.totalAmount) }} — chờ bạn phản hồi
+          {{ $t('sc26.awaitingYou', { amount: money(progress.totalAmount) }) }}
         </span>
         <NuxtLink
           v-if="progress.status === 'QUOTED'"
@@ -149,7 +150,7 @@ useHead({ title: `Tiến độ ${code}` });
           class="btn btn-primary mt-2 text-[12px]"
           style="min-height: 34px"
         >
-          Xem báo giá →
+          {{ $t('sc26.viewQuote') }}
         </NuxtLink>
       </template>
     </AyProgressSteps>
@@ -159,20 +160,20 @@ useHead({ title: `Tiến độ ${code}` });
       class="card gap-1.5"
       style="background: var(--color-neutral-100)"
     >
-      <div class="card-kicker">Cập nhật từ xưởng</div>
+      <div class="card-kicker">{{ $t('sc26.shopUpdate') }}</div>
       <p class="text-[13px]">{{ progress.progressNote }}</p>
       <p v-if="progress.estimatedCompletionAt" class="text-muted text-[11.5px]">
-        Dự kiến xong {{ dateTime(progress.estimatedCompletionAt) }}
+        {{ $t('sc26.eta', { at: dateTime(progress.estimatedCompletionAt) }) }}
       </p>
     </div>
 
     <section v-if="(progress.photos ?? []).length">
-      <h5 class="mb-2">Hình ảnh từ xưởng</h5>
+      <h5 class="mb-2">{{ $t('sc26.photos') }}</h5>
       <ul class="grid grid-cols-3 gap-2">
         <li v-for="(photo, index) in progress.photos" :key="index">
           <img
             :src="photo.url"
-            :alt="photo.caption ?? 'Ảnh tiến độ'"
+            :alt="photo.caption ?? $t('sc26.photoAlt')"
             class="aspect-square w-full object-cover"
             style="border-radius: 14px"
           />
@@ -184,18 +185,18 @@ useHead({ title: `Tiến độ ${code}` });
       :to="auth.isCustomer ? '/account/bookings' : '/'"
       class="btn btn-ghost self-center text-[13px]"
     >
-      {{ auth.isCustomer ? '← Lịch hẹn của tôi' : 'Trở về trang chủ' }}
+      {{ auth.isCustomer ? $t('sc21.backToList') : $t('common.backHome') }}
     </NuxtLink>
 
     <p class="text-muted text-center text-[11px]">
-      Trang tự cập nhật mỗi phút. Có thắc mắc, hãy gọi trực tiếp cửa hàng.
+      {{ $t('sc26.autoRefresh') }}
     </p>
 
     <!-- Lop phu ma QR -->
     <AyConfirmDialog
       :open="qrOpen && Boolean(qr?.dataUrl)"
-      title="Mã QR lịch hẹn"
-      confirm-label="Đóng"
+      :title="$t('sc26.qrTitle')"
+      :confirm-label="$t('common.close')"
       hide-cancel
       @confirm="qrOpen = false"
       @cancel="qrOpen = false"
@@ -203,13 +204,13 @@ useHead({ title: `Tiến độ ${code}` });
       <div class="flex flex-col items-center gap-2.5">
         <img
           :src="qr?.dataUrl"
-          :alt="`Mã QR ${progress.bookingCode}`"
+          :alt="$t('sc26.qrAlt', { code: progress.bookingCode })"
           class="bg-white"
           style="width: 190px; height: 190px; border-radius: 16px"
         />
         <p class="font-heading text-[16px]">{{ progress.bookingCode }}</p>
         <p class="text-muted text-center text-[11.5px]">
-          Đưa mã này cho lễ tân khi đến cửa hàng.
+          {{ $t('sc26.qrHint') }}
         </p>
       </div>
     </AyConfirmDialog>

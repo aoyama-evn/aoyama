@@ -11,6 +11,7 @@ import { VehicleFuelType } from '~/types/enums';
 definePageMeta({ middleware: 'auth' });
 
 const route = useRoute();
+const { t } = useI18n();
 const api = useApi();
 const ui = useUiStore();
 const booking = useBookingStore();
@@ -59,9 +60,9 @@ if (!isNew) {
 
 function validate(): boolean {
   Object.keys(errors).forEach((key) => delete errors[key]);
-  if (!form.value.plateNumber.trim()) errors.plateNumber = 'Vui lòng nhập biển số';
-  if (!form.value.maker.trim()) errors.maker = 'Vui lòng chọn hãng xe';
-  if (!form.value.model.trim()) errors.model = 'Vui lòng nhập dòng xe';
+  if (!form.value.plateNumber.trim()) errors.plateNumber = t('validate.plate');
+  if (!form.value.maker.trim()) errors.maker = t('sc30.makerRequired');
+  if (!form.value.model.trim()) errors.model = t('validate.model');
   return Object.keys(errors).length === 0;
 }
 
@@ -73,7 +74,7 @@ async function save(): Promise<void> {
     const saved = isNew
       ? await api.post<Vehicle>('/account/vehicles', form.value)
       : await api.put<Vehicle>(`/account/vehicles/${id}`, form.value);
-    ui.success(isNew ? 'Đã thêm xe' : 'Đã lưu thay đổi');
+    ui.success(isNew ? t('sc30.added') : t('common.saved'));
 
     if (fromBooking) {
       booking.restore();
@@ -89,12 +90,12 @@ async function save(): Promise<void> {
   }
 }
 
-useHead({ title: isNew ? 'Thêm xe' : 'Sửa thông tin xe' });
+useHead({ title: () => (isNew ? t('sc30.addTitle') : t('sc30.headEdit')) });
 </script>
 
 <template>
   <form class="flex flex-col gap-3 pb-4 pt-1" @submit.prevent="save">
-    <h4>{{ isNew ? 'Thêm xe' : 'Thêm / sửa xe' }}</h4>
+    <h4>{{ isNew ? $t('sc30.addTitle') : $t('sc30.editTitle') }}</h4>
 
     <AyVehicleForm v-model="form" :errors="errors" />
 
@@ -106,14 +107,14 @@ useHead({ title: isNew ? 'Thêm xe' : 'Sửa thông tin xe' });
       style="min-height: 48px; font-size: 15px; margin: 0"
       :disabled="saving"
     >
-      {{ saving ? 'Đang lưu…' : fromBooking ? 'Lưu và đặt lịch' : 'Lưu xe' }}
+      {{ saving ? $t('common.saving') : fromBooking ? $t('sc30.saveAndBook') : $t('sc30.save') }}
     </button>
 
     <NuxtLink
       :to="fromBooking ? '/booking/confirm' : '/account/vehicles'"
       class="btn btn-ghost self-center text-[13px]"
     >
-      {{ fromBooking ? 'Hủy' : '← Quay lại' }}
+      {{ fromBooking ? $t('common.cancel') : $t('common.back') }}
     </NuxtLink>
   </form>
 </template>

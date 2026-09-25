@@ -11,34 +11,7 @@ const props = defineProps<{
 
 type Tone = 'neutral' | 'info' | 'success' | 'warning' | 'danger' | 'accent';
 
-const LABELS: Record<string, string> = {
-  // Lich hen — RD muc 5.1
-  PENDING: 'Chờ xác nhận',
-  CONFIRMED: 'Đã xác nhận',
-  RECEIVED: 'Đã tiếp nhận',
-  DONE: 'Hoàn tất',
-  CANCELLED: 'Đã hủy',
-  NO_SHOW: 'Khách không đến',
-  // Phiếu dịch vụ — RD muc 5.2
-  DIAGNOSING: 'Đang chẩn đoán',
-  QUOTED: 'Chờ duyệt báo giá',
-  IN_PROGRESS: 'Đang thực hiện',
-  COMPLETED: 'Hoàn tất',
-  DELIVERED: 'Đã bàn giao',
-  // Bao gia — RD muc 5.3
-  DRAFT: 'Nháp',
-  SENT: 'Đã gửi',
-  ACCEPTED: 'Đã đồng ý',
-  REJECTED: 'Đã từ chối',
-  SUPERSEDED: 'Đã thay thế',
-  // Thanh toan
-  UNPAID: 'Chưa thanh toán',
-  PARTIAL: 'Thanh toán một phần',
-  PAID: 'Đã thanh toán',
-  // Thong bao
-  QUEUED: 'Chờ gửi',
-  FAILED: 'Gửi lỗi',
-};
+const { t, te } = useI18n();
 
 const TONES: Record<string, Tone> = {
   PENDING: 'warning',
@@ -73,7 +46,10 @@ const TONE_CLASS: Record<Tone, string> = {
   accent: 'tag-accent',
 };
 
-const label = computed(() => LABELS[props.status] ?? props.status);
+/** Chu hien ra lay tu tep ngon ngu; trang thai la khoa dung chung ba thu tieng. */
+const label = computed(() =>
+  te(`status.${props.status}`) ? t(`status.${props.status}`) : props.status,
+);
 const toneClass = computed(() => TONE_CLASS[TONES[props.status] ?? 'neutral']);
 </script>
 

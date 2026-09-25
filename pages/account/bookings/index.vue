@@ -8,6 +8,7 @@ import type { Booking, Page } from '~/types/models';
  */
 definePageMeta({ middleware: 'auth' });
 
+const { t } = useI18n();
 const api = useApi();
 
 const page = ref(1);
@@ -18,21 +19,21 @@ const { data, pending } = await useAsyncData(
   { watch: [page] },
 );
 
-useHead({ title: 'Lịch hẹn của tôi' });
+useHead({ title: () => t('sc21.title') });
 </script>
 
 <template>
   <div class="flex flex-col gap-3 pb-4 pt-1">
-    <h4>Lịch hẹn của tôi</h4>
+    <h4>{{ $t('sc21.title') }}</h4>
 
     <AyLoading v-if="pending" />
 
     <AyEmptyState
       v-else-if="(data?.items ?? []).length === 0"
-      title="Bạn chưa có lịch hẹn nào"
-      hint="Đặt lịch trực tuyến chỉ mất khoảng một phút."
+      :title="$t('sc21.emptyTitle')"
+      :hint="$t('sc21.emptyHint')"
     >
-      <NuxtLink to="/booking/step1" class="btn btn-primary text-[12.5px]">Đặt lịch ngay</NuxtLink>
+      <NuxtLink to="/booking/step1" class="btn btn-primary text-[12.5px]">{{ $t('sc21.bookNow') }}</NuxtLink>
     </AyEmptyState>
 
     <AyBookingCard
@@ -48,7 +49,7 @@ useHead({ title: 'Lịch hẹn của tôi' });
         :disabled="!data.meta.hasPrev"
         @click="page -= 1"
       >
-        Trước
+        {{ $t('common.prev') }}
       </button>
       <span class="text-muted self-center text-[13px]">
         {{ data.meta.page }} / {{ data.meta.totalPages }}
@@ -59,10 +60,10 @@ useHead({ title: 'Lịch hẹn của tôi' });
         :disabled="!data.meta.hasNext"
         @click="page += 1"
       >
-        Sau
+        {{ $t('common.nextPage') }}
       </button>
     </div>
 
-    <NuxtLink to="/" class="btn btn-ghost self-center text-[13px]">Trở về trang chủ</NuxtLink>
+    <NuxtLink to="/" class="btn btn-ghost self-center text-[13px]">{{ $t('common.backHome') }}</NuxtLink>
   </div>
 </template>

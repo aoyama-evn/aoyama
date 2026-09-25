@@ -11,6 +11,7 @@ definePageMeta({ middleware: 'auth' });
 const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { i18n, money } = useFormat();
 
 const code = route.params.code as string;
@@ -81,14 +82,14 @@ async function submit(): Promise<void> {
 
   reasonError.value = null;
   if (!reason.value.trim()) {
-    reasonError.value = 'Vui lòng cho biết lý do thay đổi';
+    reasonError.value = t('sc23.reasonRequired');
     return;
   }
   if (selectedIds.value.length === 0) {
     error.value = {
       statusCode: 400,
       code: 'NO_SERVICE',
-      message: 'Hãy giữ lại ít nhất một hạng mục dịch vụ',
+      message: t('sc23.needService'),
     };
     return;
   }
@@ -105,7 +106,7 @@ async function submit(): Promise<void> {
       symptomDescription: note.value,
       reason: reason.value.trim(),
     });
-    ui.success('Đã lưu thay đổi', 'Chúng tôi đã gửi thông báo xác nhận cho bạn.');
+    ui.success(t('common.saved'), t('sc23.savedSub'));
     await navigateTo('/account/bookings');
   } catch (caught) {
     error.value = normalizeError(caught);
@@ -114,21 +115,21 @@ async function submit(): Promise<void> {
   }
 }
 
-useHead({ title: `Cập nhật lịch hẹn ${code}` });
+useHead({ title: () => t('sc23.title', { code }) });
 </script>
 
 <template>
   <div v-if="booking" class="flex flex-col gap-3.5 pb-4 pt-1">
     <div class="flex flex-wrap items-center justify-between gap-2.5">
       <div>
-        <p class="text-muted text-[11px]">Đang cập nhật</p>
+        <p class="text-muted text-[11px]">{{ $t('sc23.updating') }}</p>
         <p class="font-heading text-[18px]">{{ booking.code }}</p>
       </div>
       <AyStatusTag :status="booking.status" />
     </div>
 
     <section class="flex flex-col gap-2.5">
-      <h5>Hạng mục dịch vụ</h5>
+      <h5>{{ $t('sc23.services') }}</h5>
       <label
         v-for="service in data?.services ?? []"
         :key="service.id"
@@ -151,15 +152,17 @@ useHead({ title: `Cập nhật lịch hẹn ${code}` });
           <span class="block text-[14px]" :class="selectedIds.includes(service.id) ? 'font-semibold' : ''">
             {{ i18n(service.name) }}
           </span>
-          <span class="text-muted block text-[11.5px]">{{ service.durationMinutes }} mins</span>
+          <span class="text-muted block text-[11.5px]">
+            {{ $t('common.minutes', { n: service.durationMinutes }) }}
+          </span>
         </span>
         <span class="whitespace-nowrap font-heading text-[14px]">
-          {{ service.quoteOnly ? 'báo giá' : money(service.basePrice) }}
+          {{ service.quoteOnly ? $t('common.quoteOnly') : money(service.basePrice) }}
         </span>
       </label>
     </section>
 
-    <AyField for="store" label="Cửa hàng">
+    <AyField for="store" :label="$t('sc23.store')">
       <select id="store" v-model="storeId" class="input">
         <option v-for="store in data?.stores ?? []" :key="store.id" :value="store.id">
           {{ i18n(store.name) }}
@@ -168,24 +171,24 @@ useHead({ title: `Cập nhật lịch hẹn ${code}` });
     </AyField>
 
     <section class="flex flex-col gap-2.5">
-      <h5>Ngày &amp; khung giờ</h5>
+      <h5>{{ $t('sc23.dateSlot') }}</h5>
       <AySlotPicker v-model="slot" :days="days" :loading="loading" />
     </section>
 
-    <AyField for="odo" label="Số km hiện tại">
+    <AyField for="odo" :label="$t('sc14.odometer')">
       <input id="odo" v-model.number="odometer" class="input" type="number" inputmode="numeric" min="0" />
     </AyField>
 
-    <AyField for="note" label="Ghi chú thêm cho cửa hàng">
+    <AyField for="note" :label="$t('sc23.noteLabel')">
       <textarea id="note" v-model="note" class="input" style="min-height: 74px" maxlength="1000" />
     </AyField>
 
-    <AyField for="reason" label="Lý do thay đổi" required :error="reasonError ?? undefined">
+    <AyField for="reason" :label="$t('sc23.reasonLabel')" required :error="reasonError ?? undefined">
       <input
         id="reason"
         v-model="reason"
         class="input"
-        placeholder="vd: bận công việc, muốn đổi sang buổi chiều"
+        :placeholder="$t('sc23.reasonPlaceholder')"
       />
     </AyField>
 
@@ -197,7 +200,7 @@ useHead({ title: `Cập nhật lịch hẹn ${code}` });
         class="btn btn-secondary flex-1 text-[14px]"
         style="min-height: 48px; margin: 0"
       >
-        Hủy bỏ
+        {{ $t('common.discard') }}
       </NuxtLink>
       <button
         type="button"
@@ -206,7 +209,7 @@ useHead({ title: `Cập nhật lịch hẹn ${code}` });
         :disabled="submitting"
         @click="submit"
       >
-        {{ submitting ? 'Đang lưu…' : 'Lưu thay đổi' }}
+        {{ submitting ? $t('common.saving') : $t('common.saveChanges') }}
       </button>
     </div>
   </div>

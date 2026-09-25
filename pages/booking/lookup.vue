@@ -6,6 +6,7 @@ import type { ApiError, Booking } from '~/types/models';
  * Ban thiet ke dat o tai anh ma QR len truoc, roi moi den o nhap ma. Anh QR
  * duoc giai ma ngay tren may de khong phai gui anh len may chu.
  */
+const { t } = useI18n();
 const api = useApi();
 const route = useRoute();
 const ui = useUiStore();
@@ -43,7 +44,7 @@ async function decodeQrImage(event: Event): Promise<void> {
   const Detector = (window as unknown as { BarcodeDetector?: new (o: object) => object })
     .BarcodeDetector;
   if (!Detector) {
-    ui.warning('Trình duyệt không đọc được ảnh QR', 'Bạn hãy nhập mã lịch hẹn bên dưới.');
+    ui.warning(t('sc20.qrNoReader'), t('sc20.qrTypeIn'));
     return;
   }
 
@@ -56,29 +57,29 @@ async function decodeQrImage(event: Event): Promise<void> {
     const found = await detector.detect(bitmap);
     const raw = found[0]?.rawValue;
     if (!raw) {
-      ui.warning('Không tìm thấy mã QR trong ảnh', 'Bạn hãy thử ảnh rõ hơn hoặc nhập mã bằng tay.');
+      ui.warning(t('sc20.qrNotFound'), t('sc20.qrRetry'));
       return;
     }
     // Ma QR chua duong dan hoac chinh ma lich hen.
     const matched = raw.match(/B-\d{8}-\d{4}/i);
     code.value = (matched?.[0] ?? raw).toUpperCase();
-    ui.success('Đã đọc mã từ ảnh', 'Nhập số điện thoại để tra cứu.');
+    ui.success(t('sc20.qrOk'), t('sc20.qrOkSub'));
   } catch {
-    ui.warning('Không đọc được ảnh', 'Bạn hãy nhập mã lịch hẹn bên dưới.');
+    ui.warning(t('sc20.qrUnreadable'), t('sc20.qrTypeIn'));
   } finally {
     decoding.value = false;
   }
 }
 
-useHead({ title: 'Tra cứu lịch hẹn' });
+useHead({ title: () => t('sc20.title') });
 </script>
 
 <template>
   <form class="flex flex-col gap-3.5 pb-4 pt-2" @submit.prevent="lookup">
     <div>
-      <h3 class="mb-1.5">Tra cứu lịch hẹn</h3>
+      <h3 class="mb-1.5">{{ $t('sc20.title') }}</h3>
       <p class="text-muted text-[12.5px]">
-        Dành cho khách chưa đăng nhập — xem, đổi hoặc hủy lịch hẹn của bạn.
+        {{ $t('sc20.lead') }}
       </p>
     </div>
 
@@ -99,23 +100,23 @@ useHead({ title: 'Tra cứu lịch hẹn' });
         <rect x="3" y="14" width="7" height="7" rx="2" />
         <path d="M14 14h3v3M21 21h.01M17 21h.01M21 17h.01" />
       </svg>
-      <p class="text-[13.5px] font-semibold">Tải ảnh mã QR lên</p>
+      <p class="text-[13.5px] font-semibold">{{ $t('sc20.qrTitle') }}</p>
       <p class="text-muted text-center text-[11.5px] leading-[1.5]">
-        Chọn ảnh QR đã lưu — hệ thống tự tìm lịch hẹn<br />Upload your saved QR image
+        {{ $t('sc20.qrLead') }}
       </p>
       <label class="btn btn-primary cursor-pointer text-[13px]" style="min-height: 44px">
-        {{ decoding ? 'Đang đọc ảnh…' : 'Chọn ảnh QR' }}
+        {{ decoding ? $t('sc20.qrReading') : $t('sc20.qrPick') }}
         <input type="file" class="sr-only" accept="image/*" @change="decodeQrImage" />
       </label>
     </div>
 
     <div class="flex items-center gap-2.5">
       <span class="h-px flex-1" style="background: var(--color-divider)" />
-      <span class="text-muted text-[11.5px]">hoặc nhập mã</span>
+      <span class="text-muted text-[11.5px]">{{ $t('sc20.orCode') }}</span>
       <span class="h-px flex-1" style="background: var(--color-divider)" />
     </div>
 
-    <AyField for="code" label="Mã lịch hẹn" required>
+    <AyField for="code" :label="$t('sc20.codeLabel')" required>
       <input
         id="code"
         v-model="code"
@@ -125,7 +126,7 @@ useHead({ title: 'Tra cứu lịch hẹn' });
       />
     </AyField>
 
-    <AyField for="phone" label="Số điện thoại đã dùng khi đặt" required>
+    <AyField for="phone" :label="$t('sc20.phoneLabel')" required>
       <input
         id="phone"
         v-model="phone"
@@ -145,9 +146,9 @@ useHead({ title: 'Tra cứu lịch hẹn' });
       style="min-height: 48px; font-size: 15px; margin: 0"
       :disabled="loading || !code.trim() || !phone.trim()"
     >
-      {{ loading ? 'Đang tra cứu…' : 'Tra cứu' }}
+      {{ loading ? $t('sc20.looking') : $t('sc20.submit') }}
     </button>
 
-    <NuxtLink to="/" class="btn btn-ghost self-center text-[13px]">Trở về trang chủ</NuxtLink>
+    <NuxtLink to="/" class="btn btn-ghost self-center text-[13px]">{{ $t('common.backHome') }}</NuxtLink>
   </form>
 </template>

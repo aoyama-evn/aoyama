@@ -15,6 +15,7 @@ const api = useApi();
 const auth = useAuthStore();
 const booking = useBookingStore();
 const ui = useUiStore();
+const { t } = useI18n();
 const { number } = useFormat();
 
 type Mode = 'login' | 'guest' | 'member' | 'register';
@@ -57,14 +58,14 @@ const showVehicleForm = computed(() => mode.value === 'guest' || mode.value === 
 
 async function requestOtp(): Promise<void> {
   if (!booking.contactPhone.trim()) {
-    errors.contactPhone = 'Vui lòng nhập số điện thoại';
+    errors.contactPhone = t('validate.phone');
     return;
   }
   otpBusy.value = true;
   try {
     await api.post('/auth/otp/request', { phone: booking.contactPhone.trim(), purpose: 'LOGIN' });
     otpSent.value = true;
-    ui.success('Đã gửi mã xác thực', 'Mã có hiệu lực 5 phút.');
+    ui.success(t('common.otpSent'), t('common.otpValidNote'));
   } catch (error) {
     ui.error(normalizeError(error).message);
   } finally {
@@ -85,7 +86,7 @@ async function verifyOtp(): Promise<void> {
     myVehicles.value = await api.get<Vehicle[]>('/account/vehicles').catch(() => []);
     booking.contactName = auth.user?.name ?? booking.contactName;
     booking.persist();
-    ui.success('Xác thực thành công');
+    ui.success(t('common.verified'));
   } catch (error) {
     ui.error(normalizeError(error).message);
   } finally {
@@ -100,26 +101,26 @@ function pickVehicle(vehicle: Vehicle): void {
 function vehicleLine(item: Vehicle): string {
   const parts = [item.plateNumber];
   if (item.currentOdometer !== null) parts.push(`${number(item.currentOdometer)} km`);
-  if (item.modelYear) parts.push(`đời ${item.modelYear}`);
+  if (item.modelYear) parts.push(t('common.modelYear', { year: item.modelYear }));
   return parts.filter(Boolean).join(' · ');
 }
 
 function validateAndContinue(): void {
   Object.keys(errors).forEach((key) => delete errors[key]);
 
-  if (!booking.contactName.trim()) errors.contactName = 'Vui lòng nhập họ tên';
-  if (!booking.contactPhone.trim()) errors.contactPhone = 'Vui lòng nhập số điện thoại';
+  if (!booking.contactName.trim()) errors.contactName = t('validate.name');
+  if (!booking.contactPhone.trim()) errors.contactPhone = t('validate.phone');
   else if (!/^[0-9+\-\s()]{8,20}$/.test(booking.contactPhone.trim())) {
-    errors.contactPhone = 'Số điện thoại không hợp lệ';
+    errors.contactPhone = t('validate.phoneBad');
   }
   if (booking.contactEmail.trim() && !/^\S+@\S+\.\S+$/.test(booking.contactEmail.trim())) {
-    errors.contactEmail = 'Email không hợp lệ';
+    errors.contactEmail = t('validate.emailBad');
   }
 
   if (showVehicleForm.value) {
-    if (!booking.vehicle.maker.trim()) errors.maker = 'Vui lòng nhập hãng xe';
-    if (!booking.vehicle.model.trim()) errors.model = 'Vui lòng nhập dòng xe';
-    if (!booking.vehicle.plateNumber.trim()) errors.plateNumber = 'Vui lòng nhập biển số';
+    if (!booking.vehicle.maker.trim()) errors.maker = t('validate.maker');
+    if (!booking.vehicle.model.trim()) errors.model = t('validate.model');
+    if (!booking.vehicle.plateNumber.trim()) errors.plateNumber = t('validate.plate');
   }
 
   if (Object.keys(errors).length > 0) return;
@@ -127,7 +128,7 @@ function validateAndContinue(): void {
   void navigateTo('/booking/confirm');
 }
 
-useHead({ title: 'Đặt lịch — Bước 3' });
+useHead({ title: () => `${t('sc01.bookCta')} — 3` });
 </script>
 
 <template>
@@ -136,10 +137,10 @@ useHead({ title: 'Đặt lịch — Bước 3' });
 
     <!-- SC-14a Dang nhap -->
     <div v-if="mode === 'login'" class="flex flex-col gap-3">
-      <h4 class="mb-1">Đăng nhập để tiếp tục</h4>
+      <h4 class="mb-1">{{ $t('sc14.loginTitle') }}</h4>
 
       <div class="field">
-        <label for="phone">Số điện thoại *</label>
+        <label for="phone">{{ $t('sc14.phone') }} *</label>
         <div class="mt-[5px] flex gap-2">
           <input
             id="phone"
@@ -157,14 +158,14 @@ useHead({ title: 'Đặt lịch — Bước 3' });
             :disabled="otpBusy"
             @click="requestOtp"
           >
-            Gửi mã
+            {{ $t('sc14.sendCode') }}
           </button>
         </div>
         <p v-if="errors.contactPhone" class="field-error mt-1">{{ errors.contactPhone }}</p>
       </div>
 
       <div class="field">
-        <label for="otp">Mã xác thực (OTP) *</label>
+        <label for="otp">{{ $t('sc14.otp') }} *</label>
         <input
           id="otp"
           v-model="otpCode"
@@ -178,9 +179,9 @@ useHead({ title: 'Đặt lịch — Bước 3' });
       </div>
 
       <div class="flex flex-wrap items-center justify-between gap-2.5">
-        <span class="text-muted text-[12px]">Mã có hiệu lực 5 phút</span>
+        <span class="text-muted text-[12px]">{{ $t('sc14.otpValid') }}</span>
         <button type="button" class="btn btn-ghost px-1 text-[12.5px]" @click="requestOtp">
-          Gửi lại mã
+          {{ $t('sc14.resend') }}
         </button>
       </div>
 
@@ -191,12 +192,12 @@ useHead({ title: 'Đặt lịch — Bước 3' });
         :disabled="otpBusy || otpCode.trim().length < 4"
         @click="verifyOtp"
       >
-        Xác thực &amp; đăng nhập
+        {{ $t('sc14.verifyLogin') }}
       </button>
 
       <div class="flex items-center gap-2.5 text-[11px]" style="color: var(--color-neutral-500)">
         <span class="h-px flex-1" style="background: var(--color-divider)" />
-        hoặc
+        {{ $t('sc14.or') }}
         <span class="h-px flex-1" style="background: var(--color-divider)" />
       </div>
 
@@ -204,9 +205,9 @@ useHead({ title: 'Đặt lịch — Bước 3' });
         class="flex flex-col gap-1.5 p-3"
         style="background: var(--color-accent-2-100); border-radius: 20px"
       >
-        <p class="text-[13px] font-semibold">Chưa có tài khoản?</p>
+        <p class="text-[13px] font-semibold">{{ $t('sc14.noAccount') }}</p>
         <p class="text-[12px] leading-[1.5]" style="color: var(--color-accent-2-800)">
-          Đăng ký thành viên để lưu hồ sơ xe, xem lịch sử sửa chữa và nhận nhắc bảo dưỡng.
+          {{ $t('sc14.noAccountLead') }}
         </p>
         <button
           type="button"
@@ -218,7 +219,7 @@ useHead({ title: 'Đặt lịch — Bước 3' });
           "
           @click="mode = 'register'"
         >
-          Đăng ký thành viên →
+          {{ $t('sc14.registerCta') }}
         </button>
       </div>
 
@@ -226,9 +227,9 @@ useHead({ title: 'Đặt lịch — Bước 3' });
         class="flex flex-col gap-1.5 p-3"
         style="background: var(--color-accent-100); border-radius: 20px"
       >
-        <p class="text-[13px] font-semibold">Không muốn tạo tài khoản?</p>
+        <p class="text-[13px] font-semibold">{{ $t('sc14.guestTitle') }}</p>
         <p class="text-[12px] leading-[1.5]" style="color: var(--color-neutral-700)">
-          Đặt lịch với vai trò khách vãng lai — chỉ cần họ tên và số điện thoại.
+          {{ $t('sc14.guestLead') }}
         </p>
         <button
           type="button"
@@ -236,7 +237,7 @@ useHead({ title: 'Đặt lịch — Bước 3' });
           style="min-height: 44px"
           @click="mode = 'guest'"
         >
-          Đặt lịch không cần tài khoản →
+          {{ $t('sc14.guestCta') }}
         </button>
       </div>
     </div>
@@ -265,22 +266,22 @@ useHead({ title: 'Đặt lịch — Bước 3' });
           </svg>
         </span>
         <span class="min-w-0 flex-1 leading-[1.3]">
-          <span class="block text-[13.5px] font-semibold">Đặt lịch với tư cách khách</span>
+          <span class="block text-[13.5px] font-semibold">{{ $t('sc14.guestBadge') }}</span>
           <span class="text-muted block text-[11.5px]">
-            Booking as guest · không cần tài khoản
+            {{ $t('sc14.guestBadgeSub') }}
           </span>
         </span>
       </div>
 
       <div v-else class="flex items-center gap-2">
-        <span class="tag tag-accent-2">Đăng ký thành viên</span>
+        <span class="tag tag-accent-2">{{ $t('sc14.registerBadge') }}</span>
       </div>
 
-      <AyField for="name" label="Họ tên · Full name" required :error="errors.contactName">
+      <AyField for="name" :label="$t('sc14.fullName')" required :error="errors.contactName">
         <input id="name" v-model="booking.contactName" class="input" autocomplete="name" />
       </AyField>
 
-      <AyField for="phone" label="Số điện thoại · Phone" required :error="errors.contactPhone">
+      <AyField for="phone" :label="$t('sc14.phone')" required :error="errors.contactPhone">
         <input
           id="phone"
           v-model="booking.contactPhone"
@@ -293,7 +294,7 @@ useHead({ title: 'Đặt lịch — Bước 3' });
 
       <AyField
         id="email"
-        :label="mode === 'register' ? 'Email (tùy chọn · optional)' : 'Email'"
+        :label="mode === 'register' ? $t('sc14.emailOptional') : $t('sc14.email')"
         :error="errors.contactEmail"
       >
         <input
@@ -365,10 +366,10 @@ useHead({ title: 'Đặt lịch — Bước 3' });
         to="/account/vehicles/new/edit"
         class="btn btn-secondary self-start text-[12.5px]"
       >
-        + Thêm xe khác
+        {{ $t('sc12.addVehicle') }}
       </NuxtLink>
 
-      <AyField for="odo" label="Số km hiện tại" hint="cập nhật nếu đã thay đổi">
+      <AyField for="odo" :label="$t('sc14.odometer')" :hint="$t('sc14.odometerHint')">
         <input
           id="odo"
           v-model.number="booking.vehicle.odometer"
@@ -382,15 +383,15 @@ useHead({ title: 'Đặt lịch — Bước 3' });
 
     <!-- CP-13 Thong tin xe — chi hien o che do khach va dang ky -->
     <div v-if="showVehicleForm" class="pt-3" style="border-top: 1px solid var(--color-divider)">
-      <h5 class="mb-2.5">Thông tin xe · Vehicle</h5>
+      <h5 class="mb-2.5">{{ $t('sc14.vehicleTitle') }}</h5>
       <div class="grid grid-cols-2 gap-2.5">
-        <AyField for="maker" label="Hãng" required :error="errors.maker">
+        <AyField for="maker" :label="$t('sc14.maker')" required :error="errors.maker">
           <input id="maker" v-model="booking.vehicle.maker" class="input" placeholder="Honda" />
         </AyField>
-        <AyField for="model" label="Dòng xe" required :error="errors.model">
+        <AyField for="model" :label="$t('sc14.model')" required :error="errors.model">
           <input id="model" v-model="booking.vehicle.model" class="input" placeholder="Lead 125" />
         </AyField>
-        <AyField for="cc" label="Dung tích (cc)">
+        <AyField for="cc" :label="$t('sc14.engineCc')">
           <input
             id="cc"
             v-model.number="booking.vehicle.engineCc"
@@ -400,7 +401,7 @@ useHead({ title: 'Đặt lịch — Bước 3' });
             min="0"
           />
         </AyField>
-        <AyField for="plate" label="Biển số" required :error="errors.plateNumber">
+        <AyField for="plate" :label="$t('sc14.plate')" required :error="errors.plateNumber">
           <input
             id="plate"
             v-model="booking.vehicle.plateNumber"
@@ -409,7 +410,7 @@ useHead({ title: 'Đặt lịch — Bước 3' });
           />
         </AyField>
         <div class="col-span-2">
-          <AyField for="odo2" label="Số km hiện tại">
+          <AyField for="odo2" :label="$t('sc14.odometer')">
             <input
               id="odo2"
               v-model.number="booking.vehicle.odometer"
@@ -428,7 +429,7 @@ useHead({ title: 'Đặt lịch — Bước 3' });
       class="flex cursor-pointer items-start gap-2.5 text-[12.5px]"
     >
       <input v-model="marketingOptIn" type="checkbox" class="mt-[3px]" />
-      <span>Nhận nhắc bảo dưỡng và ưu đãi dành cho thành viên.</span>
+      <span>{{ $t('sc14.marketingOptIn') }}</span>
     </label>
 
     <template v-if="mode !== 'login'">
@@ -438,12 +439,12 @@ useHead({ title: 'Đặt lịch — Bước 3' });
         style="min-height: 48px; font-size: 15px; margin: 0"
         @click="validateAndContinue"
       >
-        {{ mode === 'register' ? 'Tạo tài khoản & xác thực' : 'Tiếp theo →' }}
+        {{ mode === 'register' ? $t('sc14.createAccount') : $t('common.next') }}
       </button>
     </template>
 
     <NuxtLink to="/booking/step2" class="btn btn-ghost self-center text-[13px]">
-      ← Quay lại
+      {{ $t('common.back') }}
     </NuxtLink>
   </div>
 </template>

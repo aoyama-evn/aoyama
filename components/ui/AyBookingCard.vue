@@ -61,8 +61,8 @@ const serviceNames = computed(() =>
           <NuxtLink
             :to="`/bookings/${booking.code}/reschedule`"
             class="ay-round-btn"
-            :aria-label="`Cập nhật lịch hẹn ${booking.code}`"
-            :title="`Cập nhật lịch hẹn ${booking.code}`"
+            :aria-label="$t('card.reschedule', { code: booking.code })"
+            :title="$t('card.reschedule', { code: booking.code })"
           >
             <svg
               width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -75,8 +75,8 @@ const serviceNames = computed(() =>
           <NuxtLink
             :to="`/bookings/${booking.code}/cancel`"
             class="ay-round-btn"
-            :aria-label="`Hủy lịch hẹn ${booking.code}`"
-            :title="`Hủy lịch hẹn ${booking.code}`"
+            :aria-label="$t('card.cancel', { code: booking.code })"
+            :title="$t('card.cancel', { code: booking.code })"
           >
             <svg
               width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -91,8 +91,8 @@ const serviceNames = computed(() =>
           v-else-if="closed"
           :to="`/bookings/${booking.code}/rebook`"
           class="ay-round-btn ay-round-btn-accent"
-          :aria-label="`Đặt lại lịch hẹn ${booking.code}`"
-          :title="`Đặt lại lịch hẹn ${booking.code}`"
+          :aria-label="$t('card.rebook', { code: booking.code })"
+          :title="$t('card.rebook', { code: booking.code })"
         >
           <svg
             width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"

@@ -7,6 +7,7 @@ definePageMeta({ middleware: 'auth' });
 const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { dateTime } = useFormat();
 
 const code = route.params.code as string;
@@ -19,12 +20,12 @@ const submitting = ref(false);
 const error = ref<ApiError | null>(null);
 const confirmOpen = ref(false);
 
-const REASONS = [
-  'Bận việc đột xuất',
-  'Đã sửa ở nơi khác',
-  'Muốn đổi sang ngày khác',
-  'Lý do khác',
-];
+const REASONS = computed(() => [
+  t('sc24.reasonBusy'),
+  t('sc24.reasonElsewhere'),
+  t('sc24.reasonOtherDay'),
+  t('sc24.reasonOther'),
+]);
 
 async function cancel(): Promise<void> {
   if (!booking.value) return;
@@ -32,7 +33,7 @@ async function cancel(): Promise<void> {
   error.value = null;
   try {
     await api.put(`/bookings/${booking.value.id}/cancel`, { reason: reason.value || undefined });
-    ui.success('Đã hủy lịch hẹn');
+    ui.success(t('sc24.done'));
     await navigateTo('/account/bookings');
   } catch (err) {
     error.value = normalizeError(err);
@@ -42,28 +43,28 @@ async function cancel(): Promise<void> {
   }
 }
 
-useHead({ title: `Hủy lịch hẹn ${code}` });
+useHead({ title: () => t('sc24.headTitle', { code }) });
 </script>
 
 <template>
   <div v-if="booking" class="mx-auto flex max-w-md flex-col gap-5">
-    <AyPageHeader code="SC-24" title="Hủy lịch hẹn" :back-to="`/bookings/${code}`" />
+    <AyPageHeader code="SC-24" :title="$t('sc24.title')" :back-to="`/bookings/${code}`" />
 
     <section class="card flex flex-col gap-2">
-      <p class="text-[14px]">
-        Bạn đang hủy lịch hẹn <strong>{{ booking.code }}</strong>
-        vào <strong>{{ dateTime(booking.scheduledAt) }}</strong>.
-      </p>
+      <i18n-t keypath="sc24.lead" tag="p" class="text-[14px]">
+        <template #code><strong>{{ booking.code }}</strong></template>
+        <template #date><strong>{{ dateTime(booking.scheduledAt) }}</strong></template>
+      </i18n-t>
       <p class="text-[12.5px] text-muted">
-        Chỉ hủy trực tuyến được đến trước giờ hẹn 2 tiếng. Sau mốc đó vui lòng gọi cửa hàng.
+        {{ $t('sc24.cutoff') }}
       </p>
     </section>
 
     <section class="card flex flex-col gap-3">
-      <AyField label="Lý do hủy" hint="Giúp cửa hàng cải thiện dịch vụ">
+      <AyField :label="$t('sc24.reasonLabel')" :hint="$t('sc24.reasonHint')">
         <template #default="{ id }">
           <select :id="id" v-model="reason" class="input">
-            <option value="">— Không nêu lý do —</option>
+            <option value="">{{ $t('sc24.noReason') }}</option>
             <option v-for="item in REASONS" :key="item" :value="item">{{ item }}</option>
           </select>
         </template>
@@ -72,17 +73,17 @@ useHead({ title: `Hủy lịch hẹn ${code}` });
       <AyErrorNote :error="error" />
 
       <div class="flex gap-2">
-        <AyButton :to="`/bookings/${code}`" variant="secondary" class="flex-1">Giữ lịch hẹn</AyButton>
-        <AyButton variant="danger" class="flex-1" @click="confirmOpen = true">Hủy lịch hẹn</AyButton>
+        <AyButton :to="`/bookings/${code}`" variant="secondary" class="flex-1">{{ $t('sc24.keep') }}</AyButton>
+        <AyButton variant="danger" class="flex-1" @click="confirmOpen = true">{{ $t('sc24.title') }}</AyButton>
       </div>
     </section>
 
     <AyConfirmDialog
       :open="confirmOpen"
-      title="Xác nhận hủy lịch hẹn"
-      message="Lịch hẹn sẽ bị hủy và không khôi phục được. Bạn cần đặt lại nếu đổi ý."
-      confirm-label="Hủy lịch hẹn"
-      cancel-label="Quay lại"
+      :title="$t('sc24.confirmTitle')"
+      :message="$t('sc24.confirmBody')"
+      :confirm-label="$t('sc24.title')"
+      :cancel-label="$t('common.back')"
       danger
       :loading="submitting"
       @confirm="cancel"

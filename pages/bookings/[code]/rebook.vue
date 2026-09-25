@@ -7,6 +7,7 @@ definePageMeta({ middleware: 'auth' });
 const route = useRoute();
 const api = useApi();
 const booking = useBookingStore();
+const { t } = useI18n();
 const { dateTime } = useFormat();
 
 const code = route.params.code as string;
@@ -65,18 +66,18 @@ async function continueBooking(): Promise<void> {
   await navigateTo('/booking/confirm');
 }
 
-useHead({ title: 'Đặt lại lịch bảo dưỡng' });
+useHead({ title: () => t('sc25.title') });
 </script>
 
 <template>
   <div v-if="previous" class="mx-auto flex max-w-3xl flex-col gap-5">
     <AyPageHeader
-      code="SC-25" title="Đặt lại lịch bảo dưỡng" :back-to="`/bookings/${code}`"
-      description="Giữ nguyên cửa hàng, dịch vụ và thông tin xe của lần trước — bạn chỉ cần chọn thời gian mới."
+      code="SC-25" :title="$t('sc25.title')" :back-to="`/bookings/${code}`"
+      :description="$t('sc25.lead')"
     />
 
     <section class="card flex flex-col gap-2">
-      <h2 class="font-heading text-[16px]">Lần trước</h2>
+      <h2 class="font-heading text-[16px]">{{ $t('sc25.previous') }}</h2>
       <p class="text-[13.5px] text-muted">{{ dateTime(previous.scheduledAt) }}</p>
       <ul class="flex flex-wrap gap-1.5">
         <li v-for="line in previous.services ?? []" :key="line.id" class="tag bg-neutral-200 text-neutral-700">
@@ -90,7 +91,7 @@ useHead({ title: 'Đặt lại lịch bảo dưỡng' });
     <AyErrorNote :error="error" />
 
     <div class="sticky bottom-0 -mx-4 border-t border-divider bg-surface px-4 py-3 ay-safe-bottom">
-      <AyButton block :disabled="!slot" @click="continueBooking">Tiếp tục xác nhận →</AyButton>
+      <AyButton block :disabled="!slot" @click="continueBooking">{{ $t('sc25.continue') }}</AyButton>
     </div>
   </div>
 </template>

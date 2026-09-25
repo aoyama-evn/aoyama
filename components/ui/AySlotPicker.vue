@@ -17,6 +17,7 @@ const emit = defineEmits<{
   (e: 'need-range', from: string): void;
 }>();
 
+const { t } = useI18n();
 const { date: fmtDate } = useFormat();
 
 const byDate = computed(() => new Map(props.days.map((d) => [d.date, d])));
@@ -39,7 +40,9 @@ const monthLabel = computed(() =>
 );
 
 /** Luoi bat dau tu Thu Hai, dung thu tu T2..CN nhu ban thiet ke. */
-const WEEKDAYS = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+const WEEKDAYS = computed(() =>
+  ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((key) => t(`slot.weekday.${key}`)),
+);
 
 interface Cell {
   key: string;
@@ -118,22 +121,22 @@ const CELL_STYLE: Record<Cell['state'], string> = {
 
 <template>
   <div class="flex flex-col gap-3.5">
-    <div v-if="loading" class="card text-center text-muted">Đang tải lịch trống…</div>
+    <div v-if="loading" class="card text-center text-muted">{{ $t('slot.loading') }}</div>
 
     <AyEmptyState
       v-else-if="days.length === 0"
-      title="Không có ngày nào nhận xe trong khoảng này"
-      hint="Cửa hàng có thể đang nghỉ. Hãy chọn cửa hàng khác hoặc gọi trực tiếp."
+      :title="$t('slot.emptyTitle')"
+      :hint="$t('slot.emptyHint')"
     />
 
     <template v-else>
       <!-- Dieu huong thang -->
       <div class="flex items-center justify-between">
-        <button type="button" class="btn btn-secondary btn-icon" aria-label="Tháng trước" @click="shiftMonth(-1)">
+        <button type="button" class="btn btn-secondary btn-icon" :aria-label="$t('slot.prevMonth')" @click="shiftMonth(-1)">
           ‹
         </button>
         <h5>{{ monthLabel }}</h5>
-        <button type="button" class="btn btn-secondary btn-icon" aria-label="Tháng sau" @click="shiftMonth(1)">
+        <button type="button" class="btn btn-secondary btn-icon" :aria-label="$t('slot.nextMonth')" @click="shiftMonth(1)">
           ›
         </button>
       </div>
@@ -152,11 +155,11 @@ const CELL_STYLE: Record<Cell['state'], string> = {
             :style="CELL_STYLE[cell.state]"
             :disabled="cell.state === 'closed' || cell.state === 'past' || cell.state === 'unknown'"
             :aria-pressed="cell.state === 'selected'"
-            :aria-label="`Ngày ${cell.label}`"
+            :aria-label="$t('slot.day', { n: cell.label })"
             @click="pickDate(cell)"
           >
             <template v-if="cell.state === 'closed'">
-              <span class="text-[10px] font-semibold">NGHỈ</span>
+              <span class="text-[10px] font-semibold">{{ $t('slot.closed') }}</span>
             </template>
             <template v-else>{{ cell.label }}</template>
           </button>
@@ -165,7 +168,9 @@ const CELL_STYLE: Record<Cell['state'], string> = {
 
       <!-- Khung gio cua ngay dang chon -->
       <div v-if="activeDay">
-        <h5 class="mb-2.5">Khung giờ — {{ fmtDate(activeDay.date, 'yyyy/MM/dd (EEE)') }}</h5>
+        <h5 class="mb-2.5">
+          {{ $t('slot.timesFor', { date: fmtDate(activeDay.date, 'yyyy/MM/dd (EEE)') }) }}
+        </h5>
 
         <div class="grid grid-cols-2 gap-2">
           <template v-for="slot in activeDay.slots" :key="slot.startTime">
@@ -190,7 +195,9 @@ const CELL_STYLE: Record<Cell['state'], string> = {
                 <span class="block text-[14px] font-semibold">
                   {{ slot.startTime }} – {{ slot.endTime }}
                 </span>
-                <span class="block text-[10.5px] text-muted">còn {{ slot.remaining }} chỗ</span>
+                <span class="block text-[10.5px] text-muted">
+                  {{ $t('slot.remaining', { n: slot.remaining }) }}
+                </span>
               </span>
             </label>
 
@@ -206,7 +213,13 @@ const CELL_STYLE: Record<Cell['state'], string> = {
             >
               <span class="text-[14px]">{{ slot.startTime }} – {{ slot.endTime }}</span>
               <span class="text-[10.5px] font-bold" style="letter-spacing: 0.06em">
-                {{ slot.reason === 'PAST' ? 'ĐÃ QUA' : slot.reason === 'CLOSED' ? 'NGHỈ' : 'ĐÃ ĐẦY' }}
+                {{
+                  slot.reason === 'PAST'
+                    ? $t('slot.past')
+                    : slot.reason === 'CLOSED'
+                      ? $t('slot.closed')
+                      : $t('slot.full')
+                }}
               </span>
             </div>
           </template>

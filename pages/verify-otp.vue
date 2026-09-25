@@ -6,6 +6,7 @@ import type { ApiError, TokenResponse } from '~/types/models';
  * Ban thiet ke: sau o vuong rieng, dong dem nguoc truoc khi cho gui lai, va
  * mot dong nhac ve gioi han so lan nhap sai.
  */
+const { t } = useI18n();
 const api = useApi();
 const auth = useAuthStore();
 const ui = useUiStore();
@@ -75,7 +76,7 @@ async function verify(): Promise<void> {
       email,
     });
     auth.setSession(result, 'R-USER');
-    ui.success(result.isNewAccount ? 'Tạo tài khoản thành công' : 'Xác thực thành công');
+    ui.success(result.isNewAccount ? t('sc19.accountCreated') : t('common.verified'));
     await navigateTo(redirect ?? '/account/bookings');
   } catch (caught) {
     error.value = normalizeError(caught);
@@ -89,7 +90,7 @@ async function resend(): Promise<void> {
   error.value = null;
   try {
     await api.post('/auth/otp/request', { phone, purpose });
-    ui.success('Đã gửi lại mã xác thực');
+    ui.success(t('sc19.resent'));
     startCooldown();
   } catch (caught) {
     error.value = normalizeError(caught);
@@ -101,17 +102,19 @@ watch(digitsTyped, (typed) => {
   if (typed === 6 && !loading.value) verify();
 });
 
-useHead({ title: 'Nhập mã xác thực' });
+useHead({ title: () => t('sc19.titleLogin') });
 </script>
 
 <template>
   <div class="flex flex-col gap-[15px] pb-4 pt-2">
     <div>
       <h3 class="mb-1.5">
-        {{ purpose === 'REGISTER' ? 'Xác thực đăng ký' : 'Nhập mã đăng nhập' }}
+        {{ purpose === 'REGISTER' ? $t('sc19.titleRegister') : $t('sc19.titleLogin') }}
       </h3>
       <p class="text-muted text-[12.5px]">
-        Đã gửi 6 chữ số tới <strong>{{ maskedTarget }}</strong>. Mã có hiệu lực 5 phút.
+        <i18n-t keypath="sc19.sentTo" tag="span">
+          <template #target><strong>{{ maskedTarget }}</strong></template>
+        </i18n-t>
       </p>
     </div>
 
@@ -119,7 +122,9 @@ useHead({ title: 'Nhập mã xác thực' });
 
     <div class="flex items-center justify-between gap-2.5 text-[12.5px]">
       <span class="text-muted">
-        {{ cooldown > 0 ? `Gửi lại mã sau ${countdown}` : 'Bạn có thể gửi lại mã' }}
+        {{
+          cooldown > 0 ? $t('sc19.resendIn', { time: countdown }) : $t('sc19.canResend')
+        }}
       </span>
       <button
         type="button"
@@ -128,7 +133,7 @@ useHead({ title: 'Nhập mã xác thực' });
         :disabled="cooldown > 0"
         @click="resend"
       >
-        Gửi lại mã
+        {{ $t('sc14.resend') }}
       </button>
     </div>
 
@@ -136,7 +141,7 @@ useHead({ title: 'Nhập mã xác thực' });
       class="px-3.5 py-2.5 text-[12px] leading-[1.5]"
       style="background: var(--color-accent-100); border-radius: 18px"
     >
-      Nhập sai quá 5 lần sẽ tạm khóa gửi mã cho số này trong 15 phút.
+      {{ $t('sc19.lockNote') }}
     </p>
 
     <AyErrorNote :error="error" />
@@ -148,9 +153,9 @@ useHead({ title: 'Nhập mã xác thực' });
       :disabled="loading || digitsTyped < 6"
       @click="verify"
     >
-      {{ loading ? 'Đang xác thực…' : 'Xác nhận' }}
+      {{ loading ? $t('sc19.verifying') : $t('common.confirm') }}
     </button>
 
-    <NuxtLink to="/login" class="btn btn-ghost self-center text-[13px]">← Quay lại</NuxtLink>
+    <NuxtLink to="/login" class="btn btn-ghost self-center text-[13px]">{{ $t('common.back') }}</NuxtLink>
   </div>
 </template>

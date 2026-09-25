@@ -6,7 +6,7 @@ definePageMeta({ middleware: 'auth' });
 
 const api = useApi();
 const ui = useUiStore();
-const { setLocale } = useI18n();
+const { setLocale, t } = useI18n();
 
 const { data: profile } = await useAsyncData('settings-profile', () =>
   api.get<CustomerProfile>('/auth/profile'),
@@ -27,7 +27,7 @@ async function save(): Promise<void> {
   try {
     await api.put('/auth/profile', { ...form });
     setLocale(form.language);
-    ui.success('Đã lưu cài đặt');
+    ui.success(t('sc34.saved'));
   } catch (error) {
     ui.error(normalizeError(error).message);
   } finally {
@@ -41,23 +41,23 @@ const LANGS: { code: LanguageCode; label: string }[] = [
   { code: 'vi', label: 'Tiếng Việt' },
 ];
 
-useHead({ title: 'Cài đặt thông báo & ngôn ngữ' });
+useHead({ title: () => t('sc34.title') });
 </script>
 
 <template>
   <div class="flex flex-col gap-5">
-    <AyPageHeader code="SC-34" title="Cài đặt thông báo &amp; ngôn ngữ" />
+    <AyPageHeader code="SC-34" :title="$t('sc34.title')" />
     <AccountNav />
 
     <form class="card flex max-w-2xl flex-col gap-4" @submit.prevent="save">
       <fieldset class="flex flex-col gap-2">
-        <legend class="label">Kênh nhận thông báo</legend>
+        <legend class="label">{{ $t('sc34.channels') }}</legend>
         <label class="flex items-start gap-2.5 text-[14px]">
           <input v-model="form.notifySms" type="checkbox" class="mt-1 h-4 w-4 accent-[var(--color-accent)]">
           <span>
             <strong>SMS</strong>
             <span class="block text-[12.5px] text-muted">
-              Xác nhận lịch hẹn, nhắc lịch, báo xe đã sửa xong. Nên bật để không bỏ lỡ.
+              {{ $t('sc34.smsHint') }}
             </span>
           </span>
         </label>
@@ -65,12 +65,12 @@ useHead({ title: 'Cài đặt thông báo & ngôn ngữ' });
           <input v-model="form.notifyEmail" type="checkbox" class="mt-1 h-4 w-4 accent-[var(--color-accent)]">
           <span>
             <strong>Email</strong>
-            <span class="block text-[12.5px] text-muted">Cần có email trong hồ sơ cá nhân.</span>
+            <span class="block text-[12.5px] text-muted">{{ $t('sc34.emailHint') }}</span>
           </span>
         </label>
       </fieldset>
 
-      <AyField label="Ngôn ngữ hiển thị">
+      <AyField :label="$t('sc34.language')">
         <template #default="{ id }">
           <select :id="id" v-model="form.language" class="input">
             <option v-for="lang in LANGS" :key="lang.code" :value="lang.code">{{ lang.label }}</option>
@@ -78,7 +78,7 @@ useHead({ title: 'Cài đặt thông báo & ngôn ngữ' });
         </template>
       </AyField>
 
-      <AyButton type="submit" class="self-start" :loading="saving">Lưu cài đặt</AyButton>
+      <AyButton type="submit" class="self-start" :loading="saving">{{ $t('sc34.save') }}</AyButton>
     </form>
   </div>
 </template>

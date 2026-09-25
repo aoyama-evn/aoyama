@@ -11,6 +11,7 @@ definePageMeta({ middleware: 'auth' });
 const route = useRoute();
 const api = useApi();
 const booking = useBookingStore();
+const { t, te } = useI18n();
 const { date, money, number } = useFormat();
 
 const id = route.params.id as string;
@@ -39,18 +40,16 @@ const visible = computed(() =>
   filter.value === 'ALL' ? records.value : records.value.filter((r) => r.type === filter.value),
 );
 
-const TABS = [
-  { value: 'ALL' as const, label: 'Tất cả' },
-  { value: 'MAINTENANCE' as const, label: 'Bảo dưỡng' },
-  { value: 'REPAIR' as const, label: 'Sửa chữa' },
-];
+const TABS = computed(() => [
+  { value: 'ALL' as const, label: t('common.all') },
+  { value: 'MAINTENANCE' as const, label: t('serviceType.MAINTENANCE') },
+  { value: 'REPAIR' as const, label: t('serviceType.REPAIR') },
+]);
 
-const TYPE_LABELS: Record<string, string> = {
-  MAINTENANCE: 'Bảo dưỡng',
-  REPAIR: 'Sửa chữa',
-  INSPECTION: 'Kiểm tra',
-  PACKAGE: 'Gói dịch vụ',
-};
+/** Ten loai dich vu; loai la khoa dung chung ba thu tieng. */
+function typeLabel(type: string): string {
+  return te(`serviceType.${type}`) ? t(`serviceType.${type}`) : type;
+}
 
 function storeName(storeId: string): string {
   const found = (data.value?.stores ?? []).find((s) => s.id === storeId);
@@ -64,7 +63,7 @@ async function bookAgain(): Promise<void> {
   await navigateTo('/booking/step1');
 }
 
-useHead({ title: 'Lịch sử dịch vụ' });
+useHead({ title: () => t('sc31.title') });
 </script>
 
 <template>
@@ -82,12 +81,12 @@ useHead({ title: 'Lịch sử dịch vụ' });
         class="mt-1.5 text-[12.5px]"
         style="color: var(--color-accent-2-800)"
       >
-        Bảo dưỡng tiếp theo đề xuất:
+        {{ $t('sc31.nextDue') }}
         <template v-if="vehicle.nextServiceDueDate">
           {{ date(vehicle.nextServiceDueDate, 'yyyy/MM') }}
         </template>
         <template v-if="vehicle.nextServiceDueOdometer">
-          hoặc {{ number(vehicle.nextServiceDueOdometer) }} km
+          {{ $t('sc29.orKm', { km: number(vehicle.nextServiceDueOdometer) }) }}
         </template>
       </p>
     </div>
@@ -113,8 +112,8 @@ useHead({ title: 'Lịch sử dịch vụ' });
 
     <AyEmptyState
       v-if="visible.length === 0"
-      title="Chưa có lần dịch vụ nào trong nhóm này"
-      hint="Lịch sử được ghi tự động sau mỗi lần bảo dưỡng hoặc sửa chữa tại cửa hàng."
+      :title="$t('sc31.emptyTitle')"
+      :hint="$t('sc31.emptyHint')"
     />
 
     <div v-for="(record, index) in visible" :key="record.id" class="flex gap-[13px]">
@@ -137,7 +136,7 @@ useHead({ title: 'Lịch sử dịch vụ' });
         :class="index < visible.length - 1 ? 'pb-3.5' : ''"
       >
         <span class="text-[13.5px] font-semibold">
-          {{ date(record.servicedAt) }} · {{ TYPE_LABELS[record.type] ?? record.type }}
+          {{ date(record.servicedAt) }} · {{ typeLabel(record.type) }}
         </span>
         <span class="text-muted text-[11.5px]">
           {{ storeName(record.storeId) }}
@@ -152,7 +151,7 @@ useHead({ title: 'Lịch sử dịch vụ' });
             class="whitespace-nowrap text-[11px] font-bold"
             style="color: var(--color-accent-2-700)"
           >
-            Đã hoàn tất
+            {{ $t('sc31.completed') }}
           </span>
         </span>
       </component>
@@ -164,11 +163,11 @@ useHead({ title: 'Lịch sử dịch vụ' });
       style="min-height: 46px; margin: 0"
       @click="bookAgain"
     >
-      Đặt lịch cho xe này
+      {{ $t('sc29.bookForThis') }}
     </button>
 
     <NuxtLink to="/account/vehicles" class="btn btn-ghost self-center text-[13px]">
-      ← Xe của tôi
+      {{ $t('sc31.backToBikes') }}
     </NuxtLink>
   </div>
 </template>

@@ -10,6 +10,7 @@ definePageMeta({ middleware: 'auth' });
 
 const api = useApi();
 const booking = useBookingStore();
+const { t } = useI18n();
 const { number, date } = useFormat();
 
 const { data: vehicles } = await useAsyncData('my-vehicles', () =>
@@ -31,25 +32,25 @@ async function bookFor(vehicle: Vehicle): Promise<void> {
   await navigateTo('/booking/step1');
 }
 
-useHead({ title: 'Xe của tôi' });
+useHead({ title: () => t('sc29.title') });
 </script>
 
 <template>
   <div class="flex flex-col gap-3 pb-4 pt-1">
     <div class="flex items-baseline justify-between gap-2.5">
-      <h4>Xe của tôi</h4>
+      <h4>{{ $t('sc29.title') }}</h4>
       <NuxtLink to="/account/vehicles/new/edit" class="btn btn-ghost p-0 text-[12.5px]">
-        + Thêm xe
+        {{ $t('sc29.add') }}
       </NuxtLink>
     </div>
 
     <AyEmptyState
       v-if="(vehicles ?? []).length === 0"
-      title="Bạn chưa đăng ký xe nào"
-      hint="Thêm xe để hệ thống lưu lịch sử bảo dưỡng và nhắc bạn đến kỳ kiểm tra."
+      :title="$t('sc29.emptyTitle')"
+      :hint="$t('sc29.emptyHint')"
     >
       <NuxtLink to="/account/vehicles/new/edit" class="btn btn-primary text-[12.5px]">
-        Thêm xe đầu tiên
+        {{ $t('sc29.addFirst') }}
       </NuxtLink>
     </AyEmptyState>
 
@@ -69,17 +70,17 @@ useHead({ title: 'Xe của tôi' });
             class="text-[11px] font-bold"
             style="color: var(--color-accent-700)"
           >
-            đời {{ vehicle.modelYear }}
+            {{ $t('common.modelYear', { year: vehicle.modelYear }) }}
           </span>
         </span>
         <span class="text-muted text-[11.5px]">{{ subtitle(vehicle) }}</span>
         <span v-if="vehicle.lastServicedAt" class="text-muted text-[11.5px]">
-          Gần nhất {{ date(vehicle.lastServicedAt) }}
+          {{ $t('sc29.lastService', { date: date(vehicle.lastServicedAt) }) }}
           <template v-if="vehicle.nextServiceDueDate">
-            · đề xuất tiếp theo {{ date(vehicle.nextServiceDueDate, 'yyyy/MM') }}
+            · {{ $t('sc29.nextDue', { date: date(vehicle.nextServiceDueDate, 'yyyy/MM') }) }}
           </template>
           <template v-if="vehicle.nextServiceDueOdometer">
-            hoặc {{ number(vehicle.nextServiceDueOdometer) }} km
+            {{ $t('sc29.orKm', { km: number(vehicle.nextServiceDueOdometer) }) }}
           </template>
         </span>
       </NuxtLink>
@@ -91,8 +92,8 @@ useHead({ title: 'Xe của tôi' });
         <NuxtLink
           :to="`/account/vehicles/${vehicle.id}/edit`"
           class="ay-round-btn"
-          :aria-label="`Sửa xe ${vehicle.maker} ${vehicle.model}`"
-          :title="`Sửa xe ${vehicle.maker} ${vehicle.model}`"
+          :aria-label="$t('sc29.editBike', { name: `${vehicle.maker} ${vehicle.model}` })"
+          :title="$t('sc29.editBike', { name: `${vehicle.maker} ${vehicle.model}` })"
         >
           <svg
             width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -106,8 +107,8 @@ useHead({ title: 'Xe của tôi' });
           type="button"
           class="btn btn-primary"
           style="min-height: 38px; min-width: 38px; padding: 8px"
-          aria-label="Đặt lịch cho xe này"
-          title="Đặt lịch cho xe này"
+          :aria-label="$t('sc29.bookForThis')"
+          :title="$t('sc29.bookForThis')"
           @click="bookFor(vehicle)"
         >
           <svg
@@ -121,7 +122,7 @@ useHead({ title: 'Xe của tôi' });
       </div>
     </div>
 
-    <NuxtLink to="/" class="btn btn-ghost self-center text-[13px]">Trở về trang chủ</NuxtLink>
+    <NuxtLink to="/" class="btn btn-ghost self-center text-[13px]">{{ $t('common.backHome') }}</NuxtLink>
   </div>
 </template>
 
