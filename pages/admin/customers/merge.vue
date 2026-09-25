@@ -6,6 +6,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { date } = useFormat();
 
 const { data: pairs, refresh } = await useAsyncData('admin-duplicates', () =>
@@ -35,7 +36,7 @@ async function merge(): Promise<void> {
   merging.value = true;
   try {
     await api.post('/admin/customers/merge', { sourceId, targetId: keepId.value });
-    ui.success('Đã gộp hồ sơ', 'Toàn bộ xe và lịch sử đã chuyển sang hồ sơ giữ lại.');
+    ui.success(t('sa18.done'), t('sa18.doneSub'));
     selected.value = null;
     await refresh();
   } catch (error) {
@@ -45,22 +46,23 @@ async function merge(): Promise<void> {
   }
 }
 
-useHead({ title: 'Gộp hồ sơ khách hàng — AOYAMA Admin' });
+setScreenTitle(() => t('sa18.headTitle'));
+useHead({ title: () => `${t('sa18.headTitle')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
     <AyPageHeader
-      code="SA-18" title="Gộp hồ sơ khách hàng trùng" back-to="/admin/customers"
-      description="Hệ thống gợi ý các cặp hồ sơ cùng tên. Chọn hồ sơ giữ lại — xe và lịch sử của hồ sơ kia sẽ chuyển sang."
+      code="SA-18" :title="$t('sa18.title')" back-to="/admin/customers"
+      :description="$t('sa18.lead')"
     />
 
     <AyEmptyState
       v-if="(pairs ?? []).length === 0"
-      title="Không phát hiện hồ sơ trùng"
-      hint="Hệ thống so khớp theo tên khách hàng. Nếu nghi ngờ trùng, tìm theo số điện thoại ở danh sách khách hàng."
+      :title="$t('sa18.empty')"
+      :hint="$t('sa18.emptyHint')"
     >
-      <AyButton to="/admin/customers" variant="secondary" size="sm">Về danh sách</AyButton>
+      <AyButton to="/admin/customers" variant="secondary" size="sm">{{ $t('sa18.backToList') }}</AyButton>
     </AyEmptyState>
 
     <ul v-else class="flex flex-col gap-2">
@@ -71,25 +73,25 @@ useHead({ title: 'Gộp hồ sơ khách hàng — AOYAMA Admin' });
         <div>
           <p class="font-semibold">{{ pair.left.name }}</p>
           <p class="text-[12.5px] text-muted">
-            {{ pair.left.phone }} · tạo {{ date(pair.left.createdAt) }}
+            {{ pair.left.phone }} · {{ $t('sa18.createdOn', { date: date(pair.left.createdAt) }) }}
           </p>
         </div>
         <span class="hidden text-center text-muted sm:block" aria-hidden="true">↔</span>
         <div>
           <p class="font-semibold">{{ pair.right.name }}</p>
           <p class="text-[12.5px] text-muted">
-            {{ pair.right.phone }} · tạo {{ date(pair.right.createdAt) }}
+            {{ pair.right.phone }} · {{ $t('sa18.createdOn', { date: date(pair.right.createdAt) }) }}
           </p>
         </div>
-        <AyButton variant="secondary" size="sm" @click="choose(pair)">Xem &amp; gộp</AyButton>
+        <AyButton variant="secondary" size="sm" @click="choose(pair)">{{ $t('sa18.review') }}</AyButton>
       </li>
     </ul>
 
     <AyConfirmDialog
       :open="Boolean(selected)"
-      title="Gộp hai hồ sơ khách hàng"
-      message="Thao tác này không hoàn tác được. Hồ sơ không giữ lại sẽ bị khóa và trỏ tới hồ sơ giữ lại."
-      confirm-label="Gộp hồ sơ"
+      :title="$t('sa18.askTitle')"
+      :message="$t('sa18.askBody')"
+      :confirm-label="$t('sa18.confirm')"
       danger
       confirm-phrase="GOP"
       :loading="merging"
@@ -97,7 +99,7 @@ useHead({ title: 'Gộp hồ sơ khách hàng — AOYAMA Admin' });
       @cancel="selected = null"
     >
       <fieldset v-if="selected" class="mt-3 flex flex-col gap-2">
-        <legend class="label">Giữ lại hồ sơ nào?</legend>
+        <legend class="label">{{ $t('sa18.whichKeep') }}</legend>
         <label
           v-for="candidate in [selected.left, selected.right]" :key="candidate.id"
           class="flex items-start gap-2.5 rounded-xl border px-3 py-2 text-[13.5px]"
@@ -108,8 +110,8 @@ useHead({ title: 'Gộp hồ sơ khách hàng — AOYAMA Admin' });
             <strong>{{ candidate.name }}</strong>
             <span class="block text-muted">
               {{ candidate.phone }}
-              · {{ candidate.isGuest ? 'khách vãng lai' : 'đã đăng ký' }}
-              · tạo {{ date(candidate.createdAt) }}
+              · {{ candidate.isGuest ? $t('sa18.guestLower') : $t('sa18.registeredLower') }}
+              · {{ $t('sa18.createdOn', { date: date(candidate.createdAt) }) }}
             </span>
           </span>
         </label>

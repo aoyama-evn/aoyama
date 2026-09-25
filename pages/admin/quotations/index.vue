@@ -8,6 +8,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 const api = useApi();
 const ui = useUiStore();
 const route = useRoute();
+const { t } = useI18n();
 const { money, dateTime } = useFormat();
 
 const filters = reactive({ keyword: '', status: (route.query.status as string) ?? '' });
@@ -33,36 +34,39 @@ function reset(): void {
   page.value = 1;
 }
 
-const COLUMNS = [
-  { key: 'code', label: 'Mã báo giá', width: '170px' },
-  { key: 'createdAt', label: 'Ngày lập', width: '150px' },
-  { key: 'customer', label: 'Khách hàng' },
-  { key: 'vehicle', label: 'Xe' },
-  { key: 'version', label: 'Bản', align: 'center' as const, width: '70px' },
-  { key: 'status', label: 'Trạng thái', width: '150px' },
-  { key: 'totalAmount', label: 'Tổng tiền', align: 'right' as const, width: '120px' },
-];
+const COLUMNS = computed(() => [
+  { key: 'code', label: t('sa13.colCode'), width: '170px' },
+  { key: 'createdAt', label: t('sa13.colDate'), width: '150px' },
+  { key: 'customer', label: t('sa03.colCustomer') },
+  { key: 'vehicle', label: t('sa03.colVehicle') },
+  { key: 'version', label: t('sa13.colVersion'), align: 'center' as const, width: '70px' },
+  { key: 'status', label: t('sa02.colStatus'), width: '150px' },
+  { key: 'totalAmount', label: t('sa09.colTotal'), align: 'right' as const, width: '120px' },
+]);
 
-useHead({ title: 'Báo giá — AOYAMA Admin' });
+setScreenTitle(() => t('sa13.title'));
+useHead({ title: () => `${t('sa13.title')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div class="flex flex-col gap-[15px]">
     <AdminStoreBar />
 
-    <AyPageHeader code="SA-13" title="Danh sách báo giá" />
+    <AyPageHeader code="SA-13" :title="$t('sa13.listTitle')" />
 
     <AyFilterBar :has-active-filters="Boolean(filters.keyword || filters.status)" @reset="reset">
-      <AyField label="Từ khóa" class="min-w-[200px] flex-1">
+      <AyField :label="$t('common.keyword')" class="min-w-[200px] flex-1">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.keyword" class="input" type="search" placeholder="Mã, tên khách, biển số">
+          <input :id="id" v-model="filters.keyword" class="input" type="search" :placeholder="$t('sa13.searchPlaceholder')">
         </template>
       </AyField>
-      <AyField label="Trạng thái">
+      <AyField :label="$t('sa02.colStatus')">
         <template #default="{ id }">
           <select :id="id" v-model="filters.status" class="input">
-            <option value="">Tất cả</option>
-            <option v-for="s in Object.values(QuotationStatus)" :key="s" :value="s">{{ s }}</option>
+            <option value="">{{ $t('common.all') }}</option>
+            <option v-for="s in Object.values(QuotationStatus)" :key="s" :value="s">
+              {{ $t(`status.${s}`) }}
+            </option>
           </select>
         </template>
       </AyField>
@@ -73,8 +77,8 @@ useHead({ title: 'Báo giá — AOYAMA Admin' });
       :rows="data?.items ?? []"
       :meta="data?.meta ?? null"
       :loading="pending"
-      empty-title="Chưa có báo giá nào"
-      empty-hint="Báo giá được lập từ màn hình phiếu dịch vụ."
+      :empty-title="$t('sa13.empty')"
+      :empty-hint="$t('sa13.emptyHint')"
       @update:page="page = $event"
       @row-click="navigateTo(`/admin/quotations/${$event.id}`)"
     >

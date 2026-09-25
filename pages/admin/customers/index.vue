@@ -5,6 +5,7 @@ import type { CustomerProfile, Page } from '~/types/models';
 definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const api = useApi();
+const { t } = useI18n();
 const { date, maskedPhone } = useFormat();
 
 const keyword = ref('');
@@ -17,30 +18,31 @@ const { data, pending } = await useAsyncData(
   { watch: [query] },
 );
 
-const COLUMNS = [
-  { key: 'name', label: 'Tên khách hàng' },
-  { key: 'phone', label: 'Điện thoại', width: '160px' },
-  { key: 'email', label: 'Email' },
-  { key: 'isGuest', label: 'Loại', width: '120px' },
-  { key: 'createdAt', label: 'Ngày tạo', width: '130px' },
-];
+const COLUMNS = computed(() => [
+  { key: 'name', label: t('sa15.colName') },
+  { key: 'phone', label: t('sa15.colPhone'), width: '160px' },
+  { key: 'email', label: t('sc14.email') },
+  { key: 'isGuest', label: t('sa15.colKind'), width: '120px' },
+  { key: 'createdAt', label: t('sa15.colCreated'), width: '130px' },
+]);
 
-useHead({ title: 'Khách hàng — AOYAMA Admin' });
+setScreenTitle(() => t('sa15.title'));
+useHead({ title: () => `${t('sa15.title')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
-    <AyPageHeader code="SA-15" title="Khách hàng">
+    <AyPageHeader code="SA-15" :title="$t('sa15.title')">
       <template #actions>
-        <AyButton to="/admin/customers/merge" variant="secondary" size="sm">Gộp hồ sơ trùng</AyButton>
-        <AyButton to="/admin/customers/new/edit" size="sm">Thêm khách hàng</AyButton>
+        <AyButton to="/admin/customers/merge" variant="secondary" size="sm">{{ $t('sa15.mergeCta') }}</AyButton>
+        <AyButton to="/admin/customers/new/edit" size="sm">{{ $t('sa15.addCta') }}</AyButton>
       </template>
     </AyPageHeader>
 
     <AyFilterBar :has-active-filters="Boolean(keyword)" @reset="keyword = ''">
-      <AyField label="Tìm kiếm" class="min-w-[240px] flex-1">
+      <AyField :label="$t('common.search')" class="min-w-[240px] flex-1">
         <template #default="{ id }">
-          <input :id="id" v-model="keyword" class="input" type="search" placeholder="Tên, số điện thoại hoặc email">
+          <input :id="id" v-model="keyword" class="input" type="search" :placeholder="$t('sa15.searchPlaceholder')">
         </template>
       </AyField>
     </AyFilterBar>
@@ -50,7 +52,7 @@ useHead({ title: 'Khách hàng — AOYAMA Admin' });
       :rows="data?.items ?? []"
       :meta="data?.meta ?? null"
       :loading="pending"
-      empty-title="Không tìm thấy khách hàng nào"
+      :empty-title="$t('sa15.empty')"
       @update:page="page = $event"
       @row-click="navigateTo(`/admin/customers/${$event.id}`)"
     >
@@ -61,7 +63,7 @@ useHead({ title: 'Khách hàng — AOYAMA Admin' });
       <template #cell-email="{ row }">{{ row.email ?? '—' }}</template>
       <template #cell-isGuest="{ row }">
         <span class="tag" :class="row.isGuest ? 'bg-neutral-200 text-neutral-700' : 'bg-success-bg text-success'">
-          {{ row.isGuest ? 'Khách vãng lai' : 'Đã đăng ký' }}
+          {{ row.isGuest ? $t('sa15.guest') : $t('sa15.registered') }}
         </span>
       </template>
       <template #cell-createdAt="{ row }">{{ date(row.createdAt as string) }}</template>

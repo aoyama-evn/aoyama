@@ -5,6 +5,7 @@ import type { ApiError, CustomerProfile } from '~/types/models';
 definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const route = useRoute();
+const { t } = useI18n();
 const api = useApi();
 const ui = useUiStore();
 
@@ -50,11 +51,11 @@ async function save(): Promise<void> {
     };
     if (isNew) {
       const created = await api.post<CustomerProfile>('/admin/customers', body);
-      ui.success('Đã tạo hồ sơ khách hàng');
+      ui.success(t('sa17.created'));
       await navigateTo(`/admin/customers/${created.id}`);
     } else {
       await api.put(`/admin/customers/${id}`, body);
-      ui.success('Đã lưu hồ sơ');
+      ui.success(t('sa17.saved'));
       await navigateTo(`/admin/customers/${id}`);
     }
   } catch (err) {
@@ -64,48 +65,49 @@ async function save(): Promise<void> {
   }
 }
 
-useHead({ title: isNew ? 'Thêm khách hàng' : 'Sửa khách hàng' });
+setScreenTitle(() => (isNew ? t('sa17.addTitle') : t('sa17.headEdit')));
+useHead({ title: () => (isNew ? t('sa17.addTitle') : t('sa17.headEdit')) });
 </script>
 
 <template>
   <div class="admin-form">
     <AyPageHeader
-      code="SA-17" :title="isNew ? 'Thêm khách hàng' : 'Sửa hồ sơ khách hàng'"
+      code="SA-17" :title="isNew ? $t('sa17.addTitle') : $t('sa17.editTitle')"
       :back-to="isNew ? '/admin/customers' : `/admin/customers/${id}`"
     />
 
     <form class="card admin-grid" style="background: #fff" @submit.prevent="save">
-      <AyField label="Số điện thoại" required hint="Là khóa định danh khách hàng (BR-01)">
+      <AyField :label="$t('sc14.phone')" required :hint="$t('sa17.phoneHint')">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.phone" class="input" type="tel" required>
         </template>
       </AyField>
 
-      <AyField label="Họ tên" required>
+      <AyField :label="$t('sc14.fullName')" required>
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.name" class="input" type="text" required>
         </template>
       </AyField>
 
-      <AyField label="Tên kana">
+      <AyField :label="$t('sa17.kana')">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.nameKana" class="input" type="text">
         </template>
       </AyField>
 
-      <AyField label="Email">
+      <AyField :label="$t('sc14.email')">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.email" class="input" type="email">
         </template>
       </AyField>
 
-      <AyField label="Địa chỉ" class="ay-col-full">
+      <AyField :label="$t('sa17.address')" class="ay-col-full">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.address" class="input" type="text">
         </template>
       </AyField>
 
-      <AyField label="Ngôn ngữ liên lạc">
+      <AyField :label="$t('sa17.contactLang')">
         <template #default="{ id: fid }">
           <select :id="fid" v-model="form.language" class="input">
             <option value="ja">日本語</option>
@@ -115,7 +117,7 @@ useHead({ title: isNew ? 'Thêm khách hàng' : 'Sửa khách hàng' });
         </template>
       </AyField>
 
-      <AyField label="Ghi chú nội bộ" class="ay-col-full">
+      <AyField :label="$t('sa05.internalNote')" class="ay-col-full">
         <template #default="{ id: fid }">
           <textarea :id="fid" v-model="form.internalNote" class="input min-h-[90px]" />
         </template>
@@ -125,9 +127,9 @@ useHead({ title: isNew ? 'Thêm khách hàng' : 'Sửa khách hàng' });
 
       <div class="admin-actions ay-col-full">
         <AyButton :to="isNew ? '/admin/customers' : `/admin/customers/${id}`" variant="secondary">
-          ← Hủy
+          {{ $t('common.cancel') }}
         </AyButton>
-        <AyButton type="submit" :loading="saving">Lưu hồ sơ</AyButton>
+        <AyButton type="submit" :loading="saving">{{ $t('sa17.save') }}</AyButton>
       </div>
     </form>
   </div>

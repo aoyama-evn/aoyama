@@ -11,6 +11,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { date, money, number } = useFormat();
 
 const id = route.params.id as string;
@@ -28,15 +29,13 @@ const { data } = await useAsyncData(`admin-customer-${id}`, async () => {
 });
 
 if (!data.value?.customer) {
-  throw createError({ statusCode: 404, statusMessage: 'Không tìm thấy khách hàng' });
+  throw createError({ statusCode: 404, statusMessage: t('sa16.notFound') });
 }
 
-setScreenTitle('Chi tiết khách hàng');
+setScreenTitle(() => t('sa16.title'));
 
 const note = ref(data.value.customer.internalNote ?? '');
 const tab = ref<'VEHICLES' | 'BOOKINGS' | 'WORK_ORDERS'>('VEHICLES');
-
-const LANGUAGES: Record<string, string> = { ja: 'Tiếng Nhật', en: 'Tiếng Anh', vi: 'Tiếng Việt' };
 
 /** Bon the chi so o dau man hinh. */
 const stats = computed(() => {
@@ -54,7 +53,7 @@ const stats = computed(() => {
 async function saveNote(): Promise<void> {
   try {
     await api.put(`/admin/customers/${id}`, { internalNote: note.value });
-    ui.success('Đã lưu ghi chú');
+    ui.success(t('sa05.noteSaved'));
   } catch (error) {
     ui.error(normalizeError(error).message);
   }
@@ -68,7 +67,7 @@ useHead({ title: `${data.value.customer.name} — AOYAMA Admin` });
     <div class="flex flex-wrap items-center gap-2.5">
       <p class="font-heading text-[21px]">{{ data.customer.name }}</p>
       <span class="tag" :class="data.customer.isGuest ? 'tag-neutral' : 'tag-accent-2'">
-        {{ data.customer.isGuest ? 'Khách vãng lai' : 'Đang hoạt động' }}
+        {{ data.customer.isGuest ? $t('sa15.guest') : $t('sa16.active') }}
       </span>
       <div class="ml-auto flex flex-wrap gap-2">
         <NuxtLink
@@ -76,47 +75,47 @@ useHead({ title: `${data.value.customer.name} — AOYAMA Admin` });
           class="btn btn-secondary text-[13px]"
           style="min-height: 44px"
         >
-          Sửa
+          {{ $t('common.edit') }}
         </NuxtLink>
         <NuxtLink
           :to="`/admin/bookings/new?customerId=${id}`"
           class="btn btn-primary text-[13px]"
           style="min-height: 44px"
         >
-          Đặt lịch cho khách này
+          {{ $t('sa16.bookFor') }}
         </NuxtLink>
       </div>
     </div>
 
     <div class="grid gap-3" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr))">
       <div class="card elev-sm gap-0.5" style="background: #fff">
-        <div class="card-kicker">Lần dùng dịch vụ</div>
+        <div class="card-kicker">{{ $t('sa16.visits') }}</div>
         <p class="font-heading text-[30px] leading-none">{{ stats.visits }}</p>
       </div>
       <div class="card elev-sm gap-0.5" style="background: #fff">
-        <div class="card-kicker">Tổng chi tiêu</div>
+        <div class="card-kicker">{{ $t('sa16.totalSpent') }}</div>
         <p class="font-heading text-[30px] leading-none">{{ money(stats.totalSpent) }}</p>
       </div>
       <div class="card elev-sm gap-0.5" style="background: #fff">
-        <div class="card-kicker">Gần nhất</div>
+        <div class="card-kicker">{{ $t('sa16.lastVisit') }}</div>
         <p class="font-heading text-[22px] leading-[1.2]">
           {{ stats.lastAt ? date(stats.lastAt) : '—' }}
         </p>
       </div>
       <div class="card elev-sm gap-0.5" style="background: #fff">
-        <div class="card-kicker">Số xe</div>
+        <div class="card-kicker">{{ $t('sa16.vehicleCount') }}</div>
         <p class="font-heading text-[30px] leading-none">{{ stats.vehicles }}</p>
       </div>
     </div>
 
     <section class="card gap-1.5" style="background: #fff">
-      <div class="card-kicker">Thông tin cá nhân</div>
+      <div class="card-kicker">{{ $t('sa16.personal') }}</div>
       <dl
         class="grid gap-2 text-[13px]"
         style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))"
       >
         <div>
-          <dt class="text-muted block text-[11.5px]">Điện thoại</dt>
+          <dt class="text-muted block text-[11.5px]">{{ $t('sa15.colPhone') }}</dt>
           <dd>{{ data.customer.phone }}</dd>
         </div>
         <div>
@@ -124,12 +123,12 @@ useHead({ title: `${data.value.customer.name} — AOYAMA Admin` });
           <dd>{{ data.customer.email ?? '—' }}</dd>
         </div>
         <div>
-          <dt class="text-muted block text-[11.5px]">Địa chỉ</dt>
+          <dt class="text-muted block text-[11.5px]">{{ $t('sa17.address') }}</dt>
           <dd>{{ data.customer.address ?? '—' }}</dd>
         </div>
         <div>
-          <dt class="text-muted block text-[11.5px]">Ngôn ngữ ưa dùng</dt>
-          <dd>{{ LANGUAGES[data.customer.language] ?? data.customer.language }}</dd>
+          <dt class="text-muted block text-[11.5px]">{{ $t('sa16.prefLang') }}</dt>
+          <dd>{{ $t(`lang.${data.customer.language}`) }}</dd>
         </div>
       </dl>
     </section>
@@ -147,7 +146,7 @@ useHead({ title: `${data.value.customer.name} — AOYAMA Admin` });
         :aria-selected="tab === 'VEHICLES'"
         @click="tab = 'VEHICLES'"
       >
-        Phương tiện <span style="opacity: 0.6">{{ data.vehicles.items.length }}</span>
+        {{ $t('sa16.tabVehicles') }} <span style="opacity: 0.6">{{ data.vehicles.items.length }}</span>
       </button>
       <button
         type="button"
@@ -157,7 +156,7 @@ useHead({ title: `${data.value.customer.name} — AOYAMA Admin` });
         :aria-selected="tab === 'BOOKINGS'"
         @click="tab = 'BOOKINGS'"
       >
-        Lịch hẹn <span style="opacity: 0.6">{{ data.bookings?.items.length ?? 0 }}</span>
+        {{ $t('sa03.title') }} <span style="opacity: 0.6">{{ data.bookings?.items.length ?? 0 }}</span>
       </button>
       <button
         type="button"
@@ -167,7 +166,7 @@ useHead({ title: `${data.value.customer.name} — AOYAMA Admin` });
         :aria-selected="tab === 'WORK_ORDERS'"
         @click="tab = 'WORK_ORDERS'"
       >
-        Phiếu dịch vụ <span style="opacity: 0.6">{{ data.workOrders?.items.length ?? 0 }}</span>
+        {{ $t('sa09.title') }} <span style="opacity: 0.6">{{ data.workOrders?.items.length ?? 0 }}</span>
       </button>
     </div>
 
@@ -175,7 +174,10 @@ useHead({ title: `${data.value.customer.name} — AOYAMA Admin` });
       <table v-if="tab === 'VEHICLES'" class="table" style="min-width: 600px">
         <thead>
           <tr>
-            <th>Biển số</th><th>Hãng · dòng</th><th>Số km</th><th>Đời xe</th>
+            <th>{{ $t('sa16.colPlate') }}</th>
+            <th>{{ $t('sa16.colMakerModel') }}</th>
+            <th>{{ $t('sa16.colOdometer') }}</th>
+            <th>{{ $t('sa16.colYear') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -191,14 +193,19 @@ useHead({ title: `${data.value.customer.name} — AOYAMA Admin` });
             <td>{{ vehicle.modelYear ?? '—' }}</td>
           </tr>
           <tr v-if="data.vehicles.items.length === 0">
-            <td colspan="4" class="text-muted py-6 text-center">Khách chưa có xe nào</td>
+            <td colspan="4" class="text-muted py-6 text-center">{{ $t('sa16.noVehicles') }}</td>
           </tr>
         </tbody>
       </table>
 
       <table v-else-if="tab === 'BOOKINGS'" class="table" style="min-width: 600px">
         <thead>
-          <tr><th>Mã</th><th>Thời gian</th><th>Dịch vụ</th><th>Trạng thái</th></tr>
+          <tr>
+            <th>{{ $t('sa03.colCode') }}</th>
+            <th>{{ $t('sa03.colWhen') }}</th>
+            <th>{{ $t('sa02.colService') }}</th>
+            <th>{{ $t('sa02.colStatus') }}</th>
+          </tr>
         </thead>
         <tbody>
           <tr
@@ -213,14 +220,19 @@ useHead({ title: `${data.value.customer.name} — AOYAMA Admin` });
             <td><AyStatusTag :status="booking.status" /></td>
           </tr>
           <tr v-if="(data.bookings?.items ?? []).length === 0">
-            <td colspan="4" class="text-muted py-6 text-center">Chưa có lịch hẹn nào</td>
+            <td colspan="4" class="text-muted py-6 text-center">{{ $t('sa16.noBookings') }}</td>
           </tr>
         </tbody>
       </table>
 
       <table v-else class="table" style="min-width: 600px">
         <thead>
-          <tr><th>Mã phiếu</th><th>Ngày</th><th>Tổng tiền</th><th>Trạng thái</th></tr>
+          <tr>
+            <th>{{ $t('sa09.colCode') }}</th>
+            <th>{{ $t('sa16.colDate') }}</th>
+            <th>{{ $t('sa09.colTotal') }}</th>
+            <th>{{ $t('sa02.colStatus') }}</th>
+          </tr>
         </thead>
         <tbody>
           <tr
@@ -235,7 +247,7 @@ useHead({ title: `${data.value.customer.name} — AOYAMA Admin` });
             <td><AyStatusTag :status="order.status" /></td>
           </tr>
           <tr v-if="(data.workOrders?.items ?? []).length === 0">
-            <td colspan="4" class="text-muted py-6 text-center">Chưa có phiếu dịch vụ nào</td>
+            <td colspan="4" class="text-muted py-6 text-center">{{ $t('sa16.noOrders') }}</td>
           </tr>
         </tbody>
       </table>
@@ -243,15 +255,15 @@ useHead({ title: `${data.value.customer.name} — AOYAMA Admin` });
 
     <div class="grid gap-[13px]" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr))">
       <section class="card gap-[7px]" style="background: #fff">
-        <h5>Ghi chú nội bộ</h5>
+        <h5>{{ $t('sa05.internalNote') }}</h5>
         <textarea
           v-model="note"
           class="input"
           style="min-height: 70px"
-          placeholder="Chỉ nhân viên thấy nội dung này"
+          :placeholder="$t('sa05.internalHint')"
         />
         <button type="button" class="btn btn-secondary self-end text-[12.5px]" @click="saveNote">
-          Lưu ghi chú
+          {{ $t('sa05.saveNote') }}
         </button>
       </section>
     </div>
