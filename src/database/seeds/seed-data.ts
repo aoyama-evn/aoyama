@@ -116,7 +116,7 @@ export const SERVICES: ServiceSeed[] = [
   {
     code: 'SVC-MAINT-INSPECT',
     slug: 'general-inspection',
-    type: ServiceType.MAINTENANCE,
+    type: ServiceType.INSPECTION,
     name: { ja: '総合点検', en: 'General inspection', vi: 'Kiểm tra tổng quát' },
     shortDescription: {
       ja: '車両全体の状態チェック',
@@ -135,6 +135,26 @@ export const SERVICES: ServiceSeed[] = [
     sortOrder: 2,
     maintenanceIntervalMonths: 12,
     maintenanceIntervalKm: 6000,
+  },
+  {
+    code: 'SVC-MAINT-OIL',
+    slug: 'engine-oil-change',
+    type: ServiceType.MAINTENANCE,
+    name: { ja: 'エンジンオイル交換', en: 'Engine oil change', vi: 'Thay dầu máy' },
+    shortDescription: {
+      ja: 'オイルとフィルターの交換',
+      en: 'Oil and filter replacement',
+      vi: 'Thay dầu và lọc dầu',
+    },
+    checklistItems: [
+      { ja: 'オイル抜き取り', en: 'Drain old oil', vi: 'Xả dầu cũ' },
+      { ja: 'オイルフィルター交換', en: 'Replace oil filter', vi: 'Thay lọc dầu' },
+    ],
+    durationMinutes: 30,
+    basePrice: 2500,
+    iconKey: 'droplet',
+    isFeatured: false,
+    sortOrder: 3,
   },
   {
     code: 'SVC-REPAIR-BRAKE-TYRE',
@@ -178,6 +198,26 @@ export const SERVICES: ServiceSeed[] = [
     sortOrder: 4,
   },
   {
+    code: 'SVC-REPAIR-ELECTRIC',
+    slug: 'electrical-and-battery',
+    type: ServiceType.REPAIR,
+    name: { ja: '電装・バッテリー', en: 'Electrical and battery', vi: 'Điện · ắc quy' },
+    shortDescription: {
+      ja: 'バッテリー上がり、配線、灯火類',
+      en: 'Flat battery, wiring and lights',
+      vi: 'Hết bình, dây điện, đèn',
+    },
+    checklistItems: [
+      { ja: 'バッテリー電圧測定', en: 'Battery voltage test', vi: 'Đo điện áp ắc quy' },
+      { ja: '充電系点検', en: 'Charging system check', vi: 'Kiểm tra hệ sạc' },
+    ],
+    durationMinutes: 40,
+    basePrice: 2200,
+    iconKey: 'bolt',
+    isFeatured: false,
+    sortOrder: 6,
+  },
+  {
     code: 'SVC-REPAIR-PAINT',
     slug: 'paint-and-bodywork',
     type: ServiceType.REPAIR,
@@ -194,6 +234,26 @@ export const SERVICES: ServiceSeed[] = [
     iconKey: 'brush',
     isFeatured: true,
     sortOrder: 5,
+  },
+  {
+    code: 'SVC-PACKAGE-CARE-12M',
+    slug: 'care-plan-12-months',
+    type: ServiceType.PACKAGE,
+    name: { ja: '12ヶ月メンテナンスパック', en: '12-month care plan', vi: 'Gói bảo dưỡng 12 tháng' },
+    shortDescription: {
+      ja: '年4回の定期メンテナンス',
+      en: 'Four scheduled services a year',
+      vi: '4 lần bảo dưỡng trong năm',
+    },
+    checklistItems: [
+      { ja: '定期点検 4回', en: '4 periodic services', vi: '4 lần bảo dưỡng định kỳ' },
+      { ja: 'オイル交換 4回', en: '4 oil changes', vi: '4 lần thay dầu' },
+    ],
+    durationMinutes: 45,
+    basePrice: 18000,
+    iconKey: 'shield',
+    isFeatured: false,
+    sortOrder: 8,
   },
   {
     code: 'SVC-INSURANCE',

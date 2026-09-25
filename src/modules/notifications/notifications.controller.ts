@@ -68,6 +68,12 @@ export class NotificationsController {
     return this.service.searchLogs(query);
   }
 
+  @Get('unread-count')
+  @ApiOperation({ summary: 'CP-05 — so thong bao gui loi con phai xu ly' })
+  unreadCount() {
+    return this.service.countFailedLogs();
+  }
+
   @Post('logs/:id/retry')
   @ApiOperation({ summary: 'SA-42 — gui lai thong bao that bai' })
   retry(@Param('id', ParseUUIDPipe) id: string) {

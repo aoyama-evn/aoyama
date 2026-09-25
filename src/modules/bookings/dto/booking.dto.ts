@@ -1,8 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
   IsArray,
+  IsBoolean,
   IsEmail,
   IsEnum,
   IsInt,
@@ -133,6 +134,13 @@ export class BookingQueryDto extends PaginationQueryDto {
   from?: string;
 
   @IsOptional() @Matches(DATE_PATTERN) to?: string;
+
+  /** SC-01a va SC-21 — chi lay lich hen con o phia truoc. */
+  @ApiPropertyOptional({ description: 'Chi lay lich hen chua dien ra' })
+  @IsOptional()
+  @Transform(({ value }) => value === true || value === 'true')
+  @IsBoolean()
+  upcoming?: boolean;
 }
 
 export class CalendarQueryDto {

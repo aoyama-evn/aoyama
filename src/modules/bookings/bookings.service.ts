@@ -225,7 +225,7 @@ export class BookingsService {
     const qb = this.baseQuery().where('b.customer_id = :customerId', { customerId });
     this.applyFilters(qb, query);
     const [items, total] = await qb
-      .orderBy('b.scheduledAt', 'DESC')
+      .orderBy('b.scheduledAt', query.sortOrder)
       .skip(query.skip)
       .take(query.limit)
       .getManyAndCount();
@@ -462,6 +462,12 @@ export class BookingsService {
       qb.andWhere('b.scheduled_at < :to', {
         to: new Date(zonedDateTimeToUtc(query.to, '00:00').getTime() + 86_400_000),
       });
+    }
+    if (query.upcoming) {
+      qb.andWhere('b.scheduled_at >= :now', { now: new Date() }).andWhere(
+        'b.status IN (:...openStatuses)',
+        { openStatuses: [BookingStatus.PENDING, BookingStatus.CONFIRMED] },
+      );
     }
   }
 

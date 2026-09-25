@@ -93,6 +93,17 @@ export class NotificationsService {
   }
 
   /** Thu lai mot ban ghi that bai — FR-NOT-13, thao tac tu SA-42. */
+  /**
+   * CP-05 — chuong tren thanh tieu de dem so thong bao gui that bai, tuc so
+   * viec con phai xu ly. Gui thanh cong thi khong con gi de bao.
+   */
+  async countFailedLogs(): Promise<{ count: number }> {
+    const count = await this.logRepo.count({
+      where: { status: NotificationSendStatus.FAILED },
+    });
+    return { count };
+  }
+
   async retry(logId: string): Promise<NotificationLog | null> {
     const log = await this.logRepo.findOne({ where: { id: logId } });
     if (!log || log.status === NotificationSendStatus.SENT) return log;
