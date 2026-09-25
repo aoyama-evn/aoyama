@@ -91,7 +91,7 @@ useHead({ title: 'Giờ làm việc — AOYAMA Admin' });
 </script>
 
 <template>
-  <div v-if="store" class="mx-auto flex max-w-3xl flex-col gap-4">
+  <div v-if="store" class="admin-form admin-form-wide">
     <AyPageHeader
       code="SA-34" title="Giờ làm việc &amp; ngày nghỉ" back-to="/admin/stores"
       :description="i18n(store.name)"
@@ -101,7 +101,7 @@ useHead({ title: 'Giờ làm việc — AOYAMA Admin' });
       </template>
     </AyPageHeader>
 
-    <section class="card">
+    <section class="card" style="background: #fff">
       <h2 class="mb-3 font-heading text-[16px]">Giờ làm việc theo thứ</h2>
 
       <ul class="flex flex-col gap-2">
@@ -127,10 +127,12 @@ useHead({ title: 'Giờ làm việc — AOYAMA Admin' });
         </li>
       </ul>
 
-      <AyButton class="mt-3" :loading="savingHours" @click="saveHours">Lưu giờ làm việc</AyButton>
+      <div class="admin-actions mt-3">
+        <AyButton :loading="savingHours" @click="saveHours">Lưu giờ làm việc</AyButton>
+      </div>
     </section>
 
-    <section class="card">
+    <section class="card" style="background: #fff">
       <h2 class="mb-3 font-heading text-[16px]">Ngày nghỉ</h2>
 
       <div class="flex flex-wrap items-end gap-2">

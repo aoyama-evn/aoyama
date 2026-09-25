@@ -108,7 +108,7 @@ useHead({ title: 'Khung giờ nhận xe — AOYAMA Admin' });
 </script>
 
 <template>
-  <div v-if="store" class="mx-auto flex max-w-3xl flex-col gap-4">
+  <div v-if="store" class="admin-form admin-form-wide">
     <AyPageHeader
       code="SA-35" title="Khung giờ &amp; năng lực tiếp nhận" back-to="/admin/stores"
       :description="`${i18n(store.name)} — số chỗ là số xe tối đa nhận trong một khung giờ`"
@@ -159,7 +159,8 @@ useHead({ title: 'Khung giờ nhận xe — AOYAMA Admin' });
       </ul>
     </section>
 
-    <div class="sticky bottom-0 -mx-4 border-t border-divider bg-surface px-4 py-3">
+    <div class="admin-actions">
+      <AyButton to="/admin/stores" variant="secondary">← Hủy</AyButton>
       <AyButton :loading="saving" @click="save">Lưu toàn bộ khung giờ</AyButton>
     </div>
   </div>

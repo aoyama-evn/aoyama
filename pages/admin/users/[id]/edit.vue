@@ -103,13 +103,13 @@ useHead({ title: isNew ? 'Thêm tài khoản' : 'Sửa tài khoản' });
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-2xl flex-col gap-4">
+  <div class="admin-form">
     <AyPageHeader
       code="SA-40" :title="isNew ? 'Thêm tài khoản quản trị' : 'Sửa tài khoản quản trị'"
       back-to="/admin/users"
     />
 
-    <section class="card grid gap-3 sm:grid-cols-2">
+    <section class="card admin-grid" style="background: #fff">
       <AyField label="Tên đăng nhập" :required="isNew" hint="Không đổi được sau khi tạo">
         <template #default="{ id: fid }">
           <input
@@ -176,9 +176,9 @@ useHead({ title: isNew ? 'Thêm tài khoản' : 'Sửa tài khoản' });
 
     <AyErrorNote :error="error" />
 
-    <div class="flex gap-2">
-      <AyButton :loading="saving" @click="save">Lưu</AyButton>
+    <div class="admin-actions">
       <AyButton to="/admin/users" variant="secondary">Hủy</AyButton>
+      <AyButton :loading="saving" @click="save">Lưu</AyButton>
     </div>
 
     <section v-if="!isNew" class="card">

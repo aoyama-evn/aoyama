@@ -80,12 +80,12 @@ useHead({ title: isNew ? 'Thêm cửa hàng' : 'Sửa cửa hàng' });
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-3xl flex-col gap-4">
+  <div class="admin-form">
     <AyPageHeader
       code="SA-33" :title="isNew ? 'Thêm cửa hàng' : 'Sửa cửa hàng'" back-to="/admin/stores"
     />
 
-    <section class="card grid gap-3 sm:grid-cols-2">
+    <section class="card admin-grid" style="background: #fff">
       <AyField label="Mã cửa hàng" required>
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.code" class="input font-mono" type="text" placeholder="AY-HAMAMATSU">
@@ -98,9 +98,9 @@ useHead({ title: isNew ? 'Thêm cửa hàng' : 'Sửa cửa hàng' });
         </template>
       </AyField>
 
-      <div class="sm:col-span-2"><AyI18nInput v-model="form.name" label="Tên cửa hàng" required /></div>
-      <div class="sm:col-span-2"><AyI18nInput v-model="form.address" label="Địa chỉ" required /></div>
-      <div class="sm:col-span-2"><AyI18nInput v-model="form.description" label="Giới thiệu" multiline /></div>
+      <div class="ay-col-full"><AyI18nInput v-model="form.name" label="Tên cửa hàng" required /></div>
+      <div class="ay-col-full"><AyI18nInput v-model="form.address" label="Địa chỉ" required /></div>
+      <div class="ay-col-full"><AyI18nInput v-model="form.description" label="Giới thiệu" multiline /></div>
 
       <AyField label="Email">
         <template #default="{ id: fid }">
@@ -140,9 +140,9 @@ useHead({ title: isNew ? 'Thêm cửa hàng' : 'Sửa cửa hàng' });
 
     <AyErrorNote :error="error" />
 
-    <div class="flex gap-2">
-      <AyButton :loading="saving" @click="save">Lưu</AyButton>
+    <div class="admin-actions">
       <AyButton to="/admin/stores" variant="secondary">Hủy</AyButton>
+      <AyButton :loading="saving" @click="save">Lưu</AyButton>
     </div>
   </div>
 </template>

@@ -42,7 +42,7 @@ useHead({ title: `Báo giá ${quotation.value.code} — AOYAMA Admin` });
 </script>
 
 <template>
-  <div v-if="quotation" class="mx-auto flex max-w-3xl flex-col gap-4">
+  <div v-if="quotation" class="admin-form admin-form-wide">
     <AyPageHeader
       code="SA-13" :title="`Báo giá ${quotation.code}`" back-to="/admin/quotations"
       :description="`Bản ${quotation.version} · phiếu ${quotation.workOrder?.code ?? ''}`"
@@ -58,7 +58,7 @@ useHead({ title: `Báo giá ${quotation.value.code} — AOYAMA Admin` });
       </template>
     </AyPageHeader>
 
-    <section class="card">
+    <section class="card" style="background: #fff">
       <div class="table-wrap !shadow-none">
         <table class="table">
           <thead>
@@ -91,7 +91,7 @@ useHead({ title: `Báo giá ${quotation.value.code} — AOYAMA Admin` });
     </section>
 
     <div class="grid gap-4 sm:grid-cols-2">
-      <section class="card">
+      <section class="card" style="background: #fff">
         <AyMoneyTable
           :subtotal="quotation.subtotal"
           :discount-amount="quotation.discountAmount"

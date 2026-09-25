@@ -53,7 +53,7 @@ useHead({ title: 'Nhập phụ tùng bằng AI — AOYAMA Admin' });
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-2xl flex-col gap-4">
+  <div class="admin-form">
     <AyPageHeader
       code="SA-27" title="Nhập phụ tùng bằng AI" back-to="/admin/parts"
       description="Chụp ảnh phụ tùng hoặc hộp vỏ, trợ lý sẽ đọc thông tin và điền sẵn biểu mẫu. Bạn luôn kiểm tra trước khi lưu."
@@ -63,14 +63,14 @@ useHead({ title: 'Nhập phụ tùng bằng AI — AOYAMA Admin' });
       </template>
     </AyPageHeader>
 
-    <section class="card flex flex-col gap-3">
+    <section class="card flex flex-col gap-3" style="background: #fff">
       <AyImageUpload v-model="images" label="Ảnh phụ tùng hoặc hộp vỏ" :max="3" />
       <AyButton :loading="analyzing" :disabled="images.length === 0" @click="analyze">
         Nhận dạng bằng AI
       </AyButton>
     </section>
 
-    <section v-if="result && !result.isFallback" class="card flex flex-col gap-3">
+    <section v-if="result && !result.isFallback" class="card flex flex-col gap-3" style="background: #fff">
       <div class="flex items-center gap-2">
         <h2 class="font-heading text-[16px]">Kết quả nhận dạng</h2>
         <AyAiBadge :confidence="result.confidence ?? null" />
@@ -81,8 +81,8 @@ useHead({ title: 'Nhập phụ tùng bằng AI — AOYAMA Admin' });
         <div><dt class="text-muted">Hãng</dt><dd>{{ result.maker ?? '—' }}</dd></div>
         <div><dt class="text-muted">Mã hãng</dt><dd class="font-mono">{{ result.makerPartNo ?? '—' }}</dd></div>
         <div><dt class="text-muted">Nhóm</dt><dd>{{ result.category ?? '—' }}</dd></div>
-        <div class="sm:col-span-2"><dt class="text-muted">Quy cách</dt><dd>{{ result.specification ?? '—' }}</dd></div>
-        <div v-if="result.compatibleVehicles?.length" class="sm:col-span-2">
+        <div class="ay-col-full"><dt class="text-muted">Quy cách</dt><dd>{{ result.specification ?? '—' }}</dd></div>
+        <div v-if="result.compatibleVehicles?.length" class="ay-col-full">
           <dt class="text-muted">Xe tương thích</dt>
           <dd>
             <ul class="mt-1 flex flex-wrap gap-1.5">
@@ -98,9 +98,9 @@ useHead({ title: 'Nhập phụ tùng bằng AI — AOYAMA Admin' });
         Đây là gợi ý của AI. Hãy đối chiếu với hộp vỏ thật rồi bổ sung giá nhập, giá bán trước khi lưu.
       </p>
 
-      <div class="flex gap-2">
-        <AyButton @click="reviewAndSave">Kiểm tra &amp; tạo phụ tùng →</AyButton>
+      <div class="admin-actions">
         <AyButton variant="secondary" @click="result = null">Nhận dạng lại</AyButton>
+        <AyButton @click="reviewAndSave">Kiểm tra &amp; tạo phụ tùng →</AyButton>
       </div>
     </section>
 

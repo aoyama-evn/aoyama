@@ -66,7 +66,7 @@ useHead({ title: 'Cấu hình hệ thống — AOYAMA Admin' });
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-3xl flex-col gap-4">
+  <div class="admin-form admin-form-wide">
     <AyPageHeader
       code="SA-43" title="Cấu hình hệ thống"
       description="Các ngưỡng nghiệp vụ đọc từ đây trước. Thay đổi có hiệu lực ngay, không cần khởi động lại."

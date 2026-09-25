@@ -103,7 +103,7 @@ useHead({ title: isNew ? 'Thêm phụ tùng' : 'Sửa phụ tùng' });
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-3xl flex-col gap-4">
+  <div class="admin-form">
     <AyPageHeader
       code="SA-26" :title="isNew ? 'Thêm phụ tùng' : 'Sửa phụ tùng'" back-to="/admin/parts"
     >
@@ -119,7 +119,7 @@ useHead({ title: isNew ? 'Thêm phụ tùng' : 'Sửa phụ tùng' });
       Thông tin dưới đây do trợ lý AI điền sẵn từ ảnh. Hãy kiểm tra lại trước khi lưu.
     </p>
 
-    <section class="card grid gap-3 sm:grid-cols-2">
+    <section class="card admin-grid" style="background: #fff">
       <AyField label="Mã phụ tùng" required>
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.code" class="input font-mono" type="text" placeholder="P-OIL-10W30">
@@ -132,7 +132,7 @@ useHead({ title: isNew ? 'Thêm phụ tùng' : 'Sửa phụ tùng' });
         </template>
       </AyField>
 
-      <div class="sm:col-span-2"><AyI18nInput v-model="form.name" label="Tên phụ tùng" required /></div>
+      <div class="ay-col-full"><AyI18nInput v-model="form.name" label="Tên phụ tùng" required /></div>
 
       <AyField label="Hãng sản xuất">
         <template #default="{ id: fid }">
@@ -146,7 +146,7 @@ useHead({ title: isNew ? 'Thêm phụ tùng' : 'Sửa phụ tùng' });
         </template>
       </AyField>
 
-      <AyField label="Quy cách" class="sm:col-span-2">
+      <AyField label="Quy cách" class="ay-col-full">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.specification" class="input" type="text">
         </template>
@@ -176,7 +176,7 @@ useHead({ title: isNew ? 'Thêm phụ tùng' : 'Sửa phụ tùng' });
       </label>
     </section>
 
-    <section class="card">
+    <section class="card" style="background: #fff">
       <h2 class="mb-2 font-heading text-[16px]">Xe tương thích</h2>
       <div class="flex gap-2">
         <input
@@ -194,15 +194,15 @@ useHead({ title: isNew ? 'Thêm phụ tùng' : 'Sửa phụ tùng' });
       </ul>
     </section>
 
-    <section class="card">
+    <section class="card" style="background: #fff">
       <AyImageUpload v-model="images" label="Ảnh phụ tùng" :max="4" />
     </section>
 
     <AyErrorNote :error="error" />
 
-    <div class="flex gap-2">
-      <AyButton :loading="saving" @click="save">Lưu</AyButton>
+    <div class="admin-actions">
       <AyButton to="/admin/parts" variant="secondary">Hủy</AyButton>
+      <AyButton :loading="saving" @click="save">Lưu</AyButton>
     </div>
   </div>
 </template>

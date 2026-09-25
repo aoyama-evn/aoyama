@@ -177,14 +177,14 @@ useHead({ title: 'Đặt lịch thay khách — AOYAMA Admin' });
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-4xl flex-col gap-4">
+  <div class="admin-form admin-form-wide">
     <AyPageHeader
       code="SA-06" title="Đặt lịch thay khách" back-to="/admin/bookings"
       description="Lịch tạo từ đây được xác nhận ngay và gửi mã QR cho khách."
     />
 
     <div class="grid gap-4 lg:grid-cols-2">
-      <section class="card flex flex-col gap-3">
+      <section class="card flex flex-col gap-3" style="background: #fff">
         <h2 class="font-heading text-[16px]">Khách hàng</h2>
 
         <AyField label="Số điện thoại" required hint="Nhập để tìm hồ sơ khách đã có">
@@ -214,7 +214,7 @@ useHead({ title: 'Đặt lịch thay khách — AOYAMA Admin' });
         </AyField>
       </section>
 
-      <section class="card flex flex-col gap-3">
+      <section class="card flex flex-col gap-3" style="background: #fff">
         <h2 class="font-heading text-[16px]">Cửa hàng &amp; dịch vụ</h2>
 
         <AyField label="Cửa hàng" required>
@@ -247,7 +247,7 @@ useHead({ title: 'Đặt lịch thay khách — AOYAMA Admin' });
       </section>
     </div>
 
-    <section class="card flex flex-col gap-3">
+    <section class="card flex flex-col gap-3" style="background: #fff">
       <h2 class="font-heading text-[16px]">Thông tin xe</h2>
 
       <div v-if="customerVehicles.length" class="flex flex-wrap gap-2">
@@ -270,12 +270,12 @@ useHead({ title: 'Đặt lịch thay khách — AOYAMA Admin' });
       <AyVehicleForm v-if="!selectedVehicleId" v-model="vehicle" />
     </section>
 
-    <section class="card">
+    <section class="card" style="background: #fff">
       <h2 class="mb-3 font-heading text-[16px]">Ngày &amp; khung giờ</h2>
       <AySlotPicker v-model="slot" :days="days" :loading="loadingSlots" />
     </section>
 
-    <section class="card grid gap-3 sm:grid-cols-2">
+    <section class="card admin-grid" style="background: #fff">
       <AyField label="Mô tả tình trạng xe">
         <template #default="{ id }">
           <textarea :id="id" v-model="form.symptomDescription" class="input min-h-[90px]" />
@@ -290,11 +290,11 @@ useHead({ title: 'Đặt lịch thay khách — AOYAMA Admin' });
 
     <AyErrorNote :error="error" />
 
-    <div class="flex gap-2">
+    <div class="admin-actions">
+      <AyButton to="/admin/bookings" variant="secondary">Hủy</AyButton>
       <AyButton :disabled="!canSubmit" :loading="submitting" @click="submit">
         Tạo và xác nhận lịch hẹn
       </AyButton>
-      <AyButton to="/admin/bookings" variant="secondary">Hủy</AyButton>
     </div>
   </div>
 </template>

@@ -99,13 +99,13 @@ useHead({ title: isNew ? 'Thêm dịch vụ' : 'Sửa dịch vụ' });
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-3xl flex-col gap-4">
+  <div class="admin-form">
     <AyPageHeader
       code="SA-23" :title="isNew ? 'Thêm dịch vụ' : 'Sửa dịch vụ'" back-to="/admin/services"
       description="Tên và mô tả nhập cho cả ba ngôn ngữ — thiếu bản dịch nào, hệ thống lùi về tiếng Nhật."
     />
 
-    <section class="card grid gap-3 sm:grid-cols-2">
+    <section class="card admin-grid" style="background: #fff">
       <AyField label="Mã dịch vụ" required>
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.code" class="input font-mono" type="text" placeholder="SVC-MAINT-PERIODIC">
@@ -136,18 +136,18 @@ useHead({ title: isNew ? 'Thêm dịch vụ' : 'Sửa dịch vụ' });
         </template>
       </AyField>
 
-      <div class="sm:col-span-2">
+      <div class="ay-col-full">
         <AyI18nInput v-model="form.name" label="Tên dịch vụ" required />
       </div>
-      <div class="sm:col-span-2">
+      <div class="ay-col-full">
         <AyI18nInput v-model="form.shortDescription" label="Mô tả ngắn" />
       </div>
-      <div class="sm:col-span-2">
+      <div class="ay-col-full">
         <AyI18nInput v-model="form.description" label="Mô tả chi tiết" multiline />
       </div>
     </section>
 
-    <section class="card">
+    <section class="card" style="background: #fff">
       <div class="mb-2 flex items-baseline justify-between">
         <h2 class="font-heading text-[16px]">Hạng mục kiểm tra</h2>
         <AyButton variant="ghost" size="sm" @click="checklist.push({})">+ Thêm hạng mục</AyButton>
@@ -163,8 +163,8 @@ useHead({ title: isNew ? 'Thêm dịch vụ' : 'Sửa dịch vụ' });
       </p>
     </section>
 
-    <section class="card grid gap-3 sm:grid-cols-2">
-      <h2 class="font-heading text-[16px] sm:col-span-2">Thời gian &amp; giá</h2>
+    <section class="card admin-grid" style="background: #fff">
+      <h2 class="font-heading text-[16px] ay-col-full">Thời gian &amp; giá</h2>
 
       <AyField label="Thời gian ước tính (phút)" required>
         <template #default="{ id: fid }">
@@ -212,9 +212,9 @@ useHead({ title: isNew ? 'Thêm dịch vụ' : 'Sửa dịch vụ' });
 
     <AyErrorNote :error="error" />
 
-    <div class="flex gap-2">
-      <AyButton :loading="saving" @click="save">Lưu</AyButton>
+    <div class="admin-actions">
       <AyButton to="/admin/services" variant="secondary">Hủy</AyButton>
+      <AyButton :loading="saving" @click="save">Lưu</AyButton>
     </div>
   </div>
 </template>

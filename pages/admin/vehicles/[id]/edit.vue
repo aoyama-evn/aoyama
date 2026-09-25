@@ -93,7 +93,7 @@ useHead({ title: isNew ? 'Thêm phương tiện' : 'Sửa phương tiện' });
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-2xl flex-col gap-4">
+  <div class="admin-form">
     <AyPageHeader
       code="SA-21" :title="isNew ? 'Thêm phương tiện' : 'Sửa phương tiện'"
       :back-to="isNew ? '/admin/vehicles' : `/admin/vehicles/${id}`"
@@ -121,12 +121,12 @@ useHead({ title: isNew ? 'Thêm phương tiện' : 'Sửa phương tiện' });
       </ul>
     </section>
 
-    <form class="card flex flex-col gap-4" @submit.prevent="save">
+    <form class="card flex flex-col gap-4" style="background: #fff" @submit.prevent="save">
       <AyVehicleForm v-model="form" :errors="errors" />
       <AyErrorNote :error="error" />
-      <div class="flex gap-2">
-        <AyButton type="submit" :loading="saving">Lưu</AyButton>
+      <div class="admin-actions">
         <AyButton :to="isNew ? '/admin/vehicles' : `/admin/vehicles/${id}`" variant="secondary">Hủy</AyButton>
+        <AyButton type="submit" :loading="saving">Lưu</AyButton>
       </div>
     </form>
   </div>

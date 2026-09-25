@@ -57,7 +57,7 @@ useHead({ title: 'Đổi lịch hẹn — AOYAMA Admin' });
 </script>
 
 <template>
-  <div v-if="booking" class="mx-auto flex max-w-3xl flex-col gap-4">
+  <div v-if="booking" class="admin-form">
     <AyPageHeader
       code="SA-05" title="Đổi lịch hẹn" :back-to="`/admin/bookings/${id}`"
       :description="`${booking.code} · hiện tại ${dateTime(booking.scheduledAt)}`"
@@ -73,9 +73,9 @@ useHead({ title: 'Đổi lịch hẹn — AOYAMA Admin' });
 
     <AyErrorNote :error="error" />
 
-    <div class="flex gap-2">
-      <AyButton :disabled="!slot" :loading="submitting" @click="submit">Xác nhận đổi lịch</AyButton>
+    <div class="admin-actions">
       <AyButton :to="`/admin/bookings/${id}`" variant="secondary">Hủy</AyButton>
+      <AyButton :disabled="!slot" :loading="submitting" @click="submit">Xác nhận đổi lịch</AyButton>
     </div>
   </div>
 </template>

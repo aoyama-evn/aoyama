@@ -68,13 +68,13 @@ useHead({ title: isNew ? 'Thêm khách hàng' : 'Sửa khách hàng' });
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-2xl flex-col gap-4">
+  <div class="admin-form">
     <AyPageHeader
       code="SA-17" :title="isNew ? 'Thêm khách hàng' : 'Sửa hồ sơ khách hàng'"
       :back-to="isNew ? '/admin/customers' : `/admin/customers/${id}`"
     />
 
-    <form class="card grid gap-3 sm:grid-cols-2" @submit.prevent="save">
+    <form class="card admin-grid" style="background: #fff" @submit.prevent="save">
       <AyField label="Số điện thoại" required hint="Là khóa định danh khách hàng (BR-01)">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.phone" class="input" type="tel" required>
@@ -99,7 +99,7 @@ useHead({ title: isNew ? 'Thêm khách hàng' : 'Sửa khách hàng' });
         </template>
       </AyField>
 
-      <AyField label="Địa chỉ" class="sm:col-span-2">
+      <AyField label="Địa chỉ" class="ay-col-full">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.address" class="input" type="text">
         </template>
@@ -115,19 +115,19 @@ useHead({ title: isNew ? 'Thêm khách hàng' : 'Sửa khách hàng' });
         </template>
       </AyField>
 
-      <AyField label="Ghi chú nội bộ" class="sm:col-span-2">
+      <AyField label="Ghi chú nội bộ" class="ay-col-full">
         <template #default="{ id: fid }">
           <textarea :id="fid" v-model="form.internalNote" class="input min-h-[90px]" />
         </template>
       </AyField>
 
-      <div class="sm:col-span-2"><AyErrorNote :error="error" /></div>
+      <div class="ay-col-full"><AyErrorNote :error="error" /></div>
 
-      <div class="flex gap-2 sm:col-span-2">
-        <AyButton type="submit" :loading="saving">Lưu</AyButton>
+      <div class="admin-actions ay-col-full">
         <AyButton :to="isNew ? '/admin/customers' : `/admin/customers/${id}`" variant="secondary">
-          Hủy
+          ← Hủy
         </AyButton>
+        <AyButton type="submit" :loading="saving">Lưu hồ sơ</AyButton>
       </div>
     </form>
   </div>

@@ -328,6 +328,59 @@
     background: var(--color-neutral-100);
   }
 
+  /**
+   * Bieu mau them / sua du lieu goc cua trang quan tri.
+   *
+   * Ban thiet ke can trai chu khong can giua, va cho cac o nhap chay thanh
+   * nhieu cot — nho do tren man 1920 bieu mau van day chu khong phai mot cot
+   * doc hep nam giua khoang trong.
+   */
+  .admin-form {
+    display: flex;
+    max-width: 880px;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /** Bieu mau nhieu cot hon: bang gio, khung gio, cau hinh he thong. */
+  .admin-form-wide {
+    max-width: 1180px;
+  }
+
+  /** Luoi o nhap — tu chia cot theo be rong con lai. */
+  .admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 11px;
+  }
+
+  /** O nhap trai het hang trong .admin-grid. */
+  .ay-col-full {
+    grid-column: 1 / -1;
+  }
+
+  /** Hang nut cuoi bieu mau — can phai, nut cao 48px (C-05). */
+  .admin-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 9px;
+  }
+  .admin-actions > .btn {
+    min-height: 48px;
+    padding-inline: 20px;
+  }
+
+  @media (min-width: 1760px) {
+    .admin-form {
+      max-width: 1040px;
+    }
+    .admin-form-wide {
+      max-width: 1400px;
+    }
+  }
+
   /** Vung chinh cua trang quan tri dung nen sang hon de the noi len. */
   .admin-surface {
     background: var(--color-neutral-100);
