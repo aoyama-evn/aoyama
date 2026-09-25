@@ -26,6 +26,14 @@
 
     /** Be rong cot noi dung site khach hang — khung dien thoai 392px cua ban thiet ke. */
     --sp-width: 392px;
+
+    /**
+     * Vo may cua khung dien thoai. Bang mau cua he thong dung cho giao dien,
+     * chua co tong du toi cho mot than may, nen hai mau nay dat rieng o day:
+     * ca hai deu nguoc tu neutral-900 (#2e2b25) cua he thong.
+     */
+    --ay-device-shell: #16140f;
+    --ay-device-edge: #55503f;
   }
 
   /**
@@ -239,9 +247,10 @@
     .ay-device {
       min-height: 100dvh;
       align-items: center;
-      justify-content: center;
+      /* Ghim len tren: can giua theo chieu doc lam khung tut xuong thap. */
+      justify-content: flex-start;
       background: var(--color-neutral-200);
-      padding: 24px 16px;
+      padding: 16px 16px 24px;
     }
 
     /**
@@ -252,31 +261,33 @@
     .ay-device-frame {
       position: relative;
       display: block;
-      width: 392px;
+      /* 370px man hinh cua ban thiet ke + 19px vo may moi ben. */
+      width: 408px;
       flex: none;
-      border-radius: 52px;
+      border-radius: 60px;
       background: linear-gradient(
         150deg,
-        var(--color-neutral-500) 0%,
-        var(--color-neutral-800) 26%,
-        var(--color-neutral-900) 58%,
-        var(--color-neutral-700) 100%
+        var(--ay-device-edge) 0%,
+        var(--ay-device-shell) 30%,
+        var(--ay-device-shell) 68%,
+        var(--ay-device-edge) 100%
       );
-      padding: 13px;
+      padding: 19px;
       box-shadow:
-        0 32px 64px -20px rgb(32 30 29 / 45%),
-        0 8px 20px -8px rgb(32 30 29 / 30%),
-        inset 0 0 0 1px rgb(255 255 255 / 14%);
+        0 38px 72px -22px rgb(22 20 15 / 55%),
+        0 10px 24px -8px rgb(22 20 15 / 38%),
+        inset 0 0 0 1.5px rgb(255 255 255 / 12%),
+        inset 0 0 0 5px rgb(22 20 15 / 85%);
     }
 
     .ay-device-screen {
       height: min(772px, calc(100dvh - 78px));
       min-height: 0;
       flex: none;
-      border-radius: 40px;
+      border-radius: 42px;
       /* Chua cho vach cham nha o day, de noi dung khong de len no. */
       padding-bottom: 18px;
-      box-shadow: inset 0 0 0 1px rgb(32 30 29 / 55%);
+      box-shadow: inset 0 0 0 1px rgb(22 20 15 / 65%);
     }
 
     .ay-device-statusbar {
@@ -288,13 +299,13 @@
       display: block;
       position: absolute;
       left: 50%;
-      top: 8px;
+      top: 9px;
       z-index: 5;
-      width: 108px;
-      height: 26px;
+      width: 112px;
+      height: 28px;
       transform: translateX(-50%);
       border-radius: 999px;
-      background: var(--color-neutral-900);
+      background: var(--ay-device-shell);
     }
 
     /* Vach cham nha o day man hinh. */
@@ -316,28 +327,24 @@
     .ay-device-btn {
       display: block;
       position: absolute;
-      width: 3px;
+      width: 4px;
       border-radius: 4px;
-      background: linear-gradient(
-        180deg,
-        var(--color-neutral-600),
-        var(--color-neutral-800)
-      );
+      background: linear-gradient(180deg, var(--ay-device-edge), var(--ay-device-shell));
     }
     .ay-device-btn-power {
-      right: -3px;
-      top: 168px;
-      height: 74px;
+      right: -4px;
+      top: 176px;
+      height: 86px;
     }
     .ay-device-btn-up {
-      left: -3px;
-      top: 142px;
-      height: 46px;
+      left: -4px;
+      top: 146px;
+      height: 52px;
     }
     .ay-device-btn-down {
-      left: -3px;
-      top: 196px;
-      height: 46px;
+      left: -4px;
+      top: 208px;
+      height: 52px;
     }
   }
 
