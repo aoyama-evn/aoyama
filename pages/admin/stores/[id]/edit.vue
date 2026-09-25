@@ -5,6 +5,7 @@ import type { ApiError, I18nText, Store } from '~/types/models';
 definePageMeta({ layout: 'admin', middleware: ['admin', 'admin-only'] });
 
 const route = useRoute();
+const { t } = useI18n();
 const api = useApi();
 const ui = useUiStore();
 
@@ -48,7 +49,7 @@ if (!isNew) {
 
 async function save(): Promise<void> {
   if (!form.code.trim() || !form.phone.trim() || !(form.name.ja || form.name.en || form.name.vi)) {
-    ui.warning('Cần mã cửa hàng, số điện thoại và ít nhất một bản dịch tên');
+    ui.warning(t('sa33.needFields'));
     return;
   }
   saving.value = true;
@@ -62,11 +63,11 @@ async function save(): Promise<void> {
     };
     if (isNew) {
       const created = await api.post<Store>('/admin/stores', body);
-      ui.success('Đã thêm cửa hàng', 'Hãy cấu hình giờ làm việc và khung giờ nhận xe.');
+      ui.success(t('sa33.added'), t('sa33.addedSub'));
       await navigateTo(`/admin/stores/${created.id}/hours`);
     } else {
       await api.put(`/admin/stores/${id}`, body);
-      ui.success('Đã lưu cửa hàng');
+      ui.success(t('sa33.saved'));
       await navigateTo('/admin/stores');
     }
   } catch (err) {
@@ -76,57 +77,60 @@ async function save(): Promise<void> {
   }
 }
 
-useHead({ title: isNew ? 'Thêm cửa hàng' : 'Sửa cửa hàng' });
+setScreenTitle(() => (isNew ? t('sa33.addTitle') : t('sa33.editTitle')));
+useHead({ title: () => (isNew ? t('sa33.addTitle') : t('sa33.editTitle')) });
 </script>
 
 <template>
   <div class="admin-form">
     <AyPageHeader
-      code="SA-33" :title="isNew ? 'Thêm cửa hàng' : 'Sửa cửa hàng'" back-to="/admin/stores"
+      code="SA-33"
+      :title="isNew ? $t('sa33.addTitle') : $t('sa33.editTitle')"
+      back-to="/admin/stores"
     />
 
     <section class="card admin-grid" style="background: #fff">
-      <AyField label="Mã cửa hàng" required>
+      <AyField :label="$t('sa33.code')" required>
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.code" class="input font-mono" type="text" placeholder="AY-HAMAMATSU">
         </template>
       </AyField>
 
-      <AyField label="Số điện thoại" required>
+      <AyField :label="$t('sc14.phone')" required>
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.phone" class="input" type="tel">
         </template>
       </AyField>
 
-      <div class="ay-col-full"><AyI18nInput v-model="form.name" label="Tên cửa hàng" required /></div>
-      <div class="ay-col-full"><AyI18nInput v-model="form.address" label="Địa chỉ" required /></div>
-      <div class="ay-col-full"><AyI18nInput v-model="form.description" label="Giới thiệu" multiline /></div>
+      <div class="ay-col-full"><AyI18nInput v-model="form.name" :label="$t('sa33.nameLabel')" required /></div>
+      <div class="ay-col-full"><AyI18nInput v-model="form.address" :label="$t('sa17.address')" required /></div>
+      <div class="ay-col-full"><AyI18nInput v-model="form.description" :label="$t('sa33.intro')" multiline /></div>
 
-      <AyField label="Email">
+      <AyField :label="$t('sc14.email')">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.email" class="input" type="email">
         </template>
       </AyField>
 
-      <AyField label="Sức tiếp nhận mặc định" hint="Số xe tối đa mỗi khung giờ khi chưa cấu hình riêng">
+      <AyField :label="$t('sa33.capacity')" :hint="$t('sa33.capacityHint')">
         <template #default="{ id: fid }">
           <input :id="fid" v-model.number="form.defaultCapacity" class="input" type="number" min="1">
         </template>
       </AyField>
 
-      <AyField label="Vĩ độ">
+      <AyField :label="$t('sa33.lat')">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.latitude" class="input" type="text" placeholder="34.7108000">
         </template>
       </AyField>
 
-      <AyField label="Kinh độ">
+      <AyField :label="$t('sa33.lng')">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.longitude" class="input" type="text" placeholder="137.7261000">
         </template>
       </AyField>
 
-      <AyField label="Thứ tự hiển thị">
+      <AyField :label="$t('sa23.sortOrder')">
         <template #default="{ id: fid }">
           <input :id="fid" v-model.number="form.sortOrder" class="input" type="number">
         </template>
@@ -134,15 +138,15 @@ useHead({ title: isNew ? 'Thêm cửa hàng' : 'Sửa cửa hàng' });
 
       <label class="flex items-center gap-2.5 self-end text-[14px]">
         <input v-model="form.isActive" type="checkbox" class="h-4 w-4 accent-[var(--color-accent)]">
-        Đang hoạt động
+        {{ $t('sa33.isActive') }}
       </label>
     </section>
 
     <AyErrorNote :error="error" />
 
     <div class="admin-actions">
-      <AyButton to="/admin/stores" variant="secondary">Hủy</AyButton>
-      <AyButton :loading="saving" @click="save">Lưu</AyButton>
+      <AyButton to="/admin/stores" variant="secondary">{{ $t('common.cancel') }}</AyButton>
+      <AyButton :loading="saving" @click="save">{{ $t('common.save') }}</AyButton>
     </div>
   </div>
 </template>

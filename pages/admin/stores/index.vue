@@ -7,6 +7,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 const api = useApi();
 const ui = useUiStore();
 const auth = useAuthStore();
+const { t } = useI18n();
 const { i18n } = useFormat();
 
 const { data: stores, refresh } = await useAsyncData('admin-stores-list', () =>
@@ -19,7 +20,7 @@ async function deactivate(): Promise<void> {
   if (!deactivateTarget.value) return;
   try {
     await api.del(`/admin/stores/${deactivateTarget.value.id}`);
-    ui.success('Đã ngừng hoạt động cửa hàng');
+    ui.success(t('sa32.stopped'));
     deactivateTarget.value = null;
     await refresh();
   } catch (error) {
@@ -27,14 +28,15 @@ async function deactivate(): Promise<void> {
   }
 }
 
-useHead({ title: 'Cửa hàng — AOYAMA Admin' });
+setScreenTitle(() => t('sa32.title'));
+useHead({ title: () => `${t('sa32.title')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
-    <AyPageHeader code="SA-32" title="Cửa hàng">
+    <AyPageHeader code="SA-32" :title="$t('sa32.title')">
       <template #actions>
-        <AyButton v-if="auth.isSuperAdmin" to="/admin/stores/new/edit" size="sm">Thêm cửa hàng</AyButton>
+        <AyButton v-if="auth.isSuperAdmin" to="/admin/stores/new/edit" size="sm">{{ $t('sa32.addCta') }}</AyButton>
       </template>
     </AyPageHeader>
 
@@ -49,23 +51,25 @@ useHead({ title: 'Cửa hàng — AOYAMA Admin' });
             class="tag"
             :class="store.isActive ? 'bg-success-bg text-success' : 'bg-neutral-200 text-neutral-600'"
           >
-            {{ store.isActive ? 'Hoạt động' : 'Ngừng' }}
+            {{ store.isActive ? $t('sa32.active') : $t('sa32.inactive') }}
           </span>
         </div>
 
         <p class="text-[13px] text-muted">{{ i18n(store.address) }}</p>
         <p class="text-[13.5px]">{{ store.phone }}</p>
-        <p class="text-[12.5px] text-muted">Sức tiếp nhận mặc định: {{ store.defaultCapacity }} xe / khung giờ</p>
+        <p class="text-[12.5px] text-muted">
+          {{ $t('sa32.capacity', { n: store.defaultCapacity }) }}
+        </p>
 
         <div class="mt-auto flex flex-wrap gap-1.5 pt-2">
-          <AyButton :to="`/admin/stores/${store.id}/edit`" variant="secondary" size="sm">Sửa</AyButton>
-          <AyButton :to="`/admin/stores/${store.id}/hours`" variant="secondary" size="sm">Giờ làm việc</AyButton>
-          <AyButton :to="`/admin/stores/${store.id}/slots`" variant="secondary" size="sm">Khung giờ</AyButton>
+          <AyButton :to="`/admin/stores/${store.id}/edit`" variant="secondary" size="sm">{{ $t('common.edit') }}</AyButton>
+          <AyButton :to="`/admin/stores/${store.id}/hours`" variant="secondary" size="sm">{{ $t('sa32.hoursCta') }}</AyButton>
+          <AyButton :to="`/admin/stores/${store.id}/slots`" variant="secondary" size="sm">{{ $t('sa32.slotsCta') }}</AyButton>
           <AyButton
             v-if="store.isActive && auth.isSuperAdmin"
             variant="ghost" size="sm" @click="deactivateTarget = store"
           >
-            Ngừng
+            {{ $t('sa32.stop') }}
           </AyButton>
         </div>
       </article>
@@ -73,9 +77,9 @@ useHead({ title: 'Cửa hàng — AOYAMA Admin' });
 
     <AyConfirmDialog
       :open="Boolean(deactivateTarget)"
-      title="Ngừng hoạt động cửa hàng"
-      message="Cửa hàng không còn nhận lịch hẹn mới. Lịch hẹn và phiếu đang mở vẫn xử lý bình thường."
-      confirm-label="Ngừng hoạt động"
+      :title="$t('sa32.askStop')"
+      :message="$t('sa32.askStopBody')"
+      :confirm-label="$t('sa32.stopConfirm')"
       danger
       @confirm="deactivate"
       @cancel="deactivateTarget = null"

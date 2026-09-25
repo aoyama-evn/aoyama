@@ -15,15 +15,19 @@ interface SlotRow {
 const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { i18n } = useFormat();
 
 const id = route.params.id as string;
-const WEEKDAYS = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+/** Ten bay thu; lay tu tep ngon ngu nen doi theo ngon ngu dang chon. */
+const WEEKDAYS = computed(() => [0, 1, 2, 3, 4, 5, 6].map((d) => t(`weekday.${d}`)));
 
 const { data: store } = await useAsyncData(`store-slots-${id}`, () =>
   api.get<Store>(`/admin/stores/${id}`),
 );
-if (!store.value) throw createError({ statusCode: 404, statusMessage: 'Không tìm thấy cửa hàng' });
+if (!store.value) {
+  throw createError({ statusCode: 404, statusMessage: t('sc06.notFound') });
+}
 
 const { data: existing, refresh } = await useAsyncData(`store-slots-list-${id}`, () =>
   api.get<TimeSlotConfig[]>(`/admin/stores/${id}/slots`),
@@ -65,7 +69,7 @@ function addMinutes(time: string, minutes: number): string {
 function copyToAll(weekday: number): void {
   const source = slots.value.filter((s) => s.weekday === weekday);
   if (source.length === 0) {
-    ui.warning('Thứ này chưa có khung giờ nào để sao chép');
+    ui.warning(t('sa35.nothingToCopy'));
     return;
   }
   const others = slots.value.filter((s) => s.weekday === weekday);
@@ -75,11 +79,11 @@ function copyToAll(weekday: number): void {
     copies.push(...source.map((s) => ({ ...s, weekday: day })));
   }
   slots.value = [...others, ...copies];
-  ui.success('Đã sao chép khung giờ sang các thứ còn lại');
+  ui.success(t('sa35.copied'));
 }
 
 const byWeekday = computed(() =>
-  WEEKDAYS.map((label, weekday) => ({
+  WEEKDAYS.value.map((label, weekday) => ({
     weekday,
     label,
     rows: slots.value.filter((s) => s.weekday === weekday),
@@ -89,13 +93,13 @@ const byWeekday = computed(() =>
 async function save(): Promise<void> {
   const invalid = slots.value.find((s) => s.startTime >= s.endTime);
   if (invalid) {
-    ui.warning('Có khung giờ kết thúc trước hoặc bằng giờ bắt đầu');
+    ui.warning(t('sa35.badRange'));
     return;
   }
   saving.value = true;
   try {
     await api.put(`/admin/stores/${id}/slots`, { slots: slots.value });
-    ui.success('Đã lưu khung giờ');
+    ui.success(t('sa35.saved'));
     await refresh();
   } catch (error) {
     ui.error(normalizeError(error).message);
@@ -104,17 +108,18 @@ async function save(): Promise<void> {
   }
 }
 
-useHead({ title: 'Khung giờ nhận xe — AOYAMA Admin' });
+setScreenTitle(() => t('sa35.headTitle'));
+useHead({ title: () => `${t('sa35.headTitle')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div v-if="store" class="admin-form admin-form-wide">
     <AyPageHeader
-      code="SA-35" title="Khung giờ &amp; năng lực tiếp nhận" back-to="/admin/stores"
-      :description="`${i18n(store.name)} — số chỗ là số xe tối đa nhận trong một khung giờ`"
+      code="SA-35" :title="$t('sa35.title')" back-to="/admin/stores"
+      :description="$t('sa35.lead', { store: i18n(store.name) })"
     >
       <template #actions>
-        <AyButton :to="`/admin/stores/${id}/hours`" variant="secondary" size="sm">Giờ làm việc</AyButton>
+        <AyButton :to="`/admin/stores/${id}/hours`" variant="secondary" size="sm">{{ $t('sa32.hoursCta') }}</AyButton>
       </template>
     </AyPageHeader>
 
@@ -122,46 +127,46 @@ useHead({ title: 'Khung giờ nhận xe — AOYAMA Admin' });
       <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
         <h2 class="font-heading text-[15px]">{{ day.label }}</h2>
         <div class="flex gap-1">
-          <AyButton variant="ghost" size="sm" @click="addSlot(day.weekday)">+ Khung giờ</AyButton>
+          <AyButton variant="ghost" size="sm" @click="addSlot(day.weekday)">{{ $t('sa35.addSlot') }}</AyButton>
           <AyButton v-if="day.rows.length" variant="ghost" size="sm" @click="copyToAll(day.weekday)">
-            Sao chép sang mọi thứ
+            {{ $t('sa35.copyAll') }}
           </AyButton>
         </div>
       </div>
 
       <p v-if="day.rows.length === 0" class="text-[13px] text-muted">
-        Chưa có khung giờ — cửa hàng sẽ không nhận đặt lịch vào thứ này.
+        {{ $t('sa35.noSlots') }}
       </p>
 
       <ul v-else class="flex flex-col gap-2">
         <li v-for="(slot, index) in day.rows" :key="index" class="flex flex-wrap items-center gap-2">
-          <input v-model="slot.startTime" class="input h-10 min-h-0 w-auto py-1" type="time" aria-label="Giờ bắt đầu">
+          <input v-model="slot.startTime" class="input h-10 min-h-0 w-auto py-1" type="time" :aria-label="$t('sa35.startAria')">
           <span class="text-muted">–</span>
-          <input v-model="slot.endTime" class="input h-10 min-h-0 w-auto py-1" type="time" aria-label="Giờ kết thúc">
+          <input v-model="slot.endTime" class="input h-10 min-h-0 w-auto py-1" type="time" :aria-label="$t('sa35.endAria')">
 
           <label class="flex items-center gap-1.5 text-[13px]">
-            <span class="text-muted">Số chỗ</span>
+            <span class="text-muted">{{ $t('sa35.capacity') }}</span>
             <input v-model.number="slot.capacity" class="input h-10 min-h-0 w-20 py-1 text-center" type="number" min="0">
           </label>
 
           <label class="flex items-center gap-1.5 text-[13px]">
             <input v-model="slot.isActive" type="checkbox" class="h-4 w-4 accent-[var(--color-accent)]">
-            Đang mở
+            {{ $t('sa35.isOpen') }}
           </label>
 
           <button
             type="button" class="ml-auto text-[12.5px] text-danger underline"
             @click="slots.splice(slots.indexOf(slot), 1)"
           >
-            Xóa
+            {{ $t('common.delete') }}
           </button>
         </li>
       </ul>
     </section>
 
     <div class="admin-actions">
-      <AyButton to="/admin/stores" variant="secondary">← Hủy</AyButton>
-      <AyButton :loading="saving" @click="save">Lưu toàn bộ khung giờ</AyButton>
+      <AyButton to="/admin/stores" variant="secondary">{{ $t('common.cancel') }}</AyButton>
+      <AyButton :loading="saving" @click="save">{{ $t('sa35.saveAll') }}</AyButton>
     </div>
   </div>
 </template>
