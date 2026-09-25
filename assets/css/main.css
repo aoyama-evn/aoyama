@@ -24,8 +24,8 @@
     --color-danger: #a3342c;
     --color-danger-bg: #fbeae8;
 
-    /** Be rong cot noi dung site khach hang — khung dien thoai 392px cua ban thiet ke. */
-    --sp-width: 392px;
+    /** Be rong man hinh SP muc tieu — 375 x 812 (iPhone X tro len). */
+    --sp-width: 375px;
 
     /**
      * Vo may cua khung dien thoai. Bang mau cua he thong dung cho giao dien,
@@ -192,7 +192,7 @@
   /* ---------- Khung dien thoai cua site khach hang ---------- */
 
   /**
-   * Ban thiet ke ve toan bo site khach hang trong mot khung dien thoai 392px.
+   * Site khach hang chay trong khung dien thoai 375 x 812 (co SP muc tieu).
    * Tren dien thoai that thi khong ve khung: ung dung chiem tron man hinh.
    * Tu 560px tro len moi dung khung, de xem tren may tinh giong nhu cam dien
    * thoai tren tay — cung la cach ban thiet ke trinh bay.
@@ -250,13 +250,13 @@
     }
 
     /**
-     * Vo may — dung thong so ban thiet ke: rong 392px, vien 11px, bo tron 46px
-     * ngoai va 36px trong. Vien phang mot mau, khong danh bong kim loai.
+     * Vo may boc vua mot man hinh SP 375 x 812: 375 + 11px vien moi ben.
+     * Vien phang mot mau, bo tron 46px ngoai va 36px trong nhu ban thiet ke.
      */
     .ay-device-frame {
       position: relative;
       display: block;
-      width: 392px;
+      width: 397px;
       flex: none;
       border-radius: 46px;
       background: var(--ay-device-shell);
@@ -267,7 +267,8 @@
     }
 
     .ay-device-screen {
-      height: min(772px, calc(100dvh - 62px));  /* 16 tren + 24 duoi + 11 x 2 vien */
+      /* 812px cua khung SP; thap hon thi co lai theo khung nhin. */
+      height: min(812px, calc(100dvh - 62px));
       min-height: 0;
       flex: none;
       border-radius: 36px;

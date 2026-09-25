@@ -4,10 +4,9 @@ import { SCREEN_ID } from '~/composables/useOverlayTarget';
 /**
  * Bo cuc site khach hang.
  *
- * Ban thiet ke ve toan bo site nay trong mot khung dien thoai 392 × 772: thanh
- * trang thai va dau trang dung yen o tren, chi phan noi dung cuon. Tren dien
- * thoai that vo may bien mat va ung dung chiem tron man hinh (xem .ay-device
- * trong main.css).
+ * Giao dien dung cho khung dien thoai 375 × 812: thanh trang thai va dau trang
+ * dung yen o tren, chi phan noi dung cuon. Tren dien thoai that vo may bien
+ * mat va ung dung chiem tron man hinh (xem .ay-device trong main.css).
  */
 </script>
 
