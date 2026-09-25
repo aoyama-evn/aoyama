@@ -267,7 +267,12 @@
     }
 
     .ay-device-screen {
-      /* 812px cua khung SP; thap hon thi co lai theo khung nhin. */
+      /*
+       * 812px cua khung SP. Dat truoc mot gia tri don gian de trinh duyet nao
+       * chua hieu dvh van co chieu cao — thieu buoc nay thi ca khai bao bi bo,
+       * man hinh cao bang 0 va khung chi con lai vien den.
+       */
+      height: 812px;
       height: min(812px, calc(100dvh - 62px));
       min-height: 0;
       flex: none;
