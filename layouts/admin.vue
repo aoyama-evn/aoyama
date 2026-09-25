@@ -41,7 +41,7 @@ watch(() => route.fullPath, () => {
           style="background: rgb(32 30 29 / 50%)"
           role="dialog"
           aria-modal="true"
-          aria-label="Điều hướng trang quản trị"
+          :aria-label="$t('adm.nav.aria')"
           @click.self="navOpen = false"
         >
           <AdminSidebar class="admin-nav flex h-full" />

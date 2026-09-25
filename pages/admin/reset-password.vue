@@ -6,6 +6,7 @@
  */
 definePageMeta({ layout: 'auth' });
 
+const { t } = useI18n();
 const api = useApi();
 const route = useRoute();
 const ui = useUiStore();
@@ -25,7 +26,7 @@ async function submit(): Promise<void> {
     return;
   }
   if (password.value !== confirm.value) {
-    errorText.value = 'Hai lần nhập mật khẩu chưa khớp';
+    errorText.value = t('sa01c.mismatch');
     return;
   }
   saving.value = true;
@@ -35,7 +36,7 @@ async function submit(): Promise<void> {
       token,
       newPassword: password.value,
     });
-    ui.success('Đã đặt mật khẩu mới', 'Hãy đăng nhập lại bằng mật khẩu vừa đặt.');
+    ui.success(t('sa01c.done'), t('sa01c.doneSub'));
     await navigateTo('/admin/login');
   } catch (caught) {
     errorText.value = normalizeError(caught).message;
@@ -44,23 +45,23 @@ async function submit(): Promise<void> {
   }
 }
 
-useHead({ title: 'Đặt mật khẩu mới — AOYAMA Admin' });
+useHead({ title: () => `${t('sa01c.title')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div class="flex flex-col gap-3.5">
-    <p class="font-heading text-[20px]" style="color: var(--color-accent-300)">Đặt mật khẩu mới</p>
+    <p class="font-heading text-[20px]" style="color: var(--color-accent-300)">{{ $t('sa01c.title') }}</p>
 
     <p
       v-if="!adminId || !token"
       class="text-[12.5px] leading-[1.55]"
       style="color: var(--color-neutral-300)"
     >
-      Đường dẫn không hợp lệ. Hãy yêu cầu lại từ màn hình quên mật khẩu.
+      {{ $t('sa01c.badLink') }}
     </p>
 
     <form v-else class="flex flex-col gap-3.5" @submit.prevent="submit">
-      <AyField for="pw" label="Mật khẩu mới" required hint="ít nhất 10 ký tự">
+      <AyField for="pw" :label="$t('sa01c.newPw')" required :hint="$t('sa01c.newPwHint')">
         <input
           id="pw"
           v-model="password"
@@ -70,7 +71,7 @@ useHead({ title: 'Đặt mật khẩu mới — AOYAMA Admin' });
         />
       </AyField>
 
-      <AyField for="pw2" label="Nhập lại mật khẩu" required :error="errorText ?? undefined">
+      <AyField for="pw2" :label="$t('sa01c.repeatPw')" required :error="errorText ?? undefined">
         <input
           id="pw2"
           v-model="confirm"
@@ -86,7 +87,7 @@ useHead({ title: 'Đặt mật khẩu mới — AOYAMA Admin' });
         style="min-height: 48px; font-size: 15px; margin: 0"
         :disabled="saving"
       >
-        {{ saving ? 'Đang lưu…' : 'Đặt mật khẩu' }}
+        {{ saving ? $t('common.saving') : $t('sa01c.submit') }}
       </button>
     </form>
 
@@ -95,7 +96,7 @@ useHead({ title: 'Đặt mật khẩu mới — AOYAMA Admin' });
       class="btn btn-ghost self-center text-[13px]"
       style="color: var(--color-accent-300)"
     >
-      ← Quay lại đăng nhập
+      {{ $t('sa01.backToLogin') }}
     </NuxtLink>
   </div>
 </template>

@@ -6,6 +6,36 @@
     "settings": "Cài đặt",
     "vehicles": "Xe của tôi"
   },
+  "adm": {
+    "nav": {
+      "aria": "Điều hướng trang quản trị",
+      "assistant": "Trợ lý AI",
+      "bookings": "Lịch hẹn",
+      "calendar": "Lịch dạng tuần",
+      "catalog": "Danh mục",
+      "customers": "Khách hàng",
+      "dashboard": "Bảng điều khiển",
+      "intake": "Tiếp nhận",
+      "open": "Mở điều hướng",
+      "quotations": "Báo giá",
+      "scanQr": "Quét mã QR",
+      "stores": "Cửa hàng",
+      "system": "Hệ thống"
+    },
+    "store": {
+      "all": "Tất cả",
+      "allLong": "Tất cả cửa hàng",
+      "label": "Cửa hàng"
+    },
+    "top": {
+      "account": "Tài khoản",
+      "changePw": "Đổi mật khẩu",
+      "logout": "Đăng xuất",
+      "roleAdmin": "Quản trị viên",
+      "roleStaff": "Nhân viên",
+      "unread": "{n} thông báo mới"
+    }
+  },
   "ai": {
     "badge": "Gợi ý bởi AI",
     "badgeShort": "✦ Gợi ý bởi AI",
@@ -169,6 +199,46 @@
     "sent": "Ghi âm đã gửi kèm",
     "stop": "Dừng",
     "useText": "Bạn có thể mô tả bằng văn bản thay thế."
+  },
+  "sa01": {
+    "backToLogin": "← Quay lại đăng nhập",
+    "forgot": "Quên mật khẩu?",
+    "hidePw": "Ẩn mật khẩu",
+    "password": "Mật khẩu",
+    "remember": "Ghi nhớ đăng nhập",
+    "showPw": "Hiện mật khẩu",
+    "submit": "Đăng nhập",
+    "submitting": "Đang đăng nhập…",
+    "title": "Đăng nhập quản trị",
+    "username": "Tên đăng nhập hoặc email"
+  },
+  "sa01b": {
+    "lead": "Nhập email tài khoản quản trị. Hệ thống gửi đường dẫn đặt lại mật khẩu, hiệu lực 30 phút.",
+    "resend": "Gửi lại email",
+    "sent": "Đã gửi đường dẫn tới {email}. Kiểm tra hộp thư (cả thư rác) và mở đường dẫn trong vòng 30 phút.",
+    "submit": "Gửi đường dẫn đặt lại",
+    "title": "Quên mật khẩu"
+  },
+  "sa01c": {
+    "badLink": "Đường dẫn không hợp lệ. Hãy yêu cầu lại từ màn hình quên mật khẩu.",
+    "done": "Đã đặt mật khẩu mới",
+    "doneSub": "Hãy đăng nhập lại bằng mật khẩu vừa đặt.",
+    "mismatch": "Hai lần nhập mật khẩu chưa khớp",
+    "newPw": "Mật khẩu mới",
+    "newPwHint": "ít nhất 10 ký tự",
+    "repeatPw": "Nhập lại mật khẩu",
+    "submit": "Đặt mật khẩu",
+    "title": "Đặt mật khẩu mới"
+  },
+  "sa01d": {
+    "currentPw": "Mật khẩu hiện tại",
+    "done": "Đã đổi mật khẩu",
+    "doneSub": "Vui lòng đăng nhập lại bằng mật khẩu mới.",
+    "mismatch": "Hai mật khẩu chưa khớp",
+    "mustChange": "Tài khoản mới cần đổi mật khẩu trước khi sử dụng.",
+    "newPwHint": "Tối thiểu 8 ký tự",
+    "repeatNew": "Nhập lại mật khẩu mới",
+    "title": "Đổi mật khẩu"
   },
   "sc01": {
     "askAi": "Xe đang gặp vấn đề? Hỏi trợ lý AI",

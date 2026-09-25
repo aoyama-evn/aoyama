@@ -5,6 +5,7 @@ import type { ApiError } from '~/types/models';
 definePageMeta({ layout: 'auth', middleware: 'admin' });
 
 const api = useApi();
+const { t } = useI18n();
 const auth = useAuthStore();
 const ui = useUiStore();
 
@@ -24,7 +25,7 @@ async function submit(): Promise<void> {
       currentPassword: form.currentPassword,
       newPassword: form.newPassword,
     });
-    ui.success('Đã đổi mật khẩu', 'Vui lòng đăng nhập lại bằng mật khẩu mới.');
+    ui.success(t('sa01d.done'), t('sa01d.doneSub'));
     // Doi mat khau thi backend thu hoi moi phien — buoc dang nhap lai.
     auth.clear();
     await navigateTo('/admin/login');
@@ -35,32 +36,36 @@ async function submit(): Promise<void> {
   }
 }
 
-useHead({ title: 'Đổi mật khẩu' });
+useHead({ title: () => t('sa01d.title') });
 </script>
 
 <template>
   <div class="card flex flex-col gap-4">
     <div>
-      <h1 class="font-heading text-[19px]">Đổi mật khẩu</h1>
+      <h1 class="font-heading text-[19px]">{{ $t('sa01d.title') }}</h1>
       <p v-if="auth.user?.mustChangePassword" class="mt-1 text-[13px] text-warning">
-        Tài khoản mới cần đổi mật khẩu trước khi sử dụng.
+        {{ $t('sa01d.mustChange') }}
       </p>
     </div>
 
     <form class="flex flex-col gap-3" @submit.prevent="submit">
-      <AyField label="Mật khẩu hiện tại" required>
+      <AyField :label="$t('sa01d.currentPw')" required>
         <template #default="{ id }">
           <input :id="id" v-model="form.currentPassword" class="input" type="password" autocomplete="current-password" required>
         </template>
       </AyField>
 
-      <AyField label="Mật khẩu mới" required hint="Tối thiểu 8 ký tự">
+      <AyField :label="$t('sa01c.newPw')" required :hint="$t('sa01d.newPwHint')">
         <template #default="{ id }">
           <input :id="id" v-model="form.newPassword" class="input" type="password" autocomplete="new-password" minlength="8" required>
         </template>
       </AyField>
 
-      <AyField label="Nhập lại mật khẩu mới" required :error="mismatch ? 'Hai mật khẩu chưa khớp' : undefined">
+      <AyField
+        :label="$t('sa01d.repeatNew')"
+        required
+        :error="mismatch ? $t('sa01d.mismatch') : undefined"
+      >
         <template #default="{ id, invalid }">
           <input :id="id" v-model="form.confirmPassword" class="input" type="password" autocomplete="new-password" :aria-invalid="invalid" required>
         </template>
@@ -69,7 +74,7 @@ useHead({ title: 'Đổi mật khẩu' });
       <AyErrorNote :error="error" />
 
       <AyButton type="submit" block :loading="loading" :disabled="mismatch || form.newPassword.length < 8">
-        Đổi mật khẩu
+        {{ $t('sa01d.title') }}
       </AyButton>
     </form>
   </div>

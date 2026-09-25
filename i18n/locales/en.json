@@ -6,6 +6,36 @@
     "settings": "Settings",
     "vehicles": "My bikes"
   },
+  "adm": {
+    "nav": {
+      "aria": "Admin navigation",
+      "assistant": "AI assistant",
+      "bookings": "Bookings",
+      "calendar": "Week calendar",
+      "catalog": "Catalog",
+      "customers": "Customers",
+      "dashboard": "Dashboard",
+      "intake": "Intake",
+      "open": "Open navigation",
+      "quotations": "Quotations",
+      "scanQr": "Scan QR code",
+      "stores": "Stores",
+      "system": "System"
+    },
+    "store": {
+      "all": "All",
+      "allLong": "All stores",
+      "label": "Store"
+    },
+    "top": {
+      "account": "Account",
+      "changePw": "Change password",
+      "logout": "Log out",
+      "roleAdmin": "Administrator",
+      "roleStaff": "Staff",
+      "unread": "{n} new notifications"
+    }
+  },
   "ai": {
     "badge": "AI suggestion",
     "badgeShort": "✦ AI suggestion",
@@ -169,6 +199,46 @@
     "sent": "Voice recording sent",
     "stop": "Stop",
     "useText": "You can describe it in writing instead."
+  },
+  "sa01": {
+    "backToLogin": "← Back to sign in",
+    "forgot": "Forgot your password?",
+    "hidePw": "Hide password",
+    "password": "Password",
+    "remember": "Remember me",
+    "showPw": "Show password",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "title": "Admin sign in",
+    "username": "Username or email"
+  },
+  "sa01b": {
+    "lead": "Enter the email of your admin account. We will send a reset link, valid for 30 minutes.",
+    "resend": "Resend email",
+    "sent": "We sent a link to {email}. Check your inbox (and spam) and open it within 30 minutes.",
+    "submit": "Send reset link",
+    "title": "Forgot password"
+  },
+  "sa01c": {
+    "badLink": "This link is not valid. Please request a new one from the forgot-password screen.",
+    "done": "New password set",
+    "doneSub": "Please sign in with your new password.",
+    "mismatch": "The passwords do not match",
+    "newPw": "New password",
+    "newPwHint": "at least 10 characters",
+    "repeatPw": "Repeat the password",
+    "submit": "Set password",
+    "title": "Set a new password"
+  },
+  "sa01d": {
+    "currentPw": "Current password",
+    "done": "Password changed",
+    "doneSub": "Please sign in again with your new password.",
+    "mismatch": "The passwords do not match",
+    "mustChange": "New accounts must change their password before use.",
+    "newPwHint": "At least 8 characters",
+    "repeatNew": "Repeat the new password",
+    "title": "Change password"
   },
   "sc01": {
     "askAi": "Bike trouble? Ask the AI assistant",

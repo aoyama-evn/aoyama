@@ -5,10 +5,12 @@
  * nhom va khong kem ma man hinh, nut "Quet ma QR" ghim duoi cung. Man hinh con
  * cua tung muc duoc vao tu chinh muc do chu khong len thanh dieu huong.
  */
+const { t } = useI18n();
 const auth = useAuthStore();
 
 interface NavItem {
   to: string;
+  /** Khoa ngon ngu cua nhan, vi du adm.nav.bookings. */
   label: string;
   /** Duong dan con van lam sang muc nay. */
   match?: string[];
@@ -16,29 +18,34 @@ interface NavItem {
 }
 
 const ITEMS: NavItem[] = [
-  { to: '/admin', label: 'Bảng điều khiển' },
-  { to: '/admin/bookings', label: 'Lịch hẹn' },
-  { to: '/admin/bookings/calendar', label: 'Lịch dạng tuần' },
-  { to: '/admin/scan', label: 'Tiếp nhận', match: ['/admin/work-orders'] },
-  { to: '/admin/quotations', label: 'Báo giá' },
-  { to: '/admin/customers', label: 'Khách hàng', match: ['/admin/vehicles'] },
+  { to: '/admin', label: 'adm.nav.dashboard' },
+  { to: '/admin/bookings', label: 'adm.nav.bookings' },
+  { to: '/admin/bookings/calendar', label: 'adm.nav.calendar' },
+  { to: '/admin/scan', label: 'adm.nav.intake', match: ['/admin/work-orders'] },
+  { to: '/admin/quotations', label: 'adm.nav.quotations' },
+  { to: '/admin/customers', label: 'adm.nav.customers', match: ['/admin/vehicles'] },
   {
     to: '/admin/services',
-    label: 'Danh mục',
+    label: 'adm.nav.catalog',
     match: ['/admin/pricing', '/admin/parts', '/admin/inventory'],
   },
-  { to: '/admin/tech-assistant', label: 'Trợ lý AI', match: ['/admin/knowledge-base'] },
-  { to: '/admin/stores', label: 'Cửa hàng' },
+  { to: '/admin/tech-assistant', label: 'adm.nav.assistant', match: ['/admin/knowledge-base'] },
+  { to: '/admin/stores', label: 'adm.nav.stores' },
   {
     to: '/admin/users',
-    label: 'Hệ thống',
+    label: 'adm.nav.system',
     match: ['/admin/notifications', '/admin/settings', '/admin/audit-logs', '/admin/reports'],
     adminOnly: true,
   },
 ];
 
 /** RD muc 8 — tai khoan STAFF khong thay muc chi danh cho ADMIN. */
-const items = computed(() => ITEMS.filter((item) => !item.adminOnly || auth.isSuperAdmin));
+const items = computed(() =>
+  ITEMS.filter((item) => !item.adminOnly || auth.isSuperAdmin).map((item) => ({
+    ...item,
+    text: t(item.label),
+  })),
+);
 
 const route = useRoute();
 
@@ -72,7 +79,7 @@ function isActive(item: NavItem): boolean {
       :class="isActive(item) ? 'ay-nav-active' : ''"
       :aria-current="isActive(item) ? 'page' : undefined"
     >
-      {{ item.label }}
+      {{ item.text }}
     </NuxtLink>
 
     <NuxtLink to="/admin/scan" class="btn btn-primary mt-auto gap-[7px] text-[12.5px]">
@@ -85,7 +92,7 @@ function isActive(item: NavItem): boolean {
         <rect x="3" y="14" width="7" height="7" rx="2" />
         <path d="M14 14h3v3M21 21h.01M17 21h.01M21 17h.01" />
       </svg>
-      Quét mã QR
+      {{ $t('adm.nav.scanQr') }}
     </NuxtLink>
   </aside>
 </template>

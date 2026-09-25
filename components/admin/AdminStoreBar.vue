@@ -8,10 +8,15 @@ import type { Store } from '~/types/models';
  * SA-02 ve dang day the bam, con cac man hinh danh sach ve dang o chon; prop
  * "variant" chon giua hai kieu do.
  */
-withDefaults(defineProps<{ variant?: 'chips' | 'select'; label?: string }>(), {
-  variant: 'select',
-  label: 'Cửa hàng',
-});
+const props = withDefaults(
+  defineProps<{ variant?: 'chips' | 'select'; label?: string }>(),
+  { variant: 'select' },
+);
+
+const { t } = useI18n();
+
+/** Nhan mac dinh lay tu tep ngon ngu; man hinh goi co the dat nhan rieng. */
+const labelText = computed(() => props.label ?? t('adm.store.label'));
 
 const api = useApi();
 const auth = useAuthStore();
@@ -39,7 +44,7 @@ function pick(id: string | null): void {
       class="text-[10px] uppercase"
       style="letter-spacing: 0.09em; color: var(--color-neutral-600)"
     >
-      {{ label }}
+      {{ labelText }}
     </span>
 
     <template v-if="variant === 'chips'">
@@ -63,7 +68,7 @@ function pick(id: string | null): void {
         :aria-pressed="ui.activeStoreId === null"
         @click="pick(null)"
       >
-        Tất cả
+        {{ $t('adm.store.all') }}
       </button>
     </template>
 
@@ -71,12 +76,12 @@ function pick(id: string | null): void {
       v-else
       class="input"
       style="width: auto; min-width: 220px; padding-right: 34px"
-      :aria-label="label"
+      :aria-label="labelText"
       :disabled="locked"
       :value="ui.activeStoreId ?? ''"
       @change="pick(($event.target as HTMLSelectElement).value || null)"
     >
-      <option value="">Tất cả cửa hàng</option>
+      <option value="">{{ $t('adm.store.allLong') }}</option>
       <option v-for="store in stores ?? []" :key="store.id" :value="store.id">
         {{ i18n(store.name) }}
       </option>

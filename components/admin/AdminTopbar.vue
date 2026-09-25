@@ -5,6 +5,7 @@
  * chi co chuong thong bao va vong tron chu cai dau cua tai khoan. Bo chon cua
  * hang khong nam o day ma o dau noi dung tung man hinh (AdminStoreBar).
  */
+const { t } = useI18n();
 const auth = useAuthStore();
 const api = useApi();
 const router = useRouter();
@@ -65,8 +66,8 @@ async function logout(): Promise<void> {
         to="/admin/notifications/logs"
         class="relative inline-flex items-center"
         style="color: var(--color-neutral-700)"
-        :title="`${unread?.count ?? 0} thông báo mới`"
-        :aria-label="`${unread?.count ?? 0} thông báo mới`"
+        :title="$t('adm.top.unread', { n: unread?.count ?? 0 })"
+        :aria-label="$t('adm.top.unread', { n: unread?.count ?? 0 })"
       >
         <svg
           width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -93,7 +94,7 @@ async function logout(): Promise<void> {
           class="grid place-items-center rounded-full text-[11px] font-bold"
           style="width: 30px; height: 30px; background: var(--color-accent-300)"
           :aria-expanded="accountMenuOpen"
-          :aria-label="auth.user?.name || 'Tài khoản'"
+          :aria-label="auth.user?.name || t('adm.top.account')"
           @click="accountMenuOpen = !accountMenuOpen"
         >
           {{ initials }}
@@ -109,13 +110,15 @@ async function logout(): Promise<void> {
             style="border-bottom: 1px solid var(--color-divider)"
           >
             {{ auth.user?.name }} ·
-            {{ auth.user?.adminRole === 'ADMIN' ? 'Quản trị viên' : 'Nhân viên' }}
+            {{
+              auth.user?.adminRole === 'ADMIN' ? $t('adm.top.roleAdmin') : $t('adm.top.roleStaff')
+            }}
           </p>
           <NuxtLink
             to="/admin/change-password"
             class="block px-3 py-2.5 text-[13.5px] hover:bg-[var(--color-accent-100)]"
           >
-            Đổi mật khẩu
+            {{ $t('adm.top.changePw') }}
           </NuxtLink>
           <button
             type="button"
@@ -123,7 +126,7 @@ async function logout(): Promise<void> {
             style="color: var(--color-danger)"
             @click="logout"
           >
-            Đăng xuất
+            {{ $t('adm.top.logout') }}
           </button>
         </div>
       </div>

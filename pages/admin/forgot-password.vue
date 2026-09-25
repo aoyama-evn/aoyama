@@ -6,6 +6,7 @@
  */
 definePageMeta({ layout: 'auth' });
 
+const { t } = useI18n();
 const api = useApi();
 
 const email = ref('');
@@ -30,24 +31,24 @@ async function submit(): Promise<void> {
   }
 }
 
-useHead({ title: 'Quên mật khẩu — AOYAMA Admin' });
+useHead({ title: () => `${t('sa01b.title')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div class="flex flex-col gap-3.5">
     <div class="flex flex-col gap-1.5">
-      <p class="font-heading text-[20px]" style="color: var(--color-accent-300)">Quên mật khẩu</p>
+      <p class="font-heading text-[20px]" style="color: var(--color-accent-300)">{{ $t('sa01b.title') }}</p>
       <p
         v-if="!sent"
         class="text-[12.5px] leading-[1.55]"
         style="color: var(--color-neutral-300)"
       >
-        Nhập email tài khoản quản trị. Hệ thống gửi đường dẫn đặt lại mật khẩu, hiệu lực 30 phút.
+        {{ $t('sa01b.lead') }}
       </p>
     </div>
 
     <form v-if="!sent" class="flex flex-col gap-3.5" @submit.prevent="submit">
-      <AyField for="email" label="Email" required :error="errorText ?? undefined">
+      <AyField for="email" :label="$t('sc14.email')" required :error="errorText ?? undefined">
         <input
           id="email"
           v-model="email"
@@ -63,7 +64,7 @@ useHead({ title: 'Quên mật khẩu — AOYAMA Admin' });
         style="min-height: 48px; font-size: 15px; margin: 0"
         :disabled="sending"
       >
-        {{ sending ? 'Đang gửi…' : 'Gửi đường dẫn đặt lại' }}
+        {{ sending ? $t('common.sending') : $t('sa01b.submit') }}
       </button>
     </form>
 
@@ -80,8 +81,9 @@ useHead({ title: 'Quên mật khẩu — AOYAMA Admin' });
           ✓
         </span>
         <p class="text-[13px] leading-[1.55]" style="color: var(--color-neutral-200)">
-          Đã gửi đường dẫn tới <strong style="color: #fff">{{ email }}</strong
-          >. Kiểm tra hộp thư (cả thư rác) và mở đường dẫn trong vòng 30 phút.
+          <i18n-t keypath="sa01b.sent" tag="span">
+            <template #email><strong style="color: #fff">{{ email }}</strong></template>
+          </i18n-t>
         </p>
       </div>
       <button
@@ -94,7 +96,7 @@ useHead({ title: 'Quên mật khẩu — AOYAMA Admin' });
         :disabled="sending"
         @click="submit"
       >
-        Gửi lại email
+        {{ $t('sa01b.resend') }}
       </button>
     </div>
 
@@ -103,7 +105,7 @@ useHead({ title: 'Quên mật khẩu — AOYAMA Admin' });
       class="btn btn-ghost self-center text-[13px]"
       style="color: var(--color-accent-300)"
     >
-      ← Quay lại đăng nhập
+      {{ $t('sa01.backToLogin') }}
     </NuxtLink>
   </div>
 </template>

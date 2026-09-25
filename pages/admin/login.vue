@@ -9,6 +9,7 @@ import type { ApiError, TokenResponse } from '~/types/models';
 definePageMeta({ layout: 'auth' });
 
 const api = useApi();
+const { t } = useI18n();
 const auth = useAuthStore();
 const route = useRoute();
 
@@ -38,14 +39,14 @@ async function submit(): Promise<void> {
   }
 }
 
-useHead({ title: 'Đăng nhập quản trị — AOYAMA Service' });
+useHead({ title: () => `${t('sa01.title')} — AOYAMA Service` });
 </script>
 
 <template>
   <form class="flex flex-col gap-3.5" @submit.prevent="submit">
     <p class="font-heading text-[20px]" style="color: var(--color-accent-300)">AOYAMA Admin</p>
 
-    <AyField for="username" label="Tên đăng nhập hoặc email" required>
+    <AyField for="username" :label="$t('sa01.username')" required>
       <input
         id="username"
         v-model="form.username"
@@ -56,7 +57,7 @@ useHead({ title: 'Đăng nhập quản trị — AOYAMA Service' });
       />
     </AyField>
 
-    <AyField for="password" label="Mật khẩu" required>
+    <AyField for="password" :label="$t('sa01.password')" required>
       <div class="relative mt-[5px]">
         <input
           id="password"
@@ -71,8 +72,8 @@ useHead({ title: 'Đăng nhập quản trị — AOYAMA Service' });
           type="button"
           class="btn absolute right-1 top-1/2 -translate-y-1/2 p-2"
           style="background: transparent; color: var(--color-neutral-400)"
-          :aria-label="showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'"
-          :title="showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'"
+          :aria-label="showPassword ? $t('sa01.hidePw') : $t('sa01.showPw')"
+          :title="showPassword ? $t('sa01.hidePw') : $t('sa01.showPw')"
           @click="showPassword = !showPassword"
         >
           <svg
@@ -93,14 +94,14 @@ useHead({ title: 'Đăng nhập quản trị — AOYAMA Service' });
         style="color: var(--color-neutral-300)"
       >
         <input v-model="remember" type="checkbox" />
-        Ghi nhớ đăng nhập
+        {{ $t('sa01.remember') }}
       </label>
       <NuxtLink
         to="/admin/forgot-password"
         class="text-[12.5px]"
         style="color: var(--color-accent-300)"
       >
-        Quên mật khẩu?
+        {{ $t('sa01.forgot') }}
       </NuxtLink>
     </div>
 
@@ -112,7 +113,7 @@ useHead({ title: 'Đăng nhập quản trị — AOYAMA Service' });
       style="min-height: 48px; font-size: 15px; margin: 0"
       :disabled="loading"
     >
-      {{ loading ? 'Đang đăng nhập…' : 'Đăng nhập' }}
+      {{ loading ? $t('sa01.submitting') : $t('sa01.submit') }}
     </button>
   </form>
 </template>
