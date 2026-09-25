@@ -15,6 +15,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { i18n, money, dateTime, number } = useFormat();
 
 const id = route.params.id as string;
@@ -22,9 +23,11 @@ const id = route.params.id as string;
 const { data: workOrder, refresh } = await useAsyncData(`wo-${id}`, () =>
   api.get<WorkOrder>(`/admin/work-orders/${id}`),
 );
-if (!workOrder.value) throw createError({ statusCode: 404, statusMessage: 'Không tìm thấy phiếu' });
+if (!workOrder.value) {
+  throw createError({ statusCode: 404, statusMessage: t('sa10.notFound') });
+}
 
-setScreenTitle(() => `Phiếu dịch vụ ${workOrder.value?.code ?? ''}`);
+setScreenTitle(() => t('sa10.title', { code: workOrder.value?.code ?? '' }));
 
 const { data: quotations } = await useAsyncData(`wo-quotes-${id}`, () =>
   api.get<Quotation[]>(`/admin/work-orders/${id}/quotations`),
@@ -56,42 +59,26 @@ const TRANSITIONS: Record<string, WorkOrderStatus[]> = {
   CANCELLED: [],
 };
 
-const ACTION_LABELS: Record<string, string> = {
-  DIAGNOSING: 'Bắt đầu chẩn đoán',
-  IN_PROGRESS: 'Bắt đầu thực hiện',
-  COMPLETED: 'Hoàn tất sửa chữa →',
-  DELIVERED: 'Bàn giao xe →',
-  CANCELLED: 'Hủy phiếu',
-};
+/** Nhan cua nut chuyen trang thai; trang thai la khoa dung chung ba thu tieng. */
+function actionLabel(status: string): string {
+  return t(`sa10.act.${status}`);
+}
 
-const WORK_ORDER_LABELS: Record<string, string> = {
-  RECEIVED: 'Đã tiếp nhận',
-  DIAGNOSING: 'Đã chẩn đoán',
-  QUOTED: 'Đang báo giá',
-  IN_PROGRESS: 'Đang tiến hành',
-  COMPLETED: 'Đã xong',
-  DELIVERED: 'Đã bàn giao',
-  CANCELLED: 'Đã hủy',
-};
-
-const DIFFICULTY_LABELS: Record<string, string> = {
-  EASY: 'Dễ',
-  MEDIUM: 'Trung bình',
-  HARD: 'Khó',
-};
-
-const FUEL_LABELS = ['Cạn', '1/4', '1/2', '3/4', 'Đầy'];
+/** Ten moc tien do cua phieu — khac nhan trang thai o cho no ke chuyen da xong. */
+function flowLabel(status: string): string {
+  return t(`sa10.flow.${status}`);
+}
 
 const nextStatuses = computed(() => TRANSITIONS[workOrder.value?.status ?? ''] ?? []);
 
 const confirmMessage = computed(() => {
   switch (statusTarget.value) {
     case WorkOrderStatus.COMPLETED:
-      return 'Phụ tùng sẽ bị trừ khỏi kho, lịch sử dịch vụ của xe được ghi lại và khách nhận SMS báo xe đã xong.';
+      return t('sa10.ask.COMPLETED');
     case WorkOrderStatus.DELIVERED:
-      return 'Phiếu đóng lại và lịch hẹn liên quan chuyển sang hoàn tất.';
+      return t('sa10.ask.DELIVERED');
     case WorkOrderStatus.CANCELLED:
-      return 'Phiếu bị hủy. Nếu đã trừ kho, phụ tùng sẽ được hoàn lại.';
+      return t('sa10.ask.CANCELLED');
     default:
       return undefined;
   }
@@ -105,7 +92,7 @@ async function changeStatus(): Promise<void> {
       status: statusTarget.value,
       note: statusNote.value || undefined,
     });
-    ui.success('Đã cập nhật trạng thái phiếu');
+    ui.success(t('sa10.statusSaved'));
     statusTarget.value = null;
     statusNote.value = '';
     await refresh();
@@ -123,7 +110,7 @@ async function saveProgress(): Promise<void> {
       progressNote: progress.progressNote || undefined,
       estimatedCompletionAt: progress.estimatedCompletionAt || undefined,
     });
-    ui.success('Đã cập nhật tiến độ', 'Khách xem được ngay trên trang theo dõi.');
+    ui.success(t('sa10.progressSaved'), t('sa10.progressSavedSub'));
     await refresh();
   } catch (error) {
     ui.error(normalizeError(error).message);
@@ -141,7 +128,7 @@ const timelineEntries = computed(() =>
     id: h.id,
     createdAt: h.createdAt,
     actorType: 'ADMIN',
-    action: `${h.fromStatus ?? 'Mở phiếu'} → ${h.toStatus}`,
+    action: `${h.fromStatus ? flowLabel(h.fromStatus) : t('sa10.opened')} → ${flowLabel(h.toStatus)}`,
     detail: h.note,
   })),
 );
@@ -154,12 +141,12 @@ const progressSteps = computed<ProgressStep[]>(() => {
   const current = order.indexOf(workOrder.value?.status ?? 'RECEIVED');
   return order.map((status, index) => ({
     key: status,
-    label: WORK_ORDER_LABELS[status],
+    label: flowLabel(status),
     state: index < current ? 'done' : index === current ? 'current' : 'todo',
   }));
 });
 
-useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
+useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '' })} — AOYAMA Admin` });
 </script>
 
 <template>
@@ -167,7 +154,7 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
     <!-- Ba the tom tat -->
     <div class="grid gap-[13px]" style="grid-template-columns: repeat(auto-fit, minmax(230px, 1fr))">
       <div class="card gap-1" style="background: #fff">
-        <div class="card-kicker">Khách · xe · cửa hàng</div>
+        <div class="card-kicker">{{ $t('sa10.summary1') }}</div>
         <p class="text-[13.5px]">
           {{ workOrder.customer?.name }} · {{ workOrder.customer?.phone }}
         </p>
@@ -187,11 +174,11 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
       </div>
 
       <div class="card gap-1" style="background: #fff">
-        <div class="card-kicker">Hiện trạng khi tiếp nhận</div>
+        <div class="card-kicker">{{ $t('sa10.summary2') }}</div>
         <p class="text-[13.5px]">
           {{ number(workOrder.intakeOdometer) }} km
           <template v-if="workOrder.intakeFuelLevel !== null">
-            · nhiên liệu {{ FUEL_LABELS[workOrder.intakeFuelLevel] ?? workOrder.intakeFuelLevel }}
+            · {{ $t('sa10.fuelIs', { level: $t(`fuel.${workOrder.intakeFuelLevel}`) }) }}
           </template>
         </p>
         <p v-if="workOrder.intakeAccessories" class="text-muted text-[12px]">
@@ -201,14 +188,16 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
       </div>
 
       <div class="card gap-1" style="background: #fff">
-        <div class="card-kicker">Kỹ thuật viên</div>
+        <div class="card-kicker">{{ $t('sa10.technician') }}</div>
         <p class="text-[13.5px]">
-          {{ workOrder.assignedTechnician?.fullName ?? 'Chưa phân công' }}
+          {{ workOrder.assignedTechnician?.fullName ?? $t('sa10.unassigned') }}
           <template v-if="workOrder.difficulty">
-            · mức độ khó: {{ DIFFICULTY_LABELS[workOrder.difficulty] }}
+            · {{ $t('sa10.difficultyIs', { level: $t(`difficulty.${workOrder.difficulty}`) }) }}
           </template>
         </p>
-        <p class="text-muted text-[12px]">Mở phiếu {{ dateTime(workOrder.createdAt) }}</p>
+        <p class="text-muted text-[12px]">
+          {{ $t('sa10.openedAt', { at: dateTime(workOrder.createdAt) }) }}
+        </p>
       </div>
     </div>
 
@@ -217,38 +206,38 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
     <!-- Chan doan -->
     <section class="card gap-2.5" style="background: #fff">
       <div class="flex items-baseline justify-between gap-2.5">
-        <h5>Chẩn đoán kỹ thuật viên</h5>
+        <h5>{{ $t('sa10.diagnosis') }}</h5>
         <NuxtLink :to="`/admin/work-orders/${id}/items`" class="btn btn-ghost text-[12.5px]">
-          Sửa chẩn đoán &amp; hạng mục →
+          {{ $t('sa10.editItems') }}
         </NuxtLink>
       </div>
       <p v-if="workOrder.customerSymptom" class="text-[13.5px]">
-        <strong>Triệu chứng:</strong> {{ workOrder.customerSymptom }}
+        <strong>{{ $t('sa10.symptom') }}</strong> {{ workOrder.customerSymptom }}
       </p>
       <p v-if="workOrder.diagnosisNote" class="text-[13.5px]">
-        <strong>Ghi nhận:</strong> {{ workOrder.diagnosisNote }}
+        <strong>{{ $t('sa10.finding') }}</strong> {{ workOrder.diagnosisNote }}
       </p>
       <p v-if="workOrder.diagnosisCause" class="text-[13.5px]">
-        <strong>Nguyên nhân:</strong> {{ workOrder.diagnosisCause }}
+        <strong>{{ $t('sa10.cause') }}</strong> {{ workOrder.diagnosisCause }}
       </p>
       <p
         v-if="!workOrder.customerSymptom && !workOrder.diagnosisNote && !workOrder.diagnosisCause"
         class="text-muted text-[12.5px]"
       >
-        Chưa ghi chẩn đoán.
+        {{ $t('sa10.noDiagnosis') }}
       </p>
     </section>
 
     <!-- Hang muc va phu tung -->
     <div class="grid gap-[13px]" style="grid-template-columns: repeat(auto-fit, minmax(330px, 1fr))">
       <section class="card gap-2" style="background: #fff">
-        <h5>Hạng mục công việc</h5>
+        <h5>{{ $t('sa10.items') }}</h5>
         <table v-if="(workOrder.items ?? []).length" class="table" style="min-width: 270px">
           <thead>
             <tr>
-              <th>Hạng mục</th>
-              <th>Thời gian</th>
-              <th class="text-right">Đơn giá</th>
+              <th>{{ $t('sa10.colItem') }}</th>
+              <th>{{ $t('sa10.colTime') }}</th>
+              <th class="text-right">{{ $t('sa10.colUnit') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -259,24 +248,24 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
                 <AyAiBadge v-if="item.suggestedByAi" class="ml-1" />
               </td>
               <td class="whitespace-nowrap">
-                {{ item.laborMinutes ? `${item.laborMinutes} mins` : '—' }}
+                {{ item.laborMinutes ? $t('common.minutes', { n: item.laborMinutes }) : '—' }}
               </td>
               <td class="text-right">{{ money(item.unitPrice * item.quantity) }}</td>
             </tr>
           </tbody>
         </table>
-        <p v-else class="text-muted text-[12.5px]">Chưa có hạng mục nào.</p>
+        <p v-else class="text-muted text-[12.5px]">{{ $t('sa10.noItems') }}</p>
       </section>
 
       <section class="card gap-2" style="background: #fff">
-        <h5>Phụ tùng</h5>
+        <h5>{{ $t('sa10.parts') }}</h5>
         <table v-if="(workOrder.parts ?? []).length" class="table" style="min-width: 270px">
           <thead>
             <tr>
-              <th>Tên · mã</th>
-              <th>SL</th>
-              <th class="text-right">Đơn giá</th>
-              <th class="text-right">Thành tiền</th>
+              <th>{{ $t('sa10.colPart') }}</th>
+              <th>{{ $t('sa10.colQty') }}</th>
+              <th class="text-right">{{ $t('sa10.colUnit') }}</th>
+              <th class="text-right">{{ $t('sa10.colAmount') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -293,7 +282,7 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
             </tr>
           </tbody>
         </table>
-        <p v-else class="text-muted text-[12.5px]">Chưa có phụ tùng nào.</p>
+        <p v-else class="text-muted text-[12.5px]">{{ $t('sa10.noParts') }}</p>
       </section>
     </div>
 
@@ -301,50 +290,50 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
     <div class="flex flex-wrap items-stretch gap-[13px]">
       <section class="card min-w-[250px] flex-1 gap-1.5" style="background: var(--color-surface)">
         <div class="flex justify-between text-[13px]">
-          <span class="text-muted">Tiền công</span><span>{{ money(workOrder.laborSubtotal) }}</span>
+          <span class="text-muted">{{ $t('money.labor') }}</span><span>{{ money(workOrder.laborSubtotal) }}</span>
         </div>
         <div class="flex justify-between text-[13px]">
-          <span class="text-muted">Phụ tùng</span><span>{{ money(workOrder.partsSubtotal) }}</span>
+          <span class="text-muted">{{ $t('money.parts') }}</span><span>{{ money(workOrder.partsSubtotal) }}</span>
         </div>
         <div v-if="workOrder.discountAmount" class="flex justify-between text-[13px]">
-          <span class="text-muted">Giảm giá</span>
+          <span class="text-muted">{{ $t('money.discount') }}</span>
           <span>−{{ money(workOrder.discountAmount) }}</span>
         </div>
         <div class="flex justify-between text-[13px]">
-          <span class="text-muted">Thuế {{ workOrder.taxRate }} %</span>
+          <span class="text-muted">{{ $t('money.taxRate', { rate: workOrder.taxRate }) }}</span>
           <span>{{ money(workOrder.taxAmount) }}</span>
         </div>
         <div
           class="flex items-baseline justify-between pt-2"
           style="border-top: 1px solid var(--color-divider)"
         >
-          <strong>TỔNG</strong>
+          <strong>{{ $t('sa10.grandTotal') }}</strong>
           <span class="font-heading text-[21px]">{{ money(workOrder.totalAmount) }}</span>
         </div>
         <div v-if="deposit" class="flex justify-between text-[13px]">
           <span class="text-muted">
-            Đã thu
+            {{ $t('sa10.collected') }}
             <span class="text-[11.5px]">({{ dateTime(deposit.paidAt) }})</span>
           </span>
           <span>{{ money(workOrder.paidAmount) }}</span>
         </div>
         <div class="flex items-baseline justify-between text-[13.5px]">
-          <strong>Còn phải thu</strong><strong>{{ money(remaining) }}</strong>
+          <strong>{{ $t('sa10.remaining') }}</strong><strong>{{ money(remaining) }}</strong>
         </div>
       </section>
 
       <section class="card min-w-[250px] flex-1 gap-2" style="background: #fff">
         <div class="flex items-baseline justify-between">
-          <h5>Báo giá</h5>
+          <h5>{{ $t('sa10.quotes') }}</h5>
           <NuxtLink
             :to="`/admin/work-orders/${id}/quotation`"
             class="btn btn-ghost text-[12.5px]"
           >
-            Lập mới
+            {{ $t('sa10.newQuote') }}
           </NuxtLink>
         </div>
         <p v-if="(quotations ?? []).length === 0" class="text-muted text-[12.5px]">
-          Chưa có báo giá.
+          {{ $t('sa10.noQuotes') }}
         </p>
         <ul v-else class="flex flex-col gap-1.5 text-[13.5px]">
           <li
@@ -366,9 +355,9 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
 
     <!-- Tien do hien cho khach -->
     <section class="card gap-3" style="background: #fff">
-      <h5>Tiến độ hiển thị cho khách</h5>
+      <h5>{{ $t('sa10.customerProgress') }}</h5>
       <div class="grid gap-3 sm:grid-cols-2">
-        <AyField :label="`Hoàn thành ${progress.progressPercent}%`">
+        <AyField :label="$t('sa10.percentDone', { n: progress.progressPercent })">
           <template #default="{ id: fid }">
             <input
               :id="fid"
@@ -381,7 +370,7 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
             />
           </template>
         </AyField>
-        <AyField label="Dự kiến xong">
+        <AyField :label="$t('sa10.eta')">
           <template #default="{ id: fid }">
             <input
               :id="fid"
@@ -391,19 +380,19 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
             />
           </template>
         </AyField>
-        <AyField label="Ghi chú tiến độ" class="sm:col-span-2" hint="Khách đọc được nội dung này">
+        <AyField :label="$t('sa10.progressNote')" class="sm:col-span-2" :hint="$t('sa10.progressNoteHint')">
           <template #default="{ id: fid }">
             <textarea :id="fid" v-model="progress.progressNote" class="input min-h-[70px]" />
           </template>
         </AyField>
       </div>
       <button type="button" class="btn btn-secondary self-start text-[12.5px]" @click="saveProgress">
-        Cập nhật tiến độ
+        {{ $t('sa10.saveProgress') }}
       </button>
     </section>
 
     <section class="card gap-2" style="background: #fff">
-      <h5>Nhật ký phiếu</h5>
+      <h5>{{ $t('sa10.log') }}</h5>
       <AyChangeLog :entries="timelineEntries" />
     </section>
 
@@ -418,7 +407,7 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
         class="btn btn-secondary text-[13px]"
         style="min-height: 48px; padding-inline: 20px"
       >
-        Ghi nhận thanh toán
+        {{ $t('sa10.recordPayment') }}
       </NuxtLink>
       <button
         v-for="status in nextStatuses"
@@ -429,20 +418,20 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
         style="min-height: 48px; padding-inline: 26px"
         @click="statusTarget = status"
       >
-        {{ ACTION_LABELS[status] }}
+        {{ actionLabel(status) }}
       </button>
     </div>
 
     <AyConfirmDialog
       :open="statusTarget !== null"
-      :title="`Chuyển phiếu sang: ${WORK_ORDER_LABELS[statusTarget ?? ''] ?? ''}`"
+      :title="$t('sa10.moveTo', { status: statusTarget ? flowLabel(statusTarget) : '' })"
       :message="confirmMessage"
       :danger="statusTarget === 'CANCELLED'"
       :loading="busy"
       @confirm="changeStatus"
       @cancel="statusTarget = null"
     >
-      <AyField label="Ghi chú" class="mt-3">
+      <AyField :label="$t('common.note')" class="mt-3">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="statusNote" class="input" type="text" />
         </template>

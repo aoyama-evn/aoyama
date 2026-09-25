@@ -18,6 +18,7 @@ interface Line {
 const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { i18n, money } = useFormat();
 
 const id = route.params.id as string;
@@ -25,7 +26,9 @@ const id = route.params.id as string;
 const { data: workOrder } = await useAsyncData(`wo-quote-${id}`, () =>
   api.get<WorkOrder>(`/admin/work-orders/${id}`),
 );
-if (!workOrder.value) throw createError({ statusCode: 404, statusMessage: 'Không tìm thấy phiếu' });
+if (!workOrder.value) {
+  throw createError({ statusCode: 404, statusMessage: t('sa10.notFound') });
+}
 
 /** Khoi tao tu hang muc va phu tung da ghi o SA-11. */
 const lines = ref<Line[]>([
@@ -77,10 +80,10 @@ async function loadSuggestion(): Promise<void> {
   try {
     suggestion.value = await api.get<QuotationSuggestion>(`/admin/ai/quotation-suggestion/${id}`);
     if (suggestion.value.isFallback) {
-      ui.info('Trợ lý AI chưa có gợi ý', 'Bạn vẫn lập báo giá thủ công như bình thường.');
+      ui.info(t('sa12.aiNone'), t('sa12.aiNoneSub'));
     }
   } catch {
-    ui.warning('Không lấy được gợi ý AI', 'Chức năng lập báo giá vẫn dùng bình thường.');
+    ui.warning(t('sa12.aiFailed'), t('sa12.aiFailedSub'));
   } finally {
     loadingSuggestion.value = false;
   }
@@ -134,11 +137,11 @@ const totalAmount = computed(
 
 async function save(): Promise<void> {
   if (lines.value.length === 0) {
-    ui.warning('Báo giá cần ít nhất một dòng');
+    ui.warning(t('sa12.needLine'));
     return;
   }
   if (lines.value.some((l) => !l.name.trim())) {
-    ui.warning('Còn dòng chưa có tên hạng mục');
+    ui.warning(t('sa12.needLineName'));
     return;
   }
 
@@ -162,9 +165,9 @@ async function save(): Promise<void> {
 
     if (sendAfterSave.value) {
       await api.put(`/admin/quotations/${created.id}/send`);
-      ui.success('Đã lập và gửi báo giá', `${created.code} — khách nhận SMS kèm đường dẫn xem báo giá.`);
+      ui.success(t('sa12.sent'), t('sa12.sentSub', { code: created.code }));
     } else {
-      ui.success('Đã lưu báo giá nháp', created.code);
+      ui.success(t('sa12.draftSaved'), created.code);
     }
     await navigateTo(`/admin/work-orders/${id}`);
   } catch (err) {
@@ -178,20 +181,20 @@ const remainingOnHandover = computed(() =>
   Math.max(0, totalAmount.value - (requireDeposit.value ? depositAmount.value : 0)),
 );
 
-setScreenTitle(() => `Báo giá · ${workOrder.value?.code ?? ''}`);
+setScreenTitle(() => t('sa12.screenTitle', { code: workOrder.value?.code ?? '' }));
 
-useHead({ title: 'Lập báo giá — AOYAMA Admin' });
+useHead({ title: () => `${t('sa12.headTitle')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div v-if="workOrder" class="flex flex-col gap-4">
     <AyPageHeader
-      code="SA-12" title="Lập báo giá" :back-to="`/admin/work-orders/${id}`"
+      code="SA-12" :title="$t('sa12.headTitle')" :back-to="`/admin/work-orders/${id}`"
       :description="`${workOrder.code} · ${workOrder.vehicle?.plateNumber} · ${workOrder.customer?.name}`"
     >
       <template #actions>
         <AyButton variant="secondary" size="sm" :loading="loadingSuggestion" @click="loadSuggestion">
-          Lấy gợi ý AI
+          {{ $t('sa12.getAi') }}
         </AyButton>
       </template>
     </AyPageHeader>
@@ -202,10 +205,10 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
     >
       <section class="card" style="background: #fff">
         <div class="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-          <h2 class="font-heading text-[16px]">Các dòng báo giá</h2>
+          <h2 class="font-heading text-[16px]">{{ $t('sa12.lines') }}</h2>
           <div class="flex gap-1">
-            <AyButton variant="ghost" size="sm" @click="addLine('LABOR')">+ Tiền công</AyButton>
-            <AyButton variant="ghost" size="sm" @click="addLine('OTHER')">+ Khác</AyButton>
+            <AyButton variant="ghost" size="sm" @click="addLine('LABOR')">{{ $t('sa12.addLabor') }}</AyButton>
+            <AyButton variant="ghost" size="sm" @click="addLine('OTHER')">{{ $t('sa12.addOther') }}</AyButton>
           </div>
         </div>
 
@@ -213,12 +216,12 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
           <table class="table">
             <thead>
               <tr>
-                <th scope="col" class="w-24">Loại</th>
-                <th scope="col">Nội dung</th>
-                <th scope="col" class="w-28 text-right">Đơn giá</th>
-                <th scope="col" class="w-16 text-center">SL</th>
-                <th scope="col" class="w-20 text-center">Tùy chọn</th>
-                <th scope="col" class="w-28 text-right">Thành tiền</th>
+                <th scope="col" class="w-24">{{ $t('sa12.colKind') }}</th>
+                <th scope="col">{{ $t('sa12.colContent') }}</th>
+                <th scope="col" class="w-28 text-right">{{ $t('sa10.colUnit') }}</th>
+                <th scope="col" class="w-16 text-center">{{ $t('sa10.colQty') }}</th>
+                <th scope="col" class="w-20 text-center">{{ $t('sa12.colOptional') }}</th>
+                <th scope="col" class="w-28 text-right">{{ $t('sa10.colAmount') }}</th>
                 <th scope="col" class="w-10" />
               </tr>
             </thead>
@@ -226,9 +229,9 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
               <tr v-for="(line, index) in lines" :key="index">
                 <td>
                   <select v-model="line.kind" class="input h-9 min-h-0 py-1 text-[12.5px]">
-                    <option value="LABOR">Công</option>
-                    <option value="PART">Phụ tùng</option>
-                    <option value="OTHER">Khác</option>
+                    <option value="LABOR">{{ $t('sa12.kindLabor') }}</option>
+                    <option value="PART">{{ $t('sa12.kindPart') }}</option>
+                    <option value="OTHER">{{ $t('sa12.kindOther') }}</option>
                   </select>
                 </td>
                 <td>
@@ -241,23 +244,23 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
                   <input
                     v-model="line.isOptional" type="checkbox"
                     class="h-4 w-4 accent-[var(--color-accent)]"
-                    :aria-label="`Hạng mục tùy chọn: ${line.name}`"
+                    :aria-label="$t('sa12.optionalAria', { name: line.name })"
                   >
                 </td>
                 <td class="text-right whitespace-nowrap">{{ money(line.unitPrice * line.quantity) }}</td>
                 <td>
-                  <button type="button" class="text-danger" aria-label="Xóa dòng" @click="lines.splice(index, 1)">×</button>
+                  <button type="button" class="text-danger" :aria-label="$t('sa12.removeLine')" @click="lines.splice(index, 1)">×</button>
                 </td>
               </tr>
               <tr v-if="lines.length === 0">
-                <td colspan="7" class="py-6 text-center text-muted">Chưa có dòng nào</td>
+                <td colspan="7" class="py-6 text-center text-muted">{{ $t('sa12.noLines') }}</td>
               </tr>
             </tbody>
           </table>
         </div>
 
         <p class="mt-2 text-[12px] text-muted">
-          Đánh dấu “Tùy chọn” cho hạng mục khách có thể bỏ khi phản hồi báo giá.
+          {{ $t('sa12.optionalNote') }}
         </p>
       </section>
 
@@ -265,10 +268,10 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
         <section class="ay-ai-card">
           <div>
             <span class="tag" style="background: var(--color-accent-2-500); color: #fff">
-              ✦ Gợi ý bởi AI
+              {{ $t('ai.badgeShort') }}
             </span>
             <p class="mt-2 text-[11.5px]" style="color: var(--color-accent-2-800)">
-              Đây là đề xuất. Bấm “Chọn” từng dòng bạn đồng ý — không có gì tự vào báo giá (AI-02).
+              {{ $t('sa12.aiLead') }}
             </p>
           </div>
 
@@ -279,7 +282,7 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
             :disabled="loadingSuggestion"
             @click="loadSuggestion"
           >
-            {{ loadingSuggestion ? 'Đang lấy gợi ý…' : 'Lấy gợi ý AI' }}
+            {{ loadingSuggestion ? $t('sa12.gettingAi') : $t('sa12.getAi') }}
           </button>
 
           <p
@@ -287,7 +290,7 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
             class="text-[12.5px]"
             style="color: var(--color-accent-2-800)"
           >
-            Trợ lý chưa có gợi ý nào cho phiếu này.
+            {{ $t('sa12.aiEmpty') }}
           </p>
 
           <div v-for="(line, index) in suggestion?.lines ?? []" :key="index" class="ay-ai-line">
@@ -301,26 +304,26 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
               class="btn btn-secondary ay-ai-btn self-start text-[12.5px]"
               @click="acceptSuggestion(line)"
             >
-              Chọn
+              {{ $t('sa12.aiUse') }}
             </button>
           </div>
         </section>
 
         <section class="card gap-2" style="background: #fff">
-          <h5>Thêm phụ tùng</h5>
+          <h5>{{ $t('sa12.addPart') }}</h5>
           <AyPartPicker :store-id="workOrder.storeId" @select="addPart" />
         </section>
 
         <section class="card flex flex-col gap-3" style="background: #fff">
-          <h5>Tổng kết</h5>
+          <h5>{{ $t('sa12.summary') }}</h5>
 
-          <AyField label="Giảm giá">
+          <AyField :label="$t('money.discount')">
             <template #default="{ id: fid }">
               <input :id="fid" v-model.number="discountAmount" class="input" type="number" min="0">
             </template>
           </AyField>
 
-          <AyField label="Thuế (%)">
+          <AyField :label="$t('sa12.taxPercent')">
             <template #default="{ id: fid }">
               <input :id="fid" v-model.number="taxRate" class="input" type="number" min="0" max="100">
             </template>
@@ -329,14 +332,14 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
           <div class="ay-deposit">
             <label class="flex cursor-pointer items-center gap-2.5 text-[13.5px] font-semibold">
               <input v-model="requireDeposit" type="checkbox" />
-              Yêu cầu tiền cọc trước
+              {{ $t('sa12.requireDeposit') }}
             </label>
             <div
               v-if="requireDeposit"
               class="grid gap-2.5"
               style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))"
             >
-              <AyField label="Số tiền cọc" required>
+              <AyField :label="$t('sa12.depositAmount')" required>
                 <template #default="{ id: fid }">
                   <input
                     :id="fid"
@@ -348,24 +351,24 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
                   />
                 </template>
               </AyField>
-              <AyField label="Hạn đặt cọc">
+              <AyField :label="$t('sa12.depositDue')">
                 <template #default="{ id: fid }">
                   <input :id="fid" v-model="depositDueAt" class="input" type="datetime-local" />
                 </template>
               </AyField>
             </div>
             <p v-if="requireDeposit" class="text-muted text-[12px]">
-              Còn phải thu khi bàn giao: {{ money(remainingOnHandover) }}
+              {{ $t('sa12.remainingOnHandover', { amount: money(remainingOnHandover) }) }}
             </p>
           </div>
 
-          <AyField label="Hiệu lực đến">
+          <AyField :label="$t('sa12.validUntil')">
             <template #default="{ id: fid }">
               <input :id="fid" v-model="validUntil" class="input" type="date">
             </template>
           </AyField>
 
-          <AyField label="Ghi chú gửi khách">
+          <AyField :label="$t('sa12.noteToCustomer')">
             <template #default="{ id: fid }">
               <textarea :id="fid" v-model="note" class="input min-h-[70px]" />
             </template>
@@ -383,13 +386,13 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
 
           <label class="flex items-start gap-2.5 text-[13.5px]">
             <input v-model="sendAfterSave" type="checkbox" class="mt-1 h-4 w-4 accent-[var(--color-accent)]">
-            <span>Gửi ngay cho khách sau khi lưu (SMS kèm đường dẫn xem báo giá)</span>
+            <span>{{ $t('sa12.sendNow') }}</span>
           </label>
 
           <AyErrorNote :error="error" />
 
           <AyButton block :loading="saving" @click="save">
-            {{ sendAfterSave ? 'Lưu và gửi báo giá' : 'Lưu nháp' }}
+            {{ sendAfterSave ? $t('sa12.saveAndSend') : $t('sa12.saveDraft') }}
           </AyButton>
         </section>
       </div>

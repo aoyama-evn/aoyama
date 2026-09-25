@@ -43,6 +43,7 @@ interface PartRow {
 const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { i18n, money, number } = useFormat();
 
 const id = route.params.id as string;
@@ -50,13 +51,15 @@ const id = route.params.id as string;
 const { data: workOrder } = await useAsyncData(`wo-items-${id}`, () =>
   api.get<WorkOrder>(`/admin/work-orders/${id}`),
 );
-if (!workOrder.value) throw createError({ statusCode: 404, statusMessage: 'Không tìm thấy phiếu' });
+if (!workOrder.value) {
+  throw createError({ statusCode: 404, statusMessage: t('sa10.notFound') });
+}
 
 const { data: services } = await useAsyncData('wo-items-services', () =>
   api.get<ServiceItem[]>('/services'),
 );
 
-setScreenTitle(() => `Chẩn đoán · ${workOrder.value?.code ?? ''}`);
+setScreenTitle(() => t('sa11.screenTitle', { code: workOrder.value?.code ?? '' }));
 
 /** Danh sach ky thuat vien de phan cong — SA-10a. */
 const { data: technicians } = await useAsyncData('wo-technicians', () =>
@@ -78,13 +81,11 @@ const diagnosisCause = ref(workOrder.value.diagnosisCause ?? '');
 const difficulty = ref<WorkDifficulty>(workOrder.value.difficulty ?? WorkDifficulty.MEDIUM);
 const technicianId = ref(workOrder.value.assignedTechnicianId ?? '');
 
-const DIFFICULTIES = [
-  { value: WorkDifficulty.EASY, label: 'Dễ' },
-  { value: WorkDifficulty.MEDIUM, label: 'Trung bình' },
-  { value: WorkDifficulty.HARD, label: 'Khó' },
-];
-
-const FUEL_LABELS = ['Cạn', '1/4', '1/2', '3/4', 'Đầy'];
+const DIFFICULTIES = computed(() => [
+  { value: WorkDifficulty.EASY, label: t('difficulty.EASY') },
+  { value: WorkDifficulty.MEDIUM, label: t('difficulty.MEDIUM') },
+  { value: WorkDifficulty.HARD, label: t('difficulty.HARD') },
+]);
 const items = ref<ItemRow[]>(
   (workOrder.value.items ?? []).map((i) => ({
     serviceId: i.serviceId,
@@ -161,7 +162,7 @@ const overStock = computed(() =>
 
 async function save(): Promise<void> {
   if (items.value.some((i) => !i.name.trim())) {
-    ui.warning('Còn hạng mục chưa có tên');
+    ui.warning(t('sa11.needName'));
     return;
   }
   saving.value = true;
@@ -175,7 +176,7 @@ async function save(): Promise<void> {
       items: items.value.map((i, index) => ({ ...i, sortOrder: index })),
       parts: parts.value.map(({ available, ...rest }) => rest),
     });
-    ui.success('Đã lưu chẩn đoán và hạng mục');
+    ui.success(t('sa11.saved'));
     await navigateTo(`/admin/work-orders/${id}`);
   } catch (err) {
     error.value = normalizeError(err);
@@ -184,16 +185,16 @@ async function save(): Promise<void> {
   }
 }
 
-useHead({ title: 'Chẩn đoán & hạng mục — AOYAMA Admin' });
+useHead({ title: () => `${t('sa11.headTitle')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div v-if="workOrder" class="flex flex-col gap-4">
-    <h4>Chẩn đoán và báo giá</h4>
+    <h4>{{ $t('sa11.title') }}</h4>
 
     <div class="grid gap-[13px]" style="grid-template-columns: repeat(auto-fit, minmax(230px, 1fr))">
       <div class="card gap-1" style="background: #fff">
-        <div class="card-kicker">Khách · xe · cửa hàng</div>
+        <div class="card-kicker">{{ $t('sa10.summary1') }}</div>
         <p class="text-[13.5px]">
           {{ workOrder.customer?.name }} · {{ workOrder.customer?.phone }}
         </p>
@@ -204,11 +205,11 @@ useHead({ title: 'Chẩn đoán & hạng mục — AOYAMA Admin' });
         <p class="text-muted text-[12px]">{{ i18n(workOrder.store?.name ?? null) }}</p>
       </div>
       <div class="card gap-1" style="background: #fff">
-        <div class="card-kicker">Hiện trạng khi tiếp nhận</div>
+        <div class="card-kicker">{{ $t('sa10.summary2') }}</div>
         <p class="text-[13.5px]">
           {{ number(workOrder.intakeOdometer) }} km
           <template v-if="workOrder.intakeFuelLevel !== null">
-            · nhiên liệu {{ FUEL_LABELS[workOrder.intakeFuelLevel] ?? workOrder.intakeFuelLevel }}
+            · {{ $t('sa10.fuelIs', { level: $t(`fuel.${workOrder.intakeFuelLevel}`) }) }}
           </template>
         </p>
         <p v-if="workOrder.intakeAccessories" class="text-muted text-[12px]">
@@ -216,7 +217,7 @@ useHead({ title: 'Chẩn đoán & hạng mục — AOYAMA Admin' });
         </p>
       </div>
       <div class="card gap-1" style="background: #fff">
-        <div class="card-kicker">Phiếu</div>
+        <div class="card-kicker">{{ $t('sa11.order') }}</div>
         <p class="font-heading text-[16px]">{{ workOrder.code }}</p>
         <AyStatusTag :status="workOrder.status" />
       </div>
@@ -227,21 +228,21 @@ useHead({ title: 'Chẩn đoán & hạng mục — AOYAMA Admin' });
       style="grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr)"
     >
       <section class="card gap-3" style="background: #fff">
-        <h5>Chẩn đoán kỹ thuật viên</h5>
+        <h5>{{ $t('sa10.diagnosis') }}</h5>
 
-        <AyField label="Triệu chứng ghi nhận" required hint="điền sẵn từ mô tả của khách">
+        <AyField :label="$t('sa11.findingLabel')" required :hint="$t('sa11.findingHint')">
           <template #default="{ id: fid }">
             <textarea
               :id="fid"
               v-model="diagnosisNote"
               class="input"
               style="min-height: 72px"
-              placeholder="Mô tả tình trạng thực tế sau khi kiểm tra"
+              :placeholder="$t('sa11.findingPlaceholder')"
             />
           </template>
         </AyField>
 
-        <AyField label="Nguyên nhân xác định" required>
+        <AyField :label="$t('sa11.causeLabel')" required>
           <template #default="{ id: fid }">
             <textarea
               :id="fid"
@@ -253,7 +254,7 @@ useHead({ title: 'Chẩn đoán & hạng mục — AOYAMA Admin' });
         </AyField>
 
         <div class="grid gap-3" style="grid-template-columns: 1fr 1fr">
-          <AyField label="Mức độ khó" required>
+          <AyField :label="$t('sa11.difficulty')" required>
             <template #default="{ id: fid }">
               <select :id="fid" v-model="difficulty" class="input">
                 <option v-for="level in DIFFICULTIES" :key="level.value" :value="level.value">
@@ -262,10 +263,10 @@ useHead({ title: 'Chẩn đoán & hạng mục — AOYAMA Admin' });
               </select>
             </template>
           </AyField>
-          <AyField label="Kỹ thuật viên phụ trách">
+          <AyField :label="$t('sa11.assignee')">
             <template #default="{ id: fid }">
               <select :id="fid" v-model="technicianId" class="input">
-                <option value="">— Chưa phân công —</option>
+                <option value="">{{ $t('sa11.unassigned') }}</option>
                 <option v-for="tech in technicians ?? []" :key="tech.id" :value="tech.id">
                   {{ tech.fullName }}
                 </option>
@@ -277,10 +278,10 @@ useHead({ title: 'Chẩn đoán & hạng mục — AOYAMA Admin' });
 
       <section class="ay-ai-card">
         <span class="tag self-start" style="background: var(--color-accent-2-500); color: #fff">
-          ✦ Đối chiếu chẩn đoán AI
+          {{ $t('sa11.aiCompare') }}
         </span>
         <p class="text-[12.5px] leading-[1.5]" style="color: var(--color-accent-2-800)">
-          So sánh dự đoán của AI (từ chatbox khách) với kết luận của kỹ thuật viên.
+          {{ $t('sa11.aiCompareLead') }}
         </p>
 
         <p
@@ -288,7 +289,7 @@ useHead({ title: 'Chẩn đoán & hạng mục — AOYAMA Admin' });
           class="text-[12.5px]"
           style="color: var(--color-accent-2-800)"
         >
-          Lịch hẹn này không kèm phiên chẩn đoán AI.
+          {{ $t('sa11.noAi') }}
         </p>
 
         <div
@@ -299,7 +300,7 @@ useHead({ title: 'Chẩn đoán & hạng mục — AOYAMA Admin' });
         >
           <span>{{ finding.label }} · {{ Math.round(finding.matchPercent) }} %</span>
           <span class="tag tag-neutral whitespace-nowrap">
-            {{ index === 0 ? 'khớp' : 'chưa xác nhận' }}
+            {{ index === 0 ? $t('sa11.aiMatch') : $t('sa11.aiUnconfirmed') }}
           </span>
         </div>
       </section>
@@ -308,18 +309,18 @@ useHead({ title: 'Chẩn đoán & hạng mục — AOYAMA Admin' });
     <div class="grid gap-4 lg:grid-cols-3">
       <section class="card lg:col-span-2">
         <div class="mb-3 flex items-baseline justify-between">
-          <h2 class="font-heading text-[16px]">Hạng mục công việc</h2>
-          <AyButton variant="ghost" size="sm" @click="addFreeItem">+ Hạng mục tự do</AyButton>
+          <h2 class="font-heading text-[16px]">{{ $t('sa10.items') }}</h2>
+          <AyButton variant="ghost" size="sm" @click="addFreeItem">{{ $t('sa11.freeItem') }}</AyButton>
         </div>
 
         <div class="table-wrap !shadow-none">
           <table class="table">
             <thead>
               <tr>
-                <th scope="col">Tên hạng mục</th>
-                <th scope="col" class="w-28 text-right">Đơn giá</th>
-                <th scope="col" class="w-20 text-center">SL</th>
-                <th scope="col" class="w-28 text-right">Thành tiền</th>
+                <th scope="col">{{ $t('sa11.colName') }}</th>
+                <th scope="col" class="w-28 text-right">{{ $t('sa10.colUnit') }}</th>
+                <th scope="col" class="w-20 text-center">{{ $t('sa10.colQty') }}</th>
+                <th scope="col" class="w-28 text-right">{{ $t('sa10.colAmount') }}</th>
                 <th scope="col" class="w-12" />
               </tr>
             </thead>
@@ -333,18 +334,18 @@ useHead({ title: 'Chẩn đoán & hạng mục — AOYAMA Admin' });
                 <td><input v-model.number="item.quantity" class="input h-9 min-h-0 py-1 text-center" type="number" min="1"></td>
                 <td class="text-right whitespace-nowrap">{{ money(item.unitPrice * item.quantity) }}</td>
                 <td>
-                  <button type="button" class="text-danger" aria-label="Xóa hạng mục" @click="items.splice(index, 1)">×</button>
+                  <button type="button" class="text-danger" :aria-label="$t('sa11.removeItem')" @click="items.splice(index, 1)">×</button>
                 </td>
               </tr>
               <tr v-if="items.length === 0">
-                <td colspan="5" class="py-6 text-center text-muted">Chưa có hạng mục nào</td>
+                <td colspan="5" class="py-6 text-center text-muted">{{ $t('sa11.noItems') }}</td>
               </tr>
             </tbody>
           </table>
         </div>
 
         <div class="mt-3">
-          <p class="label">Thêm nhanh từ danh mục dịch vụ</p>
+          <p class="label">{{ $t('sa11.quickAdd') }}</p>
           <div class="flex flex-wrap gap-1.5">
             <button
               v-for="service in services ?? []" :key="service.id" type="button"
@@ -358,7 +359,7 @@ useHead({ title: 'Chẩn đoán & hạng mục — AOYAMA Admin' });
       </section>
 
       <section class="card">
-        <h2 class="mb-3 font-heading text-[16px]">Phụ tùng</h2>
+        <h2 class="mb-3 font-heading text-[16px]">{{ $t('sa10.parts') }}</h2>
         <AyPartPicker :store-id="workOrder.storeId" @select="addPart" />
 
         <ul v-if="parts.length" class="mt-3 flex flex-col gap-2 border-t border-divider pt-3">
@@ -367,30 +368,32 @@ useHead({ title: 'Chẩn đoán & hạng mục — AOYAMA Admin' });
               <span class="block truncate font-semibold">{{ part.partName }}</span>
               <span class="block text-[11.5px] text-muted">
                 {{ part.partCode }} · {{ money(part.unitPrice) }}
-                <template v-if="part.available !== undefined"> · tồn {{ part.available }}</template>
+                <template v-if="part.available !== undefined">
+                  · {{ $t('sa11.stockIs', { n: part.available }) }}
+                </template>
               </span>
             </span>
             <input v-model.number="part.quantity" class="input h-9 min-h-0 w-16 py-1 text-center" type="number" min="1">
-            <button type="button" class="text-danger" aria-label="Xóa phụ tùng" @click="parts.splice(index, 1)">×</button>
+            <button type="button" class="text-danger" :aria-label="$t('sa11.removePart')" @click="parts.splice(index, 1)">×</button>
           </li>
         </ul>
 
         <p v-if="overStock.length" class="mt-2 rounded-xl bg-warning-bg px-3 py-2 text-[12.5px] text-warning">
-          {{ overStock.length }} phụ tùng vượt tồn kho hiện có. Nhập thêm kho trước khi hoàn tất phiếu.
+          {{ $t('sa11.overStock', { n: overStock.length }) }}
         </p>
       </section>
     </div>
 
     <section class="card flex flex-wrap items-center justify-between gap-3">
       <dl class="flex gap-6 text-[14px]">
-        <div><dt class="text-muted">Tiền công</dt><dd class="font-heading text-[17px]">{{ money(laborTotal) }}</dd></div>
-        <div><dt class="text-muted">Tiền phụ tùng</dt><dd class="font-heading text-[17px]">{{ money(partsTotal) }}</dd></div>
-        <div><dt class="text-muted">Tạm tính</dt><dd class="font-heading text-[17px]">{{ money(laborTotal + partsTotal) }}</dd></div>
+        <div><dt class="text-muted">{{ $t('money.labor') }}</dt><dd class="font-heading text-[17px]">{{ money(laborTotal) }}</dd></div>
+        <div><dt class="text-muted">{{ $t('money.parts') }}</dt><dd class="font-heading text-[17px]">{{ money(partsTotal) }}</dd></div>
+        <div><dt class="text-muted">{{ $t('money.subtotal') }}</dt><dd class="font-heading text-[17px]">{{ money(laborTotal + partsTotal) }}</dd></div>
       </dl>
 
       <div class="flex gap-2">
-        <AyButton :loading="saving" @click="save">Lưu</AyButton>
-        <AyButton :to="`/admin/work-orders/${id}`" variant="secondary">Hủy</AyButton>
+        <AyButton :loading="saving" @click="save">{{ $t('common.save') }}</AyButton>
+        <AyButton :to="`/admin/work-orders/${id}`" variant="secondary">{{ $t('common.cancel') }}</AyButton>
       </div>
     </section>
 

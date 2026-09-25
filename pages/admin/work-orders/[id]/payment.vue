@@ -14,6 +14,7 @@ const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
 const auth = useAuthStore();
+const { t } = useI18n();
 const { money, dateTime } = useFormat();
 
 const id = route.params.id as string;
@@ -21,7 +22,9 @@ const id = route.params.id as string;
 const { data: workOrder, refresh } = await useAsyncData(`wo-pay-${id}`, () =>
   api.get<WorkOrder>(`/admin/work-orders/${id}`),
 );
-if (!workOrder.value) throw createError({ statusCode: 404, statusMessage: 'Không tìm thấy phiếu' });
+if (!workOrder.value) {
+  throw createError({ statusCode: 404, statusMessage: t('sa10.notFound') });
+}
 
 const { data: payments, refresh: refreshPayments } = await useAsyncData(`wo-pay-list-${id}`, () =>
   api.get<Payment[]>(`/admin/work-orders/${id}/payments`),
@@ -44,12 +47,7 @@ const voidReason = ref('');
 
 watchEffect(() => { form.amount = remaining.value > 0 ? remaining.value : 0; });
 
-const METHOD_LABELS: Record<string, string> = {
-  CASH: 'Tiền mặt',
-  CARD_AT_STORE: 'Thẻ tại quầy',
-  BANK_TRANSFER: 'Chuyển khoản',
-  OTHER: 'Khác',
-};
+const METHODS = ['CASH', 'CARD_AT_STORE', 'BANK_TRANSFER', 'OTHER'];
 
 async function record(): Promise<void> {
   saving.value = true;
@@ -61,7 +59,7 @@ async function record(): Promise<void> {
       receiptNo: form.receiptNo || undefined,
       note: form.note || undefined,
     });
-    ui.success('Đã ghi nhận thanh toán');
+    ui.success(t('sa14.recorded'));
     form.receiptNo = '';
     form.note = '';
     await Promise.all([refresh(), refreshPayments()]);
@@ -78,7 +76,7 @@ async function voidPayment(): Promise<void> {
     await api.put(`/admin/work-orders/${id}/payments/${voidTarget.value.id}/void`, {
       reason: voidReason.value.trim(),
     });
-    ui.success('Đã hủy dòng thanh toán');
+    ui.success(t('sa14.voidDone'));
     voidTarget.value = null;
     voidReason.value = '';
     await Promise.all([refresh(), refreshPayments()]);
@@ -101,7 +99,7 @@ async function recordAndHandover(): Promise<void> {
       });
     }
     await api.put(`/admin/work-orders/${id}/status`, { status: 'DELIVERED' });
-    ui.success('Đã ghi nhận thanh toán và bàn giao xe');
+    ui.success(t('sa14.handedOver'));
     await navigateTo(`/admin/work-orders/${id}`);
   } catch (caught) {
     error.value = normalizeError(caught);
@@ -110,44 +108,44 @@ async function recordAndHandover(): Promise<void> {
   }
 }
 
-setScreenTitle(() => `Thanh toán · ${workOrder.value?.code ?? ''}`);
+setScreenTitle(() => t('sa14.screenTitle', { code: workOrder.value?.code ?? '' }));
 
-useHead({ title: 'Ghi nhận thanh toán — AOYAMA Admin' });
+useHead({ title: () => `${t('sa14.headTitle')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div v-if="workOrder" class="flex flex-col gap-3.5" style="max-width: 900px">
     <section class="card gap-1.5" style="background: var(--color-surface)">
       <div class="flex justify-between text-[13.5px]">
-        <span class="text-muted">Tổng tiền phiếu</span>
+        <span class="text-muted">{{ $t('sa14.orderTotal') }}</span>
         <span>{{ money(workOrder.totalAmount) }}</span>
       </div>
       <div class="flex justify-between text-[13.5px]">
-        <span class="text-muted">Đã thu trước đó</span>
+        <span class="text-muted">{{ $t('sa14.paidBefore') }}</span>
         <span>{{ money(workOrder.paidAmount) }}</span>
       </div>
       <div
         class="flex items-baseline justify-between pt-2"
         style="border-top: 1px solid var(--color-divider)"
       >
-        <strong>Còn phải thu</strong>
+        <strong>{{ $t('sa10.remaining') }}</strong>
         <span class="font-heading text-[21px]">{{ money(remaining) }}</span>
       </div>
     </section>
 
     <section v-if="remaining > 0" class="card gap-3.5" style="background: #fff">
-      <AyField label="Hình thức thanh toán" required>
+      <AyField :label="$t('sa14.method')" required>
         <div class="mt-1.5 flex flex-wrap gap-4">
-          <label v-for="(label, value) in METHOD_LABELS" :key="value" class="radio">
+          <label v-for="value in METHODS" :key="value" class="radio">
             <input v-model="form.method" type="radio" name="pay" :value="value" />
             <span class="dot" />
-            {{ label }}
+            {{ $t(`payMethod.${value}`) }}
           </label>
         </div>
       </AyField>
 
       <div class="grid gap-3" style="grid-template-columns: repeat(auto-fit, minmax(190px, 1fr))">
-        <AyField label="Số tiền thực thu" required :hint="`tối đa ${money(remaining)}`">
+        <AyField :label="$t('sa14.amount')" required :hint="$t('sa14.amountHint', { amount: money(remaining) })">
           <template #default="{ id: fid }">
             <input
               :id="fid"
@@ -160,22 +158,22 @@ useHead({ title: 'Ghi nhận thanh toán — AOYAMA Admin' });
           </template>
         </AyField>
 
-        <AyField label="Thời điểm thu">
+        <AyField :label="$t('sa14.when')">
           <p class="py-1.5 text-[15px] font-semibold">{{ dateTime(new Date()) }}</p>
         </AyField>
 
-        <AyField label="Người thu">
+        <AyField :label="$t('sa14.by')">
           <p class="py-1.5 text-[15px] font-semibold">{{ auth.user?.name ?? '—' }}</p>
         </AyField>
       </div>
 
-      <AyField label="Ghi chú · số tham chiếu chuyển khoản">
+      <AyField :label="$t('sa14.noteRef')">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.note" class="input" type="text" placeholder="—" />
         </template>
       </AyField>
 
-      <AyField label="Số biên lai">
+      <AyField :label="$t('sa14.receiptNo')">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.receiptNo" class="input" type="text" />
         </template>
@@ -185,13 +183,13 @@ useHead({ title: 'Ghi nhận thanh toán — AOYAMA Admin' });
     </section>
 
     <p v-else class="card text-center text-[14px] text-success" style="background: #fff">
-      Phiếu đã thu đủ {{ money(workOrder.totalAmount) }}.
+      {{ $t('sa14.fullyPaid', { amount: money(workOrder.totalAmount) }) }}
     </p>
 
     <section class="card gap-2" style="background: #fff">
-      <h5>Các lần thu</h5>
+      <h5>{{ $t('sa14.list') }}</h5>
 
-      <AyEmptyState v-if="(payments ?? []).length === 0" title="Chưa có lần thu nào" />
+      <AyEmptyState v-if="(payments ?? []).length === 0" :title="$t('sa14.listEmpty')" />
 
       <ul v-else class="flex flex-col gap-2">
         <li
@@ -202,10 +200,10 @@ useHead({ title: 'Ghi nhận thanh toán — AOYAMA Admin' });
           :class="payment.isVoided ? 'line-through opacity-55' : ''"
         >
           <span class="font-heading text-[15px]">{{ money(payment.amount) }}</span>
-          <span class="text-muted">{{ METHOD_LABELS[payment.method] }}</span>
+          <span class="text-muted">{{ $t(`payMethod.${payment.method}`) }}</span>
           <span class="text-muted">{{ dateTime(payment.paidAt) }}</span>
           <span v-if="payment.receiptNo" class="font-mono text-[12px]">#{{ payment.receiptNo }}</span>
-          <span v-if="payment.isVoided" class="tag tag-neutral">đã hủy</span>
+          <span v-if="payment.isVoided" class="tag tag-neutral">{{ $t('sa14.voided') }}</span>
           <button
             v-else
             type="button"
@@ -213,7 +211,7 @@ useHead({ title: 'Ghi nhận thanh toán — AOYAMA Admin' });
             style="color: var(--color-danger)"
             @click="voidTarget = payment"
           >
-            Hủy dòng này
+            {{ $t('sa14.voidThis') }}
           </button>
         </li>
       </ul>
@@ -225,7 +223,7 @@ useHead({ title: 'Ghi nhận thanh toán — AOYAMA Admin' });
         class="btn btn-secondary text-[13px]"
         style="min-height: 48px; padding-inline: 20px"
       >
-        Quay lại phiếu
+        {{ $t('sa14.backToOrder') }}
       </NuxtLink>
       <button
         v-if="remaining > 0"
@@ -235,7 +233,7 @@ useHead({ title: 'Ghi nhận thanh toán — AOYAMA Admin' });
         :disabled="saving || form.amount <= 0 || form.amount > remaining"
         @click="record"
       >
-        Chỉ ghi nhận {{ money(form.amount) }}
+        {{ $t('sa14.recordOnly', { amount: money(form.amount) }) }}
       </button>
       <button
         type="button"
@@ -244,25 +242,25 @@ useHead({ title: 'Ghi nhận thanh toán — AOYAMA Admin' });
         :disabled="saving || workOrder.status !== 'COMPLETED'"
         :title="
           workOrder.status !== 'COMPLETED'
-            ? 'Chỉ bàn giao được khi phiếu đã hoàn tất'
+            ? $t('sa14.handoverBlocked')
             : undefined
         "
         @click="recordAndHandover"
       >
-        Ghi nhận thanh toán &amp; bàn giao
+        {{ $t('sa14.recordAndHandover') }}
       </button>
     </div>
 
     <AyConfirmDialog
       :open="Boolean(voidTarget)"
-      title="Hủy dòng thanh toán"
-      message="Dòng thu này sẽ được đánh dấu đã hủy và trừ khỏi số tiền đã thu. Bản ghi vẫn được giữ để đối soát."
-      confirm-label="Hủy dòng thu"
+      :title="$t('sa14.voidTitle')"
+      :message="$t('sa14.voidBody')"
+      :confirm-label="$t('sa14.voidConfirm')"
       danger
       @confirm="voidPayment"
       @cancel="voidTarget = null"
     >
-      <AyField label="Lý do hủy" required class="mt-3">
+      <AyField :label="$t('sa14.voidReason')" required class="mt-3">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="voidReason" class="input" type="text" />
         </template>
