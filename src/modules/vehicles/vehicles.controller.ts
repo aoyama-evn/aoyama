@@ -126,8 +126,9 @@ export class AdminVehiclesController {
 
   @Get(':id')
   @ApiOperation({ summary: 'SA-20 — chi tiet phuong tien' })
-  detail(@Param('id', ParseUUIDPipe) id: string) {
-    return this.service.findById(id);
+  async detail(@Param('id', ParseUUIDPipe) id: string) {
+    // SA-20 hien moc bao duong tiep theo ngay tren the chi so.
+    return this.service.withMaintenanceHint(await this.service.findById(id));
   }
 
   @Get(':id/history')

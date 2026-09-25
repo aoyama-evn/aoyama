@@ -132,6 +132,8 @@ export class AddPhotoDto {
 export class WorkOrderQueryDto extends PaginationQueryDto {
   @IsOptional() @IsString() keyword?: string;
   @IsOptional() @IsUUID('4') storeId?: string;
+  /** SA-16 — loc phieu cua mot khach hang. */
+  @IsOptional() @IsUUID('4') customerId?: string;
   @IsOptional() @IsEnum(WorkOrderStatus) status?: WorkOrderStatus;
   @IsOptional() @IsEnum(PaymentStatus) paymentStatus?: PaymentStatus;
   @IsOptional() @IsString() from?: string;

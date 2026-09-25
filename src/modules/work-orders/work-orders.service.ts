@@ -194,6 +194,9 @@ export class WorkOrdersService {
       .leftJoinAndSelect('w.store', 's');
 
     if (query.storeId) qb.andWhere('w.store_id = :storeId', { storeId: query.storeId });
+    if (query.customerId) {
+      qb.andWhere('w.customer_id = :customerId', { customerId: query.customerId });
+    }
     if (query.status) qb.andWhere('w.status = :status', { status: query.status });
     if (query.paymentStatus) {
       qb.andWhere('w.payment_status = :ps', { ps: query.paymentStatus });
