@@ -115,3 +115,11 @@ export const VehicleFuelType = {
   HYBRID: 'HYBRID',
 } as const;
 export type VehicleFuelType = (typeof VehicleFuelType)[keyof typeof VehicleFuelType];
+
+/** Muc do kho cua phieu — SA-10a cho ky thuat vien chon. */
+export const WorkDifficulty = {
+  EASY: 'EASY',
+  MEDIUM: 'MEDIUM',
+  HARD: 'HARD',
+} as const;
+export type WorkDifficulty = (typeof WorkDifficulty)[keyof typeof WorkDifficulty];

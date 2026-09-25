@@ -12,6 +12,7 @@ import type {
   ServiceType,
   UserRole,
   VehicleFuelType,
+  WorkDifficulty,
   WorkOrderStatus,
 } from './enums';
 
@@ -363,6 +364,10 @@ export interface WorkOrder {
   customerSymptom: string | null;
   diagnosisNote: string | null;
   diagnosisCause: string | null;
+  assignedTechnicianId: string | null;
+  assignedTechnician?: AdminUser | null;
+  /** SA-10a — muc do kho do ky thuat vien danh gia. */
+  difficulty: WorkDifficulty | null;
   progressPercent: number;
   progressNote: string | null;
   estimatedCompletionAt: string | null;

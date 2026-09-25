@@ -3,7 +3,13 @@ import type { ProgressStep } from '~/components/ui/AyProgressSteps.vue';
 import type { Payment, Quotation, WorkOrder } from '~/types/models';
 import { WORK_ORDER_FLOW, WorkOrderStatus } from '~/types/enums';
 
-/** SA-10 Chi tiet phieu dich vu — FR-WO-02, FR-WO-07..16. */
+/**
+ * SA-10 Chi tiet phieu dich vu (va SA-10b khi phieu da ban giao) —
+ * FR-WO-02, FR-WO-07..16.
+ *
+ * Ban thiet ke: ba the tom tat, the chan doan, hai cot hang muc va phu tung,
+ * the tien tren nen mat the, hang hanh dong can phai duoi mot duong ke.
+ */
 definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const route = useRoute();
@@ -18,10 +24,12 @@ const { data: workOrder, refresh } = await useAsyncData(`wo-${id}`, () =>
 );
 if (!workOrder.value) throw createError({ statusCode: 404, statusMessage: 'Không tìm thấy phiếu' });
 
-const { data: quotations, refresh: refreshQuotations } = await useAsyncData(`wo-quotes-${id}`, () =>
+setScreenTitle(() => `Phiếu dịch vụ ${workOrder.value?.code ?? ''}`);
+
+const { data: quotations } = await useAsyncData(`wo-quotes-${id}`, () =>
   api.get<Quotation[]>(`/admin/work-orders/${id}/quotations`),
 );
-const { data: payments, refresh: refreshPayments } = await useAsyncData(`wo-payments-${id}`, () =>
+const { data: payments } = await useAsyncData(`wo-payments-${id}`, () =>
   api.get<Payment[]>(`/admin/work-orders/${id}/payments`),
 );
 
@@ -48,13 +56,31 @@ const TRANSITIONS: Record<string, WorkOrderStatus[]> = {
   CANCELLED: [],
 };
 
-const LABELS: Record<string, string> = {
+const ACTION_LABELS: Record<string, string> = {
   DIAGNOSING: 'Bắt đầu chẩn đoán',
   IN_PROGRESS: 'Bắt đầu thực hiện',
-  COMPLETED: 'Đánh dấu hoàn tất',
-  DELIVERED: 'Bàn giao xe',
+  COMPLETED: 'Hoàn tất sửa chữa →',
+  DELIVERED: 'Bàn giao xe →',
   CANCELLED: 'Hủy phiếu',
 };
+
+const WORK_ORDER_LABELS: Record<string, string> = {
+  RECEIVED: 'Đã tiếp nhận',
+  DIAGNOSING: 'Đã chẩn đoán',
+  QUOTED: 'Đang báo giá',
+  IN_PROGRESS: 'Đang tiến hành',
+  COMPLETED: 'Đã xong',
+  DELIVERED: 'Đã bàn giao',
+  CANCELLED: 'Đã hủy',
+};
+
+const DIFFICULTY_LABELS: Record<string, string> = {
+  EASY: 'Dễ',
+  MEDIUM: 'Trung bình',
+  HARD: 'Khó',
+};
+
+const FUEL_LABELS = ['Cạn', '1/4', '1/2', '3/4', 'Đầy'];
 
 const nextStatuses = computed(() => TRANSITIONS[workOrder.value?.status ?? ''] ?? []);
 
@@ -104,6 +130,12 @@ async function saveProgress(): Promise<void> {
   }
 }
 
+const remaining = computed(() =>
+  workOrder.value ? workOrder.value.totalAmount - workOrder.value.paidAmount : 0,
+);
+
+const deposit = computed(() => (payments.value ?? []).filter((p) => !p.isVoided)[0] ?? null);
+
 const timelineEntries = computed(() =>
   (workOrder.value?.statusHistories ?? []).map((h) => ({
     id: h.id,
@@ -113,23 +145,6 @@ const timelineEntries = computed(() =>
     detail: h.note,
   })),
 );
-
-const activeQuotation = computed(
-  () => (quotations.value ?? []).find((q) => q.status !== 'SUPERSEDED') ?? null,
-);
-const remaining = computed(() =>
-  workOrder.value ? workOrder.value.totalAmount - workOrder.value.paidAmount : 0,
-);
-
-const WORK_ORDER_LABELS: Record<string, string> = {
-  RECEIVED: 'Đã tiếp nhận',
-  DIAGNOSING: 'Đã chẩn đoán',
-  QUOTED: 'Đang báo giá',
-  IN_PROGRESS: 'Đang tiến hành',
-  COMPLETED: 'Đã xong',
-  DELIVERED: 'Đã bàn giao',
-  CANCELLED: 'Đã hủy',
-};
 
 /** CP-19 — moc tien do cua phieu, bo buoc bao gia khi phieu khong can bao gia. */
 const progressSteps = computed<ProgressStep[]>(() => {
@@ -148,191 +163,288 @@ useHead({ title: `Phiếu ${workOrder.value.code} — AOYAMA Admin` });
 </script>
 
 <template>
-  <div v-if="workOrder" class="flex flex-col gap-4">
-    <AyPageHeader code="SA-10" :title="`Phiếu dịch vụ ${workOrder.code}`" back-to="/admin/work-orders">
-      <template #actions>
-        <AyStatusTag :status="workOrder.status" />
-        <AyStatusTag :status="workOrder.paymentStatus" />
-        <AyButton :to="`/admin/work-orders/${id}/items`" variant="secondary" size="sm">
-          Chẩn đoán &amp; hạng mục
-        </AyButton>
-        <AyButton :to="`/admin/work-orders/${id}/quotation`" variant="secondary" size="sm">
-          Lập báo giá
-        </AyButton>
-        <AyButton :to="`/admin/work-orders/${id}/payment`" variant="secondary" size="sm">
-          Thanh toán
-        </AyButton>
-      </template>
-    </AyPageHeader>
+  <div v-if="workOrder" class="flex flex-col gap-[15px]">
+    <!-- Ba the tom tat -->
+    <div class="grid gap-[13px]" style="grid-template-columns: repeat(auto-fit, minmax(230px, 1fr))">
+      <div class="card gap-1" style="background: #fff">
+        <div class="card-kicker">Khách · xe · cửa hàng</div>
+        <p class="text-[13.5px]">
+          {{ workOrder.customer?.name }} · {{ workOrder.customer?.phone }}
+        </p>
+        <p class="text-[13.5px]">
+          {{ workOrder.vehicle?.maker }} {{ workOrder.vehicle?.model }} ·
+          {{ workOrder.vehicle?.plateNumber }}
+        </p>
+        <p class="text-muted text-[12px]">
+          {{ i18n(workOrder.store?.name ?? null) }}
+          <template v-if="workOrder.booking">
+            ·
+            <NuxtLink :to="`/admin/bookings/${workOrder.bookingId}`">
+              {{ workOrder.booking.code }}
+            </NuxtLink>
+          </template>
+        </p>
+      </div>
+
+      <div class="card gap-1" style="background: #fff">
+        <div class="card-kicker">Hiện trạng khi tiếp nhận</div>
+        <p class="text-[13.5px]">
+          {{ number(workOrder.intakeOdometer) }} km
+          <template v-if="workOrder.intakeFuelLevel !== null">
+            · nhiên liệu {{ FUEL_LABELS[workOrder.intakeFuelLevel] ?? workOrder.intakeFuelLevel }}
+          </template>
+        </p>
+        <p v-if="workOrder.intakeAccessories" class="text-muted text-[12px]">
+          {{ workOrder.intakeAccessories }}
+        </p>
+        <p v-if="workOrder.intakeNote" class="text-muted text-[12px]">{{ workOrder.intakeNote }}</p>
+      </div>
+
+      <div class="card gap-1" style="background: #fff">
+        <div class="card-kicker">Kỹ thuật viên</div>
+        <p class="text-[13.5px]">
+          {{ workOrder.assignedTechnician?.fullName ?? 'Chưa phân công' }}
+          <template v-if="workOrder.difficulty">
+            · mức độ khó: {{ DIFFICULTY_LABELS[workOrder.difficulty] }}
+          </template>
+        </p>
+        <p class="text-muted text-[12px]">Mở phiếu {{ dateTime(workOrder.createdAt) }}</p>
+      </div>
+    </div>
 
     <AyProgressSteps :steps="progressSteps" />
 
-    <div class="flex flex-wrap gap-2">
-      <AyButton
-        v-for="status in nextStatuses" :key="status"
-        :variant="status === 'CANCELLED' ? 'ghost' : 'primary'"
-        size="sm"
-        @click="statusTarget = status"
+    <!-- Chan doan -->
+    <section class="card gap-2.5" style="background: #fff">
+      <div class="flex items-baseline justify-between gap-2.5">
+        <h5>Chẩn đoán kỹ thuật viên</h5>
+        <NuxtLink :to="`/admin/work-orders/${id}/items`" class="btn btn-ghost text-[12.5px]">
+          Sửa chẩn đoán &amp; hạng mục →
+        </NuxtLink>
+      </div>
+      <p v-if="workOrder.customerSymptom" class="text-[13.5px]">
+        <strong>Triệu chứng:</strong> {{ workOrder.customerSymptom }}
+      </p>
+      <p v-if="workOrder.diagnosisNote" class="text-[13.5px]">
+        <strong>Ghi nhận:</strong> {{ workOrder.diagnosisNote }}
+      </p>
+      <p v-if="workOrder.diagnosisCause" class="text-[13.5px]">
+        <strong>Nguyên nhân:</strong> {{ workOrder.diagnosisCause }}
+      </p>
+      <p
+        v-if="!workOrder.customerSymptom && !workOrder.diagnosisNote && !workOrder.diagnosisCause"
+        class="text-muted text-[12.5px]"
       >
-        {{ LABELS[status] }}
-      </AyButton>
+        Chưa ghi chẩn đoán.
+      </p>
+    </section>
+
+    <!-- Hang muc va phu tung -->
+    <div class="grid gap-[13px]" style="grid-template-columns: repeat(auto-fit, minmax(330px, 1fr))">
+      <section class="card gap-2" style="background: #fff">
+        <h5>Hạng mục công việc</h5>
+        <table v-if="(workOrder.items ?? []).length" class="table" style="min-width: 270px">
+          <thead>
+            <tr>
+              <th>Hạng mục</th>
+              <th>Thời gian</th>
+              <th class="text-right">Đơn giá</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in workOrder.items" :key="item.id">
+              <td>
+                {{ item.name }}
+                <template v-if="item.quantity > 1"> × {{ item.quantity }}</template>
+                <AyAiBadge v-if="item.suggestedByAi" class="ml-1" />
+              </td>
+              <td class="whitespace-nowrap">
+                {{ item.laborMinutes ? `${item.laborMinutes} mins` : '—' }}
+              </td>
+              <td class="text-right">{{ money(item.unitPrice * item.quantity) }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p v-else class="text-muted text-[12.5px]">Chưa có hạng mục nào.</p>
+      </section>
+
+      <section class="card gap-2" style="background: #fff">
+        <h5>Phụ tùng</h5>
+        <table v-if="(workOrder.parts ?? []).length" class="table" style="min-width: 270px">
+          <thead>
+            <tr>
+              <th>Tên · mã</th>
+              <th>SL</th>
+              <th class="text-right">Đơn giá</th>
+              <th class="text-right">Thành tiền</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="part in workOrder.parts" :key="part.id">
+              <td>
+                {{ part.partName }}
+                <span v-if="part.partCode" class="text-muted block text-[11px]">
+                  {{ part.partCode }}
+                </span>
+              </td>
+              <td>{{ part.quantity }}</td>
+              <td class="text-right">{{ money(part.unitPrice) }}</td>
+              <td class="text-right">{{ money(part.unitPrice * part.quantity) }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p v-else class="text-muted text-[12.5px]">Chưa có phụ tùng nào.</p>
+      </section>
     </div>
 
-    <div class="grid gap-4 lg:grid-cols-3">
-      <div class="flex flex-col gap-4 lg:col-span-2">
-        <section class="card">
-          <h2 class="mb-2 font-heading text-[16px]">Thông tin chung</h2>
-          <dl class="grid gap-2 text-[14px] sm:grid-cols-2">
-            <div><dt class="text-muted">Khách hàng</dt><dd>{{ workOrder.customer?.name }} · {{ workOrder.customer?.phone }}</dd></div>
-            <div><dt class="text-muted">Cửa hàng</dt><dd>{{ i18n(workOrder.store?.name ?? null) }}</dd></div>
-            <div><dt class="text-muted">Xe</dt><dd>{{ workOrder.vehicle?.plateNumber }} · {{ workOrder.vehicle?.maker }} {{ workOrder.vehicle?.model }}</dd></div>
-            <div><dt class="text-muted">Số km khi nhận</dt><dd>{{ number(workOrder.intakeOdometer) }} km</dd></div>
-            <div v-if="workOrder.bookingId">
-              <dt class="text-muted">Lịch hẹn</dt>
-              <dd><NuxtLink :to="`/admin/bookings/${workOrder.bookingId}`" class="underline">{{ workOrder.booking?.code }}</NuxtLink></dd>
-            </div>
-            <div><dt class="text-muted">Nhiên liệu khi nhận</dt><dd>{{ workOrder.intakeFuelLevel ?? '—' }}%</dd></div>
-          </dl>
-          <div v-if="workOrder.intakeNote" class="mt-3 border-t border-divider pt-3">
-            <p class="text-[12.5px] text-muted">Ghi chú tiếp nhận</p>
-            <p class="whitespace-pre-line text-[14px]">{{ workOrder.intakeNote }}</p>
-          </div>
-        </section>
+    <!-- Tien -->
+    <div class="flex flex-wrap items-stretch gap-[13px]">
+      <section class="card min-w-[250px] flex-1 gap-1.5" style="background: var(--color-surface)">
+        <div class="flex justify-between text-[13px]">
+          <span class="text-muted">Tiền công</span><span>{{ money(workOrder.laborSubtotal) }}</span>
+        </div>
+        <div class="flex justify-between text-[13px]">
+          <span class="text-muted">Phụ tùng</span><span>{{ money(workOrder.partsSubtotal) }}</span>
+        </div>
+        <div v-if="workOrder.discountAmount" class="flex justify-between text-[13px]">
+          <span class="text-muted">Giảm giá</span>
+          <span>−{{ money(workOrder.discountAmount) }}</span>
+        </div>
+        <div class="flex justify-between text-[13px]">
+          <span class="text-muted">Thuế {{ workOrder.taxRate }} %</span>
+          <span>{{ money(workOrder.taxAmount) }}</span>
+        </div>
+        <div
+          class="flex items-baseline justify-between pt-2"
+          style="border-top: 1px solid var(--color-divider)"
+        >
+          <strong>TỔNG</strong>
+          <span class="font-heading text-[21px]">{{ money(workOrder.totalAmount) }}</span>
+        </div>
+        <div v-if="deposit" class="flex justify-between text-[13px]">
+          <span class="text-muted">
+            Đã thu
+            <span class="text-[11.5px]">({{ dateTime(deposit.paidAt) }})</span>
+          </span>
+          <span>{{ money(workOrder.paidAmount) }}</span>
+        </div>
+        <div class="flex items-baseline justify-between text-[13.5px]">
+          <strong>Còn phải thu</strong><strong>{{ money(remaining) }}</strong>
+        </div>
+      </section>
 
-        <section v-if="workOrder.customerSymptom || workOrder.diagnosisNote" class="card">
-          <h2 class="mb-2 font-heading text-[16px]">Chẩn đoán</h2>
-          <div v-if="workOrder.customerSymptom" class="mb-2">
-            <p class="text-[12.5px] text-muted">Khách mô tả</p>
-            <p class="whitespace-pre-line text-[14px]">{{ workOrder.customerSymptom }}</p>
-          </div>
-          <div v-if="workOrder.diagnosisNote">
-            <p class="text-[12.5px] text-muted">Kỹ thuật viên</p>
-            <p class="whitespace-pre-line text-[14px]">{{ workOrder.diagnosisNote }}</p>
-          </div>
-          <p v-if="workOrder.diagnosisCause" class="mt-2 text-[13.5px]">
-            <span class="text-muted">Nguyên nhân: </span>{{ workOrder.diagnosisCause }}
-          </p>
-        </section>
-
-        <section class="card">
-          <h2 class="mb-2 font-heading text-[16px]">Hạng mục &amp; phụ tùng</h2>
-
-          <AyEmptyState
-            v-if="(workOrder.items ?? []).length === 0 && (workOrder.parts ?? []).length === 0"
-            title="Chưa có hạng mục nào"
-            hint="Vào màn hình chẩn đoán để thêm hạng mục công việc và phụ tùng."
+      <section class="card min-w-[250px] flex-1 gap-2" style="background: #fff">
+        <div class="flex items-baseline justify-between">
+          <h5>Báo giá</h5>
+          <NuxtLink
+            :to="`/admin/work-orders/${id}/quotation`"
+            class="btn btn-ghost text-[12.5px]"
           >
-            <AyButton :to="`/admin/work-orders/${id}/items`" size="sm">Thêm hạng mục</AyButton>
-          </AyEmptyState>
+            Lập mới
+          </NuxtLink>
+        </div>
+        <p v-if="(quotations ?? []).length === 0" class="text-muted text-[12.5px]">
+          Chưa có báo giá.
+        </p>
+        <ul v-else class="flex flex-col gap-1.5 text-[13.5px]">
+          <li
+            v-for="quote in quotations ?? []"
+            :key="quote.id"
+            class="flex items-center justify-between gap-2"
+          >
+            <NuxtLink :to="`/admin/quotations/${quote.id}`">
+              {{ quote.code }} · v{{ quote.version }}
+            </NuxtLink>
+            <span class="flex items-center gap-2">
+              <AyStatusTag :status="quote.status" />
+              <span class="whitespace-nowrap">{{ money(quote.totalAmount) }}</span>
+            </span>
+          </li>
+        </ul>
+      </section>
+    </div>
 
-          <template v-else>
-            <ul v-if="(workOrder.items ?? []).length" class="flex flex-col gap-1.5 text-[14px]">
-              <li v-for="item in workOrder.items" :key="item.id" class="flex justify-between gap-3">
-                <span>
-                  {{ item.name }}
-                  <template v-if="item.quantity > 1"> × {{ item.quantity }}</template>
-                  <AyAiBadge v-if="item.suggestedByAi" class="ml-1" />
-                </span>
-                <span class="whitespace-nowrap">{{ money(item.unitPrice * item.quantity) }}</span>
-              </li>
-            </ul>
-
-            <ul v-if="(workOrder.parts ?? []).length" class="mt-3 flex flex-col gap-1.5 border-t border-divider pt-3 text-[14px]">
-              <li v-for="part in workOrder.parts" :key="part.id" class="flex justify-between gap-3">
-                <span>{{ part.partName }}<template v-if="part.quantity > 1"> × {{ part.quantity }}</template></span>
-                <span class="whitespace-nowrap">{{ money(part.unitPrice * part.quantity) }}</span>
-              </li>
-            </ul>
+    <!-- Tien do hien cho khach -->
+    <section class="card gap-3" style="background: #fff">
+      <h5>Tiến độ hiển thị cho khách</h5>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <AyField :label="`Hoàn thành ${progress.progressPercent}%`">
+          <template #default="{ id: fid }">
+            <input
+              :id="fid"
+              v-model.number="progress.progressPercent"
+              class="w-full"
+              type="range"
+              min="0"
+              max="100"
+              step="5"
+            />
           </template>
-        </section>
-
-        <section class="card">
-          <h2 class="mb-3 font-heading text-[16px]">Tiến độ hiển thị cho khách</h2>
-          <div class="grid gap-3 sm:grid-cols-2">
-            <AyField :label="`Hoàn thành ${progress.progressPercent}%`">
-              <template #default="{ id: fid }">
-                <input :id="fid" v-model.number="progress.progressPercent" class="w-full" type="range" min="0" max="100" step="5">
-              </template>
-            </AyField>
-            <AyField label="Dự kiến xong">
-              <template #default="{ id: fid }">
-                <input :id="fid" v-model="progress.estimatedCompletionAt" class="input" type="datetime-local">
-              </template>
-            </AyField>
-            <AyField label="Ghi chú tiến độ" class="sm:col-span-2" hint="Khách đọc được nội dung này">
-              <template #default="{ id: fid }">
-                <textarea :id="fid" v-model="progress.progressNote" class="input min-h-[70px]" />
-              </template>
-            </AyField>
-          </div>
-          <AyButton variant="secondary" size="sm" class="mt-2" @click="saveProgress">Cập nhật tiến độ</AyButton>
-        </section>
+        </AyField>
+        <AyField label="Dự kiến xong">
+          <template #default="{ id: fid }">
+            <input
+              :id="fid"
+              v-model="progress.estimatedCompletionAt"
+              class="input"
+              type="datetime-local"
+            />
+          </template>
+        </AyField>
+        <AyField label="Ghi chú tiến độ" class="sm:col-span-2" hint="Khách đọc được nội dung này">
+          <template #default="{ id: fid }">
+            <textarea :id="fid" v-model="progress.progressNote" class="input min-h-[70px]" />
+          </template>
+        </AyField>
       </div>
+      <button type="button" class="btn btn-secondary self-start text-[12.5px]" @click="saveProgress">
+        Cập nhật tiến độ
+      </button>
+    </section>
 
-      <div class="flex flex-col gap-4">
-        <section class="card">
-          <h2 class="mb-2 font-heading text-[16px]">Chi phí</h2>
-          <AyMoneyTable
-            :labor-subtotal="workOrder.laborSubtotal"
-            :parts-subtotal="workOrder.partsSubtotal"
-            :discount-amount="workOrder.discountAmount"
-            :tax-rate="workOrder.taxRate"
-            :tax-amount="workOrder.taxAmount"
-            :total-amount="workOrder.totalAmount"
-            :paid-amount="workOrder.paidAmount"
-          />
-          <AyButton
-            v-if="remaining > 0"
-            :to="`/admin/work-orders/${id}/payment`" size="sm" block class="mt-3"
-          >
-            Ghi nhận thanh toán
-          </AyButton>
-        </section>
+    <section class="card gap-2" style="background: #fff">
+      <h5>Nhật ký phiếu</h5>
+      <AyChangeLog :entries="timelineEntries" />
+    </section>
 
-        <section class="card">
-          <div class="mb-2 flex items-baseline justify-between">
-            <h2 class="font-heading text-[16px]">Báo giá</h2>
-            <NuxtLink :to="`/admin/work-orders/${id}/quotation`" class="btn btn-ghost text-[12.5px]">Lập mới</NuxtLink>
-          </div>
-          <AyEmptyState v-if="(quotations ?? []).length === 0" title="Chưa có báo giá" />
-          <ul v-else class="flex flex-col gap-1.5 text-[13.5px]">
-            <li v-for="q in quotations ?? []" :key="q.id" class="flex items-center justify-between gap-2">
-              <NuxtLink :to="`/admin/quotations/${q.id}`" class="underline">Bản {{ q.version }}</NuxtLink>
-              <AyStatusTag :status="q.status" />
-              <span class="whitespace-nowrap">{{ money(q.totalAmount) }}</span>
-            </li>
-          </ul>
-        </section>
-
-        <section v-if="(workOrder.photos ?? []).length" class="card">
-          <h2 class="mb-2 font-heading text-[16px]">Hình ảnh</h2>
-          <ul class="grid grid-cols-3 gap-1.5">
-            <li v-for="photo in workOrder.photos" :key="photo.id">
-              <img :src="photo.url" :alt="photo.caption ?? ''" class="aspect-square w-full rounded-lg object-cover">
-              <p class="mt-0.5 text-[10.5px] text-muted">{{ photo.stage }}</p>
-            </li>
-          </ul>
-        </section>
-
-        <section class="card">
-          <h2 class="mb-3 font-heading text-[16px]">Nhật ký</h2>
-          <AyChangeLog :entries="timelineEntries" />
-        </section>
-      </div>
+    <!-- Hang hanh dong -->
+    <div
+      class="flex flex-wrap items-center justify-end gap-2.5 pt-[15px]"
+      style="border-top: 1px solid var(--color-divider)"
+    >
+      <NuxtLink
+        v-if="remaining > 0"
+        :to="`/admin/work-orders/${id}/payment`"
+        class="btn btn-secondary text-[13px]"
+        style="min-height: 48px; padding-inline: 20px"
+      >
+        Ghi nhận thanh toán
+      </NuxtLink>
+      <button
+        v-for="status in nextStatuses"
+        :key="status"
+        type="button"
+        class="btn"
+        :class="status === 'CANCELLED' ? 'btn-ghost text-[13px]' : 'btn-primary text-[15px]'"
+        style="min-height: 48px; padding-inline: 26px"
+        @click="statusTarget = status"
+      >
+        {{ ACTION_LABELS[status] }}
+      </button>
     </div>
 
     <AyConfirmDialog
       :open="statusTarget !== null"
-      :title="LABELS[statusTarget ?? ''] ?? 'Đổi trạng thái'"
+      :title="`Chuyển phiếu sang: ${WORK_ORDER_LABELS[statusTarget ?? ''] ?? ''}`"
       :message="confirmMessage"
       :danger="statusTarget === 'CANCELLED'"
       :loading="busy"
       @confirm="changeStatus"
       @cancel="statusTarget = null"
     >
-      <AyField v-if="statusTarget === 'CANCELLED'" label="Lý do hủy" class="mt-3">
+      <AyField label="Ghi chú" class="mt-3">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="statusNote" class="input" type="text">
+          <input :id="fid" v-model="statusNote" class="input" type="text" />
         </template>
       </AyField>
     </AyConfirmDialog>

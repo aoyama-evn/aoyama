@@ -53,6 +53,10 @@ const discountAmount = ref(workOrder.value.discountAmount);
 const taxRate = ref(workOrder.value.taxRate);
 const validUntil = ref(defaultValidUntil());
 const note = ref('');
+/** SA-12 — bao gia co the yeu cau khach dat coc truoc khi bat tay vao viec. */
+const requireDeposit = ref(false);
+const depositAmount = ref(0);
+const depositDueAt = ref('');
 const saving = ref(false);
 const sendAfterSave = ref(true);
 const error = ref<ApiError | null>(null);
@@ -148,6 +152,9 @@ async function save(): Promise<void> {
         discountAmount: discountAmount.value,
         taxRate: taxRate.value,
         validUntil: validUntil.value || undefined,
+        depositAmount: requireDeposit.value ? depositAmount.value : undefined,
+        depositDueAt:
+          requireDeposit.value && depositDueAt.value ? depositDueAt.value : undefined,
         note: note.value || undefined,
         aiSuggestion: suggestion.value ?? undefined,
       },
@@ -167,6 +174,12 @@ async function save(): Promise<void> {
   }
 }
 
+const remainingOnHandover = computed(() =>
+  Math.max(0, totalAmount.value - (requireDeposit.value ? depositAmount.value : 0)),
+);
+
+setScreenTitle(() => `Báo giá · ${workOrder.value?.code ?? ''}`);
+
 useHead({ title: 'Lập báo giá — AOYAMA Admin' });
 </script>
 
@@ -183,31 +196,11 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
       </template>
     </AyPageHeader>
 
-    <section v-if="suggestion && suggestion.lines.length" class="card">
-      <div class="mb-2 flex items-center gap-2">
-        <h2 class="font-heading text-[16px]">Gợi ý của trợ lý AI</h2>
-        <AyAiBadge />
-      </div>
-      <p class="mb-2 text-[12.5px] text-muted">
-        Đây là đề xuất. Bấm thêm từng dòng bạn đồng ý — không có gì tự động vào báo giá.
-      </p>
-      <ul class="flex flex-col gap-1.5">
-        <li
-          v-for="(line, index) in suggestion.lines" :key="index"
-          class="flex items-center gap-3 rounded-xl bg-olive-100 px-3 py-2 text-[13.5px]"
-        >
-          <span class="flex-1">
-            <strong>{{ line.name }}</strong>
-            <span v-if="line.reason" class="block text-[12px] opacity-80">{{ line.reason }}</span>
-          </span>
-          <span class="whitespace-nowrap">{{ money(line.unitPrice) }} × {{ line.quantity }}</span>
-          <AyButton size="sm" variant="secondary" @click="acceptSuggestion(line)">Thêm</AyButton>
-        </li>
-      </ul>
-    </section>
-
-    <div class="grid gap-4 lg:grid-cols-3">
-      <section class="card lg:col-span-2">
+    <div
+      class="grid items-start gap-3.5"
+      style="grid-template-columns: repeat(auto-fit, minmax(330px, 1fr))"
+    >
+      <section class="card" style="background: #fff">
         <div class="mb-3 flex flex-wrap items-baseline justify-between gap-2">
           <h2 class="font-heading text-[16px]">Các dòng báo giá</h2>
           <div class="flex gap-1">
@@ -268,14 +261,58 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
         </p>
       </section>
 
-      <div class="flex flex-col gap-4">
-        <section class="card">
-          <h2 class="mb-2 font-heading text-[16px]">Thêm phụ tùng</h2>
+      <div class="flex flex-col gap-3.5">
+        <section class="ay-ai-card">
+          <div>
+            <span class="tag" style="background: var(--color-accent-2-500); color: #fff">
+              ✦ Gợi ý bởi AI
+            </span>
+            <p class="mt-2 text-[11.5px]" style="color: var(--color-accent-2-800)">
+              Đây là đề xuất. Bấm “Chọn” từng dòng bạn đồng ý — không có gì tự vào báo giá (AI-02).
+            </p>
+          </div>
+
+          <button
+            v-if="!suggestion"
+            type="button"
+            class="btn btn-secondary ay-ai-btn self-start text-[12.5px]"
+            :disabled="loadingSuggestion"
+            @click="loadSuggestion"
+          >
+            {{ loadingSuggestion ? 'Đang lấy gợi ý…' : 'Lấy gợi ý AI' }}
+          </button>
+
+          <p
+            v-else-if="suggestion.lines.length === 0"
+            class="text-[12.5px]"
+            style="color: var(--color-accent-2-800)"
+          >
+            Trợ lý chưa có gợi ý nào cho phiếu này.
+          </p>
+
+          <div v-for="(line, index) in suggestion?.lines ?? []" :key="index" class="ay-ai-line">
+            <p class="text-[13.5px] font-semibold">{{ line.name }}</p>
+            <p class="text-muted text-[11.5px]">
+              ~{{ money(line.unitPrice) }} × {{ line.quantity }}
+              <span v-if="line.reason" class="block">{{ line.reason }}</span>
+            </p>
+            <button
+              type="button"
+              class="btn btn-secondary ay-ai-btn self-start text-[12.5px]"
+              @click="acceptSuggestion(line)"
+            >
+              Chọn
+            </button>
+          </div>
+        </section>
+
+        <section class="card gap-2" style="background: #fff">
+          <h5>Thêm phụ tùng</h5>
           <AyPartPicker :store-id="workOrder.storeId" @select="addPart" />
         </section>
 
-        <section class="card flex flex-col gap-3">
-          <h2 class="font-heading text-[16px]">Tổng kết</h2>
+        <section class="card flex flex-col gap-3" style="background: #fff">
+          <h5>Tổng kết</h5>
 
           <AyField label="Giảm giá">
             <template #default="{ id: fid }">
@@ -288,6 +325,39 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
               <input :id="fid" v-model.number="taxRate" class="input" type="number" min="0" max="100">
             </template>
           </AyField>
+
+          <div class="ay-deposit">
+            <label class="flex cursor-pointer items-center gap-2.5 text-[13.5px] font-semibold">
+              <input v-model="requireDeposit" type="checkbox" />
+              Yêu cầu tiền cọc trước
+            </label>
+            <div
+              v-if="requireDeposit"
+              class="grid gap-2.5"
+              style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))"
+            >
+              <AyField label="Số tiền cọc" required>
+                <template #default="{ id: fid }">
+                  <input
+                    :id="fid"
+                    v-model.number="depositAmount"
+                    class="input"
+                    type="number"
+                    min="0"
+                    :max="totalAmount"
+                  />
+                </template>
+              </AyField>
+              <AyField label="Hạn đặt cọc">
+                <template #default="{ id: fid }">
+                  <input :id="fid" v-model="depositDueAt" class="input" type="datetime-local" />
+                </template>
+              </AyField>
+            </div>
+            <p v-if="requireDeposit" class="text-muted text-[12px]">
+              Còn phải thu khi bàn giao: {{ money(remainingOnHandover) }}
+            </p>
+          </div>
 
           <AyField label="Hiệu lực đến">
             <template #default="{ id: fid }">
@@ -326,3 +396,37 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
     </div>
   </div>
 </template>
+
+<style scoped>
+/** Khung goi y AI: vien dut mau accent-2, giong SA-05 va SA-10a. */
+.ay-ai-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1.5px dashed var(--color-accent-2-400);
+  background: var(--color-accent-2-100);
+  border-radius: 26px;
+  padding: 16px;
+}
+.ay-ai-line {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  background: #fff;
+  border-radius: 18px;
+  padding: 12px;
+}
+.ay-ai-btn {
+  border-color: var(--color-accent-2-500);
+  color: var(--color-accent-2-800);
+}
+
+.ay-deposit {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1.5px solid var(--color-accent-200);
+  border-radius: 20px;
+  padding: 13px;
+}
+</style>
