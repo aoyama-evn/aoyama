@@ -4,6 +4,7 @@ import type { SystemSetting } from '~/types/models';
 /** SA-43 Cau hinh he thong — FR-SYS-01, FR-SYS-02, FR-SYS-07. */
 definePageMeta({ layout: 'admin', middleware: ['admin', 'admin-only'] });
 
+const { t, te } = useI18n();
 const api = useApi();
 const ui = useUiStore();
 
@@ -20,13 +21,10 @@ watchEffect(() => {
   draft.value = next;
 });
 
-const GROUP_LABELS: Record<string, string> = {
-  booking: 'Đặt lịch',
-  pricing: 'Giá & thuế',
-  maintenance: 'Chu kỳ bảo dưỡng',
-  ai: 'Trợ lý AI',
-  system: 'Hệ thống',
-};
+/** Ten nhom tham so; nhom la khoa dung chung ba thu tieng. */
+function groupLabel(group: string): string {
+  return te(`settingGroup.${group}`) ? t(`settingGroup.${group}`) : group;
+}
 
 const grouped = computed(() => {
   const map = new Map<string, SystemSetting[]>();
@@ -45,7 +43,7 @@ const changedKeys = computed(() =>
 
 async function save(): Promise<void> {
   if (changedKeys.value.length === 0) {
-    ui.info('Không có thay đổi nào để lưu');
+    ui.info(t('sa43.noChanges'));
     return;
   }
   saving.value = true;
@@ -53,7 +51,7 @@ async function save(): Promise<void> {
     await api.put('/admin/system/settings', {
       entries: changedKeys.value.map((key) => ({ key, value: draft.value[key] })),
     });
-    ui.success(`Đã lưu ${changedKeys.value.length} tham số`);
+    ui.success(t('sa43.saved', { n: changedKeys.value.length }));
     await refresh();
   } catch (error) {
     ui.error(normalizeError(error).message);
@@ -62,24 +60,25 @@ async function save(): Promise<void> {
   }
 }
 
-useHead({ title: 'Cấu hình hệ thống — AOYAMA Admin' });
+setScreenTitle(() => t('sa43.title'));
+useHead({ title: () => `${t('sa43.title')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div class="admin-form admin-form-wide">
     <AyPageHeader
-      code="SA-43" title="Cấu hình hệ thống"
-      description="Các ngưỡng nghiệp vụ đọc từ đây trước. Thay đổi có hiệu lực ngay, không cần khởi động lại."
+      code="SA-43" :title="$t('sa43.title')"
+      :description="$t('sa43.lead')"
     >
       <template #actions>
         <AyButton :loading="saving" :disabled="changedKeys.length === 0" @click="save">
-          Lưu {{ changedKeys.length > 0 ? `(${changedKeys.length})` : '' }}
+          {{ $t('common.save') }}{{ changedKeys.length > 0 ? ` (${changedKeys.length})` : '' }}
         </AyButton>
       </template>
     </AyPageHeader>
 
     <section v-for="[group, items] in grouped" :key="group" class="card">
-      <h2 class="mb-3 font-heading text-[16px]">{{ GROUP_LABELS[group] ?? group }}</h2>
+      <h2 class="mb-3 font-heading text-[16px]">{{ groupLabel(group) }}</h2>
 
       <ul class="flex flex-col gap-3">
         <li
@@ -98,7 +97,7 @@ useHead({ title: 'Cấu hình hệ thống — AOYAMA Admin' });
               :disabled="!setting.isEditable"
               @change="draft[setting.key] = ($event.target as HTMLInputElement).checked"
             >
-            {{ draft[setting.key] ? 'Bật' : 'Tắt' }}
+            {{ draft[setting.key] ? $t('sa43.on') : $t('sa43.off') }}
           </label>
 
           <input
@@ -123,8 +122,7 @@ useHead({ title: 'Cấu hình hệ thống — AOYAMA Admin' });
     </section>
 
     <p v-if="changedKeys.length" class="rounded-xl bg-warning-bg px-3 py-2 text-[13px] text-warning">
-      Có {{ changedKeys.length }} tham số đang chờ lưu. Thay đổi ngưỡng đặt lịch ảnh hưởng tới
-      quy tắc hủy và đổi lịch của khách.
+      {{ $t('sa43.pending', { n: changedKeys.length }) }}
     </p>
   </div>
 </template>

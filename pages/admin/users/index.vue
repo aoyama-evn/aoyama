@@ -7,6 +7,7 @@ definePageMeta({ layout: 'admin', middleware: ['admin', 'admin-only'] });
 
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { i18n, dateTime } = useFormat();
 
 const keyword = ref('');
@@ -27,7 +28,7 @@ async function toggleActive(): Promise<void> {
     await api.put(`/admin/users/${toggleTarget.value.id}/active`, {
       isActive: !toggleTarget.value.isActive,
     });
-    ui.success(toggleTarget.value.isActive ? 'Đã khóa tài khoản' : 'Đã mở khóa tài khoản');
+    ui.success(toggleTarget.value.isActive ? t('sa39.locked') : t('sa39.unlocked'));
     toggleTarget.value = null;
     await refresh();
   } catch (error) {
@@ -38,41 +39,42 @@ async function toggleActive(): Promise<void> {
 async function unlock(user: AdminUser): Promise<void> {
   try {
     await api.put(`/admin/users/${user.id}/unlock`);
-    ui.success('Đã gỡ khóa đăng nhập');
+    ui.success(t('sa39.lockCleared'));
     await refresh();
   } catch (error) {
     ui.error(normalizeError(error).message);
   }
 }
 
-const COLUMNS = [
-  { key: 'username', label: 'Tên đăng nhập', width: '180px' },
-  { key: 'fullName', label: 'Họ tên' },
-  { key: 'role', label: 'Vai trò', width: '120px' },
-  { key: 'store', label: 'Cửa hàng', width: '170px' },
-  { key: 'lastLoginAt', label: 'Đăng nhập gần nhất', width: '160px' },
-  { key: 'isActive', label: 'Trạng thái', width: '130px' },
+const COLUMNS = computed(() => [
+  { key: 'username', label: t('sa39.colUsername'), width: '180px' },
+  { key: 'fullName', label: t('sa39.colName') },
+  { key: 'role', label: t('sa39.colRole'), width: '120px' },
+  { key: 'store', label: t('sa03.colStore'), width: '170px' },
+  { key: 'lastLoginAt', label: t('sa39.colLastLogin'), width: '160px' },
+  { key: 'isActive', label: t('sa02.colStatus'), width: '130px' },
   { key: 'actions', label: '', width: '130px' },
-];
+]);
 
-useHead({ title: 'Tài khoản quản trị — AOYAMA Admin' });
+setScreenTitle(() => t('sa39.title'));
+useHead({ title: () => `${t('sa39.title')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
     <AyPageHeader
-      code="SA-39" title="Tài khoản quản trị"
-      description="Tài khoản bị khóa thay vì xóa, để nhật ký thao tác vẫn truy nguyên được."
+      code="SA-39" :title="$t('sa39.title')"
+      :description="$t('sa39.lead')"
     >
       <template #actions>
-        <AyButton to="/admin/users/new/edit" size="sm">Thêm tài khoản</AyButton>
+        <AyButton to="/admin/users/new/edit" size="sm">{{ $t('sa39.addCta') }}</AyButton>
       </template>
     </AyPageHeader>
 
     <AyFilterBar :has-active-filters="Boolean(keyword)" @reset="keyword = ''">
-      <AyField label="Tìm kiếm" class="min-w-[240px] flex-1">
+      <AyField :label="$t('common.search')" class="min-w-[240px] flex-1">
         <template #default="{ id }">
-          <input :id="id" v-model="keyword" class="input" type="search" placeholder="Tên đăng nhập, họ tên hoặc email">
+          <input :id="id" v-model="keyword" class="input" type="search" :placeholder="$t('sa39.searchPlaceholder')">
         </template>
       </AyField>
     </AyFilterBar>
@@ -82,7 +84,7 @@ useHead({ title: 'Tài khoản quản trị — AOYAMA Admin' });
       :rows="data?.items ?? []"
       :meta="data?.meta ?? null"
       :loading="pending"
-      empty-title="Chưa có tài khoản nào"
+      :empty-title="$t('sa39.empty')"
       @update:page="page = $event"
     >
       <template #cell-username="{ row }">
@@ -96,11 +98,11 @@ useHead({ title: 'Tài khoản quản trị — AOYAMA Admin' });
           class="tag"
           :class="row.role === AdminRole.ADMIN ? 'bg-accent-200 text-accent-800' : 'bg-neutral-200 text-neutral-700'"
         >
-          {{ row.role === AdminRole.ADMIN ? 'Quản trị' : 'Nhân viên' }}
+          {{ row.role === AdminRole.ADMIN ? $t('sa39.roleAdmin') : $t('sa39.roleStaff') }}
         </span>
       </template>
       <template #cell-store="{ row }">
-        {{ i18n((row as unknown as AdminUser).store?.name ?? null) || 'Mọi cửa hàng' }}
+        {{ i18n((row as unknown as AdminUser).store?.name ?? null) || $t('sa39.allStores') }}
       </template>
       <template #cell-lastLoginAt="{ row }">{{ dateTime(row.lastLoginAt as string) || '—' }}</template>
       <template #cell-isActive="{ row }">
@@ -108,33 +110,33 @@ useHead({ title: 'Tài khoản quản trị — AOYAMA Admin' });
           class="tag"
           :class="row.isActive ? 'bg-success-bg text-success' : 'bg-neutral-200 text-neutral-600'"
         >
-          {{ row.isActive ? 'Hoạt động' : 'Đã khóa' }}
+          {{ row.isActive ? $t('sa39.active') : $t('sa39.disabled') }}
         </span>
-        <span v-if="row.lockedUntil" class="tag mt-1 bg-danger-bg text-danger">tạm khóa</span>
+        <span v-if="row.lockedUntil" class="tag mt-1 bg-danger-bg text-danger">
+          {{ $t('sa39.tempLocked') }}
+        </span>
       </template>
       <template #cell-actions="{ row }">
         <button
           type="button" class="text-[12.5px] underline"
           @click.stop="toggleTarget = row as unknown as AdminUser"
         >
-          {{ row.isActive ? 'Khóa' : 'Mở khóa' }}
+          {{ row.isActive ? $t('sa39.lock') : $t('sa39.unlock') }}
         </button>
         <button
           v-if="row.lockedUntil" type="button" class="ml-2 text-[12.5px] underline"
           @click.stop="unlock(row as unknown as AdminUser)"
         >
-          Gỡ khóa
+          {{ $t('sa39.clearLock') }}
         </button>
       </template>
     </AyDataTable>
 
     <AyConfirmDialog
       :open="Boolean(toggleTarget)"
-      :title="toggleTarget?.isActive ? 'Khóa tài khoản' : 'Mở khóa tài khoản'"
+      :title="toggleTarget?.isActive ? $t('sa39.askLock') : $t('sa39.askUnlock')"
       :message="
-        toggleTarget?.isActive
-          ? 'Người dùng sẽ không đăng nhập được nữa. Lịch sử thao tác vẫn giữ nguyên.'
-          : 'Người dùng có thể đăng nhập trở lại.'
+        toggleTarget?.isActive ? $t('sa39.askLockBody') : $t('sa39.askUnlockBody')
       "
       :danger="toggleTarget?.isActive"
       @confirm="toggleActive"

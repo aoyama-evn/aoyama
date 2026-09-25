@@ -8,6 +8,7 @@ definePageMeta({ layout: 'admin', middleware: ['admin', 'admin-only'] });
 const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { i18n } = useFormat();
 
 const id = route.params.id as string;
@@ -49,7 +50,7 @@ if (!isNew) {
 
 async function save(): Promise<void> {
   if (!form.fullName.trim() || (isNew && (!form.username.trim() || form.password.length < 8))) {
-    ui.warning('Cần tên đăng nhập, họ tên và mật khẩu tối thiểu 8 ký tự');
+    ui.warning(t('sa40.needFields'));
     return;
   }
   saving.value = true;
@@ -69,10 +70,10 @@ async function save(): Promise<void> {
         username: form.username.trim(),
         password: form.password,
       });
-      ui.success('Đã tạo tài khoản', 'Người dùng phải đổi mật khẩu ở lần đăng nhập đầu tiên.');
+      ui.success(t('sa40.created'), t('sa40.createdSub'));
     } else {
       await api.put(`/admin/users/${id}`, body);
-      ui.success('Đã lưu tài khoản');
+      ui.success(t('sa40.saved'));
     }
     await navigateTo('/admin/users');
   } catch (err) {
@@ -84,13 +85,13 @@ async function save(): Promise<void> {
 
 async function doResetPassword(): Promise<void> {
   if (resetPassword.value.length < 8) {
-    ui.warning('Mật khẩu mới cần tối thiểu 8 ký tự');
+    ui.warning(t('sa40.pwTooShort'));
     return;
   }
   resetting.value = true;
   try {
     await api.put(`/admin/users/${id}/reset-password`, { newPassword: resetPassword.value });
-    ui.success('Đã đặt lại mật khẩu', 'Người dùng phải đổi mật khẩu khi đăng nhập lần tới.');
+    ui.success(t('sa40.resetDone'), t('sa40.resetDoneSub'));
     resetPassword.value = '';
   } catch (err) {
     ui.error(normalizeError(err).message);
@@ -99,18 +100,19 @@ async function doResetPassword(): Promise<void> {
   }
 }
 
-useHead({ title: isNew ? 'Thêm tài khoản' : 'Sửa tài khoản' });
+setScreenTitle(() => (isNew ? t('sa40.headAdd') : t('sa40.headEdit')));
+useHead({ title: () => (isNew ? t('sa40.headAdd') : t('sa40.headEdit')) });
 </script>
 
 <template>
   <div class="admin-form">
     <AyPageHeader
-      code="SA-40" :title="isNew ? 'Thêm tài khoản quản trị' : 'Sửa tài khoản quản trị'"
+      code="SA-40" :title="isNew ? $t('sa40.addTitle') : $t('sa40.editTitle')"
       back-to="/admin/users"
     />
 
     <section class="card admin-grid" style="background: #fff">
-      <AyField label="Tên đăng nhập" :required="isNew" hint="Không đổi được sau khi tạo">
+      <AyField :label="$t('sa39.colUsername')" :required="isNew" :hint="$t('sa40.usernameHint')">
         <template #default="{ id: fid }">
           <input
             :id="fid" v-model="form.username" class="input font-mono" type="text"
@@ -119,43 +121,43 @@ useHead({ title: isNew ? 'Thêm tài khoản' : 'Sửa tài khoản' });
         </template>
       </AyField>
 
-      <AyField v-if="isNew" label="Mật khẩu" required hint="Tối thiểu 8 ký tự">
+      <AyField v-if="isNew" :label="$t('sa01.password')" required :hint="$t('sa40.passwordHint')">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.password" class="input" type="password" autocomplete="new-password">
         </template>
       </AyField>
 
-      <AyField label="Họ tên" required>
+      <AyField :label="$t('sa39.colName')" required>
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.fullName" class="input" type="text">
         </template>
       </AyField>
 
-      <AyField label="Email">
+      <AyField :label="$t('sc14.email')">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.email" class="input" type="email">
         </template>
       </AyField>
 
-      <AyField label="Điện thoại">
+      <AyField :label="$t('sa15.colPhone')">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="form.phone" class="input" type="tel">
         </template>
       </AyField>
 
-      <AyField label="Vai trò" required hint="Quản trị được vào cấu hình, nhật ký và quản lý tài khoản">
+      <AyField :label="$t('sa39.colRole')" required :hint="$t('sa40.roleHint')">
         <template #default="{ id: fid }">
           <select :id="fid" v-model="form.role" class="input">
-            <option :value="AdminRole.STAFF">Nhân viên</option>
-            <option :value="AdminRole.ADMIN">Quản trị</option>
+            <option :value="AdminRole.STAFF">{{ $t('sa39.roleStaff') }}</option>
+            <option :value="AdminRole.ADMIN">{{ $t('sa39.roleAdmin') }}</option>
           </select>
         </template>
       </AyField>
 
-      <AyField label="Cửa hàng phụ trách" hint="Bỏ trống = làm việc với mọi cửa hàng">
+      <AyField :label="$t('sa40.storeLabel')" :hint="$t('sa40.storeHint')">
         <template #default="{ id: fid }">
           <select :id="fid" v-model="form.storeId" class="input">
-            <option value="">Mọi cửa hàng</option>
+            <option value="">{{ $t('sa39.allStores') }}</option>
             <option v-for="store in stores ?? []" :key="store.id" :value="store.id">
               {{ i18n(store.name) }}
             </option>
@@ -163,7 +165,7 @@ useHead({ title: isNew ? 'Thêm tài khoản' : 'Sửa tài khoản' });
         </template>
       </AyField>
 
-      <AyField label="Ngôn ngữ giao diện">
+      <AyField :label="$t('sa40.uiLang')">
         <template #default="{ id: fid }">
           <select :id="fid" v-model="form.language" class="input">
             <option value="ja">日本語</option>
@@ -177,21 +179,22 @@ useHead({ title: isNew ? 'Thêm tài khoản' : 'Sửa tài khoản' });
     <AyErrorNote :error="error" />
 
     <div class="admin-actions">
-      <AyButton to="/admin/users" variant="secondary">Hủy</AyButton>
-      <AyButton :loading="saving" @click="save">Lưu</AyButton>
+      <AyButton to="/admin/users" variant="secondary">{{ $t('common.cancel') }}</AyButton>
+      <AyButton :loading="saving" @click="save">{{ $t('common.save') }}</AyButton>
     </div>
 
     <section v-if="!isNew" class="card">
-      <h2 class="mb-2 font-heading text-[16px]">Đặt lại mật khẩu</h2>
+      <h2 class="mb-2 font-heading text-[16px]">{{ $t('sa40.resetTitle') }}</h2>
       <p class="mb-2 text-[12.5px] text-muted">
-        Người dùng sẽ bị buộc đổi mật khẩu ở lần đăng nhập kế tiếp, và mọi phiên đang mở bị thu hồi.
+        {{ $t('sa40.resetLead') }}
       </p>
       <div class="flex flex-wrap gap-2">
         <input
           v-model="resetPassword" class="input max-w-xs flex-1" type="password"
-          placeholder="Mật khẩu mới" autocomplete="new-password" aria-label="Mật khẩu mới"
+          :placeholder="$t('sa40.newPwPlaceholder')" autocomplete="new-password"
+          :aria-label="$t('sa40.newPwPlaceholder')"
         >
-        <AyButton variant="secondary" :loading="resetting" @click="doResetPassword">Đặt lại</AyButton>
+        <AyButton variant="secondary" :loading="resetting" @click="doResetPassword">{{ $t('sa40.resetCta') }}</AyButton>
       </div>
     </section>
   </div>

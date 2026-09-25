@@ -5,6 +5,7 @@ import type { AuditLog, Page } from '~/types/models';
 definePageMeta({ layout: 'admin', middleware: ['admin', 'admin-only'] });
 
 const api = useApi();
+const { t } = useI18n();
 const { dateTime } = useFormat();
 
 const filters = reactive({ entity: '', action: '', from: '', to: '' });
@@ -46,48 +47,49 @@ function reset(): void {
   page.value = 1;
 }
 
-const COLUMNS = [
-  { key: 'createdAt', label: 'Thời điểm', width: '150px' },
-  { key: 'actorName', label: 'Người thực hiện', width: '170px' },
-  { key: 'action', label: 'Hành động', width: '180px' },
-  { key: 'entity', label: 'Đối tượng', width: '150px' },
-  { key: 'changes', label: 'Thay đổi' },
+const COLUMNS = computed(() => [
+  { key: 'createdAt', label: t('sa29.colWhen'), width: '150px' },
+  { key: 'actorName', label: t('sa44.colActor'), width: '170px' },
+  { key: 'action', label: t('sa44.action'), width: '180px' },
+  { key: 'entity', label: t('sa44.entity'), width: '150px' },
+  { key: 'changes', label: t('sa44.colChanges') },
   { key: 'ipAddress', label: 'IP', width: '130px' },
-];
+]);
 
-useHead({ title: 'Nhật ký thao tác — AOYAMA Admin' });
+setScreenTitle(() => t('sa44.title'));
+useHead({ title: () => `${t('sa44.title')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
     <AyPageHeader
-      code="SA-44" title="Nhật ký thao tác"
-      description="Bản ghi chỉ ghi thêm, không sửa và không xóa được từ giao diện."
+      code="SA-44" :title="$t('sa44.title')"
+      :description="$t('sa44.lead')"
     />
 
     <AyFilterBar
       :has-active-filters="Boolean(filters.entity || filters.action || filters.from)"
       @reset="reset"
     >
-      <AyField label="Đối tượng">
+      <AyField :label="$t('sa44.entity')">
         <template #default="{ id }">
           <select :id="id" v-model="filters.entity" class="input">
-            <option value="">Tất cả</option>
+            <option value="">{{ $t('common.all') }}</option>
             <option v-for="entity in ENTITIES" :key="entity" :value="entity">{{ entity }}</option>
           </select>
         </template>
       </AyField>
-      <AyField label="Hành động">
+      <AyField :label="$t('sa44.action')">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.action" class="input" type="search" placeholder="CREATE, UPDATE, CONFIRM…">
+          <input :id="id" v-model="filters.action" class="input" type="search" :placeholder="$t('sa44.actionPlaceholder')">
         </template>
       </AyField>
-      <AyField label="Từ ngày">
+      <AyField :label="$t('sa03.fromDate')">
         <template #default="{ id }">
           <input :id="id" v-model="filters.from" class="input" type="date">
         </template>
       </AyField>
-      <AyField label="Đến ngày">
+      <AyField :label="$t('sa03.toDate')">
         <template #default="{ id }">
           <input :id="id" v-model="filters.to" class="input" type="date">
         </template>
@@ -99,7 +101,7 @@ useHead({ title: 'Nhật ký thao tác — AOYAMA Admin' });
       :rows="data?.items ?? []"
       :meta="data?.meta ?? null"
       :loading="pending"
-      empty-title="Chưa có thao tác nào được ghi nhận"
+      :empty-title="$t('sa44.empty')"
       @update:page="page = $event"
       @row-click="detail = $event as unknown as AuditLog"
     >
@@ -124,31 +126,31 @@ useHead({ title: 'Nhật ký thao tác — AOYAMA Admin' });
 
     <AyConfirmDialog
       :open="Boolean(detail)"
-      title="Chi tiết thao tác"
-      confirm-label="Đóng"
-      cancel-label="Đóng"
+      :title="$t('sa44.detail')"
+      :confirm-label="$t('common.close')"
+      :cancel-label="$t('common.close')"
       @confirm="detail = null"
       @cancel="detail = null"
     >
       <dl v-if="detail" class="mt-3 flex flex-col gap-2 text-left text-[13.5px]">
         <div class="flex justify-between">
-          <dt class="text-muted">Thời điểm</dt><dd>{{ dateTime(detail.createdAt) }}</dd>
+          <dt class="text-muted">{{ $t('sa29.colWhen') }}</dt><dd>{{ dateTime(detail.createdAt) }}</dd>
         </div>
         <div class="flex justify-between">
-          <dt class="text-muted">Người thực hiện</dt><dd>{{ detail.actorName ?? detail.actorType }}</dd>
+          <dt class="text-muted">{{ $t('sa44.colActor') }}</dt><dd>{{ detail.actorName ?? detail.actorType }}</dd>
         </div>
         <div class="flex justify-between">
-          <dt class="text-muted">Hành động</dt><dd class="font-mono">{{ detail.action }}</dd>
+          <dt class="text-muted">{{ $t('sa44.action') }}</dt><dd class="font-mono">{{ detail.action }}</dd>
         </div>
         <div class="flex justify-between">
-          <dt class="text-muted">Đối tượng</dt><dd>{{ detail.entity }}</dd>
+          <dt class="text-muted">{{ $t('sa44.entity') }}</dt><dd>{{ detail.entity }}</dd>
         </div>
         <div class="flex justify-between">
-          <dt class="text-muted">Mã đối tượng</dt>
+          <dt class="text-muted">{{ $t('sa44.entityId') }}</dt>
           <dd class="font-mono text-[11.5px]">{{ detail.entityId ?? '—' }}</dd>
         </div>
         <div v-if="detail.changes">
-          <dt class="text-muted">Thay đổi</dt>
+          <dt class="text-muted">{{ $t('sa44.colChanges') }}</dt>
           <dd>
             <pre class="overflow-x-auto rounded-xl bg-neutral-100 p-2 font-mono text-[11.5px]">{{ JSON.stringify(detail.changes, null, 2) }}</pre>
           </dd>
