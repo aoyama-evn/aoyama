@@ -194,7 +194,15 @@ export class BookingsService {
   async findByCode(code: string): Promise<Booking> {
     const booking = await this.repo.findOne({
       where: { code: code.trim().toUpperCase() },
-      relations: { customer: true, vehicle: true, store: true, services: true },
+      relations: {
+        customer: true,
+        vehicle: true,
+        store: true,
+        services: true,
+        // SC-26 ve ca chang lich hen tren dong thoi gian nen phai nap kem.
+        statusHistories: true,
+      },
+      order: { statusHistories: { createdAt: 'ASC' } },
     });
     if (!booking) {
       throw new NotFoundException({
@@ -363,9 +371,23 @@ export class BookingsService {
     booking.scheduledAt = zonedDateTimeToUtc(dto.date, dto.startTime);
     booking.slotStartTime = slot.startTime;
     booking.slotEndTime = slot.endTime;
+    if (dto.symptomDescription !== undefined) {
+      booking.symptomDescription = dto.symptomDescription || null;
+    }
     // Doi lich thi nhac lich cu khong con dung nua.
     booking.reminderSentAt = null;
     await this.repo.save(booking);
+
+    // SC-23 — khach sua luon hang muc va so km trong cung mot lan luu.
+    if (dto.serviceIds?.length) {
+      const lineRepo = this.repo.manager.getRepository(BookingServiceLine);
+      const lines = await this.buildServiceLines(dto.serviceIds, storeId, booking.vehicleId);
+      await lineRepo.delete({ bookingId: booking.id });
+      await lineRepo.insert(lines.map((line) => ({ ...line, bookingId: booking.id })));
+    }
+    if (dto.odometer !== undefined && booking.vehicleId) {
+      await this.vehicles.updateOdometer(booking.vehicleId, dto.odometer);
+    }
 
     await this.historyRepo.save(
       this.historyRepo.create({

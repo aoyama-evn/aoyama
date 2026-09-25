@@ -104,6 +104,28 @@ export class RescheduleBookingDto {
 
   @IsOptional() @IsUUID('4') storeId?: string;
   @IsOptional() @IsString() reason?: string;
+
+  /**
+   * SC-23 cho khach sua ca hang muc, so km va ghi chu trong cung mot lan luu,
+   * nen nhung truong nay di kem voi ngay gio moi.
+   */
+  @ApiPropertyOptional({ description: 'SC-23 — danh sach hang muc sau khi sua' })
+  @IsOptional()
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsUUID('4', { each: true })
+  serviceIds?: string[];
+
+  @ApiPropertyOptional({ description: 'SC-23 — so km cap nhat cho xe cua lich hen' })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  odometer?: number;
+
+  @ApiPropertyOptional({ description: 'SC-23 — ghi chu them cho cua hang' })
+  @IsOptional()
+  @IsString()
+  symptomDescription?: string;
 }
 
 export class CancelBookingDto {

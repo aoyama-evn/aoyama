@@ -213,21 +213,45 @@ export class WorkOrdersService {
   }
 
   /** SC-26 — tien do rut gon cho khach, chi gom moc va anh duoc phep hien. */
+  /**
+   * SC-26 — mot dong thoi gian duy nhat tu luc dat lich den luc ban giao.
+   * Ban thiet ke ve ca chang lich hen lan chang phieu dich vu chung mot cot,
+   * nen tra ve ca hai phan cung the xe va so km luc tiep nhan.
+   */
   async getPublicProgress(bookingCode: string) {
     const booking = await this.bookings.findByCode(bookingCode);
     const workOrder = await this.findByBooking(booking.id);
-    if (!workOrder) {
-      return {
-        bookingCode,
-        bookingStatus: booking.status,
-        hasWorkOrder: false,
-      };
-    }
-    return {
+
+    const bookingTimeline = (booking.statusHistories ?? []).map((h) => ({
+      status: h.toStatus,
+      at: h.createdAt,
+      note: h.note,
+    }));
+
+    const base = {
       bookingCode,
       bookingStatus: booking.status,
+      bookingTimeline,
+      hasQr: Boolean(booking.qrToken),
+      vehicle: booking.vehicle
+        ? {
+            maker: booking.vehicle.maker,
+            model: booking.vehicle.model,
+            plateNumber: booking.vehicle.plateNumber,
+          }
+        : null,
+    };
+
+    if (!workOrder) {
+      return { ...base, hasWorkOrder: false };
+    }
+    return {
+      ...base,
       hasWorkOrder: true,
       status: workOrder.status,
+      intakeOdometer: workOrder.intakeOdometer,
+      intakeFuelLevel: workOrder.intakeFuelLevel,
+      totalAmount: workOrder.totalAmount,
       progressPercent: workOrder.progressPercent,
       progressNote: workOrder.progressNote,
       estimatedCompletionAt: workOrder.estimatedCompletionAt,
