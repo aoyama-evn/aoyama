@@ -72,6 +72,11 @@ export class CreateBookingDto {
 
   @IsOptional() @IsArray() @IsString({ each: true }) symptomPhotoUrls?: string[];
 
+  @ApiPropertyOptional({ description: 'SC-12 — mot doan video ngan ve tinh trang xe' })
+  @IsOptional()
+  @IsString()
+  symptomVideoUrl?: string;
+
   @ApiPropertyOptional({ description: 'Phien chan doan AI dan sang tu SC-11' })
   @IsOptional()
   @IsUUID('4')

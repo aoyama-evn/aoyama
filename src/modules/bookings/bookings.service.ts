@@ -121,6 +121,7 @@ export class BookingsService {
         contactEmail: dto.contactEmail ?? null,
         symptomDescription: dto.symptomDescription ?? null,
         symptomPhotoUrls: dto.symptomPhotoUrls ?? [],
+        symptomVideoUrl: dto.symptomVideoUrl ?? null,
         aiDiagnosisId: dto.aiDiagnosisId ?? null,
         createdByAdmin: actor.type === 'ADMIN',
         createdByAdminId: actor.type === 'ADMIN' ? (actor.id ?? null) : null,

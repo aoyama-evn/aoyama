@@ -74,6 +74,10 @@ export class Booking extends BaseEntity {
   @Column({ name: 'symptom_photo_urls', type: 'jsonb', default: () => "'[]'" })
   symptomPhotoUrls!: string[];
 
+  /** SC-12 cho khach gui kem mot doan video ngan ve tinh trang xe. */
+  @Column({ name: 'symptom_video_url', type: 'text', nullable: true })
+  symptomVideoUrl!: string | null;
+
   /** Phien chan doan AI da dan sang luong dat lich — AI-01. */
   @Column({ name: 'ai_diagnosis_id', type: 'uuid', nullable: true })
   aiDiagnosisId!: string | null;
