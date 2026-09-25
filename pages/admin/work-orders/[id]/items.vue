@@ -1,7 +1,22 @@
 <script setup lang="ts">
-import type { ApiError, Part, ServiceItem, WorkOrder } from '~/types/models';
+import type {
+  AdminUser,
+  AiDiagnosis,
+  ApiError,
+  Part,
+  ServiceItem,
+  WorkOrder,
+} from '~/types/models';
+import { WorkDifficulty } from '~/types/enums';
 
-/** SA-11 Chan doan va hang muc cong viec — FR-WO-04, FR-WO-05, FR-WO-06. */
+/**
+ * SA-10a Chan doan va bao gia (SM-2026-001 goi la SA-11) —
+ * FR-WO-04, FR-WO-05, FR-WO-06.
+ *
+ * Ban thiet ke: ba the tom tat o tren, roi hai cot — chan doan ky thuat vien
+ * ben trai va khung doi chieu voi chan doan AI ben phai — sau do la bang hang
+ * muc, bang phu tung, the tong du kien va hang hanh dong can phai.
+ */
 definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 interface ItemRow {
@@ -28,7 +43,7 @@ interface PartRow {
 const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
-const { i18n, money } = useFormat();
+const { i18n, money, number } = useFormat();
 
 const id = route.params.id as string;
 
@@ -41,8 +56,35 @@ const { data: services } = await useAsyncData('wo-items-services', () =>
   api.get<ServiceItem[]>('/services'),
 );
 
+setScreenTitle(() => `Chẩn đoán · ${workOrder.value?.code ?? ''}`);
+
+/** Danh sach ky thuat vien de phan cong — SA-10a. */
+const { data: technicians } = await useAsyncData('wo-technicians', () =>
+  api
+    .get<{ items: AdminUser[] }>('/admin/users', { limit: 100 })
+    .then((page) => page.items)
+    .catch(() => []),
+);
+
+/** FR-AI-12 — doi chieu ket luan cua ky thuat vien voi du doan cua AI. */
+const { data: diagnosis } = await useAsyncData(`wo-items-diag-${id}`, () =>
+  workOrder.value?.booking?.aiDiagnosisId
+    ? api.get<AiDiagnosis>(`/ai/diagnosis/sessions/${workOrder.value.booking.aiDiagnosisId}`)
+    : Promise.resolve(null),
+);
+
 const diagnosisNote = ref(workOrder.value.diagnosisNote ?? '');
 const diagnosisCause = ref(workOrder.value.diagnosisCause ?? '');
+const difficulty = ref<WorkDifficulty>(workOrder.value.difficulty ?? WorkDifficulty.MEDIUM);
+const technicianId = ref(workOrder.value.assignedTechnicianId ?? '');
+
+const DIFFICULTIES = [
+  { value: WorkDifficulty.EASY, label: 'Dễ' },
+  { value: WorkDifficulty.MEDIUM, label: 'Trung bình' },
+  { value: WorkDifficulty.HARD, label: 'Khó' },
+];
+
+const FUEL_LABELS = ['Cạn', '1/4', '1/2', '3/4', 'Đầy'];
 const items = ref<ItemRow[]>(
   (workOrder.value.items ?? []).map((i) => ({
     serviceId: i.serviceId,
@@ -128,6 +170,8 @@ async function save(): Promise<void> {
     await api.put(`/admin/work-orders/${id}/diagnosis`, {
       diagnosisNote: diagnosisNote.value || undefined,
       diagnosisCause: diagnosisCause.value || undefined,
+      difficulty: difficulty.value,
+      assignedTechnicianId: technicianId.value || undefined,
       items: items.value.map((i, index) => ({ ...i, sortOrder: index })),
       parts: parts.value.map(({ available, ...rest }) => rest),
     });
@@ -145,24 +189,121 @@ useHead({ title: 'Chẩn đoán & hạng mục — AOYAMA Admin' });
 
 <template>
   <div v-if="workOrder" class="flex flex-col gap-4">
-    <AyPageHeader
-      code="SA-11" title="Chẩn đoán &amp; hạng mục công việc"
-      :back-to="`/admin/work-orders/${id}`"
-      :description="`${workOrder.code} · ${workOrder.vehicle?.plateNumber} · ${workOrder.customer?.name}`"
-    />
+    <h4>Chẩn đoán và báo giá</h4>
 
-    <section class="card grid gap-3 sm:grid-cols-2">
-      <AyField label="Kết luận chẩn đoán" class="sm:col-span-2">
-        <template #default="{ id: fid }">
-          <textarea :id="fid" v-model="diagnosisNote" class="input min-h-[90px]" placeholder="Mô tả tình trạng thực tế sau khi kiểm tra" />
-        </template>
-      </AyField>
-      <AyField label="Nguyên nhân" class="sm:col-span-2">
-        <template #default="{ id: fid }">
-          <input :id="fid" v-model="diagnosisCause" class="input" type="text">
-        </template>
-      </AyField>
-    </section>
+    <div class="grid gap-[13px]" style="grid-template-columns: repeat(auto-fit, minmax(230px, 1fr))">
+      <div class="card gap-1" style="background: #fff">
+        <div class="card-kicker">Khách · xe · cửa hàng</div>
+        <p class="text-[13.5px]">
+          {{ workOrder.customer?.name }} · {{ workOrder.customer?.phone }}
+        </p>
+        <p class="text-[13.5px]">
+          {{ workOrder.vehicle?.maker }} {{ workOrder.vehicle?.model }} ·
+          {{ workOrder.vehicle?.plateNumber }}
+        </p>
+        <p class="text-muted text-[12px]">{{ i18n(workOrder.store?.name ?? null) }}</p>
+      </div>
+      <div class="card gap-1" style="background: #fff">
+        <div class="card-kicker">Hiện trạng khi tiếp nhận</div>
+        <p class="text-[13.5px]">
+          {{ number(workOrder.intakeOdometer) }} km
+          <template v-if="workOrder.intakeFuelLevel !== null">
+            · nhiên liệu {{ FUEL_LABELS[workOrder.intakeFuelLevel] ?? workOrder.intakeFuelLevel }}
+          </template>
+        </p>
+        <p v-if="workOrder.intakeAccessories" class="text-muted text-[12px]">
+          {{ workOrder.intakeAccessories }}
+        </p>
+      </div>
+      <div class="card gap-1" style="background: #fff">
+        <div class="card-kicker">Phiếu</div>
+        <p class="font-heading text-[16px]">{{ workOrder.code }}</p>
+        <AyStatusTag :status="workOrder.status" />
+      </div>
+    </div>
+
+    <div
+      class="grid items-start gap-[13px]"
+      style="grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr)"
+    >
+      <section class="card gap-3" style="background: #fff">
+        <h5>Chẩn đoán kỹ thuật viên</h5>
+
+        <AyField label="Triệu chứng ghi nhận" required hint="điền sẵn từ mô tả của khách">
+          <template #default="{ id: fid }">
+            <textarea
+              :id="fid"
+              v-model="diagnosisNote"
+              class="input"
+              style="min-height: 72px"
+              placeholder="Mô tả tình trạng thực tế sau khi kiểm tra"
+            />
+          </template>
+        </AyField>
+
+        <AyField label="Nguyên nhân xác định" required>
+          <template #default="{ id: fid }">
+            <textarea
+              :id="fid"
+              v-model="diagnosisCause"
+              class="input"
+              style="min-height: 72px"
+            />
+          </template>
+        </AyField>
+
+        <div class="grid gap-3" style="grid-template-columns: 1fr 1fr">
+          <AyField label="Mức độ khó" required>
+            <template #default="{ id: fid }">
+              <select :id="fid" v-model="difficulty" class="input">
+                <option v-for="level in DIFFICULTIES" :key="level.value" :value="level.value">
+                  {{ level.label }}
+                </option>
+              </select>
+            </template>
+          </AyField>
+          <AyField label="Kỹ thuật viên phụ trách">
+            <template #default="{ id: fid }">
+              <select :id="fid" v-model="technicianId" class="input">
+                <option value="">— Chưa phân công —</option>
+                <option v-for="tech in technicians ?? []" :key="tech.id" :value="tech.id">
+                  {{ tech.fullName }}
+                </option>
+              </select>
+            </template>
+          </AyField>
+        </div>
+      </section>
+
+      <section class="ay-ai-card">
+        <span class="tag self-start" style="background: var(--color-accent-2-500); color: #fff">
+          ✦ Đối chiếu chẩn đoán AI
+        </span>
+        <p class="text-[12.5px] leading-[1.5]" style="color: var(--color-accent-2-800)">
+          So sánh dự đoán của AI (từ chatbox khách) với kết luận của kỹ thuật viên.
+        </p>
+
+        <p
+          v-if="!diagnosis || diagnosis.findings.length === 0"
+          class="text-[12.5px]"
+          style="color: var(--color-accent-2-800)"
+        >
+          Lịch hẹn này không kèm phiên chẩn đoán AI.
+        </p>
+
+        <div
+          v-for="(finding, index) in diagnosis?.findings ?? []"
+          :key="index"
+          class="flex justify-between gap-2 text-[13px]"
+          style="background: #fff; border-radius: 14px; padding: 9px 12px"
+        >
+          <span>{{ finding.label }} · {{ Math.round(finding.matchPercent) }} %</span>
+          <span class="tag tag-neutral whitespace-nowrap">
+            {{ index === 0 ? 'khớp' : 'chưa xác nhận' }}
+          </span>
+        </div>
+      </section>
+    </div>
 
     <div class="grid gap-4 lg:grid-cols-3">
       <section class="card lg:col-span-2">
@@ -256,3 +397,16 @@ useHead({ title: 'Chẩn đoán & hạng mục — AOYAMA Admin' });
     <AyErrorNote :error="error" />
   </div>
 </template>
+
+<style scoped>
+/** Khung doi chieu AI: vien dut mau accent-2, giong SA-05 va SA-12. */
+.ay-ai-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1.5px dashed var(--color-accent-2-400);
+  background: var(--color-accent-2-100);
+  border-radius: 26px;
+  padding: 15px;
+}
+</style>
