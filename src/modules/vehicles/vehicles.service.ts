@@ -11,6 +11,14 @@ import { MaintenanceSchedule } from './entities/maintenance-schedule.entity';
 import { ServiceHistory } from './entities/service-history.entity';
 import { Vehicle } from './entities/vehicle.entity';
 
+/** Xe kem hai moc ma SC-29 va SC-31 hien tren the. */
+export type VehicleWithHint = Vehicle & {
+  lastServicedAt: Date | null;
+  lastServiceOdometer: number | null;
+  nextServiceDueDate: string | null;
+  nextServiceDueOdometer: number | null;
+};
+
 /** M-08 — Phuong tien va lich su dich vu. SC-29..SC-32, SA-19..SA-21. */
 @Injectable()
 export class VehiclesService {
@@ -29,12 +37,37 @@ export class VehiclesService {
     return vehicle;
   }
 
-  /** SC-29 — xe cua khach dang dang nhap. */
-  async findByCustomer(customerId: string): Promise<Vehicle[]> {
-    return this.repo.find({
+  /** SC-29 — xe cua khach dang dang nhap, kem moc bao duong de hien tren the. */
+  async findByCustomer(customerId: string): Promise<VehicleWithHint[]> {
+    const vehicles = await this.repo.find({
       where: { customerId, isActive: true },
       order: { createdAt: 'DESC' },
     });
+    return Promise.all(vehicles.map((vehicle) => this.withMaintenanceHint(vehicle)));
+  }
+
+  /**
+   * FR-VEH-07 — gan them lan phuc vu gan nhat va moc bao duong de xuat.
+   * SC-29 va SC-31 deu hien hai thong tin nay ngay tren the xe.
+   */
+  async withMaintenanceHint(vehicle: Vehicle): Promise<VehicleWithHint> {
+    const [last, schedule] = await Promise.all([
+      this.historyRepo.findOne({
+        where: { vehicleId: vehicle.id },
+        order: { servicedAt: 'DESC' },
+      }),
+      this.scheduleRepo.findOne({
+        where: { vehicleId: vehicle.id, isDone: false },
+        order: { dueDate: 'ASC' },
+      }),
+    ]);
+    return {
+      ...vehicle,
+      lastServicedAt: last?.servicedAt ?? null,
+      lastServiceOdometer: last?.odometer ?? null,
+      nextServiceDueDate: schedule?.dueDate ?? null,
+      nextServiceDueOdometer: schedule?.dueOdometer ?? null,
+    };
   }
 
   /** Chan khach doc xe cua nguoi khac — NFR-SE-07. */

@@ -6,3 +6,4 @@ export * from './service-type.enum';
 export * from './notification.enum';
 export * from './inventory.enum';
 export * from './language.enum';
+export * from './vehicle-fuel.enum';

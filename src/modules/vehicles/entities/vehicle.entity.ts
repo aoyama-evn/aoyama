@@ -1,3 +1,4 @@
+import { VehicleFuelType } from 'src/common/enums';
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { SoftDeletableEntity } from 'src/common/entities/base.entity';
 import { Customer } from 'src/modules/customers/entities/customer.entity';
@@ -40,6 +41,18 @@ export class Vehicle extends SoftDeletableEntity {
 
   @Column({ name: 'photo_urls', type: 'jsonb', default: () => "'[]'" })
   photoUrls!: string[];
+
+  /** SC-30 — ten goi nho khach tu dat, vi du "Xe di lam". */
+  @Column({ type: 'varchar', length: 64, nullable: true })
+  nickname!: string | null;
+
+  @Column({
+    name: 'fuel_type',
+    type: 'enum',
+    enum: VehicleFuelType,
+    default: VehicleFuelType.GASOLINE,
+  })
+  fuelType!: VehicleFuelType;
 
   @Column({ type: 'text', nullable: true })
   note!: string | null;

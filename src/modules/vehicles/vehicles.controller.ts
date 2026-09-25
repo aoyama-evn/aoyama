@@ -11,9 +11,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { IsArray, IsInt, IsOptional, IsString, IsUUID, Min } from 'class-validator';
+import { IsArray, IsEnum, IsInt, IsOptional, IsString, IsUUID, Min } from 'class-validator';
 import { AuthUser, CurrentUser } from 'src/common/decorators';
 import { PaginationQueryDto } from 'src/common/dto';
+import { VehicleFuelType } from 'src/common/enums';
 import { AdminGuard, RolesGuard } from 'src/common/guards';
 import { VehiclesService } from './vehicles.service';
 
@@ -27,6 +28,8 @@ class VehicleBodyDto {
   @IsOptional() @IsString() vinNumber?: string;
   @IsOptional() @IsInt() @Min(0) currentOdometer?: number;
   @IsOptional() @IsArray() @IsString({ each: true }) photoUrls?: string[];
+  @IsOptional() @IsString() nickname?: string;
+  @IsOptional() @IsEnum(VehicleFuelType) fuelType?: VehicleFuelType;
   @IsOptional() @IsString() note?: string;
 }
 
@@ -65,8 +68,10 @@ export class MyVehiclesController {
   }
 
   @Get(':id')
-  detail(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthUser) {
-    return this.service.findOwnedBy(id, user.sub);
+  @ApiOperation({ summary: 'SC-30, SC-31 — chi tiet xe cua toi' })
+  async detail(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthUser) {
+    const vehicle = await this.service.findOwnedBy(id, user.sub);
+    return this.service.withMaintenanceHint(vehicle);
   }
 
   @Put(':id')
