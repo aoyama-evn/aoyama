@@ -13,7 +13,7 @@ const year = new Date().getFullYear();
       class="text-muted pt-2.5 text-center text-[11px] leading-[1.5]"
       style="border-top: 1px solid var(--color-divider)"
     >
-      © {{ year }} 遠鉄のリフォーム All Rights Reserved.
+      {{ $t('common.copyright', { year }) }}
     </p>
   </footer>
 </template>

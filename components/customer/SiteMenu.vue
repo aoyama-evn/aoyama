@@ -19,17 +19,19 @@ const ICON = {
   login: 'M10 8l4 4-4 4M14 12H4',
 };
 
+const { t } = useI18n();
+
 const memberItems = computed<Item[]>(() => [
-  { to: '/services', label: 'Dịch vụ', icon: 'services' },
-  { to: '/account/vehicles', label: 'Xe của tôi', icon: 'vehicles' },
-  { to: '/account/bookings', label: 'Lịch hẹn của tôi', icon: 'bookings' },
-  { to: '/account/profile', label: 'Hồ sơ cá nhân', icon: 'profile' },
+  { to: '/services', label: t('nav.services'), icon: 'services' },
+  { to: '/account/vehicles', label: t('nav.myVehicles'), icon: 'vehicles' },
+  { to: '/account/bookings', label: t('nav.myBookings'), icon: 'bookings' },
+  { to: '/account/profile', label: t('nav.myProfile'), icon: 'profile' },
 ]);
 
 const guestItems = computed<Item[]>(() => [
-  { to: '/services', label: 'Dịch vụ', icon: 'services' },
-  { to: '/booking/lookup', label: 'Tra cứu lịch hẹn', icon: 'lookup' },
-  { to: '/login', label: 'Đăng nhập / Đăng ký', icon: 'login' },
+  { to: '/services', label: t('nav.services'), icon: 'services' },
+  { to: '/booking/lookup', label: t('nav.lookup'), icon: 'lookup' },
+  { to: '/login', label: t('nav.loginRegister'), icon: 'login' },
 ]);
 
 const items = computed(() => (auth.isCustomer ? memberItems.value : guestItems.value));
@@ -119,7 +121,7 @@ async function signOut(): Promise<void> {
           </nav>
 
           <p class="text-muted mt-auto text-center text-[11px] leading-[1.5]">
-            © 2026 遠鉄のリフォーム All Rights Reserved.
+            {{ $t('common.copyright', { year: new Date().getFullYear() }) }}
           </p>
         </div>
       </div>

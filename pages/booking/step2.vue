@@ -11,6 +11,7 @@ import type { DayAvailability, Store } from '~/types/models';
  */
 const api = useApi();
 const booking = useBookingStore();
+const { t } = useI18n();
 const { i18n, date: fmtDate } = useFormat();
 
 const days = ref<DayAvailability[]>([]);
@@ -75,7 +76,7 @@ const estimatedEnd = computed(() => {
   return `${String(Math.floor(total / 60) % 24).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
 });
 
-useHead({ title: 'Đặt lịch — Bước 2' });
+useHead({ title: () => `${t('sc01.bookCta')} — 2` });
 </script>
 
 <template>
@@ -84,14 +85,14 @@ useHead({ title: 'Đặt lịch — Bước 2' });
 
     <!-- Nhac lai lua chon o buoc 1 -->
     <div class="card gap-1" style="background: var(--color-neutral-100)">
-      <div class="card-kicker">Bước 1 đã chọn</div>
+      <div class="card-kicker">{{ $t('sc13.step1Picked') }}</div>
       <div class="text-[13px]">
-        {{ booking.selectedServices.map((s) => i18n(s.name)).join(' · ') || 'Chưa chọn dịch vụ' }}
+        {{ booking.selectedServices.map((s) => i18n(s.name)).join(' · ') || $t('sc13.noService') }}
       </div>
     </div>
 
     <section class="flex flex-col gap-2.5">
-      <h5>Chọn cửa hàng</h5>
+      <h5>{{ $t('sc13.pickStore') }}</h5>
       <label
         v-for="store in stores ?? []"
         :key="store.id"
@@ -133,8 +134,10 @@ useHead({ title: 'Đặt lịch — Bước 2' });
       class="flex justify-between pt-3 text-[12.5px]"
       style="border-top: 1px solid var(--color-divider)"
     >
-      <span class="text-muted">Dự kiến hoàn thành</span>
-      <strong v-if="estimatedEnd">≈ {{ estimatedEnd }} ({{ booking.estimatedMinutes }} phút)</strong>
+      <span class="text-muted">{{ $t('sc13.estimatedEnd') }}</span>
+      <strong v-if="estimatedEnd">
+        ≈ {{ estimatedEnd }} ({{ $t('common.minutes', { n: booking.estimatedMinutes }) }})
+      </strong>
       <strong v-else>—</strong>
     </div>
 
@@ -145,11 +148,11 @@ useHead({ title: 'Đặt lịch — Bước 2' });
       :class="booking.step2Complete ? '' : 'pointer-events-none opacity-50'"
       :aria-disabled="!booking.step2Complete"
     >
-      Tiếp theo →
+      {{ $t('common.next') }}
     </NuxtLink>
 
     <NuxtLink to="/booking/step1" class="btn btn-ghost self-center text-[13px]">
-      ← Quay lại
+      {{ $t('common.back') }}
     </NuxtLink>
   </div>
 </template>

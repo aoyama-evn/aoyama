@@ -13,6 +13,7 @@ const api = useApi();
 const auth = useAuthStore();
 const booking = useBookingStore();
 const ui = useUiStore();
+const { t } = useI18n();
 const { i18n, money, number } = useFormat();
 
 const analysing = ref(false);
@@ -30,10 +31,10 @@ onMounted(() => {
 /** Luong AI khi khach den tu SC-10 hoac tu bam nut phan tich o day. */
 const aiFlow = computed(() => Boolean(booking.aiDiagnosisId) || booking.symptomPhotoUrls.length > 0);
 
-const KINDS = [
-  { value: 'MAINTENANCE' as const, label: 'Bảo dưỡng' },
-  { value: 'REPAIR' as const, label: 'Sửa chữa' },
-];
+const KINDS = computed(() => [
+  { value: 'MAINTENANCE' as const, label: t('sc12.maintenance') },
+  { value: 'REPAIR' as const, label: t('sc12.repair') },
+]);
 
 /** BR — chon ca hai nhom thi loai dich vu cua lich hen la BOTH. */
 const kinds = computed<Set<'MAINTENANCE' | 'REPAIR'>>(() => {
@@ -64,7 +65,7 @@ function vehicleLine(item: Vehicle): string {
 /** SC-12 — bam "AI phan tich van de" thi gui mo ta sang phien chan doan. */
 async function analyse(): Promise<void> {
   if (!booking.symptomDescription.trim() && booking.symptomPhotoUrls.length === 0) {
-    ui.warning('Hãy mô tả hiện tượng hoặc gửi ảnh trước khi phân tích');
+    ui.warning(t('sc12.needDescribe'));
     return;
   }
   analysing.value = true;
@@ -85,7 +86,7 @@ async function analyse(): Promise<void> {
   }
 }
 
-useHead({ title: 'Đặt lịch — Bước 1' });
+useHead({ title: () => `${t('sc01.bookCta')} — 1` });
 </script>
 
 <template>
@@ -94,7 +95,7 @@ useHead({ title: 'Đặt lịch — Bước 1' });
 
     <!-- SC-12a: chon xe tu ho so -->
     <section v-if="auth.isCustomer && (myVehicles ?? []).length" class="flex flex-col gap-2.5">
-      <h5>Chọn xe của bạn</h5>
+      <h5>{{ $t('sc12.pickVehicle') }}</h5>
       <label
         v-for="item in myVehicles ?? []"
         :key="item.id"
@@ -128,12 +129,12 @@ useHead({ title: 'Đặt lịch — Bước 1' });
         class="btn btn-secondary btn-block text-[13px]"
         style="margin: 0; min-height: 44px"
       >
-        + Thêm xe khác
+        {{ $t('sc12.addVehicle') }}
       </NuxtLink>
     </section>
 
     <section>
-      <h5 class="mb-2.5">Bạn cần dịch vụ nào?</h5>
+      <h5 class="mb-2.5">{{ $t('sc12.whichService') }}</h5>
       <div class="flex gap-2.5">
         <button
           v-for="kind in KINDS"
@@ -155,13 +156,13 @@ useHead({ title: 'Đặt lịch — Bước 1' });
 
     <!-- Luong AI -->
     <section v-if="aiFlow" class="flex flex-col gap-2.5">
-      <h5>Mô tả hiện tượng của xe</h5>
+      <h5>{{ $t('sc12.describeTitle') }}</h5>
       <textarea
         v-model="booking.symptomDescription"
         class="input"
         style="min-height: 92px"
         maxlength="1000"
-        placeholder="vd: xe kêu lạ khi phanh gấp, phanh trước không ăn"
+        :placeholder="$t('sc12.describePlaceholder')"
         @change="booking.persist()"
       />
       <div class="flex flex-wrap gap-2">
@@ -178,7 +179,7 @@ useHead({ title: 'Đặt lịch — Bước 1' });
           v-for="(url, index) in booking.symptomPhotoUrls"
           :key="index"
           :src="url"
-          alt="Ảnh đã tải"
+          :alt="$t('sc10.photos', { n: 1, max: 5 })"
           class="object-cover"
           style="width: 58px; height: 58px; border-radius: 12px"
         />
@@ -189,7 +190,7 @@ useHead({ title: 'Đặt lịch — Bước 1' });
             width: 58px; height: 58px; border-radius: 12px;
             background: var(--color-neutral-300); color: var(--color-neutral-700);
           "
-          aria-label="Video đã tải"
+          :aria-label="$t('sc10.video')"
         >
           <svg
             width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -200,8 +201,11 @@ useHead({ title: 'Đặt lịch — Bước 1' });
           </svg>
         </span>
         <span class="text-muted text-[11.5px]">
-          {{ booking.symptomPhotoUrls.length + (booking.symptomVideoUrl ? 1 : 0) }} tệp ·
-          tối đa 5 ảnh, 1 video ≤ 30 giây
+          {{
+            $t('sc12.fileCount', {
+              n: booking.symptomPhotoUrls.length + (booking.symptomVideoUrl ? 1 : 0),
+            })
+          }}
         </span>
       </div>
       <button
@@ -218,34 +222,34 @@ useHead({ title: 'Đặt lịch — Bước 1' });
           <path d="M12 3v3M12 18v3M3 12h3M18 12h3" />
           <circle cx="12" cy="12" r="4" />
         </svg>
-        AI phân tích vấn đề
+        {{ $t('sc12.analyseAi') }}
       </button>
     </section>
 
     <!-- Luong danh muc -->
     <section v-else class="flex flex-col gap-2.5">
       <h5>
-        Ghi chú thêm
-        <span class="text-muted font-body text-[11.5px]">không bắt buộc</span>
+        {{ $t('sc12.noteTitle') }}
+        <span class="text-muted font-body text-[11.5px]">{{ $t('common.optional') }}</span>
       </h5>
       <textarea
         v-model="booking.symptomDescription"
         class="input"
         style="min-height: 76px"
         maxlength="1000"
-        placeholder="vd: xe đã chạy 18.400 km, muốn kiểm tra thêm lốp"
+        :placeholder="$t('sc12.notePlaceholder')"
         @change="booking.persist()"
       />
     </section>
 
     <section class="flex flex-col gap-2.5">
       <div class="flex items-baseline justify-between gap-2.5">
-        <h5>Hạng mục đã chọn</h5>
+        <h5>{{ $t('sc12.pickedTitle') }}</h5>
         <NuxtLink
           :to="aiFlow ? '/chat' : '/services?pick=1'"
           class="btn btn-ghost px-1"
-          aria-label="Sửa hạng mục"
-          title="Sửa hạng mục"
+          :aria-label="$t('sc12.editPicked')"
+          :title="$t('sc12.editPicked')"
         >
           <svg
             width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -265,15 +269,17 @@ useHead({ title: 'Đặt lịch — Bước 1' });
         <span v-if="aiFlow" class="tag tag-accent-2 mt-0.5 text-[10px]">✦ AI</span>
         <span class="min-w-0 flex-1">
           <span class="block text-[14px] font-semibold">{{ i18n(service.name) }}</span>
-          <span class="text-muted block text-[11.5px]">{{ service.durationMinutes }} phút</span>
+          <span class="text-muted block text-[11.5px]">
+          {{ $t('common.minutes', { n: service.durationMinutes }) }}
+        </span>
         </span>
         <span class="whitespace-nowrap font-heading text-[14px]">
-          {{ service.quoteOnly ? 'báo giá' : `~ ${money(service.basePrice)}` }}
+          {{ service.quoteOnly ? $t('common.quoteOnly') : `~ ${money(service.basePrice)}` }}
         </span>
       </div>
 
       <p v-if="booking.selectedServices.length === 0" class="text-muted text-[12.5px]">
-        Chưa chọn hạng mục nào.
+        {{ $t('sc12.nonePicked') }}
       </p>
 
       <NuxtLink
@@ -281,7 +287,7 @@ useHead({ title: 'Đặt lịch — Bước 1' });
         class="btn btn-secondary btn-block text-[13px]"
         style="margin: 0; min-height: 44px"
       >
-        + Thêm hạng mục khác
+        {{ $t('sc12.addMore') }}
       </NuxtLink>
     </section>
 
@@ -290,9 +296,9 @@ useHead({ title: 'Đặt lịch — Bước 1' });
       style="border-top: 1px solid var(--color-divider); color: var(--color-neutral-700)"
     >
       <template v-if="aiFlow">
-        Giá sẽ được ước tính sau khi AI phân tích và kỹ thuật viên kiểm tra thực tế.
+        {{ $t('sc12.priceNoteAi') }}
       </template>
-      <template v-else>Giá sẽ được ước tính sau khi kỹ thuật viên kiểm tra thực tế.</template>
+      <template v-else>{{ $t('sc12.priceNote') }}</template>
     </p>
 
     <NuxtLink
@@ -302,9 +308,9 @@ useHead({ title: 'Đặt lịch — Bước 1' });
       :class="booking.selectedServiceIds.length ? '' : 'pointer-events-none opacity-50'"
       :aria-disabled="booking.selectedServiceIds.length === 0"
     >
-      Tiếp theo →
+      {{ $t('common.next') }}
     </NuxtLink>
 
-    <NuxtLink to="/" class="btn btn-ghost self-center text-[13px]">← Quay lại</NuxtLink>
+    <NuxtLink to="/" class="btn btn-ghost self-center text-[13px]">{{ $t('common.back') }}</NuxtLink>
   </div>
 </template>

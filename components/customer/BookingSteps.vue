@@ -6,11 +6,13 @@
  */
 const props = defineProps<{ current: 1 | 2 | 3 }>();
 
-const STEPS = [
-  { index: 1, label: 'Dịch vụ' },
-  { index: 2, label: 'Thời gian' },
-  { index: 3, label: 'Thông tin' },
-] as const;
+const { t } = useI18n();
+
+const STEPS = computed(() => [
+  { index: 1, label: t('booking.step1') },
+  { index: 2, label: t('booking.step2') },
+  { index: 3, label: t('booking.step3') },
+]);
 
 function state(index: number): 'done' | 'current' | 'todo' {
   if (index < props.current) return 'done';
@@ -19,7 +21,7 @@ function state(index: number): 'done' | 'current' | 'todo' {
 </script>
 
 <template>
-  <ol class="flex items-center gap-1.5 text-[11.5px]" aria-label="Các bước đặt lịch">
+  <ol class="flex items-center gap-1.5 text-[11.5px]" :aria-label="$t('sc01.bookCta')">
     <template v-for="(step, i) in STEPS" :key="step.index">
       <li
         class="flex items-center gap-1.5"

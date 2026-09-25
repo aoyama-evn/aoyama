@@ -8,6 +8,7 @@ import type { Booking, Page, ServiceItem } from '~/types/models';
  */
 const api = useApi();
 const auth = useAuthStore();
+const { t } = useI18n();
 const { i18n, money } = useFormat();
 
 const { data } = await useAsyncData('home-services', () =>
@@ -31,17 +32,19 @@ const { data: upcomingData } = await useAsyncData(
 
 const upcoming = computed(() => upcomingData.value?.booking ?? null);
 
-useHead({ title: 'AOYAMA Service — Bảo dưỡng & sửa chữa xe máy' });
+useHead({ title: 'AOYAMA Service' });
 
 /** Dong phu duoi ten dich vu: ten tieng Anh neu co, kem thoi luong. */
 function subtitle(service: ServiceItem): string {
   const en = service.name.en ?? '';
-  const duration = service.quoteOnly ? 'báo giá riêng' : `${service.durationMinutes} phút`;
+  const duration = service.quoteOnly
+    ? t('sc02.quoteAtStore')
+    : t('common.minutes', { n: service.durationMinutes });
   return [en, duration].filter(Boolean).join(' · ');
 }
 
 function priceLabel(service: ServiceItem): string {
-  return service.quoteOnly ? 'báo giá' : `~ ${money(service.basePrice)}`;
+  return service.quoteOnly ? t('common.quoteOnly') : `~ ${money(service.basePrice)}`;
 }
 </script>
 
@@ -51,7 +54,7 @@ function priceLabel(service: ServiceItem): string {
     <div class="-mx-4 -mt-4 px-3 pb-3 pt-2" style="background: var(--color-accent-200)">
       <img
         :src="'/design/hero-bike.jpg'"
-        alt="Xe máy tại AOYAMA"
+        :alt="$t('sc01.heroAlt')"
         class="block h-auto w-full"
         style="mix-blend-mode: multiply"
       />
@@ -62,18 +65,17 @@ function priceLabel(service: ServiceItem): string {
         class="mb-1.5 text-[10px] font-semibold uppercase"
         style="letter-spacing: 0.1em; color: var(--color-accent-700)"
       >
-        Bảo dưỡng &amp; sửa chữa xe máy
+        {{ $t('sc01.kicker') }}
       </p>
-      <h2 class="text-[27px]">Hỗ trợ toàn diện cho cuộc sống xe máy của bạn</h2>
+      <h2 class="text-[27px]">{{ $t('sc01.title') }}</h2>
       <p class="mt-2 text-[13px]" style="color: var(--color-neutral-700)">
-        Aoyama Motorcycle xử lý mọi dịch vụ từ bảo dưỡng đến kiểm tra, sửa chữa vỏ, sơn, phụ tùng
-        các dòng xe máy. Hãy để mọi thứ liên quan đến xe của bạn cho chúng tôi!
+        {{ $t('sc01.lead') }}
       </p>
     </div>
 
     <div class="flex flex-col gap-2.5">
       <NuxtLink to="/booking/step1" class="btn btn-primary btn-cta">
-        Đặt lịch ngay · Book now
+        {{ $t('sc01.bookCta') }}
       </NuxtLink>
       <NuxtLink to="/chat" class="btn btn-secondary btn-cta gap-2">
         <svg
@@ -82,15 +84,17 @@ function priceLabel(service: ServiceItem): string {
         >
           <path d="M21 12a8 8 0 0 1-8 8H7l-4 3 1-5a8 8 0 1 1 17-6Z" />
         </svg>
-        Xe đang gặp vấn đề? Hỏi trợ lý AI
+        {{ $t('sc01.askAi') }}
       </NuxtLink>
     </div>
 
     <!-- Danh sach dich vu dang hang -->
     <section class="flex flex-col gap-2.5">
       <div class="flex items-baseline justify-between gap-2.5">
-        <h5>Dịch vụ · Services</h5>
-        <NuxtLink to="/services" class="btn btn-ghost text-[12px]">Xem tất cả →</NuxtLink>
+        <h5>{{ $t('sc01.servicesTitle') }}</h5>
+        <NuxtLink to="/services" class="btn btn-ghost text-[12px]">
+          {{ $t('common.viewAll') }}
+        </NuxtLink>
       </div>
 
       <NuxtLink
@@ -109,26 +113,30 @@ function priceLabel(service: ServiceItem): string {
     </section>
 
     <!-- SC-01a: lich hen sap toi cua thanh vien -->
-    <AyBookingCard v-if="auth.isCustomer && upcoming" :booking="upcoming" kicker="Lịch hẹn sắp tới">
+    <AyBookingCard
+      v-if="auth.isCustomer && upcoming"
+      :booking="upcoming"
+      :kicker="$t('sc01.upcomingKicker')"
+    >
       <template #actions>
         <NuxtLink
           to="/account/bookings"
           class="btn btn-ghost px-1 text-[12.5px]"
           style="color: var(--color-accent-700)"
         >
-          Lịch hẹn của tôi →
+          {{ $t('nav.myBookings') }} →
         </NuxtLink>
       </template>
     </AyBookingCard>
 
     <!-- SC-01: khach chua dang nhap tra cuu bang ma -->
     <div v-if="!auth.isCustomer" class="card gap-1.5">
-      <div class="card-kicker">Đã có mã lịch hẹn?</div>
+      <div class="card-kicker">{{ $t('sc01.haveCode') }}</div>
       <p class="text-[13px]" style="color: var(--color-neutral-700)">
-        Tra cứu bằng mã lịch hẹn và số điện thoại — không cần đăng nhập.
+        {{ $t('sc01.haveCodeLead') }}
       </p>
       <NuxtLink to="/booking/lookup" class="btn btn-ghost self-start px-1 text-[13px]">
-        Tra cứu lịch hẹn →
+        {{ $t('sc01.lookupCta') }}
       </NuxtLink>
     </div>
   </div>

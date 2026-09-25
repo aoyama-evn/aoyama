@@ -10,6 +10,7 @@ import { ServiceType } from '~/types/enums';
 const api = useApi();
 const route = useRoute();
 const booking = useBookingStore();
+const { t } = useI18n();
 const { i18n, money } = useFormat();
 
 /**
@@ -27,20 +28,20 @@ const { data: services } = await useAsyncData('services', () => api.get<ServiceI
 const keyword = ref('');
 const filter = ref<'ALL' | ServiceType>('ALL');
 
-const TABS = [
-  { value: 'ALL' as const, label: 'Tất cả' },
-  { value: ServiceType.MAINTENANCE, label: 'Bảo dưỡng' },
-  { value: ServiceType.REPAIR, label: 'Sửa chữa' },
-  { value: ServiceType.INSPECTION, label: 'Kiểm tra' },
-];
+const TABS = computed(() => [
+  { value: 'ALL' as const, label: t('sc02.tabAll') },
+  { value: ServiceType.MAINTENANCE, label: t('sc02.tabMaintenance') },
+  { value: ServiceType.REPAIR, label: t('sc02.tabRepair') },
+  { value: ServiceType.INSPECTION, label: t('sc02.tabInspection') },
+]);
 
-/** Tieu de nhom lay theo loai dich vu, dung song ngu nhu ban thiet ke. */
-const GROUP_LABELS: Record<string, string> = {
-  [ServiceType.MAINTENANCE]: 'Bảo dưỡng · Maintenance',
-  [ServiceType.REPAIR]: 'Sửa chữa · Repair',
-  [ServiceType.INSPECTION]: 'Kiểm tra · Inspection',
-  [ServiceType.PACKAGE]: 'Gói dịch vụ · Packages',
-};
+/** Tieu de nhom lay theo loai dich vu. */
+const GROUP_LABELS = computed<Record<string, string>>(() => ({
+  [ServiceType.MAINTENANCE]: t('sc02.groupMaintenance'),
+  [ServiceType.REPAIR]: t('sc02.groupRepair'),
+  [ServiceType.INSPECTION]: t('sc02.groupInspection'),
+  [ServiceType.PACKAGE]: t('sc02.groupPackage'),
+}));
 
 const visible = computed(() => {
   const kw = keyword.value.trim().toLowerCase();
@@ -53,10 +54,10 @@ const visible = computed(() => {
 
 /** Gom theo loai, giu dung thu tu cua GROUP_LABELS. */
 const groups = computed(() =>
-  Object.keys(GROUP_LABELS)
+  Object.keys(GROUP_LABELS.value)
     .map((type) => ({
       type,
-      label: GROUP_LABELS[type],
+      label: GROUP_LABELS.value[type],
       items: visible.value.filter((service) => service.type === type),
     }))
     .filter((group) => group.items.length > 0),
@@ -64,15 +65,17 @@ const groups = computed(() =>
 
 function subtitle(service: ServiceItem): string {
   const en = service.name.en ?? '';
-  const duration = service.quoteOnly ? 'khảo sát tại cửa hàng' : `${service.durationMinutes} mins`;
+  const duration = service.quoteOnly
+    ? t('sc02.quoteAtStore')
+    : t('common.minutes', { n: service.durationMinutes });
   return [en, duration].filter(Boolean).join(' · ');
 }
 
 function priceLabel(service: ServiceItem): string {
-  return service.quoteOnly ? 'báo giá' : `~ ${money(service.basePrice)}`;
+  return service.quoteOnly ? t('common.quoteOnly') : `~ ${money(service.basePrice)}`;
 }
 
-useHead({ title: 'Dịch vụ — AOYAMA Service' });
+useHead({ title: () => `${t('nav.services')} — AOYAMA Service` });
 </script>
 
 <template>
@@ -82,8 +85,8 @@ useHead({ title: 'Dịch vụ — AOYAMA Service' });
         v-model="keyword"
         class="input"
         type="search"
-        placeholder="Tìm dịch vụ… · Search services"
-        aria-label="Tìm dịch vụ"
+        :placeholder="$t('sc02.searchPlaceholder')"
+        :aria-label="$t('sc02.searchLabel')"
       />
       <div class="flex flex-wrap gap-[7px]" role="tablist">
         <button
@@ -147,10 +150,10 @@ useHead({ title: 'Dịch vụ — AOYAMA Service' });
 
     <AyEmptyState
       v-if="groups.length === 0"
-      title="Không tìm thấy dịch vụ nào"
-      hint="Hãy thử từ khóa khác hoặc bỏ bớt bộ lọc."
+      :title="$t('sc02.emptyTitle')"
+      :hint="$t('sc02.emptyHint')"
     >
-      <AyButton to="/contact" variant="secondary" size="sm">Liên hệ cửa hàng</AyButton>
+      <AyButton to="/contact" variant="secondary" size="sm">{{ $t('sc02.contactStore') }}</AyButton>
     </AyEmptyState>
 
     <NuxtLink
@@ -159,14 +162,14 @@ useHead({ title: 'Dịch vụ — AOYAMA Service' });
       class="btn btn-primary btn-block"
       style="min-height: 48px; font-size: 15px; margin: 0"
     >
-      Xong · {{ booking.selectedServiceIds.length }} hạng mục
+      {{ $t('sc02.pickDone', { n: booking.selectedServiceIds.length }) }}
     </NuxtLink>
 
     <NuxtLink
       :to="picking ? '/booking/step1' : '/'"
       class="btn btn-ghost self-start px-1 text-[13px]"
     >
-      ← Quay lại
+      {{ $t('common.back') }}
     </NuxtLink>
   </div>
 </template>
