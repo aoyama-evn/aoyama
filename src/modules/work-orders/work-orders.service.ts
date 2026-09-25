@@ -160,6 +160,8 @@ export class WorkOrdersService {
         vehicle: true,
         store: true,
         booking: true,
+        // SA-10 hien ten ky thuat vien phu trach ngay tren the tom tat.
+        assignedTechnician: true,
         items: { service: true },
         parts: true,
         photos: true,
@@ -328,6 +330,7 @@ export class WorkOrdersService {
       const patch: Partial<WorkOrder> = {};
       if (dto.diagnosisNote !== undefined) patch.diagnosisNote = dto.diagnosisNote;
       if (dto.diagnosisCause !== undefined) patch.diagnosisCause = dto.diagnosisCause;
+      if (dto.difficulty !== undefined) patch.difficulty = dto.difficulty;
       if (dto.assignedTechnicianId !== undefined) {
         patch.assignedTechnicianId = dto.assignedTechnicianId;
       }

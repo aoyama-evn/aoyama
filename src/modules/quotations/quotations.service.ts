@@ -78,6 +78,8 @@ export class QuotationsService {
         taxAmount: totals.taxAmount,
         totalAmount: totals.totalAmount,
         validUntil: dto.validUntil ?? null,
+        depositAmount: dto.depositAmount ?? null,
+        depositDueAt: dto.depositDueAt ? new Date(dto.depositDueAt) : null,
         note: dto.note ?? null,
         aiSuggestion: dto.aiSuggestion ?? null,
         createdById,

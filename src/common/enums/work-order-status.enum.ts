@@ -36,3 +36,10 @@ export enum PaymentMethod {
   CARD_AT_STORE = 'CARD_AT_STORE',
   OTHER = 'OTHER',
 }
+
+/** Muc do kho cua phieu — SA-10a cho ky thuat vien chon. */
+export enum WorkDifficulty {
+  EASY = 'EASY',
+  MEDIUM = 'MEDIUM',
+  HARD = 'HARD',
+}

@@ -59,6 +59,13 @@ export class Quotation extends BaseEntity {
   @Column({ name: 'valid_until', type: 'date', nullable: true })
   validUntil!: string | null;
 
+  /** SA-12 — bao gia co the yeu cau khach dat coc truoc khi bat tay vao viec. */
+  @Column({ name: 'deposit_amount', type: 'int', nullable: true })
+  depositAmount!: number | null;
+
+  @Column({ name: 'deposit_due_at', type: 'timestamptz', nullable: true })
+  depositDueAt!: Date | null;
+
   @Column({ type: 'text', nullable: true })
   note!: string | null;
 

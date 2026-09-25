@@ -14,7 +14,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { PaginationQueryDto } from 'src/common/dto';
-import { PaymentStatus, WorkOrderStatus } from 'src/common/enums';
+import { PaymentStatus, WorkDifficulty, WorkOrderStatus } from 'src/common/enums';
 
 /** SA-08 — tiep nhan xe. BR-18 doi hoi so km va anh hien trang. */
 export class IntakeDto {
@@ -89,6 +89,7 @@ export class UpdateDiagnosisDto {
   @IsOptional() @IsString() diagnosisNote?: string;
   @IsOptional() @IsString() diagnosisCause?: string;
   @IsOptional() @IsUUID('4') assignedTechnicianId?: string;
+  @IsOptional() @IsEnum(WorkDifficulty) difficulty?: WorkDifficulty;
 
   @IsOptional()
   @IsArray()

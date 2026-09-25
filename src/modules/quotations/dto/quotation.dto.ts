@@ -56,6 +56,18 @@ export class CreateQuotationDto {
   @IsOptional() @IsInt() @Min(0) discountAmount?: number;
   @IsOptional() @IsInt() @Min(0) @Max(100) taxRate?: number;
   @IsOptional() @IsString() validUntil?: string;
+
+  @ApiPropertyOptional({ description: 'SA-12 — so tien coc yeu cau khach tra truoc' })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  depositAmount?: number;
+
+  @ApiPropertyOptional({ description: 'SA-12 — han dat coc' })
+  @IsOptional()
+  @IsString()
+  depositDueAt?: string;
+
   @IsOptional() @IsString() note?: string;
 
   @ApiPropertyOptional({ description: 'Ban goi y goc cua AI de doi chieu do chinh xac' })

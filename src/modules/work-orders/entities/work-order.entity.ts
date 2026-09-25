@@ -1,6 +1,7 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity } from 'src/common/entities/base.entity';
-import { PaymentStatus, WorkOrderStatus } from 'src/common/enums';
+import { PaymentStatus, WorkDifficulty, WorkOrderStatus } from 'src/common/enums';
+import { AdminUser } from 'src/modules/admin-users/entities/admin-user.entity';
 import { Booking } from 'src/modules/bookings/entities/booking.entity';
 import { Customer } from 'src/modules/customers/entities/customer.entity';
 import { Store } from 'src/modules/stores/entities/store.entity';
@@ -91,6 +92,14 @@ export class WorkOrder extends BaseEntity {
 
   @Column({ name: 'assigned_technician_id', type: 'uuid', nullable: true })
   assignedTechnicianId!: string | null;
+
+  @ManyToOne(() => AdminUser, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({ name: 'assigned_technician_id' })
+  assignedTechnician!: AdminUser | null;
+
+  /** SA-10a — muc do kho do ky thuat vien danh gia. */
+  @Column({ type: 'enum', enum: WorkDifficulty, nullable: true })
+  difficulty!: WorkDifficulty | null;
 
   @Column({ name: 'received_by_id', type: 'uuid', nullable: true })
   receivedById!: string | null;
