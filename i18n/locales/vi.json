@@ -8,6 +8,7 @@
   },
   "ai": {
     "badge": "Gợi ý bởi AI",
+    "badgeShort": "✦ Gợi ý bởi AI",
     "disclaimer": "Đây là gợi ý tham khảo, kỹ thuật viên kết luận sau khi kiểm tra thực tế.",
     "matchPercent": "Mức độ khớp {percent}%"
   },
@@ -41,6 +42,7 @@
     "language": "Ngôn ngữ",
     "loading": "Đang tải…",
     "minutes": "{n} phút",
+    "minutesFull": "{n} phút",
     "modelYear": "đời {year}",
     "namePlaceholder": "Nguyễn Văn A",
     "next": "Tiếp theo →",
@@ -53,6 +55,7 @@
     "otpValidNote": "Mã có hiệu lực 5 phút.",
     "prev": "Trước",
     "quoteOnly": "báo giá",
+    "quotePrivate": "Báo giá riêng",
     "required": "bắt buộc",
     "save": "Lưu",
     "saveChanges": "Lưu thay đổi",
@@ -70,6 +73,9 @@
     "disclaimer": "Gợi ý bởi AI — cần kỹ thuật viên kiểm tra thực tế.",
     "suggested": "Dịch vụ đề xuất"
   },
+  "err": {
+    "code": "Mã lỗi: {code}"
+  },
   "flow": {
     "COMPLETED": "Đã xong",
     "CONFIRMED": "Đã xác nhận",
@@ -78,6 +84,12 @@
     "PENDING": "Chờ xác nhận",
     "QUOTED": "Đang báo giá",
     "RECEIVED": "Đã tiếp nhận"
+  },
+  "log": {
+    "ADMIN": "Nhân viên",
+    "CUSTOMER": "Khách hàng",
+    "SYSTEM": "Hệ thống",
+    "empty": "Chưa có thay đổi nào được ghi nhận"
   },
   "money": {
     "discount": "Giảm giá",
@@ -111,6 +123,53 @@
     "services": "Dịch vụ",
     "stores": "Cửa hàng"
   },
+  "part": {
+    "noResult": "Không tìm thấy phụ tùng phù hợp.",
+    "search": "Tìm phụ tùng",
+    "searchHint": "Nhập mã hoặc tên, tối thiểu 2 ký tự",
+    "searchPlaceholder": "P-OIL-10W30 / dầu máy",
+    "searching": "Đang tìm…",
+    "stock": "Tồn {n}"
+  },
+  "privacy": {
+    "h1": "1. Dữ liệu chúng tôi thu thập",
+    "h2": "2. Mục đích sử dụng",
+    "h3": "3. Ảnh và ghi âm gửi cho trợ lý AI",
+    "h4": "4. Quyền của bạn",
+    "h5": "5. Thông báo SMS và email",
+    "p1": "Họ tên, số điện thoại, email (nếu có), thông tin phương tiện, lịch sử dịch vụ, và nội dung bạn gửi cho trợ lý AI gồm văn bản, ảnh và ghi âm.",
+    "p2": "Xác nhận và nhắc lịch hẹn, thực hiện dịch vụ, lưu lịch sử bảo dưỡng của xe, và cải thiện chất lượng phục vụ. Chúng tôi không bán dữ liệu cho bên thứ ba.",
+    "p3": "Ảnh và ghi âm chỉ dùng cho đúng phiên chẩn đoán tương ứng và được xóa tự động sau thời hạn lưu trữ do cửa hàng cấu hình (mặc định 30 ngày).",
+    "p4": "Bạn có thể yêu cầu xem, chỉnh sửa hoặc xóa dữ liệu cá nhân của mình bằng cách liên hệ cửa hàng. Một số dữ liệu liên quan tới hồ sơ dịch vụ đã hoàn tất được giữ lại theo yêu cầu quản lý chất lượng.",
+    "p5": "Bạn có thể tắt nhận thông báo trong phần cài đặt tài khoản. Tin nhắn xác nhận lịch hẹn vẫn được gửi vì đây là thông tin cần thiết cho giao dịch.",
+    "title": "Chính sách dữ liệu cá nhân"
+  },
+  "qr": {
+    "alt": "Mã QR lịch hẹn",
+    "cameraFailed": "Không mở được camera",
+    "cameraPerm": "Hãy cho phép quyền camera hoặc nhập mã bằng tay.",
+    "hint": "Đưa mã này cho nhân viên khi đến cửa hàng. Nếu máy không quét được, đọc mã chữ ở trên.",
+    "noCamera": "Trình duyệt không hỗ trợ camera",
+    "notFound": "Không tìm thấy mã QR trong ảnh",
+    "preview": "Xem trước camera · camera preview",
+    "retry": "Hãy thử ảnh rõ hơn hoặc nhập mã bằng tay.",
+    "startCamera": "Bật camera",
+    "stopCamera": "Tắt camera",
+    "typeCode": "Hãy nhập mã lịch hẹn bằng tay.",
+    "unreadable": "Không đọc được ảnh",
+    "uploadImage": "Tải ảnh QR lên"
+  },
+  "rec": {
+    "again": "Ghi lại",
+    "attached": " (có ghi âm kèm theo)",
+    "micPerm": "Hãy cho phép quyền ghi âm trong trình duyệt.",
+    "noMic": "Không truy cập được micro",
+    "noSupport": "Trình duyệt không hỗ trợ ghi âm",
+    "recording": "Đang ghi {time} / 2:00",
+    "sent": "Ghi âm đã gửi kèm",
+    "stop": "Dừng",
+    "useText": "Bạn có thể mô tả bằng văn bản thay thế."
+  },
   "sc01": {
     "askAi": "Xe đang gặp vấn đề? Hỏi trợ lý AI",
     "bookCta": "Đặt lịch ngay · Book now",
@@ -140,6 +199,68 @@
     "tabInspection": "Kiểm tra",
     "tabMaintenance": "Bảo dưỡng",
     "tabRepair": "Sửa chữa"
+  },
+  "sc03": {
+    "book": "Đặt lịch",
+    "bookThis": "Đặt lịch dịch vụ này",
+    "category": "Phân loại",
+    "checklist": "Hạng mục kiểm tra",
+    "duration": "Thời gian ước tính",
+    "interval": "Chu kỳ đề xuất",
+    "months": "{n} tháng",
+    "notFound": "Không tìm thấy dịch vụ",
+    "priceNote": "Giá cuối cùng thay đổi theo dung tích xe và tình trạng thực tế.",
+    "refPrice": "Giá tham khảo"
+  },
+  "sc04": {
+    "colDetail": "Nội dung",
+    "colPrice": "Giá tham khảo",
+    "colService": "Dịch vụ",
+    "colTime": "Thời gian",
+    "footnote": "Giá chưa bao gồm phụ tùng thay thế. Mọi hạng mục phát sinh đều được báo giá và chờ bạn đồng ý trước khi thực hiện.",
+    "lead": "Giá dưới đây áp dụng cho xe dưới 125cc. Xe dung tích lớn hơn tính theo phân khúc, giá cuối cùng ghi trong báo giá trước khi thi công.",
+    "title": "Bảng giá tham khảo"
+  },
+  "sc05": {
+    "book": "Đặt lịch",
+    "detail": "Chi tiết",
+    "empty": "Chưa có cửa hàng nào",
+    "lead": "Chọn cửa hàng gần bạn để xem giờ làm việc và đặt lịch.",
+    "title": "Cửa hàng"
+  },
+  "sc06": {
+    "address": "Địa chỉ",
+    "bookHere": "Đặt lịch tại đây",
+    "capacity": "Sức tiếp nhận",
+    "capacityValue": "{n} xe / khung giờ",
+    "closed": "Nghỉ",
+    "email": "Email",
+    "holidays": "Ngày nghỉ sắp tới",
+    "hours": "Giờ làm việc",
+    "info": "Thông tin cửa hàng",
+    "notFound": "Không tìm thấy cửa hàng",
+    "phone": "Điện thoại"
+  },
+  "sc07": {
+    "ask": "Gửi câu hỏi",
+    "emptyHint": "Bạn có thể gửi câu hỏi qua trang liên hệ.",
+    "emptyTitle": "Chưa có câu hỏi nào",
+    "title": "Câu hỏi thường gặp"
+  },
+  "sc08": {
+    "lead": "Gửi câu hỏi hoặc yêu cầu tư vấn — chúng tôi phản hồi trong giờ làm việc.",
+    "message": "Nội dung",
+    "needMessage": "Vui lòng nhập nội dung",
+    "needReach": "Cần số điện thoại hoặc email để chúng tôi liên hệ lại",
+    "sentLead": "Cửa hàng sẽ liên hệ lại qua thông tin bạn để lại.",
+    "sentTitle": "Đã nhận được liên hệ của bạn",
+    "sentToast": "Đã gửi liên hệ",
+    "sentToastSub": "Cửa hàng sẽ phản hồi trong thời gian sớm nhất.",
+    "storeAny": "— Không cụ thể —",
+    "storeLabel": "Cửa hàng liên quan",
+    "subject": "Tiêu đề",
+    "submit": "Gửi liên hệ",
+    "title": "Liên hệ"
   },
   "sc10": {
     "askSymptom": "Xe đang gặp hiện tượng gì? Bạn có thể mô tả, gửi ảnh hoặc ghi âm giọng nói.",
@@ -228,8 +349,10 @@
     "edit": "Sửa",
     "lead": "Review before confirming.",
     "memberNote": "Lịch hẹn sẽ được lưu vào tài khoản {name} — bạn có thể theo dõi tiến độ và xem lại bất cứ lúc nào.",
+    "pickAnother": "Vui lòng chọn khung giờ khác.",
     "privacyLink": "Chính sách dữ liệu",
     "service": "Dịch vụ",
+    "slotGone": "Khung giờ vừa hết chỗ",
     "submitting": "Đang gửi…",
     "terms": "Bấm xác nhận nghĩa là bạn đồng ý với {terms} và {privacy}.",
     "termsLink": "Điều khoản",
@@ -239,14 +362,20 @@
   "sc16": {
     "codeLabel": "Mã lịch hẹn · Booking code",
     "copied": "Đã sao chép mã lịch hẹn",
+    "copyBlocked": "Trình duyệt không cho sao chép",
     "copyCode": "Sao chép mã",
+    "longPress": "Nhấn giữ để lưu về máy.",
+    "popupBlocked": "Trình duyệt chặn cửa sổ mới",
     "qrHint": "Đưa mã này cho lễ tân khi đến cửa hàng",
+    "qrOpened": "Đã mở ảnh mã QR",
     "qrPending": "Cửa hàng sẽ xác nhận và gửi mã QR cho bạn sớm nhất có thể. Hãy giữ lại mã lịch hẹn ở trên để tra cứu.",
     "saveQr": "Lưu mã QR",
+    "screenshot": "Bạn có thể chụp màn hình mã QR.",
     "store": "Cửa hàng",
     "subtitle": "Booking confirmed",
     "title": "Đặt lịch thành công",
-    "trackCta": "Theo dõi tiến độ"
+    "trackCta": "Theo dõi tiến độ",
+    "yourCode": "Mã của bạn là {code}"
   },
   "sc17": {
     "agree": "Tôi đồng ý với {terms} và {privacy}.",
@@ -505,6 +634,9 @@
       "wed": "T4"
     }
   },
+  "stat": {
+    "delta": "{delta} so với kỳ trước"
+  },
   "status": {
     "ACCEPTED": "Đã đồng ý",
     "CANCELLED": "Đã hủy",
@@ -528,6 +660,67 @@
     "SUPERSEDED": "Đã thay thế",
     "UNPAID": "Chưa thanh toán"
   },
+  "sy": {
+    "expiredLead": "Vì lý do an toàn, phiên làm việc tự kết thúc sau một thời gian không hoạt động. Vui lòng đăng nhập lại để tiếp tục.",
+    "expiredTitle": "Phiên đăng nhập đã hết hạn",
+    "forbiddenLead": "Tài khoản của bạn không được phép xem nội dung này. Nếu cần quyền, hãy liên hệ quản trị viên.",
+    "forbiddenTitle": "Không có quyền truy cập",
+    "loginAgain": "Đăng nhập lại",
+    "maintLead": "Chúng tôi đang nâng cấp hệ thống và sẽ trở lại trong thời gian sớm nhất. Trong lúc này, bạn có thể gọi trực tiếp cửa hàng để đặt lịch.",
+    "maintTitle": "Hệ thống đang bảo trì",
+    "toAdmin": "Về trang quản trị"
+  },
+  "table": {
+    "deselectAll": "Bỏ chọn tất cả",
+    "loading": "Đang tải dữ liệu…",
+    "pagination": "Phân trang",
+    "selectAll": "Chọn tất cả",
+    "selectRow": "Chọn dòng {key}"
+  },
+  "terms": {
+    "h1": "1. Phạm vi áp dụng",
+    "h2": "2. Đặt lịch và hủy lịch",
+    "h3": "3. Báo giá và thanh toán",
+    "h4": "4. Kết quả gợi ý của trí tuệ nhân tạo",
+    "h5": "5. Trách nhiệm của người dùng",
+    "p1": "Điều khoản này áp dụng cho việc sử dụng dịch vụ đặt lịch bảo dưỡng và sửa chữa xe máy trực tuyến của chuỗi cửa hàng AOYAMA thuộc Mobility Enshu Railway.",
+    "p2": "Lịch hẹn chỉ có hiệu lực sau khi cửa hàng xác nhận. Bạn có thể hủy hoặc đổi lịch trực tuyến đến trước giờ hẹn tối thiểu 2 tiếng; sau mốc đó vui lòng liên hệ trực tiếp cửa hàng.",
+    "p3": "Mọi hạng mục phát sinh ngoài nội dung đã đặt đều được báo giá và chỉ thực hiện sau khi bạn đồng ý. Giai đoạn hiện tại chỉ thanh toán tại cửa hàng.",
+    "p4": "Kết quả chẩn đoán do trợ lý AI đưa ra chỉ mang tính tham khảo, kèm mức độ khớp ước lượng. Kết luận cuối cùng luôn do kỹ thuật viên đưa ra sau khi kiểm tra xe thực tế.",
+    "p5": "Bạn chịu trách nhiệm về tính chính xác của thông tin cung cấp, bao gồm số điện thoại nhận thông báo và thông tin phương tiện.",
+    "seeAlso": "Xem thêm {link}.",
+    "title": "Điều khoản sử dụng"
+  },
+  "ui": {
+    "barChart": "Biểu đồ cột",
+    "closeToast": "Đóng thông báo",
+    "confirmType": "Gõ {phrase} để xác nhận",
+    "exportExcel": "Xuất Excel",
+    "exportFailed": "Không tải được tệp báo cáo",
+    "exportPdf": "Xuất PDF",
+    "lang": "Ngôn ngữ",
+    "notEntered": "chưa nhập",
+    "otpDigit": "Chữ số thứ {n}",
+    "otpGroup": "Mã xác thực 6 chữ số",
+    "tryLater": "Vui lòng thử lại sau ít phút."
+  },
+  "upload": {
+    "badImage": "Chỉ nhận ảnh JPG, PNG, WebP hoặc HEIC",
+    "badVideo": "Chỉ nhận video MP4, MOV hoặc WebM",
+    "dropHere": "Kéo thả ảnh vào đây hoặc",
+    "imageLimit": "Tối đa {max} ảnh, mỗi ảnh dưới {mb} MB",
+    "imageTooBig": "Ảnh vượt quá {mb} MB",
+    "pickImage": "Chọn ảnh",
+    "pickOtherVideo": "Chọn video khác",
+    "pickVideo": "Chọn video",
+    "removeImage": "Xóa ảnh {n}",
+    "removeVideo": "Gỡ video",
+    "tooMany": "Chỉ tải được tối đa {max} ảnh",
+    "videoLength": "Đoạn này {n} giây.",
+    "videoLimit": "Tối đa {n} giây, dưới {mb} MB.",
+    "videoTooBig": "Video vượt quá {mb} MB",
+    "videoTooLong": "Video dài quá {n} giây"
+  },
   "validate": {
     "emailBad": "Email không hợp lệ",
     "maker": "Vui lòng nhập hãng xe",
@@ -537,5 +730,28 @@
     "phoneBad": "Số điện thoại không hợp lệ",
     "plate": "Vui lòng nhập biển số",
     "terms": "Bạn cần đồng ý với điều khoản để tiếp tục"
+  },
+  "vehicle": {
+    "ccHint": "Dùng để tính giá theo phân khúc xe",
+    "color": "Màu xe",
+    "fuel": "Nhiên liệu",
+    "fuelElectric": "Điện",
+    "fuelGasoline": "Xăng",
+    "fuelHybrid": "Hybrid",
+    "makerOther": "Khác",
+    "modelYear": "Năm sản xuất",
+    "nickname": "Tên gợi nhớ (tùy chọn)",
+    "nicknamePlaceholder": "Xe đi làm",
+    "photos": "Ảnh xe (tùy chọn)",
+    "pickMaker": "— Chọn hãng —"
+  },
+  "weekday": {
+    "0": "Chủ nhật",
+    "1": "Thứ hai",
+    "2": "Thứ ba",
+    "3": "Thứ tư",
+    "4": "Thứ năm",
+    "5": "Thứ sáu",
+    "6": "Thứ bảy"
   }
 }

@@ -55,7 +55,7 @@ const ICON_PATH: Record<string, string> = {
           <button
             type="button"
             class="ml-1 flex-none text-[15px] leading-none opacity-60 hover:opacity-100"
-            aria-label="Đóng thông báo"
+            :aria-label="$t('ui.closeToast')"
             @click="ui.dismiss(toast.id)"
           >
             ✕

@@ -14,7 +14,7 @@ defineProps<{ error: ApiError | null }>();
     <span aria-hidden="true">!</span>
     <div>
       <p class="font-semibold">{{ error.message }}</p>
-      <p class="text-[11.5px] opacity-80">Mã lỗi: {{ error.code }}</p>
+      <p class="text-[11.5px] opacity-80">{{ $t('err.code', { code: error.code }) }}</p>
     </div>
   </div>
 </template>

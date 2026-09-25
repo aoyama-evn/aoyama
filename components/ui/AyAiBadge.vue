@@ -13,6 +13,7 @@ defineProps<{ confidence?: number | null; solid?: boolean }>();
     :style="solid ? 'background: var(--color-accent-2-500); color: #fff' : ''"
   >
     <span aria-hidden="true">✦</span>
-    Gợi ý bởi AI<template v-if="confidence != null"> · {{ Math.round(confidence) }}%</template>
+    {{ $t('ai.badge')
+    }}<template v-if="confidence != null"> · {{ Math.round(confidence) }}%</template>
   </span>
 </template>

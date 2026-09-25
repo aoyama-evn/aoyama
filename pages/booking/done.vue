@@ -34,7 +34,7 @@ async function copyCode(): Promise<void> {
     await navigator.clipboard.writeText(value);
     ui.success(t('sc16.copied'));
   } catch {
-    ui.warning('Trình duyệt không cho sao chép', `Mã của bạn là ${value}`);
+    ui.warning(t('sc16.copyBlocked'), t('sc16.yourCode', { code: value }));
   }
 }
 
@@ -43,13 +43,15 @@ function saveQr(): void {
   if (!qr.value?.dataUrl) return;
   const win = window.open();
   if (!win) {
-    ui.warning('Trình duyệt chặn cửa sổ mới', 'Bạn có thể chụp màn hình mã QR.');
+    ui.warning(t('sc16.popupBlocked'), t('sc16.screenshot'));
     return;
   }
   win.document.write(
-    `<img src="${qr.value.dataUrl}" alt="Mã QR ${booking.value?.code ?? ''}" style="width:100%">`,
+    `<img src="${qr.value.dataUrl}" alt="${t('sc22.qrAlt', {
+      code: booking.value?.code ?? '',
+    })}" style="width:100%">`,
   );
-  ui.success('Đã mở ảnh mã QR', 'Nhấn giữ để lưu về máy.');
+  ui.success(t('sc16.qrOpened'), t('sc16.longPress'));
 }
 
 useHead({ title: () => t('sc16.title') });
@@ -108,7 +110,7 @@ useHead({ title: () => t('sc16.title') });
         <template v-if="qr?.available && qr.dataUrl">
           <img
             :src="qr.dataUrl"
-            :alt="`Mã QR lịch hẹn ${booking?.code ?? ''}`"
+            :alt="$t('sc22.qrAlt', { code: booking?.code ?? '' })"
             class="block bg-white"
             style="width: 172px; height: 172px; border-radius: 16px"
           />

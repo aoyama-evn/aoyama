@@ -8,6 +8,7 @@
   },
   "ai": {
     "badge": "AI suggestion",
+    "badgeShort": "✦ AI suggestion",
     "disclaimer": "A suggestion only. A technician confirms after inspecting the bike.",
     "matchPercent": "{percent}% match"
   },
@@ -41,6 +42,7 @@
     "language": "Language",
     "loading": "Loading…",
     "minutes": "{n} mins",
+    "minutesFull": "{n} min",
     "modelYear": "{year} model",
     "namePlaceholder": "Alex Nguyen",
     "next": "Next →",
@@ -53,6 +55,7 @@
     "otpValidNote": "The code is valid for 5 minutes.",
     "prev": "Previous",
     "quoteOnly": "quote",
+    "quotePrivate": "Quote on request",
     "required": "required",
     "save": "Save",
     "saveChanges": "Save changes",
@@ -70,6 +73,9 @@
     "disclaimer": "Suggested by AI — a technician still needs to check the bike.",
     "suggested": "Suggested service"
   },
+  "err": {
+    "code": "Error code: {code}"
+  },
   "flow": {
     "COMPLETED": "Work finished",
     "CONFIRMED": "Confirmed",
@@ -78,6 +84,12 @@
     "PENDING": "Awaiting confirmation",
     "QUOTED": "Quoting",
     "RECEIVED": "Vehicle received"
+  },
+  "log": {
+    "ADMIN": "Staff",
+    "CUSTOMER": "Customer",
+    "SYSTEM": "System",
+    "empty": "No changes recorded yet"
   },
   "money": {
     "discount": "Discount",
@@ -111,6 +123,53 @@
     "services": "Services",
     "stores": "Stores"
   },
+  "part": {
+    "noResult": "No matching parts found.",
+    "search": "Find a part",
+    "searchHint": "Code or name, at least 2 characters",
+    "searchPlaceholder": "P-OIL-10W30 / engine oil",
+    "searching": "Searching…",
+    "stock": "Stock {n}"
+  },
+  "privacy": {
+    "h1": "1. What we collect",
+    "h2": "2. How we use it",
+    "h3": "3. Photos and recordings sent to the AI assistant",
+    "h4": "4. Your rights",
+    "h5": "5. SMS and email notifications",
+    "p1": "Your name, phone number, email (if provided), vehicle details, service history, and anything you send to the AI assistant — text, photos and voice recordings.",
+    "p2": "To confirm and remind you of bookings, carry out the service, keep your bike’s service history, and improve our service. We do not sell data to third parties.",
+    "p3": "Photos and recordings are used only for that diagnosis session and are deleted automatically after the retention period set by the store (30 days by default).",
+    "p4": "You can ask the store to show, correct or delete your personal data. Some information tied to completed service records is kept for quality management.",
+    "p5": "You can turn notifications off in your account settings. Booking confirmations are still sent, as they are necessary for the transaction.",
+    "title": "Personal data policy"
+  },
+  "qr": {
+    "alt": "Booking QR code",
+    "cameraFailed": "Could not open the camera",
+    "cameraPerm": "Allow camera access, or type the code by hand.",
+    "hint": "Show this to our staff when you arrive. If it will not scan, read out the code above.",
+    "noCamera": "This browser does not support the camera",
+    "notFound": "No QR code found in that image",
+    "preview": "Camera preview",
+    "retry": "Try a clearer image, or type the code by hand.",
+    "startCamera": "Start camera",
+    "stopCamera": "Stop camera",
+    "typeCode": "Please type the booking code by hand.",
+    "unreadable": "Could not read that image",
+    "uploadImage": "Upload a QR image"
+  },
+  "rec": {
+    "again": "Record again",
+    "attached": " (voice recording attached)",
+    "micPerm": "Please allow microphone access in your browser.",
+    "noMic": "Could not access the microphone",
+    "noSupport": "This browser cannot record audio",
+    "recording": "Recording {time} / 2:00",
+    "sent": "Voice recording sent",
+    "stop": "Stop",
+    "useText": "You can describe it in writing instead."
+  },
   "sc01": {
     "askAi": "Bike trouble? Ask the AI assistant",
     "bookCta": "Book now",
@@ -140,6 +199,68 @@
     "tabInspection": "Inspection",
     "tabMaintenance": "Maintenance",
     "tabRepair": "Repair"
+  },
+  "sc03": {
+    "book": "Book",
+    "bookThis": "Book this service",
+    "category": "Category",
+    "checklist": "What we check",
+    "duration": "Estimated time",
+    "interval": "Recommended interval",
+    "months": "{n} months",
+    "notFound": "Service not found",
+    "priceNote": "The final price depends on engine size and the actual condition.",
+    "refPrice": "Reference price"
+  },
+  "sc04": {
+    "colDetail": "What it covers",
+    "colPrice": "Reference price",
+    "colService": "Service",
+    "colTime": "Time",
+    "footnote": "Prices exclude replacement parts. Any extra work is quoted and carried out only after you agree.",
+    "lead": "The prices below are for bikes up to 125cc. Larger engines are priced by segment, and the final amount is given in the quotation before any work starts.",
+    "title": "Price guide"
+  },
+  "sc05": {
+    "book": "Book",
+    "detail": "Details",
+    "empty": "No stores yet",
+    "lead": "Pick the store nearest you to see its hours and book.",
+    "title": "Stores"
+  },
+  "sc06": {
+    "address": "Address",
+    "bookHere": "Book at this store",
+    "capacity": "Capacity",
+    "capacityValue": "{n} bikes per slot",
+    "closed": "Closed",
+    "email": "Email",
+    "holidays": "Upcoming closures",
+    "hours": "Opening hours",
+    "info": "Store information",
+    "notFound": "Store not found",
+    "phone": "Phone"
+  },
+  "sc07": {
+    "ask": "Ask a question",
+    "emptyHint": "You can send a question from the contact page.",
+    "emptyTitle": "No questions yet",
+    "title": "Frequently asked questions"
+  },
+  "sc08": {
+    "lead": "Send us a question or a request — we reply during business hours.",
+    "message": "Message",
+    "needMessage": "Please enter your message",
+    "needReach": "We need a phone number or an email address to reply",
+    "sentLead": "The store will get back to you using the details you left.",
+    "sentTitle": "We have received your message",
+    "sentToast": "Message sent",
+    "sentToastSub": "The store will reply as soon as possible.",
+    "storeAny": "— No particular store —",
+    "storeLabel": "Store this is about",
+    "subject": "Subject",
+    "submit": "Send message",
+    "title": "Contact us"
   },
   "sc10": {
     "askSymptom": "What is happening? Tell us in text, photos or a voice note.",
@@ -228,8 +349,10 @@
     "edit": "Edit",
     "lead": "Review before confirming.",
     "memberNote": "This booking is saved to {name}’s account — you can follow progress and see it later.",
+    "pickAnother": "Please pick another time slot.",
     "privacyLink": "Data policy",
     "service": "Service",
+    "slotGone": "That time slot just filled up",
     "submitting": "Sending…",
     "terms": "By confirming you agree to our {terms} and {privacy}.",
     "termsLink": "Terms",
@@ -239,14 +362,20 @@
   "sc16": {
     "codeLabel": "Booking code",
     "copied": "Booking code copied",
+    "copyBlocked": "Your browser blocked the copy",
     "copyCode": "Copy code",
+    "longPress": "Press and hold to save it.",
+    "popupBlocked": "Your browser blocked the new window",
     "qrHint": "Show this at the counter when you arrive",
+    "qrOpened": "QR image opened",
     "qrPending": "The store will confirm and send your QR code shortly. Keep the booking code above to look it up.",
     "saveQr": "Save QR code",
+    "screenshot": "A screenshot of the QR code works too.",
     "store": "Store",
     "subtitle": "Booking confirmed",
     "title": "Booking confirmed",
-    "trackCta": "Track progress"
+    "trackCta": "Track progress",
+    "yourCode": "Your code is {code}"
   },
   "sc17": {
     "agree": "I agree to the {terms} and the {privacy}.",
@@ -505,6 +634,9 @@
       "wed": "Wed"
     }
   },
+  "stat": {
+    "delta": "{delta} vs previous period"
+  },
   "status": {
     "ACCEPTED": "Accepted",
     "CANCELLED": "Cancelled",
@@ -528,6 +660,67 @@
     "SUPERSEDED": "Superseded",
     "UNPAID": "Unpaid"
   },
+  "sy": {
+    "expiredLead": "For safety, sessions end automatically after a period of inactivity. Please log in again to continue.",
+    "expiredTitle": "Your session has expired",
+    "forbiddenLead": "Your account is not allowed to view this. Contact an administrator if you need access.",
+    "forbiddenTitle": "You do not have access",
+    "loginAgain": "Log in again",
+    "maintLead": "We are upgrading the system and will be back as soon as possible. In the meantime, you can call the store to book.",
+    "maintTitle": "System maintenance",
+    "toAdmin": "Go to admin"
+  },
+  "table": {
+    "deselectAll": "Clear selection",
+    "loading": "Loading data…",
+    "pagination": "Pagination",
+    "selectAll": "Select all",
+    "selectRow": "Select row {key}"
+  },
+  "terms": {
+    "h1": "1. Scope",
+    "h2": "2. Booking and cancellation",
+    "h3": "3. Quotations and payment",
+    "h4": "4. AI-assisted diagnosis",
+    "h5": "5. Your responsibilities",
+    "p1": "These terms apply to the online booking service for motorcycle maintenance and repair at the AOYAMA stores of Mobility Enshu Railway.",
+    "p2": "A booking becomes valid once the store confirms it. You can change or cancel online up to 2 hours before the appointment; after that, please contact the store directly.",
+    "p3": "Any work beyond what you booked is quoted first and carried out only with your agreement. At this stage, payment is taken at the store only.",
+    "p4": "Results from the AI assistant, including the estimated match, are for reference only. The final judgement is always made by a technician after inspecting the bike.",
+    "p5": "You are responsible for the accuracy of the information you provide, including the phone number for notifications and your vehicle details.",
+    "seeAlso": "See also the {link}.",
+    "title": "Terms of use"
+  },
+  "ui": {
+    "barChart": "Bar chart",
+    "closeToast": "Dismiss notification",
+    "confirmType": "Type {phrase} to confirm",
+    "exportExcel": "Export to Excel",
+    "exportFailed": "Could not download the report",
+    "exportPdf": "Export to PDF",
+    "lang": "Language",
+    "notEntered": "not filled in",
+    "otpDigit": "Digit {n}",
+    "otpGroup": "6-digit verification code",
+    "tryLater": "Please try again in a few minutes."
+  },
+  "upload": {
+    "badImage": "Only JPG, PNG, WebP or HEIC images are accepted",
+    "badVideo": "Only MP4, MOV or WebM videos are accepted",
+    "dropHere": "Drag images here, or",
+    "imageLimit": "Up to {max} images, {mb} MB each",
+    "imageTooBig": "That image is over {mb} MB",
+    "pickImage": "Choose images",
+    "pickOtherVideo": "Choose another video",
+    "pickVideo": "Choose a video",
+    "removeImage": "Remove image {n}",
+    "removeVideo": "Remove video",
+    "tooMany": "You can upload at most {max} images",
+    "videoLength": "This one is {n} seconds.",
+    "videoLimit": "Up to {n} seconds, under {mb} MB.",
+    "videoTooBig": "That video is over {mb} MB",
+    "videoTooLong": "That video is longer than {n} seconds"
+  },
   "validate": {
     "emailBad": "That email address is not valid",
     "maker": "Please enter the make",
@@ -537,5 +730,28 @@
     "phoneBad": "That phone number is not valid",
     "plate": "Please enter the plate number",
     "terms": "You need to accept the terms to continue"
+  },
+  "vehicle": {
+    "ccHint": "Used to work out the price segment",
+    "color": "Colour",
+    "fuel": "Fuel",
+    "fuelElectric": "Electric",
+    "fuelGasoline": "Petrol",
+    "fuelHybrid": "Hybrid",
+    "makerOther": "Other",
+    "modelYear": "Model year",
+    "nickname": "Nickname (optional)",
+    "nicknamePlaceholder": "Commuter",
+    "photos": "Photos (optional)",
+    "pickMaker": "— Choose a make —"
+  },
+  "weekday": {
+    "0": "Sunday",
+    "1": "Monday",
+    "2": "Tuesday",
+    "3": "Wednesday",
+    "4": "Thursday",
+    "5": "Friday",
+    "6": "Saturday"
   }
 }

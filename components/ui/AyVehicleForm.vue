@@ -35,13 +35,22 @@ function set<K extends keyof VehicleFormValue>(key: K, value: VehicleFormValue[K
   emit('update:modelValue', { ...props.modelValue, [key]: value });
 }
 
-const MAKERS = ['Honda', 'Yamaha', 'Suzuki', 'Kawasaki', 'Vespa', 'Khác'];
+const { t } = useI18n();
 
-const FUELS: { value: VehicleFuelType; label: string }[] = [
-  { value: VehicleFuelType.GASOLINE, label: 'Xăng' },
-  { value: VehicleFuelType.ELECTRIC, label: 'Điện' },
-  { value: VehicleFuelType.HYBRID, label: 'Hybrid' },
-];
+const MAKERS = computed(() => [
+  'Honda',
+  'Yamaha',
+  'Suzuki',
+  'Kawasaki',
+  'Vespa',
+  t('vehicle.makerOther'),
+]);
+
+const FUELS = computed(() => [
+  { value: VehicleFuelType.GASOLINE, label: t('vehicle.fuelGasoline') },
+  { value: VehicleFuelType.ELECTRIC, label: t('vehicle.fuelElectric') },
+  { value: VehicleFuelType.HYBRID, label: t('vehicle.fuelHybrid') },
+]);
 
 const photos = computed({
   get: () => props.modelValue.photoUrls ?? [],
@@ -52,7 +61,7 @@ const photos = computed({
 <template>
   <div class="flex flex-col gap-2.5">
     <div class="grid grid-cols-2 gap-2.5">
-      <AyField label="Hãng" required :error="errors?.maker">
+      <AyField :label="$t('sc14.maker')" required :error="errors?.maker">
         <template #default="{ id }">
           <select
             :id="id"
@@ -60,13 +69,13 @@ const photos = computed({
             :value="modelValue.maker"
             @change="set('maker', ($event.target as HTMLSelectElement).value)"
           >
-            <option value="">— Chọn hãng —</option>
+            <option value="">{{ $t('vehicle.pickMaker') }}</option>
             <option v-for="m in MAKERS" :key="m" :value="m">{{ m }}</option>
           </select>
         </template>
       </AyField>
 
-      <AyField label="Dòng xe" required :error="errors?.model">
+      <AyField :label="$t('sc14.model')" required :error="errors?.model">
         <template #default="{ id }">
           <input
             :id="id"
@@ -79,7 +88,7 @@ const photos = computed({
         </template>
       </AyField>
 
-      <AyField label="Nhiên liệu" required>
+      <AyField :label="$t('vehicle.fuel')" required>
         <template #default="{ id }">
           <select
             :id="id"
@@ -94,7 +103,7 @@ const photos = computed({
         </template>
       </AyField>
 
-      <AyField label="Biển số" required :error="errors?.plateNumber">
+      <AyField :label="$t('sc14.plate')" required :error="errors?.plateNumber">
         <template #default="{ id, invalid }">
           <input
             :id="id"
@@ -109,7 +118,7 @@ const photos = computed({
       </AyField>
 
       <div class="col-span-2">
-        <AyField label="Số km hiện tại">
+        <AyField :label="$t('sc14.odometer')">
           <template #default="{ id }">
             <input
               :id="id"
@@ -125,14 +134,14 @@ const photos = computed({
       </div>
 
       <div class="col-span-2">
-        <AyField label="Tên gợi nhớ (tùy chọn)">
+        <AyField :label="$t('vehicle.nickname')">
           <template #default="{ id }">
             <input
               :id="id"
               class="input"
               type="text"
               :value="modelValue.nickname ?? ''"
-              placeholder="Xe đi làm"
+              :placeholder="$t('vehicle.nicknamePlaceholder')"
               @input="set('nickname', ($event.target as HTMLInputElement).value)"
             />
           </template>
@@ -140,7 +149,7 @@ const photos = computed({
       </div>
 
       <template v-if="!compact">
-        <AyField label="Dung tích (cc)" hint="Dùng để tính giá theo phân khúc xe">
+        <AyField :label="$t('sc14.engineCc')" :hint="$t('vehicle.ccHint')">
           <template #default="{ id }">
             <input
               :id="id"
@@ -153,7 +162,7 @@ const photos = computed({
           </template>
         </AyField>
 
-        <AyField label="Năm sản xuất">
+        <AyField :label="$t('vehicle.modelYear')">
           <template #default="{ id }">
             <input
               :id="id"
@@ -167,7 +176,7 @@ const photos = computed({
           </template>
         </AyField>
 
-        <AyField label="Màu xe">
+        <AyField :label="$t('vehicle.color')">
           <template #default="{ id }">
             <input
               :id="id"
@@ -182,11 +191,11 @@ const photos = computed({
     </div>
 
     <template v-if="!compact">
-      <AyField label="Ảnh xe (tùy chọn)">
+      <AyField :label="$t('vehicle.photos')">
         <AyImageUpload v-model="photos" :max="4" />
       </AyField>
 
-      <AyField label="Ghi chú">
+      <AyField :label="$t('common.note')">
         <template #default="{ id }">
           <textarea
             :id="id"

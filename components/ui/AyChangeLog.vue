@@ -13,15 +13,16 @@ defineProps<{
 
 const { dateTime } = useFormat();
 
-const ACTOR: Record<string, string> = {
-  ADMIN: 'Nhân viên',
-  CUSTOMER: 'Khách hàng',
-  SYSTEM: 'Hệ thống',
-};
+const { t, te } = useI18n();
+
+/** Ten nguoi thao tac; loai la khoa dung chung ba thu tieng. */
+function actorLabel(type: string | undefined): string {
+  return te(`log.${type}`) ? t(`log.${type}`) : t('log.SYSTEM');
+}
 </script>
 
 <template>
-  <AyEmptyState v-if="entries.length === 0" title="Chưa có thay đổi nào được ghi nhận" />
+  <AyEmptyState v-if="entries.length === 0" :title="$t('log.empty')" />
 
   <ol v-else class="flex flex-col gap-0">
     <li
@@ -43,7 +44,7 @@ const ACTOR: Record<string, string> = {
         <p class="text-[13.5px] font-semibold">{{ entry.action }}</p>
         <p class="text-[12px] text-muted">
           {{ dateTime(entry.createdAt) }}
-          · {{ entry.actorName || ACTOR[entry.actorType ?? ''] || 'Hệ thống' }}
+          · {{ entry.actorName || actorLabel(entry.actorType) }}
         </p>
         <p v-if="entry.detail" class="mt-0.5 text-[12.5px]">{{ entry.detail }}</p>
       </div>

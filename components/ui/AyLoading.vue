@@ -8,6 +8,6 @@ defineProps<{ label?: string }>();
       class="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
       aria-hidden="true"
     />
-    {{ label ?? 'Đang tải…' }}
+    {{ label ?? $t('common.loading') }}
   </div>
 </template>

@@ -13,9 +13,11 @@ const props = defineProps<{
   to?: string;
 }>();
 
+const { t } = useI18n();
+
 const deltaLabel = computed(() => {
   if (props.delta === null || props.delta === undefined) return null;
-  return `${props.delta > 0 ? '+' : ''}${props.delta} so với kỳ trước`;
+  return t('stat.delta', { delta: `${props.delta > 0 ? '+' : ''}${props.delta}` });
 });
 
 const background = computed(() =>

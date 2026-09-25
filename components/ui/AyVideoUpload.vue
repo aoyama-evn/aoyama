@@ -17,6 +17,7 @@ const props = withDefaults(
 );
 const emit = defineEmits<{ (e: 'update:modelValue', v: string | null): void }>();
 
+const { t } = useI18n();
 const ui = useUiStore();
 const ACCEPT = ['video/mp4', 'video/quicktime', 'video/webm'];
 
@@ -25,18 +26,21 @@ async function handleFile(event: Event): Promise<void> {
   if (!file) return;
 
   if (!ACCEPT.includes(file.type)) {
-    ui.warning('Chỉ nhận video MP4, MOV hoặc WebM', file.name);
+    ui.warning(t('upload.badVideo'), file.name);
     return;
   }
   if (file.size > props.maxSizeMb * 1024 * 1024) {
-    ui.warning(`Video vượt quá ${props.maxSizeMb} MB`, file.name);
+    ui.warning(t('upload.videoTooBig', { mb: props.maxSizeMb }), file.name);
     return;
   }
 
   const dataUrl = await readAsDataUrl(file);
   const seconds = await durationOf(dataUrl);
   if (seconds !== null && seconds > props.maxSeconds) {
-    ui.warning(`Video dài quá ${props.maxSeconds} giây`, `Đoạn này ${Math.round(seconds)} giây.`);
+    ui.warning(
+      t('upload.videoTooLong', { n: props.maxSeconds }),
+      t('upload.videoLength', { n: Math.round(seconds) }),
+    );
     return;
   }
   emit('update:modelValue', dataUrl);
@@ -86,7 +90,7 @@ function durationOf(src: string): Promise<number | null> {
     />
     <div class="flex flex-wrap gap-2">
       <label class="btn btn-secondary cursor-pointer text-[12.5px]">
-        {{ modelValue ? 'Chọn video khác' : 'Chọn video' }}
+        {{ modelValue ? $t('upload.pickOtherVideo') : $t('upload.pickVideo') }}
         <input type="file" class="sr-only" :accept="ACCEPT.join(',')" @change="handleFile" />
       </label>
       <button
@@ -95,11 +99,11 @@ function durationOf(src: string): Promise<number | null> {
         class="btn btn-ghost text-[12.5px]"
         @click="emit('update:modelValue', null)"
       >
-        Gỡ video
+        {{ $t('upload.removeVideo') }}
       </button>
     </div>
     <p class="text-muted text-[11.5px]">
-      Tối đa {{ maxSeconds }} giây, dưới {{ maxSizeMb }} MB.
+      {{ $t('upload.videoLimit', { n: maxSeconds, mb: maxSizeMb }) }}
     </p>
   </div>
 </template>

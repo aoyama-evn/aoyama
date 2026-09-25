@@ -53,7 +53,7 @@ async function submit(): Promise<void> {
   } catch (err) {
     error.value = normalizeError(err);
     if (error.value.code === 'SLOT_FULL' || error.value.code === 'SLOT_IN_PAST') {
-      ui.warning('Khung giờ vừa hết chỗ', 'Vui lòng chọn khung giờ khác.');
+      ui.warning(t('sc15.slotGone'), t('sc15.pickAnother'));
       await navigateTo('/booking/step2');
     }
   } finally {
@@ -61,7 +61,7 @@ async function submit(): Promise<void> {
   }
 }
 
-useHead({ title: 'Đặt lịch — Xác nhận' });
+useHead({ title: () => t('sc15.title') });
 </script>
 
 <template>

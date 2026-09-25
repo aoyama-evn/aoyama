@@ -3,6 +3,7 @@ import type { ServiceItem } from '~/types/models';
 
 /** SC-04 Bang gia tham khao — FR-PUB-04, FR-SVC-06. */
 const api = useApi();
+const { t } = useI18n();
 const { i18n, money } = useFormat();
 
 const { data: services } = await useAsyncData('pricing', () => api.get<ServiceItem[]>('/services'));
@@ -10,19 +11,19 @@ const { data: services } = await useAsyncData('pricing', () => api.get<ServiceIt
 const grouped = computed(() => {
   const list = services.value ?? [];
   return [
-    { label: 'Bảo dưỡng', items: list.filter((s) => s.type === 'MAINTENANCE') },
-    { label: 'Sửa chữa', items: list.filter((s) => s.type === 'REPAIR') },
+    { label: t('serviceType.MAINTENANCE'), items: list.filter((s) => s.type === 'MAINTENANCE') },
+    { label: t('serviceType.REPAIR'), items: list.filter((s) => s.type === 'REPAIR') },
   ].filter((g) => g.items.length > 0);
 });
 
-useHead({ title: 'Bảng giá tham khảo — AOYAMA Service' });
+useHead({ title: () => `${t('sc04.title')} — AOYAMA Service` });
 </script>
 
 <template>
   <div class="flex flex-col gap-5">
     <AyPageHeader
-      code="SC-04" title="Bảng giá tham khảo"
-      description="Giá dưới đây áp dụng cho xe dưới 125cc. Xe dung tích lớn hơn tính theo phân khúc, giá cuối cùng ghi trong báo giá trước khi thi công."
+      code="SC-04" :title="$t('sc04.title')"
+      :description="$t('sc04.lead')"
     />
 
     <section v-for="group in grouped" :key="group.label">
@@ -31,10 +32,10 @@ useHead({ title: 'Bảng giá tham khảo — AOYAMA Service' });
         <table class="table">
           <thead>
             <tr>
-              <th scope="col">Dịch vụ</th>
-              <th scope="col" class="hidden sm:table-cell">Nội dung</th>
-              <th scope="col" class="text-center">Thời gian</th>
-              <th scope="col" class="text-right">Giá tham khảo</th>
+              <th scope="col">{{ $t('sc04.colService') }}</th>
+              <th scope="col" class="hidden sm:table-cell">{{ $t('sc04.colDetail') }}</th>
+              <th scope="col" class="text-center">{{ $t('sc04.colTime') }}</th>
+              <th scope="col" class="text-right">{{ $t('sc04.colPrice') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -47,9 +48,11 @@ useHead({ title: 'Bảng giá tham khảo — AOYAMA Service' });
               <td class="hidden text-[13px] text-muted sm:table-cell">
                 {{ i18n(service.shortDescription) }}
               </td>
-              <td class="text-center whitespace-nowrap">{{ service.durationMinutes }} phút</td>
+              <td class="text-center whitespace-nowrap">
+                {{ $t('common.minutesFull', { n: service.durationMinutes }) }}
+              </td>
               <td class="text-right font-heading whitespace-nowrap">
-                {{ service.quoteOnly ? 'Báo giá riêng' : `~ ${money(service.basePrice)}` }}
+                {{ service.quoteOnly ? $t('common.quotePrivate') : `~ ${money(service.basePrice)}` }}
               </td>
             </tr>
           </tbody>
@@ -58,10 +61,9 @@ useHead({ title: 'Bảng giá tham khảo — AOYAMA Service' });
     </section>
 
     <p class="text-[12.5px] text-muted">
-      Giá chưa bao gồm phụ tùng thay thế. Mọi hạng mục phát sinh đều được báo giá và chờ bạn đồng ý
-      trước khi thực hiện.
+      {{ $t('sc04.footnote') }}
     </p>
 
-    <AyButton to="/booking/step1" class="self-start">Đặt lịch ngay</AyButton>
+    <AyButton to="/booking/step1" class="self-start">{{ $t('sc21.bookNow') }}</AyButton>
   </div>
 </template>

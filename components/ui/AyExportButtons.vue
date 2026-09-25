@@ -9,6 +9,7 @@ const props = defineProps<{
 
 const config = useRuntimeConfig();
 const auth = useAuthStore();
+const { t } = useI18n();
 const ui = useUiStore();
 const busy = ref<'excel' | 'pdf' | null>(null);
 
@@ -36,7 +37,7 @@ async function download(format: 'excel' | 'pdf'): Promise<void> {
     link.click();
     URL.revokeObjectURL(url);
   } catch {
-    ui.error('Không tải được tệp báo cáo', 'Vui lòng thử lại sau ít phút.');
+    ui.error(t('ui.exportFailed'), t('ui.tryLater'));
   } finally {
     busy.value = null;
   }
@@ -46,10 +47,10 @@ async function download(format: 'excel' | 'pdf'): Promise<void> {
 <template>
   <div class="flex gap-2">
     <AyButton variant="secondary" size="sm" :loading="busy === 'excel'" @click="download('excel')">
-      Xuất Excel
+      {{ $t('ui.exportExcel') }}
     </AyButton>
     <AyButton variant="secondary" size="sm" :loading="busy === 'pdf'" @click="download('pdf')">
-      Xuất PDF
+      {{ $t('ui.exportPdf') }}
     </AyButton>
   </div>
 </template>

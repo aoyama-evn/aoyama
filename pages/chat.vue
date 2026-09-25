@@ -94,7 +94,7 @@ const canSend = computed(() => Boolean(text.value.trim() || images.value.length 
 function vehicleLine(item: Vehicle): string {
   const parts = [item.plateNumber];
   if (item.currentOdometer !== null) parts.push(`${number(item.currentOdometer)} km`);
-  if (item.modelYear) parts.push(`đời ${item.modelYear}`);
+  if (item.modelYear) parts.push(t('common.modelYear', { year: item.modelYear }));
   return parts.filter(Boolean).join(' · ');
 }
 
@@ -256,7 +256,7 @@ useHead({ title: () => t('sc10.assistant') });
     >
       <div class="flex gap-2">
         <AyImageUpload v-model="images" :max="5" compact />
-        <AyVoiceRecorder compact @recorded="transcript = 'Ghi âm đã gửi kèm'" />
+        <AyVoiceRecorder compact @recorded="transcript = t('rec.sent')" />
       </div>
       <div class="flex gap-2">
         <input

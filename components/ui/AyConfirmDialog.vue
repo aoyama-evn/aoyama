@@ -14,11 +14,12 @@ const props = withDefaults(
     /** Lop phu chi de xem, khong co lua chon nao de bo — vi du o xem ma QR. */
     hideCancel?: boolean;
   }>(),
-  { confirmLabel: 'Xác nhận', cancelLabel: 'Hủy bỏ' },
+  {},
 );
 
 const emit = defineEmits<{ (e: 'confirm'): void; (e: 'cancel'): void }>();
 
+const { t } = useI18n();
 const overlayTarget = useOverlayTarget();
 
 const typed = ref('');
@@ -43,13 +44,15 @@ watch(() => props.open, (open) => { if (open) typed.value = ''; });
         <slot />
 
         <div v-if="confirmPhrase" class="mt-3">
-          <label class="label">Gõ <strong>{{ confirmPhrase }}</strong> để xác nhận</label>
+          <i18n-t keypath="ui.confirmType" tag="label" class="label">
+            <template #phrase><strong>{{ confirmPhrase }}</strong></template>
+          </i18n-t>
           <input v-model="typed" class="input" type="text">
         </div>
 
         <div class="mt-5 flex justify-end gap-2">
           <AyButton v-if="!hideCancel" variant="secondary" size="sm" @click="emit('cancel')">
-            {{ cancelLabel }}
+            {{ cancelLabel ?? t('common.discard') }}
           </AyButton>
           <AyButton
             :variant="danger ? 'danger' : 'primary'"
@@ -58,7 +61,7 @@ watch(() => props.open, (open) => { if (open) typed.value = ''; });
             :loading="loading"
             @click="emit('confirm')"
           >
-            {{ confirmLabel }}
+            {{ confirmLabel ?? t('common.confirm') }}
           </AyButton>
         </div>
       </div>

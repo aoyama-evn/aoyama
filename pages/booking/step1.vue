@@ -80,7 +80,7 @@ async function analyse(): Promise<void> {
     booking.persist();
     await navigateTo('/chat');
   } catch (error) {
-    ui.error(normalizeError(error).message, 'Bạn vẫn có thể đặt lịch và mô tả trực tiếp tại cửa hàng.');
+    ui.error(normalizeError(error).message, t('sc10.failLead'));
   } finally {
     analysing.value = false;
   }
@@ -168,7 +168,7 @@ useHead({ title: () => `${t('sc01.bookCta')} — 1` });
       <div class="flex flex-wrap gap-2">
         <AyImageUpload v-model="booking.symptomPhotoUrls" :max="5" compact />
         <AyVideoUpload v-model="booking.symptomVideoUrl" compact />
-        <AyVoiceRecorder compact @recorded="booking.symptomDescription += ' (có ghi âm kèm theo)'" />
+        <AyVoiceRecorder compact @recorded="booking.symptomDescription += t('rec.attached')" />
       </div>
 
       <div

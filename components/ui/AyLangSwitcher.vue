@@ -13,7 +13,7 @@ const OPTIONS = [
 </script>
 
 <template>
-  <div class="seg" role="radiogroup" aria-label="Ngôn ngữ">
+  <div class="seg" role="radiogroup" :aria-label="$t('ui.lang')">
     <label v-for="option in OPTIONS" :key="option.code" class="seg-opt">
       <input
         type="radio"

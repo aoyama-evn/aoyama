@@ -7,6 +7,8 @@
  * het the ma chu van dung co, khong bi keo gian nhu khi phong to mot viewBox
  * co dinh.
  */
+const { t } = useI18n();
+
 const props = withDefaults(
   defineProps<{
     data: { label: string; value: number }[];
@@ -16,7 +18,7 @@ const props = withDefaults(
     /** Cot cuoi cung — thuong la hom nay — to dam hon cho de nhin. */
     highlightLast?: boolean;
   }>(),
-  { ariaLabel: 'Biểu đồ cột', highlightLast: true },
+  { highlightLast: true },
 );
 
 const host = ref<HTMLElement | null>(null);
@@ -86,7 +88,7 @@ function short(value: number): string {
       :style="{ width: `${width}px`, height: `${H}px`, display: 'block' }"
       class="font-body"
       role="img"
-      :aria-label="ariaLabel"
+      :aria-label="ariaLabel ?? t('ui.barChart')"
     >
       <template v-for="line in gridlines" :key="line.ratio">
         <line

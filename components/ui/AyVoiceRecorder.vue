@@ -7,6 +7,7 @@ defineProps<{ compact?: boolean }>();
 
 const emit = defineEmits<{ (e: 'recorded', payload: { dataUrl: string; seconds: number }): void }>();
 
+const { t } = useI18n();
 const ui = useUiStore();
 const recording = ref(false);
 const seconds = ref(0);
@@ -18,7 +19,7 @@ let timer: ReturnType<typeof setInterval> | null = null;
 
 async function start(): Promise<void> {
   if (!navigator.mediaDevices?.getUserMedia) {
-    ui.error('Trình duyệt không hỗ trợ ghi âm', 'Bạn có thể mô tả bằng văn bản thay thế.');
+    ui.error(t('rec.noSupport'), t('rec.useText'));
     return;
   }
   try {
@@ -46,7 +47,7 @@ async function start(): Promise<void> {
       if (seconds.value >= MAX_SECONDS) stop();
     }, 1000);
   } catch {
-    ui.error('Không truy cập được micro', 'Hãy cho phép quyền ghi âm trong trình duyệt.');
+    ui.error(t('rec.noMic'), t('rec.micPerm'));
   }
 }
 
@@ -91,14 +92,14 @@ const display = computed(() => {
     <template v-if="recording">
       <span class="tag bg-danger-bg text-danger">
         <span class="h-2 w-2 animate-pulse rounded-full bg-current" aria-hidden="true" />
-        Đang ghi {{ display }} / 2:00
+        {{ $t('rec.recording', { time: display }) }}
       </span>
-      <AyButton variant="secondary" size="sm" @click="stop">Dừng</AyButton>
+      <AyButton variant="secondary" size="sm" @click="stop">{{ $t('rec.stop') }}</AyButton>
     </template>
 
     <template v-if="audioUrl && !recording">
       <audio :src="audioUrl" controls class="h-9" />
-      <AyButton variant="ghost" size="sm" @click="reset">Ghi lại</AyButton>
+      <AyButton variant="ghost" size="sm" @click="reset">{{ $t('rec.again') }}</AyButton>
     </template>
   </div>
 </template>

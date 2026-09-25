@@ -60,7 +60,7 @@ function onKeydown(index: number, event: KeyboardEvent): void {
     class="grid gap-2"
     :style="{ gridTemplateColumns: `repeat(${length}, 1fr)` }"
     role="group"
-    aria-label="Mã xác thực 6 chữ số"
+    :aria-label="$t('ui.otpGroup')"
   >
     <input
       v-for="(digit, index) in digits"
@@ -77,7 +77,7 @@ function onKeydown(index: number, event: KeyboardEvent): void {
       :autocomplete="index === 0 ? 'one-time-code' : 'off'"
       maxlength="6"
       :value="digit"
-      :aria-label="`Chữ số thứ ${index + 1}`"
+      :aria-label="$t('ui.otpDigit', { n: index + 1 })"
       @input="onInput(index, $event)"
       @keydown="onKeydown(index, $event)"
     />

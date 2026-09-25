@@ -19,7 +19,7 @@ const props = withDefaults(
     emptyTitle?: string;
     emptyHint?: string;
   }>(),
-  { rowKey: 'id', sortOrder: 'DESC', emptyTitle: 'Chưa có dữ liệu' },
+  { rowKey: 'id', sortOrder: 'DESC' },
 );
 
 const emit = defineEmits<{
@@ -28,6 +28,8 @@ const emit = defineEmits<{
   (e: 'update:selected', ids: string[]): void;
   (e: 'row-click', row: T): void;
 }>();
+
+const { t } = useI18n();
 
 const selected = ref<string[]>([]);
 
@@ -92,7 +94,7 @@ watch(
               <input
                 type="checkbox"
                 :checked="allSelected"
-                :aria-label="allSelected ? 'Bỏ chọn tất cả' : 'Chọn tất cả'"
+                :aria-label="allSelected ? $t('table.deselectAll') : $t('table.selectAll')"
                 class="h-4 w-4 accent-[var(--color-accent)]"
                 @change="toggleAll"
               >
@@ -123,13 +125,13 @@ watch(
         <tbody>
           <tr v-if="loading">
             <td :colspan="columns.length + (selectable ? 1 : 0)" class="py-10 text-center text-muted">
-              Đang tải dữ liệu…
+              {{ $t('table.loading') }}
             </td>
           </tr>
 
           <tr v-else-if="rows.length === 0">
             <td :colspan="columns.length + (selectable ? 1 : 0)" class="p-0">
-              <AyEmptyState :title="emptyTitle" :hint="emptyHint">
+              <AyEmptyState :title="emptyTitle ?? t('common.noData')" :hint="emptyHint">
                 <slot name="empty-action" />
               </AyEmptyState>
             </td>
@@ -146,7 +148,7 @@ watch(
               <input
                 type="checkbox"
                 :checked="selected.includes(keyOf(row))"
-                :aria-label="`Chọn dòng ${keyOf(row)}`"
+                :aria-label="$t('table.selectRow', { key: keyOf(row) })"
                 class="h-4 w-4 accent-[var(--color-accent)]"
                 @change="toggleOne(row)"
               >
@@ -174,14 +176,14 @@ watch(
         / {{ meta.total.toLocaleString('ja-JP') }}
       </p>
 
-      <nav class="flex items-center gap-1" aria-label="Phân trang">
+      <nav class="flex items-center gap-1" :aria-label="$t('table.pagination')">
         <button
           type="button"
           class="btn btn-secondary text-[12.5px]"
           :disabled="!meta.hasPrev"
           @click="emit('update:page', meta.page - 1)"
         >
-          Trước
+          {{ $t('common.prev') }}
         </button>
         <button
           v-for="p in pageNumbers"
@@ -200,7 +202,7 @@ watch(
           :disabled="!meta.hasNext"
           @click="emit('update:page', meta.page + 1)"
         >
-          Sau
+          {{ $t('common.nextPage') }}
         </button>
       </nav>
     </div>

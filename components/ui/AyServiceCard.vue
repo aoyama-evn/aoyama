@@ -5,10 +5,11 @@ import type { ServiceItem } from '~/types/models';
 const props = defineProps<{ service: ServiceItem; selectable?: boolean; selected?: boolean; to?: string }>();
 const emit = defineEmits<{ (e: 'toggle', id: string): void }>();
 
+const { t } = useI18n();
 const { i18n, money } = useFormat();
 
 const priceLabel = computed(() =>
-  props.service.quoteOnly ? 'báo giá riêng' : `~ ${money(props.service.basePrice)}`,
+  props.service.quoteOnly ? t('common.quotePrivate') : `~ ${money(props.service.basePrice)}`,
 );
 </script>
 
@@ -29,7 +30,9 @@ const priceLabel = computed(() =>
       <span class="block text-[14.5px] font-semibold">{{ i18n(service.name) }}</span>
       <span class="block text-[12.5px] text-muted">
         {{ i18n(service.shortDescription) }}
-        <template v-if="service.durationMinutes"> · {{ service.durationMinutes }} phút</template>
+        <template v-if="service.durationMinutes">
+          · {{ $t('common.minutesFull', { n: service.durationMinutes }) }}
+        </template>
       </span>
     </span>
 

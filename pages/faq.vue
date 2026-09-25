@@ -3,17 +3,18 @@ import type { Faq } from '~/types/models';
 
 /** SC-07 Cau hoi thuong gap. */
 const api = useApi();
+const { t } = useI18n();
 const { i18n } = useFormat();
 
 const { data: faqs } = await useAsyncData('faqs', () => api.get<Faq[]>('/faqs'));
 const openId = ref<string | null>(null);
 
-useHead({ title: 'Câu hỏi thường gặp — AOYAMA Service' });
+useHead({ title: () => `${t('sc07.title')} — AOYAMA Service` });
 </script>
 
 <template>
   <div class="flex flex-col gap-5">
-    <AyPageHeader code="SC-07" title="Câu hỏi thường gặp" />
+    <AyPageHeader code="SC-07" :title="$t('sc07.title')" />
 
     <div class="flex flex-col gap-2">
       <article v-for="faq in faqs ?? []" :key="faq.id" class="card !p-0 overflow-hidden">
@@ -34,8 +35,12 @@ useHead({ title: 'Câu hỏi thường gặp — AOYAMA Service' });
       </article>
     </div>
 
-    <AyEmptyState v-if="(faqs ?? []).length === 0" title="Chưa có câu hỏi nào" hint="Bạn có thể gửi câu hỏi qua trang liên hệ.">
-      <AyButton to="/contact" variant="secondary" size="sm">Gửi câu hỏi</AyButton>
+    <AyEmptyState
+      v-if="(faqs ?? []).length === 0"
+      :title="$t('sc07.emptyTitle')"
+      :hint="$t('sc07.emptyHint')"
+    >
+      <AyButton to="/contact" variant="secondary" size="sm">{{ $t('sc07.ask') }}</AyButton>
     </AyEmptyState>
   </div>
 </template>

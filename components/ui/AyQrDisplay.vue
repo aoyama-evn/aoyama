@@ -10,20 +10,20 @@ defineProps<{ dataUrl: string | null; code: string; available: boolean; message?
 <template>
   <div class="card flex flex-col items-center gap-3 text-center">
     <template v-if="available && dataUrl">
-      <img :src="dataUrl" alt="Mã QR lịch hẹn" class="h-56 w-56 rounded-xl bg-white p-2">
+      <img :src="dataUrl" :alt="$t('qr.alt')" class="h-56 w-56 rounded-xl bg-white p-2">
       <div>
-        <p class="text-[12.5px] text-muted">Mã lịch hẹn</p>
+        <p class="text-[12.5px] text-muted">{{ $t('sc16.codeLabel') }}</p>
         <p class="select-all font-heading text-[22px] tracking-widest">{{ code }}</p>
       </div>
       <p class="max-w-prose text-[12.5px] text-muted">
-        Đưa mã này cho nhân viên khi đến cửa hàng. Nếu máy không quét được, đọc mã chữ ở trên.
+        {{ $t('qr.hint') }}
       </p>
     </template>
 
     <AyEmptyState
       v-else
-      title="Chưa có mã QR"
-      :hint="message ?? 'Mã QR được tạo sau khi cửa hàng xác nhận lịch hẹn của bạn.'"
+      :title="$t('sc22.noQrTitle')"
+      :hint="message ?? $t('sc22.noQrLead')"
     />
   </div>
 </template>

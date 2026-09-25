@@ -8,6 +8,7 @@ import jsQR from 'jsqr';
  */
 const emit = defineEmits<{ (e: 'scanned', token: string): void }>();
 
+const { t } = useI18n();
 const ui = useUiStore();
 const video = ref<HTMLVideoElement | null>(null);
 const canvas = ref<HTMLCanvasElement | null>(null);
@@ -18,7 +19,7 @@ let frameId: number | null = null;
 
 async function start(): Promise<void> {
   if (!navigator.mediaDevices?.getUserMedia) {
-    ui.warning('Trình duyệt không hỗ trợ camera', 'Hãy nhập mã lịch hẹn bằng tay.');
+    ui.warning(t('qr.noCamera'), t('qr.typeCode'));
     return;
   }
   try {
@@ -32,7 +33,7 @@ async function start(): Promise<void> {
     scanning.value = true;
     tick();
   } catch {
-    ui.warning('Không mở được camera', 'Hãy cho phép quyền camera hoặc nhập mã bằng tay.');
+    ui.warning(t('qr.cameraFailed'), t('qr.cameraPerm'));
   }
 }
 
@@ -81,9 +82,9 @@ async function readFromImage(event: Event): Promise<void> {
     const image = ctx.getImageData(0, 0, c.width, c.height);
     const found = jsQR(image.data, image.width, image.height);
     if (found?.data) emit('scanned', found.data.trim());
-    else ui.warning('Không tìm thấy mã QR trong ảnh', 'Hãy thử ảnh rõ hơn hoặc nhập mã bằng tay.');
+    else ui.warning(t('qr.notFound'), t('qr.retry'));
   } catch {
-    ui.warning('Không đọc được ảnh', 'Hãy nhập mã lịch hẹn bằng tay.');
+    ui.warning(t('qr.unreadable'), t('qr.typeCode'));
   }
 }
 
@@ -103,7 +104,7 @@ onBeforeUnmount(stop);
         class="absolute inset-0 grid place-items-center text-[12px]"
         style="color: var(--color-neutral-600)"
       >
-        Xem trước camera · camera preview
+        {{ $t('qr.preview') }}
       </p>
 
       <!-- Bon goc ngam, dung do day va bo tron cua ban thiet ke -->
@@ -130,7 +131,7 @@ onBeforeUnmount(stop);
         style="min-height: 44px"
         @click="start"
       >
-        Bật camera
+        {{ $t('qr.startCamera') }}
       </button>
       <button
         v-else
@@ -139,11 +140,11 @@ onBeforeUnmount(stop);
         style="min-height: 44px"
         @click="stop"
       >
-        Tắt camera
+        {{ $t('qr.stopCamera') }}
       </button>
 
       <label class="btn btn-secondary cursor-pointer text-[12.5px]" style="min-height: 44px">
-        Tải ảnh QR lên
+        {{ $t('qr.uploadImage') }}
         <input type="file" class="sr-only" accept="image/*" @change="readFromImage" />
       </label>
     </div>

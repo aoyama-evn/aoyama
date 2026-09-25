@@ -13,6 +13,7 @@ const props = withDefaults(
 );
 const emit = defineEmits<{ (e: 'update:modelValue', v: string[]): void }>();
 
+const { t } = useI18n();
 const ui = useUiStore();
 const dragging = ref(false);
 const ACCEPT = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
@@ -25,18 +26,18 @@ async function handleFiles(files: FileList | null): Promise<void> {
   if (!files) return;
   const room = props.max - props.modelValue.length;
   if (room <= 0) {
-    ui.warning(`Chỉ tải được tối đa ${props.max} ảnh`);
+    ui.warning(t('upload.tooMany', { max: props.max }));
     return;
   }
 
   const accepted: string[] = [];
   for (const file of Array.from(files).slice(0, room)) {
     if (!ACCEPT.includes(file.type)) {
-      ui.warning('Chỉ nhận ảnh JPG, PNG, WebP hoặc HEIC', file.name);
+      ui.warning(t('upload.badImage'), file.name);
       continue;
     }
     if (file.size > props.maxSizeMb * 1024 * 1024) {
-      ui.warning(`Ảnh vượt quá ${props.maxSizeMb} MB`, file.name);
+      ui.warning(t('upload.imageTooBig', { mb: props.maxSizeMb }), file.name);
       continue;
     }
     accepted.push(await readAsDataUrl(file));
@@ -85,14 +86,14 @@ function remove(index: number): void {
       @dragleave.prevent="dragging = false"
       @drop.prevent="dragging = false; handleFiles($event.dataTransfer?.files ?? null)"
     >
-      <p class="text-[13.5px] text-muted">Kéo thả ảnh vào đây hoặc</p>
+      <p class="text-[13.5px] text-muted">{{ $t('upload.dropHere') }}</p>
       <label class="btn btn-secondary text-[12.5px] mt-2 cursor-pointer">
-        Chọn ảnh
+        {{ $t('upload.pickImage') }}
         <input type="file" class="sr-only" multiple :accept="ACCEPT.join(',')"
           @change="handleFiles(($event.target as HTMLInputElement).files)">
       </label>
       <p class="mt-2 text-[11.5px] text-muted">
-        Tối đa {{ max }} ảnh, mỗi ảnh dưới {{ maxSizeMb }} MB
+        {{ $t('upload.imageLimit', { max, mb: maxSizeMb }) }}
       </p>
     </div>
 
@@ -102,7 +103,7 @@ function remove(index: number): void {
         <button
           type="button"
           class="absolute -right-1.5 -top-1.5 grid h-6 w-6 place-items-center rounded-full bg-neutral-900 text-white"
-          :aria-label="`Xóa ảnh ${index + 1}`"
+          :aria-label="$t('upload.removeImage', { n: index + 1 })"
           @click="remove(index)"
         >
           ×

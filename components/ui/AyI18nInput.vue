@@ -44,7 +44,7 @@ function isEmpty(code: LanguageCode): boolean {
         @click="active = tab.code"
       >
         {{ tab.label }}
-        <span v-if="isEmpty(tab.code)" class="text-danger" aria-label="chưa nhập">•</span>
+        <span v-if="isEmpty(tab.code)" class="text-danger" :aria-label="$t('ui.notEntered')">•</span>
       </button>
     </div>
 
