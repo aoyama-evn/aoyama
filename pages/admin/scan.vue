@@ -10,21 +10,19 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const api = useApi();
 const ui = useUiStore();
+const { t, te } = useI18n();
 const { i18n, dayLabel, clock } = useFormat();
 
-setScreenTitle('Quét mã QR');
+setScreenTitle(() => t('sa07.title'));
 
 const result = ref<QrScanResult | null>(null);
 const checking = ref(false);
 const manualCode = ref('');
 
-const REASON_HINTS: Record<string, string> = {
-  NOT_FOUND: 'Kiểm tra lại mã hoặc tra cứu theo số điện thoại khách.',
-  CANCELLED: 'Lịch hẹn này đã bị hủy. Hỏi khách có muốn đặt lại không.',
-  ALREADY_RECEIVED: 'Xe đã được tiếp nhận trước đó. Mở phiếu dịch vụ để xem tiến độ.',
-  EXPIRED: 'Mã QR quá 24 tiếng kể từ giờ hẹn. Tạo lịch hẹn mới cho khách.',
-  NOT_CONFIRMED: 'Lịch hẹn chưa được xác nhận. Vào chi tiết lịch hẹn để xác nhận trước.',
-};
+/** Goi y xu ly cho tung ly do tu choi; ly do la khoa dung chung ba thu tieng. */
+function reasonHint(reason: string): string {
+  return te(`sa07.reason.${reason}`) ? t(`sa07.reason.${reason}`) : '';
+}
 
 /**
  * Nam lan quet gan nhat la tien ich cua rieng may tinh o quay, khong phai du
@@ -68,7 +66,7 @@ async function check(payload: { token?: string; code?: string }): Promise<void> 
       valid: scanned.valid,
       bookingId: scanned.booking?.id ?? null,
     });
-    if (scanned.valid) ui.success('Mã hợp lệ', 'Có thể tiếp nhận xe.');
+    if (scanned.valid) ui.success(t('sa07.validToast'), t('sa07.validToastSub'));
   } catch (error) {
     ui.error(normalizeError(error).message);
   } finally {
@@ -80,7 +78,7 @@ function submitManual(): void {
   if (manualCode.value.trim()) check({ code: manualCode.value.trim().toUpperCase() });
 }
 
-useHead({ title: 'Quét mã QR — AOYAMA Admin' });
+useHead({ title: () => `${t('sa07.title')} — AOYAMA Admin` });
 </script>
 
 <template>
@@ -90,24 +88,24 @@ useHead({ title: 'Quét mã QR — AOYAMA Admin' });
       style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); max-width: 1040px"
     >
       <section class="card gap-3" style="background: #fff">
-        <h5>Quét mã QR của khách</h5>
+        <h5>{{ $t('sa07.scanTitle') }}</h5>
         <AyQrScanner @scanned="check({ token: $event })" />
         <p class="text-muted text-[11.5px]">
-          Quét bằng webcam hoặc đầu đọc mã vạch gắn tại quầy.
+          {{ $t('sa07.scanHint') }}
         </p>
       </section>
 
       <div class="flex flex-col gap-3.5">
         <section class="card gap-2.5" style="background: #fff">
-          <h5>Nhập mã thủ công</h5>
-          <p class="text-muted text-[12.5px]">Dùng khi không quét được mã QR.</p>
+          <h5>{{ $t('sa07.manual') }}</h5>
+          <p class="text-muted text-[12.5px]">{{ $t('sa07.manualHint') }}</p>
           <div class="flex flex-wrap gap-2.5">
             <input
               v-model="manualCode"
               class="input min-w-[180px] flex-1"
               placeholder="B-YYYYMMDD-nnnn"
               autocomplete="off"
-              aria-label="Mã lịch hẹn"
+              :aria-label="$t('sc20.codeLabel')"
               @keyup.enter="submitManual"
             />
             <button
@@ -117,7 +115,7 @@ useHead({ title: 'Quét mã QR — AOYAMA Admin' });
               :disabled="!manualCode.trim() || checking"
               @click="submitManual"
             >
-              Tra cứu
+              {{ $t('sa07.lookup') }}
             </button>
           </div>
         </section>
@@ -127,13 +125,13 @@ useHead({ title: 'Quét mã QR — AOYAMA Admin' });
           class="card gap-2.5"
           style="background: #fff; padding: 0; overflow: hidden"
         >
-          <div style="padding: 14px 16px 0"><h5>5 lần quét gần nhất</h5></div>
+          <div style="padding: 14px 16px 0"><h5>{{ $t('sa07.recent') }}</h5></div>
           <table class="table">
             <thead>
               <tr>
-                <th style="white-space: nowrap">Mã lịch hẹn</th>
-                <th>Khách</th>
-                <th>Kết quả</th>
+                <th style="white-space: nowrap">{{ $t('sc20.codeLabel') }}</th>
+                <th>{{ $t('sa02.colCustomer') }}</th>
+                <th>{{ $t('sa07.colResult') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -147,7 +145,7 @@ useHead({ title: 'Quét mã QR — AOYAMA Admin' });
                 <td>{{ entry.name }}</td>
                 <td>
                   <span class="tag" :class="entry.valid ? 'tag-success' : 'tag-danger'">
-                    {{ entry.valid ? 'Hợp lệ' : 'Không hợp lệ' }}
+                    {{ entry.valid ? $t('sa07.valid') : $t('sa07.invalid') }}
                   </span>
                 </td>
               </tr>
@@ -157,7 +155,7 @@ useHead({ title: 'Quét mã QR — AOYAMA Admin' });
       </div>
     </div>
 
-    <AyLoading v-if="checking" label="Đang kiểm tra mã…" />
+    <AyLoading v-if="checking" :label="$t('sa07.checking')" />
 
     <section v-else-if="result" class="card gap-3" style="background: #fff; max-width: 1040px">
       <div
@@ -166,9 +164,11 @@ useHead({ title: 'Quét mã QR — AOYAMA Admin' });
       >
         <span class="text-[18px]" aria-hidden="true">{{ result.valid ? '✓' : '!' }}</span>
         <div>
-          <p class="font-semibold">{{ result.valid ? 'Mã hợp lệ' : result.message }}</p>
+          <p class="font-semibold">
+            {{ result.valid ? $t('sa07.validToast') : result.message }}
+          </p>
           <p v-if="!result.valid && result.reason" class="text-[12.5px] opacity-90">
-            {{ REASON_HINTS[result.reason] }}
+            {{ reasonHint(result.reason) }}
           </p>
         </div>
       </div>
@@ -176,35 +176,35 @@ useHead({ title: 'Quét mã QR — AOYAMA Admin' });
       <template v-if="result.booking">
         <dl class="grid gap-2.5 text-[14px] sm:grid-cols-2">
           <div>
-            <dt class="text-muted text-[12px]">Mã lịch hẹn</dt>
+            <dt class="text-muted text-[12px]">{{ $t('sc20.codeLabel') }}</dt>
             <dd class="font-mono">{{ result.booking.code }}</dd>
           </div>
           <div>
-            <dt class="text-muted text-[12px]">Thời gian hẹn</dt>
+            <dt class="text-muted text-[12px]">{{ $t('sa07.when') }}</dt>
             <dd>
               {{ dayLabel(result.booking.scheduledAt) }} · {{ clock(result.booking.slotStartTime) }}
             </dd>
           </div>
           <div>
-            <dt class="text-muted text-[12px]">Khách hàng</dt>
+            <dt class="text-muted text-[12px]">{{ $t('sa03.colCustomer') }}</dt>
             <dd>{{ result.booking.contactName }} · {{ result.booking.contactPhone }}</dd>
           </div>
           <div>
-            <dt class="text-muted text-[12px]">Cửa hàng</dt>
+            <dt class="text-muted text-[12px]">{{ $t('sa03.colStore') }}</dt>
             <dd>{{ i18n(result.booking.store?.name ?? null) }}</dd>
           </div>
           <div class="sm:col-span-2">
-            <dt class="text-muted text-[12px]">Xe</dt>
+            <dt class="text-muted text-[12px]">{{ $t('sa03.colVehicle') }}</dt>
             <dd>
               {{
                 result.booking.vehicle
                   ? `${result.booking.vehicle.plateNumber} · ${result.booking.vehicle.maker} ${result.booking.vehicle.model}`
-                  : 'Chưa khai báo'
+                  : $t('common.notDeclared')
               }}
             </dd>
           </div>
           <div v-if="result.booking.symptomDescription" class="sm:col-span-2">
-            <dt class="text-muted text-[12px]">Mô tả của khách</dt>
+            <dt class="text-muted text-[12px]">{{ $t('sa07.symptom') }}</dt>
             <dd class="whitespace-pre-line">{{ result.booking.symptomDescription }}</dd>
           </div>
         </dl>
@@ -215,7 +215,7 @@ useHead({ title: 'Quét mã QR — AOYAMA Admin' });
             class="btn btn-secondary text-[13px]"
             style="min-height: 46px"
           >
-            Mở chi tiết lịch hẹn
+            {{ $t('sa07.openBooking') }}
           </NuxtLink>
           <NuxtLink
             v-if="result.valid"
@@ -223,7 +223,7 @@ useHead({ title: 'Quét mã QR — AOYAMA Admin' });
             class="btn btn-primary text-[13px]"
             style="min-height: 46px"
           >
-            Tiếp nhận xe →
+            {{ $t('sa07.receiveCta') }}
           </NuxtLink>
         </div>
       </template>

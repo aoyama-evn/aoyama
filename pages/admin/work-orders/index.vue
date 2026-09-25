@@ -8,6 +8,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 const api = useApi();
 const ui = useUiStore();
 const route = useRoute();
+const { t } = useI18n();
 const { money, dateTime } = useFormat();
 
 const filters = reactive({
@@ -41,48 +42,53 @@ function reset(): void {
   page.value = 1;
 }
 
-const COLUMNS = [
-  { key: 'code', label: 'Mã phiếu', width: '160px' },
-  { key: 'createdAt', label: 'Tiếp nhận', width: '150px' },
-  { key: 'customer', label: 'Khách hàng' },
-  { key: 'vehicle', label: 'Xe' },
-  { key: 'status', label: 'Trạng thái', width: '150px' },
-  { key: 'paymentStatus', label: 'Thanh toán', width: '160px' },
-  { key: 'totalAmount', label: 'Tổng tiền', align: 'right' as const, width: '120px' },
-];
+const COLUMNS = computed(() => [
+  { key: 'code', label: t('sa09.colCode'), width: '160px' },
+  { key: 'createdAt', label: t('sa09.colIntake'), width: '150px' },
+  { key: 'customer', label: t('sa03.colCustomer') },
+  { key: 'vehicle', label: t('sa03.colVehicle') },
+  { key: 'status', label: t('sa02.colStatus'), width: '150px' },
+  { key: 'paymentStatus', label: t('sa09.colPayment'), width: '160px' },
+  { key: 'totalAmount', label: t('sa09.colTotal'), align: 'right' as const, width: '120px' },
+]);
 
-useHead({ title: 'Phiếu dịch vụ — AOYAMA Admin' });
+setScreenTitle(() => t('sa09.title'));
+useHead({ title: () => `${t('sa09.title')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div class="flex flex-col gap-[15px]">
     <AdminStoreBar />
 
-    <AyPageHeader code="SA-09" title="Phiếu dịch vụ">
+    <AyPageHeader code="SA-09" :title="$t('sa09.title')">
       <template #actions>
-        <AyButton to="/admin/scan" variant="secondary" size="sm">Quét mã tiếp nhận</AyButton>
+        <AyButton to="/admin/scan" variant="secondary" size="sm">{{ $t('sa09.scanCta') }}</AyButton>
       </template>
     </AyPageHeader>
 
     <AyFilterBar :has-active-filters="hasFilters" @reset="reset">
-      <AyField label="Từ khóa" class="min-w-[200px] flex-1">
+      <AyField :label="$t('common.keyword')" class="min-w-[200px] flex-1">
         <template #default="{ id }">
           <input :id="id" v-model="filters.keyword" class="input" type="search" placeholder="Mã phiếu, tên khách, biển số">
         </template>
       </AyField>
-      <AyField label="Trạng thái phiếu">
+      <AyField :label="$t('sa02.colStatus')">
         <template #default="{ id }">
           <select :id="id" v-model="filters.status" class="input">
-            <option value="">Tất cả</option>
-            <option v-for="s in Object.values(WorkOrderStatus)" :key="s" :value="s">{{ s }}</option>
+            <option value="">{{ $t('common.all') }}</option>
+            <option v-for="s in Object.values(WorkOrderStatus)" :key="s" :value="s">
+              {{ $t(`status.${s}`) }}
+            </option>
           </select>
         </template>
       </AyField>
-      <AyField label="Thanh toán">
+      <AyField :label="$t('sa09.colPayment')">
         <template #default="{ id }">
           <select :id="id" v-model="filters.paymentStatus" class="input">
-            <option value="">Tất cả</option>
-            <option v-for="s in Object.values(PaymentStatus)" :key="s" :value="s">{{ s }}</option>
+            <option value="">{{ $t('common.all') }}</option>
+            <option v-for="s in Object.values(PaymentStatus)" :key="s" :value="s">
+              {{ $t(`status.${s}`) }}
+            </option>
           </select>
         </template>
       </AyField>
@@ -93,7 +99,7 @@ useHead({ title: 'Phiếu dịch vụ — AOYAMA Admin' });
       :rows="data?.items ?? []"
       :meta="data?.meta ?? null"
       :loading="pending"
-      empty-title="Không có phiếu dịch vụ nào khớp bộ lọc"
+      :empty-title="$t('sa09.empty')"
       @update:page="page = $event"
       @row-click="navigateTo(`/admin/work-orders/${$event.id}`)"
     >
