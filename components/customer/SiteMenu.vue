@@ -5,6 +5,7 @@
  */
 const menu = useSiteMenu();
 const auth = useAuthStore();
+const overlayTarget = useOverlayTarget();
 
 type Item = { to: string; label: string; icon: string };
 
@@ -41,11 +42,11 @@ async function signOut(): Promise<void> {
 </script>
 
 <template>
-  <Teleport to="body">
+  <Teleport :to="overlayTarget">
     <Transition name="ay-drawer">
       <div
         v-if="menu.isOpen.value"
-        class="fixed inset-0 z-[60] flex justify-end"
+        class="ay-overlay z-[60] flex justify-end"
         style="background: rgba(32, 30, 29, 0.5)"
         role="dialog"
         aria-modal="true"

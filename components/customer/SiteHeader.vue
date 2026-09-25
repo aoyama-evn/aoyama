@@ -18,7 +18,7 @@ function onLangChange(event: Event): void {
 
 <template>
   <header
-    class="ay-safe-top sticky top-0 z-40"
+    class="ay-safe-top flex-none"
     style="background: var(--color-bg); border-bottom: 1px solid var(--color-divider)"
   >
     <div class="sp-shell flex items-center gap-2.5 px-4 py-2">

@@ -19,6 +19,8 @@ const props = withDefaults(
 
 const emit = defineEmits<{ (e: 'confirm'): void; (e: 'cancel'): void }>();
 
+const overlayTarget = useOverlayTarget();
+
 const typed = ref('');
 const canConfirm = computed(() => !props.confirmPhrase || typed.value.trim() === props.confirmPhrase);
 
@@ -26,10 +28,11 @@ watch(() => props.open, (open) => { if (open) typed.value = ''; });
 </script>
 
 <template>
-  <Teleport to="body">
+  <Teleport :to="overlayTarget">
     <div
       v-if="open"
-      class="fixed inset-0 z-50 grid place-items-center bg-black/40 px-4"
+      class="ay-overlay z-50 grid place-items-center px-4"
+      style="background: rgb(32 30 29 / 50%)"
       role="dialog"
       aria-modal="true"
       @click.self="emit('cancel')"

@@ -1,17 +1,22 @@
 <script setup lang="ts">
+import { SCREEN_ID } from '~/composables/useOverlayTarget';
+
 /**
- * Bo cuc cho SC-10. Ban thiet ke ve man hinh tro chuyen chiem tron chieu cao
- * khung: dau trang o tren, khung tin nhan cuon o giua, o soan ghim duoi — nen
- * khong dung dem va chan trang cua bo cuc thuong.
+ * Bo cuc cho SC-10. Van la khung dien thoai nhu bo cuc thuong, nhung man hinh
+ * tro chuyen tu lo phan cuon cua no (dai tro ly o tren, o soan ghim duoi), nen
+ * o day khong boc them lop cuon nao nua.
  */
 </script>
 
 <template>
-  <div class="flex h-[100dvh] flex-col">
-    <SiteHeader />
-    <main class="sp-shell flex min-h-0 w-full flex-1 flex-col">
-      <slot />
-    </main>
-    <SiteMenu />
+  <div class="ay-device">
+    <div class="ay-device-frame">
+      <div :id="SCREEN_ID" class="ay-device-screen">
+        <PhoneStatusBar class="ay-device-statusbar" />
+        <SiteHeader />
+        <slot />
+        <SiteMenu />
+      </div>
+    </div>
   </div>
 </template>

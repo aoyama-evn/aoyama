@@ -25,7 +25,7 @@
     --color-danger-bg: #fbeae8;
 
     /** Be rong cot noi dung site khach hang — khung dien thoai 392px cua ban thiet ke. */
-    --sp-width: 430px;
+    --sp-width: 392px;
   }
 
   /**
@@ -180,6 +180,99 @@
     margin-inline: auto;
     width: 100%;
     max-width: var(--sp-width);
+  }
+
+  /* ---------- Khung dien thoai cua site khach hang ---------- */
+
+  /**
+   * Ban thiet ke ve toan bo site khach hang trong mot khung dien thoai 392px.
+   * Tren dien thoai that thi khong ve khung: ung dung chiem tron man hinh.
+   * Tu 560px tro len moi dung khung, de xem tren may tinh giong nhu cam dien
+   * thoai tren tay — cung la cach ban thiet ke trinh bay.
+   */
+  .ay-device {
+    display: flex;
+    min-height: 100dvh;
+    flex-direction: column;
+  }
+
+  /**
+   * Duoi 560px khong ve vien may, nhung van phai la mot cot co gian de man hinh
+   * ben trong cao het khung nhin — khong co no thi vung cuon bi cat mat.
+   */
+  .ay-device-frame {
+    display: flex;
+    min-height: 0;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  .ay-device-screen {
+    position: relative;
+    display: flex;
+    min-height: 0;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--color-bg);
+  }
+
+  /** Vung cuon cua man hinh — dau trang va thanh trang thai dung yen o tren. */
+  .ay-device-scroll {
+    position: relative;
+    min-height: 0;
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /** Thanh trang thai chi co y nghia khi dang ve khung may. */
+  .ay-device-statusbar {
+    display: none;
+  }
+
+  @media (min-width: 560px) {
+    /* Nen quanh khung may — dat tren chinh khoi nay de khong dung toi body. */
+    .ay-device {
+      min-height: 100dvh;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-neutral-200);
+      padding: 24px 16px;
+    }
+
+    .ay-device-frame {
+      display: block;
+      width: 392px;
+      flex: none;
+      border-radius: 46px;
+      background: var(--color-neutral-900);
+      padding: 11px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .ay-device-screen {
+      height: min(772px, calc(100dvh - 70px));
+      min-height: 0;
+      flex: none;
+      border-radius: 36px;
+    }
+
+    .ay-device-statusbar {
+      display: flex;
+    }
+  }
+
+  /**
+   * Lop phu cua site khach hang nam gon trong khung may: khi duoc dua vao
+   * #ay-screen thi doi tu fixed sang absolute de khong tran ra ngoai vien.
+   */
+  .ay-overlay {
+    position: fixed;
+    inset: 0;
+  }
+  .ay-device-screen .ay-overlay {
+    position: absolute;
   }
 
   /** Bang cua ung dung co the bam vao tung dong. */

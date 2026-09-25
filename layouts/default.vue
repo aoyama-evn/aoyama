@@ -1,18 +1,32 @@
 <script setup lang="ts">
+import { SCREEN_ID } from '~/composables/useOverlayTarget';
+
 /**
  * Bo cuc site khach hang.
- * Ban thiet ke ve theo khung dien thoai 392px, nen noi dung giu mot cot hep
- * can giua tren man hinh rong — dung ty le va nhip cua ban thiet ke.
+ *
+ * Ban thiet ke ve toan bo site nay trong mot khung dien thoai 392 × 772: thanh
+ * trang thai va dau trang dung yen o tren, chi phan noi dung cuon. Tren dien
+ * thoai that khung bien mat va ung dung chiem tron man hinh (xem .ay-device
+ * trong main.css).
  */
 </script>
 
 <template>
-  <div class="flex min-h-screen flex-col">
-    <SiteHeader />
-    <main class="sp-shell w-full flex-1 px-4 py-4">
-      <slot />
-    </main>
-    <SiteFooter />
-    <SiteMenu />
+  <div class="ay-device">
+    <div class="ay-device-frame">
+      <div :id="SCREEN_ID" class="ay-device-screen">
+        <PhoneStatusBar class="ay-device-statusbar" />
+        <SiteHeader />
+
+        <div class="ay-device-scroll">
+          <main class="sp-shell w-full px-4 py-4">
+            <slot />
+          </main>
+          <SiteFooter />
+        </div>
+
+        <SiteMenu />
+      </div>
+    </div>
   </div>
 </template>
