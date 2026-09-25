@@ -178,6 +178,19 @@
     "services": "Dịch vụ",
     "stores": "Cửa hàng"
   },
+  "notifEvent": {
+    "ADMIN_PASSWORD_RESET": "Đặt lại mật khẩu quản trị",
+    "BOOKING_CANCELLED": "Đã hủy lịch hẹn",
+    "BOOKING_CONFIRMED": "Đã xác nhận lịch hẹn",
+    "BOOKING_CREATED": "Đã nhận yêu cầu đặt lịch",
+    "BOOKING_REMINDER": "Nhắc lịch hẹn",
+    "BOOKING_RESCHEDULED": "Đã đổi lịch hẹn",
+    "MAINTENANCE_DUE": "Đến kỳ bảo dưỡng",
+    "OTP": "Mã xác thực",
+    "QUOTATION_SENT": "Gửi báo giá",
+    "VEHICLE_DELIVERED": "Đã bàn giao xe",
+    "WORK_ORDER_COMPLETED": "Xe đã sửa xong"
+  },
   "part": {
     "noResult": "Không tìm thấy phụ tùng phù hợp.",
     "search": "Tìm phụ tùng",
@@ -984,6 +997,44 @@
     "startAria": "Giờ bắt đầu",
     "title": "Khung giờ & năng lực tiếp nhận"
   },
+  "sa36": {
+    "byDay": "Lịch hẹn theo ngày",
+    "byStatus": "Lịch hẹn theo trạng thái",
+    "cancelRate": "Tỷ lệ hủy",
+    "dayTip": "{date}: {n} lịch hẹn",
+    "emptyDays": "Chưa có lịch hẹn trong khoảng này",
+    "hours": "{n} giờ",
+    "noShowRate": "Tỷ lệ khách không đến",
+    "notEnough": "chưa đủ dữ liệu",
+    "partsCta": "Phụ tùng",
+    "revenue": "Doanh thu kỳ này",
+    "revenueCta": "Doanh thu",
+    "title": "Báo cáo tổng hợp",
+    "totalBookings": "Tổng lịch hẹn",
+    "turnaround": "Thời gian xử lý trung bình:",
+    "workOrders": "Phiếu dịch vụ"
+  },
+  "sa37": {
+    "byDay": "Doanh thu theo ngày",
+    "byMethod": "Theo hình thức thanh toán",
+    "colOrders": "Số phiếu",
+    "colRevenue": "Doanh thu",
+    "dayDetail": "Chi tiết theo ngày",
+    "dayTip": "{date}: {amount} · {n} phiếu",
+    "emptyDays": "Chưa có khoản thu nào trong khoảng này",
+    "shareOf": "{n}% tổng",
+    "title": "Báo cáo doanh thu",
+    "total": "Tổng doanh thu"
+  },
+  "sa38": {
+    "headTitle": "Báo cáo phụ tùng",
+    "lowStock": "Phụ tùng sắp hết ({n})",
+    "noUsage": "Chưa có phụ tùng nào được sử dụng trong khoảng này",
+    "restock": "Nhập kho",
+    "stockOk": "Tồn kho đang ở mức an toàn",
+    "title": "Báo cáo phụ tùng & tồn kho",
+    "topUsed": "Phụ tùng dùng nhiều nhất"
+  },
   "sa39": {
     "active": "Hoạt động",
     "addCta": "Thêm tài khoản",
@@ -1033,6 +1084,39 @@
     "storeLabel": "Cửa hàng phụ trách",
     "uiLang": "Ngôn ngữ giao diện",
     "usernameHint": "Không đổi được sau khi tạo"
+  },
+  "sa41": {
+    "badVariable": "Biến không hợp lệ sẽ hiện thành chuỗi rỗng: {list}",
+    "body": "Nội dung",
+    "editTitle": "Sửa mẫu thông báo",
+    "inUse": "Đang dùng",
+    "lead": "Mỗi sự kiện có mẫu riêng cho từng kênh và ngôn ngữ. Thiếu bản dịch nào, hệ thống lùi về tiếng Nhật.",
+    "logsCta": "Nhật ký gửi",
+    "off": "tắt",
+    "saveCta": "Lưu mẫu",
+    "saved": "Đã lưu mẫu thông báo",
+    "smsHint": "{n} ký tự — tin nhắn dài làm tăng chi phí",
+    "subject": "Tiêu đề",
+    "title": "Mẫu thông báo",
+    "variables": "Biến được phép"
+  },
+  "sa42": {
+    "channel": "Kênh",
+    "detail": "Chi tiết thông báo",
+    "empty": "Chưa có thông báo nào được gửi",
+    "error": "Lỗi",
+    "event": "Sự kiện",
+    "headTitle": "Nhật ký thông báo",
+    "lead": "Mỗi lần gửi đều để lại một dòng, kể cả khi thất bại — dùng để đối soát với nhà cung cấp SMS.",
+    "recipient": "Người nhận",
+    "recipientPlaceholder": "Số điện thoại hoặc email",
+    "result": "Kết quả",
+    "retried": "Đã gửi lại thông báo",
+    "retry": "Gửi lại",
+    "retryCount": "Số lần thử lại",
+    "sentAt": "Gửi lúc",
+    "templatesCta": "Mẫu thông báo",
+    "title": "Nhật ký gửi thông báo"
   },
   "sa43": {
     "lead": "Các ngưỡng nghiệp vụ đọc từ đây trước. Thay đổi có hiệu lực ngay, không cần khởi động lại.",

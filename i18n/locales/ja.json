@@ -178,6 +178,19 @@
     "services": "サービス",
     "stores": "店舗"
   },
+  "notifEvent": {
+    "ADMIN_PASSWORD_RESET": "管理パスワードの再設定",
+    "BOOKING_CANCELLED": "予約をキャンセルしました",
+    "BOOKING_CONFIRMED": "予約を確定しました",
+    "BOOKING_CREATED": "予約を受け付けました",
+    "BOOKING_REMINDER": "予約のリマインド",
+    "BOOKING_RESCHEDULED": "予約の日時を変更しました",
+    "MAINTENANCE_DUE": "点検の時期です",
+    "OTP": "認証コード",
+    "QUOTATION_SENT": "お見積の送信",
+    "VEHICLE_DELIVERED": "車両を引き渡しました",
+    "WORK_ORDER_COMPLETED": "整備が完了しました"
+  },
   "part": {
     "noResult": "該当する部品が見つかりません。",
     "search": "部品を検索",
@@ -984,6 +997,44 @@
     "startAria": "開始時刻",
     "title": "受付枠と受入台数"
   },
+  "sa36": {
+    "byDay": "日別の予約",
+    "byStatus": "状態別の予約",
+    "cancelRate": "キャンセル率",
+    "dayTip": "{date}：{n} 件の予約",
+    "emptyDays": "この期間に予約はありません",
+    "hours": "{n} 時間",
+    "noShowRate": "来店なし率",
+    "notEnough": "データが足りません",
+    "partsCta": "部品",
+    "revenue": "期間の売上",
+    "revenueCta": "売上",
+    "title": "サマリーレポート",
+    "totalBookings": "予約件数",
+    "turnaround": "平均の作業時間：",
+    "workOrders": "整備伝票"
+  },
+  "sa37": {
+    "byDay": "日別の売上",
+    "byMethod": "支払い方法別",
+    "colOrders": "伝票数",
+    "colRevenue": "売上",
+    "dayDetail": "日別の内訳",
+    "dayTip": "{date}：{amount} · {n} 伝票",
+    "emptyDays": "この期間に入金はありません",
+    "shareOf": "全体の{n}%",
+    "title": "売上レポート",
+    "total": "売上合計"
+  },
+  "sa38": {
+    "headTitle": "部品レポート",
+    "lowStock": "在庫の少ない部品（{n}）",
+    "noUsage": "この期間に使われた部品はありません",
+    "restock": "入庫する",
+    "stockOk": "在庫は十分にあります",
+    "title": "部品と在庫のレポート",
+    "topUsed": "使用の多い部品"
+  },
   "sa39": {
     "active": "有効",
     "addCta": "アカウントを追加",
@@ -1033,6 +1084,39 @@
     "storeLabel": "担当店舗",
     "uiLang": "画面の言語",
     "usernameHint": "作成後は変更できません"
+  },
+  "sa41": {
+    "badVariable": "使えない変数は空文字になります：{list}",
+    "body": "本文",
+    "editTitle": "通知テンプレートの編集",
+    "inUse": "使用中",
+    "lead": "イベントごとに、チャネルと言語別のテンプレートがあります。訳がない言語は日本語で送信します。",
+    "logsCta": "送信ログ",
+    "off": "停止中",
+    "saveCta": "テンプレートを保存",
+    "saved": "通知テンプレートを保存しました",
+    "smsHint": "{n} 文字 — 長い本文は送信コストが上がります",
+    "subject": "件名",
+    "title": "通知テンプレート",
+    "variables": "使える変数"
+  },
+  "sa42": {
+    "channel": "チャネル",
+    "detail": "通知の詳細",
+    "empty": "送信された通知はまだありません",
+    "error": "エラー",
+    "event": "イベント",
+    "headTitle": "通知ログ",
+    "lead": "送信のたびに1行残ります。失敗した送信も残るため、SMS事業者との照合に使えます。",
+    "recipient": "宛先",
+    "recipientPlaceholder": "電話番号またはメールアドレス",
+    "result": "結果",
+    "retried": "通知を再送しました",
+    "retry": "再送",
+    "retryCount": "再送回数",
+    "sentAt": "送信日時",
+    "templatesCta": "通知テンプレート",
+    "title": "通知の送信ログ"
   },
   "sa43": {
     "lead": "業務のしきい値はまずここを参照します。変更は再起動なしで即時に反映されます。",

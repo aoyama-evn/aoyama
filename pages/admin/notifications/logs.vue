@@ -7,6 +7,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { dateTime, maskedPhone } = useFormat();
 
 const filters = reactive({ status: '', channel: '', recipient: '', from: '', to: '' });
@@ -33,7 +34,7 @@ const detail = ref<NotificationLog | null>(null);
 async function retry(log: NotificationLog): Promise<void> {
   try {
     await api.post(`/admin/notifications/logs/${log.id}/retry`);
-    ui.success('Đã gửi lại thông báo');
+    ui.success(t('sa42.retried'));
     await refresh();
   } catch (error) {
     ui.error(normalizeError(error).message);
@@ -45,27 +46,28 @@ function reset(): void {
   page.value = 1;
 }
 
-const COLUMNS = [
-  { key: 'createdAt', label: 'Thời điểm', width: '150px' },
-  { key: 'event', label: 'Sự kiện', width: '180px' },
-  { key: 'channel', label: 'Kênh', width: '90px' },
-  { key: 'recipient', label: 'Người nhận', width: '160px' },
-  { key: 'status', label: 'Kết quả', width: '130px' },
-  { key: 'body', label: 'Nội dung' },
+const COLUMNS = computed(() => [
+  { key: 'createdAt', label: t('sa29.colWhen'), width: '150px' },
+  { key: 'event', label: t('sa42.event'), width: '180px' },
+  { key: 'channel', label: t('sa42.channel'), width: '90px' },
+  { key: 'recipient', label: t('sa42.recipient'), width: '160px' },
+  { key: 'status', label: t('sa42.result'), width: '130px' },
+  { key: 'body', label: t('sa41.body') },
   { key: 'actions', label: '', width: '110px' },
-];
+]);
 
-useHead({ title: 'Nhật ký thông báo — AOYAMA Admin' });
+setScreenTitle(() => t('sa42.headTitle'));
+useHead({ title: () => `${t('sa42.headTitle')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
     <AyPageHeader
-      code="SA-42" title="Nhật ký gửi thông báo"
-      description="Mỗi lần gửi đều để lại một dòng, kể cả khi thất bại — dùng để đối soát với nhà cung cấp SMS."
+      code="SA-42" :title="$t('sa42.title')"
+      :description="$t('sa42.lead')"
     >
       <template #actions>
-        <AyButton to="/admin/notifications/templates" variant="secondary" size="sm">Mẫu thông báo</AyButton>
+        <AyButton to="/admin/notifications/templates" variant="secondary" size="sm">{{ $t('sa42.templatesCta') }}</AyButton>
       </template>
     </AyPageHeader>
 
@@ -73,33 +75,33 @@ useHead({ title: 'Nhật ký thông báo — AOYAMA Admin' });
       :has-active-filters="Boolean(filters.status || filters.channel || filters.recipient || filters.from)"
       @reset="reset"
     >
-      <AyField label="Người nhận" class="min-w-[180px]">
+      <AyField :label="$t('sa42.recipient')" class="min-w-[180px]">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.recipient" class="input" type="search" placeholder="Số điện thoại hoặc email">
+          <input :id="id" v-model="filters.recipient" class="input" type="search" :placeholder="$t('sa42.recipientPlaceholder')">
         </template>
       </AyField>
-      <AyField label="Kênh">
+      <AyField :label="$t('sa42.channel')">
         <template #default="{ id }">
           <select :id="id" v-model="filters.channel" class="input">
-            <option value="">Tất cả</option>
+            <option value="">{{ $t('common.all') }}</option>
             <option v-for="c in Object.values(NotificationChannel)" :key="c" :value="c">{{ c }}</option>
           </select>
         </template>
       </AyField>
-      <AyField label="Kết quả">
+      <AyField :label="$t('sa42.result')">
         <template #default="{ id }">
           <select :id="id" v-model="filters.status" class="input">
-            <option value="">Tất cả</option>
+            <option value="">{{ $t('common.all') }}</option>
             <option v-for="s in Object.values(NotificationSendStatus)" :key="s" :value="s">{{ s }}</option>
           </select>
         </template>
       </AyField>
-      <AyField label="Từ ngày">
+      <AyField :label="$t('sa03.fromDate')">
         <template #default="{ id }">
           <input :id="id" v-model="filters.from" class="input" type="date">
         </template>
       </AyField>
-      <AyField label="Đến ngày">
+      <AyField :label="$t('sa03.toDate')">
         <template #default="{ id }">
           <input :id="id" v-model="filters.to" class="input" type="date">
         </template>
@@ -111,7 +113,7 @@ useHead({ title: 'Nhật ký thông báo — AOYAMA Admin' });
       :rows="data?.items ?? []"
       :meta="data?.meta ?? null"
       :loading="pending"
-      empty-title="Chưa có thông báo nào được gửi"
+      :empty-title="$t('sa42.empty')"
       @update:page="page = $event"
       @row-click="detail = $event as unknown as NotificationLog"
     >
@@ -128,28 +130,28 @@ useHead({ title: 'Nhật ký thông báo — AOYAMA Admin' });
           v-if="row.status === 'FAILED'" type="button" class="text-[12.5px] underline"
           @click.stop="retry(row as unknown as NotificationLog)"
         >
-          Gửi lại
+          {{ $t('sa42.retry') }}
         </button>
       </template>
     </AyDataTable>
 
     <AyConfirmDialog
       :open="Boolean(detail)"
-      title="Chi tiết thông báo"
-      confirm-label="Đóng"
-      cancel-label="Đóng"
+      :title="$t('sa42.detail')"
+      :confirm-label="$t('common.close')"
+      :cancel-label="$t('common.close')"
       @confirm="detail = null"
       @cancel="detail = null"
     >
       <dl v-if="detail" class="mt-3 flex flex-col gap-2 text-left text-[13.5px]">
-        <div class="flex justify-between"><dt class="text-muted">Sự kiện</dt><dd class="font-mono">{{ detail.event }}</dd></div>
-        <div class="flex justify-between"><dt class="text-muted">Người nhận</dt><dd>{{ detail.recipient }}</dd></div>
-        <div class="flex justify-between"><dt class="text-muted">Gửi lúc</dt><dd>{{ dateTime(detail.sentAt) || '—' }}</dd></div>
-        <div class="flex justify-between"><dt class="text-muted">Số lần thử lại</dt><dd>{{ detail.retryCount }}</dd></div>
-        <div v-if="detail.subject"><dt class="text-muted">Tiêu đề</dt><dd>{{ detail.subject }}</dd></div>
-        <div><dt class="text-muted">Nội dung</dt><dd class="whitespace-pre-line rounded-xl bg-neutral-100 p-2">{{ detail.body }}</dd></div>
+        <div class="flex justify-between"><dt class="text-muted">{{ $t('sa42.event') }}</dt><dd class="font-mono">{{ detail.event }}</dd></div>
+        <div class="flex justify-between"><dt class="text-muted">{{ $t('sa42.recipient') }}</dt><dd>{{ detail.recipient }}</dd></div>
+        <div class="flex justify-between"><dt class="text-muted">{{ $t('sa42.sentAt') }}</dt><dd>{{ dateTime(detail.sentAt) || '—' }}</dd></div>
+        <div class="flex justify-between"><dt class="text-muted">{{ $t('sa42.retryCount') }}</dt><dd>{{ detail.retryCount }}</dd></div>
+        <div v-if="detail.subject"><dt class="text-muted">{{ $t('sa41.subject') }}</dt><dd>{{ detail.subject }}</dd></div>
+        <div><dt class="text-muted">{{ $t('sa41.body') }}</dt><dd class="whitespace-pre-line rounded-xl bg-neutral-100 p-2">{{ detail.body }}</dd></div>
         <div v-if="detail.errorMessage">
-          <dt class="text-muted">Lỗi</dt>
+          <dt class="text-muted">{{ $t('sa42.error') }}</dt>
           <dd class="text-danger">{{ detail.errorMessage }}</dd>
         </div>
       </dl>

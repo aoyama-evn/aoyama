@@ -6,6 +6,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { i18n, money, number, date: fmtDate } = useFormat();
 
 function defaultRange(): { from: string; to: string } {
@@ -28,26 +29,27 @@ const maxQuantity = computed(() =>
   Math.max(1, ...(data.value?.topUsed ?? []).map((r) => r.quantity)),
 );
 
-useHead({ title: 'Báo cáo phụ tùng — AOYAMA Admin' });
+setScreenTitle(() => t('sa38.headTitle'));
+useHead({ title: () => `${t('sa38.headTitle')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div class="flex flex-col gap-[15px]">
     <AdminStoreBar />
 
-    <AyPageHeader code="SA-38" title="Báo cáo phụ tùng &amp; tồn kho" back-to="/admin/reports">
+    <AyPageHeader code="SA-38" :title="$t('sa38.title')" back-to="/admin/reports">
       <template #actions>
         <AyExportButtons report="parts" :from="range.from" :to="range.to" :store-id="storeId" />
       </template>
     </AyPageHeader>
 
     <AyFilterBar>
-      <AyField label="Từ ngày">
+      <AyField :label="$t('sa03.fromDate')">
         <template #default="{ id }">
           <input :id="id" v-model="range.from" class="input" type="date">
         </template>
       </AyField>
-      <AyField label="Đến ngày">
+      <AyField :label="$t('sa03.toDate')">
         <template #default="{ id }">
           <input :id="id" v-model="range.to" class="input" type="date">
         </template>
@@ -58,11 +60,11 @@ useHead({ title: 'Báo cáo phụ tùng — AOYAMA Admin' });
 
     <template v-else-if="data">
       <section class="card">
-        <h2 class="mb-3 font-heading text-[16px]">Phụ tùng dùng nhiều nhất</h2>
+        <h2 class="mb-3 font-heading text-[16px]">{{ $t('sa38.topUsed') }}</h2>
 
         <AyEmptyState
           v-if="data.topUsed.length === 0"
-          title="Chưa có phụ tùng nào được sử dụng trong khoảng này"
+          :title="$t('sa38.noUsage')"
         />
 
         <ul v-else class="flex flex-col gap-2">
@@ -88,19 +90,19 @@ useHead({ title: 'Báo cáo phụ tùng — AOYAMA Admin' });
 
       <section class="card">
         <h2 class="mb-3 font-heading text-[16px]">
-          Phụ tùng sắp hết ({{ data.lowStock.length }})
+          {{ $t('sa38.lowStock', { n: data.lowStock.length }) }}
         </h2>
 
-        <AyEmptyState v-if="data.lowStock.length === 0" title="Tồn kho đang ở mức an toàn" />
+        <AyEmptyState v-if="data.lowStock.length === 0" :title="$t('sa38.stockOk')" />
 
         <div v-else class="table-wrap !shadow-none">
           <table class="table">
             <thead>
               <tr>
-                <th scope="col">Phụ tùng</th>
-                <th scope="col">Cửa hàng</th>
-                <th scope="col" class="text-right">Tồn</th>
-                <th scope="col" class="text-right">Ngưỡng</th>
+                <th scope="col">{{ $t('sa28.colPart') }}</th>
+                <th scope="col">{{ $t('sa03.colStore') }}</th>
+                <th scope="col" class="text-right">{{ $t('sa28.colQty') }}</th>
+                <th scope="col" class="text-right">{{ $t('sa28.colMin') }}</th>
                 <th scope="col" class="w-24" />
               </tr>
             </thead>
@@ -115,7 +117,7 @@ useHead({ title: 'Báo cáo phụ tùng — AOYAMA Admin' });
                 <td class="text-right">{{ number(row.minQuantity) }}</td>
                 <td>
                   <NuxtLink to="/admin/inventory/transactions" class="text-[12.5px] underline">
-                    Nhập kho
+                    {{ $t('sa38.restock') }}
                   </NuxtLink>
                 </td>
               </tr>

@@ -178,6 +178,19 @@
     "services": "Services",
     "stores": "Stores"
   },
+  "notifEvent": {
+    "ADMIN_PASSWORD_RESET": "Admin password reset",
+    "BOOKING_CANCELLED": "Booking cancelled",
+    "BOOKING_CONFIRMED": "Booking confirmed",
+    "BOOKING_CREATED": "Booking request received",
+    "BOOKING_REMINDER": "Booking reminder",
+    "BOOKING_RESCHEDULED": "Booking rescheduled",
+    "MAINTENANCE_DUE": "Service due",
+    "OTP": "Verification code",
+    "QUOTATION_SENT": "Quotation sent",
+    "VEHICLE_DELIVERED": "Bike delivered",
+    "WORK_ORDER_COMPLETED": "Service completed"
+  },
   "part": {
     "noResult": "No matching parts found.",
     "search": "Find a part",
@@ -984,6 +997,44 @@
     "startAria": "Start time",
     "title": "Time slots & capacity"
   },
+  "sa36": {
+    "byDay": "Bookings by day",
+    "byStatus": "Bookings by status",
+    "cancelRate": "Cancellation rate",
+    "dayTip": "{date}: {n} bookings",
+    "emptyDays": "No bookings in this range",
+    "hours": "{n} hours",
+    "noShowRate": "No-show rate",
+    "notEnough": "not enough data",
+    "partsCta": "Parts",
+    "revenue": "Revenue this period",
+    "revenueCta": "Revenue",
+    "title": "Summary report",
+    "totalBookings": "Total bookings",
+    "turnaround": "Average turnaround:",
+    "workOrders": "Work orders"
+  },
+  "sa37": {
+    "byDay": "Revenue by day",
+    "byMethod": "By payment method",
+    "colOrders": "Work orders",
+    "colRevenue": "Revenue",
+    "dayDetail": "Day-by-day detail",
+    "dayTip": "{date}: {amount} · {n} work orders",
+    "emptyDays": "No payments in this range",
+    "shareOf": "{n}% of total",
+    "title": "Revenue report",
+    "total": "Total revenue"
+  },
+  "sa38": {
+    "headTitle": "Parts report",
+    "lowStock": "Parts running low ({n})",
+    "noUsage": "No parts used in this range",
+    "restock": "Add stock",
+    "stockOk": "Stock levels are healthy",
+    "title": "Parts & stock report",
+    "topUsed": "Most-used parts"
+  },
   "sa39": {
     "active": "Active",
     "addCta": "Add an account",
@@ -1033,6 +1084,39 @@
     "storeLabel": "Store assignment",
     "uiLang": "Interface language",
     "usernameHint": "Cannot be changed after creation"
+  },
+  "sa41": {
+    "badVariable": "Unknown variables render as an empty string: {list}",
+    "body": "Body",
+    "editTitle": "Edit notification template",
+    "inUse": "In use",
+    "lead": "Each event has a template per channel and language. Any missing translation falls back to Japanese.",
+    "logsCta": "Send log",
+    "off": "off",
+    "saveCta": "Save template",
+    "saved": "Notification template saved",
+    "smsHint": "{n} characters — longer messages cost more to send",
+    "subject": "Subject",
+    "title": "Notification templates",
+    "variables": "Available variables"
+  },
+  "sa42": {
+    "channel": "Channel",
+    "detail": "Notification detail",
+    "empty": "No notifications sent yet",
+    "error": "Error",
+    "event": "Event",
+    "headTitle": "Notification log",
+    "lead": "Every send leaves a line, failures included — useful for reconciling with the SMS provider.",
+    "recipient": "Recipient",
+    "recipientPlaceholder": "Phone number or email",
+    "result": "Result",
+    "retried": "Notification resent",
+    "retry": "Resend",
+    "retryCount": "Retry count",
+    "sentAt": "Sent at",
+    "templatesCta": "Notification templates",
+    "title": "Notification send log"
   },
   "sa43": {
     "lead": "Business thresholds are read from here first. Changes take effect immediately, with no restart.",
