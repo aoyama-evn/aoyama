@@ -10,9 +10,10 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { i18n, money, clock, dayLabel } = useFormat();
 
-setScreenTitle('Bảng điều khiển');
+setScreenTitle(() => t('adm.nav.dashboard'));
 
 const storeId = computed(() => ui.activeStoreId ?? undefined);
 const today = new Date().toISOString().slice(0, 10);
@@ -42,12 +43,6 @@ const { data, pending } = await useAsyncData(
   { watch: [storeId] },
 );
 
-const SERVICE_TYPE: Record<string, string> = {
-  MAINTENANCE: 'Bảo dưỡng',
-  REPAIR: 'Sửa chữa',
-  BOTH: 'Cả hai',
-};
-
 /** Bay ngay gan nhat, ke ca ngay khong co doanh thu. */
 const revenueSeries = computed(() => {
   const byDate = new Map(
@@ -60,7 +55,7 @@ const revenueSeries = computed(() => {
   });
 });
 
-useHead({ title: 'Bảng điều khiển — AOYAMA Admin' });
+useHead({ title: () => `${t('adm.nav.dashboard')} — AOYAMA Admin` });
 </script>
 
 <template>
@@ -69,28 +64,30 @@ useHead({ title: 'Bảng điều khiển — AOYAMA Admin' });
   <div v-else-if="data" class="flex flex-col gap-[18px]">
     <AdminStoreBar variant="chips">
       <template #end>
-        <span class="text-muted ml-auto text-[12px]">Hôm nay · {{ dayLabel(today) }}</span>
+        <span class="text-muted ml-auto text-[12px]">
+          {{ $t('sa02.today', { date: dayLabel(today) }) }}
+        </span>
       </template>
     </AdminStoreBar>
 
     <!-- CP-22 the chi so -->
     <div class="grid gap-[13px]" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr))">
       <AyStatCard
-        label="Lịch hẹn hôm nay"
+        :label="$t('sa02.todayBookings')"
         :value="data.stats.todayBookings"
-        hint="theo cửa hàng đang chọn"
+        :hint="$t('sa02.byStore')"
         to="/admin/bookings?range=today"
       />
       <AyStatCard
-        label="Xe đang ở xưởng"
+        :label="$t('sa02.inShop')"
         :value="data.stats.openWorkOrders"
-        :hint="`${data.stats.awaitingQuotation} chờ báo giá`"
+        :hint="$t('sa02.awaitingQuote', { n: data.stats.awaitingQuotation })"
         to="/admin/work-orders"
       />
       <AyStatCard
-        label="Chờ thanh toán"
+        :label="$t('sa02.unpaid')"
         :value="data.stats.unpaidWorkOrders"
-        :hint="money(data.stats.todayRevenue) + ' đã thu hôm nay'"
+        :hint="$t('sa02.collectedToday', { amount: money(data.stats.todayRevenue) })"
         to="/admin/work-orders?paymentStatus=UNPAID"
       />
     </div>
@@ -99,19 +96,24 @@ useHead({ title: 'Bảng điều khiển — AOYAMA Admin' });
       <!-- Lich hen hom nay -->
       <section class="card gap-2.5" style="background: #fff">
         <div class="flex items-baseline justify-between">
-          <h5>Lịch hẹn hôm nay</h5>
-          <NuxtLink to="/admin/bookings" class="btn btn-ghost text-[12px]">Xem tất cả →</NuxtLink>
+          <h5>{{ $t('sa02.todayBookings') }}</h5>
+          <NuxtLink to="/admin/bookings" class="btn btn-ghost text-[12px]">{{ $t('sa02.viewAll') }}</NuxtLink>
         </div>
 
         <AyEmptyState
           v-if="data.todayBookings.items.length === 0"
-          title="Hôm nay chưa có lịch hẹn nào"
+          :title="$t('sa02.noBookings')"
         />
 
         <div v-else class="overflow-x-auto">
           <table class="table" style="min-width: 270px">
             <thead>
-              <tr><th>Giờ</th><th>Khách</th><th>Dịch vụ</th><th>Trạng thái</th></tr>
+              <tr>
+                <th>{{ $t('sa02.colTime') }}</th>
+                <th>{{ $t('sa02.colCustomer') }}</th>
+                <th>{{ $t('sa02.colService') }}</th>
+                <th>{{ $t('sa02.colStatus') }}</th>
+              </tr>
             </thead>
             <tbody>
               <tr
@@ -122,7 +124,7 @@ useHead({ title: 'Bảng điều khiển — AOYAMA Admin' });
               >
                 <td class="whitespace-nowrap tabular-nums">{{ clock(booking.slotStartTime) }}</td>
                 <td>{{ booking.contactName }}</td>
-                <td>{{ SERVICE_TYPE[booking.serviceType] }}</td>
+                <td>{{ $t(`serviceType.${booking.serviceType}`) }}</td>
                 <td><AyStatusTag :status="booking.status" /></td>
               </tr>
             </tbody>
@@ -132,15 +134,15 @@ useHead({ title: 'Bảng điều khiển — AOYAMA Admin' });
 
       <!-- Can xu ly -->
       <section class="card gap-[11px]" style="background: #fff">
-        <h5>Cần xử lý</h5>
+        <h5>{{ $t('sa02.todo') }}</h5>
 
         <NuxtLink to="/admin/bookings?status=PENDING" class="ay-todo">
-          <span>Lịch chờ xác nhận</span>
+          <span>{{ $t('sa02.todoPending') }}</span>
           <span>{{ data.stats.pendingBookings }} →</span>
         </NuxtLink>
 
         <NuxtLink to="/admin/quotations?status=SENT" class="ay-todo">
-          <span>Đang báo giá</span>
+          <span>{{ $t('sa02.todoQuoting') }}</span>
           <span>{{ data.stats.awaitingQuotation }} →</span>
         </NuxtLink>
 
@@ -149,7 +151,7 @@ useHead({ title: 'Bảng điều khiển — AOYAMA Admin' });
           to="/admin/inventory?lowStockOnly=true"
           class="ay-todo"
         >
-          <span>Phụ tùng sắp hết</span>
+          <span>{{ $t('sa02.todoLowStock') }}</span>
           <span>{{ data.stats.lowStockCount }} →</span>
         </NuxtLink>
       </section>
@@ -157,8 +159,8 @@ useHead({ title: 'Bảng điều khiển — AOYAMA Admin' });
 
     <!-- Doanh thu 7 ngay -->
     <section class="card gap-3" style="background: #fff">
-      <h5>Doanh thu 7 ngày gần nhất</h5>
-      <AyBarChart :data="revenueSeries" aria-label="Biểu đồ cột doanh thu 7 ngày gần nhất" />
+      <h5>{{ $t('sa02.revenue7') }}</h5>
+      <AyBarChart :data="revenueSeries" :aria-label="$t('sa02.revenueChart')" />
     </section>
   </div>
 </template>

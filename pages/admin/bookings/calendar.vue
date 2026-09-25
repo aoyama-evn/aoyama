@@ -6,6 +6,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { i18n, date: fmtDate, clock } = useFormat();
 
 const mode = ref<'DAY' | 'WEEK'>('WEEK');
@@ -72,17 +73,17 @@ function shift(step: number): void {
   anchor.value = fmtDate(d, 'yyyy-MM-dd');
 }
 
-useHead({ title: 'Lịch hẹn theo ngày — AOYAMA Admin' });
+useHead({ title: () => `${t('sa04.headTitle')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div class="flex flex-col gap-[15px]">
     <AdminStoreBar />
 
-    <AyPageHeader code="SA-04" title="Lịch hẹn theo ngày / tuần">
+    <AyPageHeader code="SA-04" :title="$t('sa04.title')">
       <template #actions>
-        <AyButton to="/admin/bookings" variant="secondary" size="sm">Xem danh sách</AyButton>
-        <AyButton to="/admin/bookings/new" size="sm">Đặt thay khách</AyButton>
+        <AyButton to="/admin/bookings" variant="secondary" size="sm">{{ $t('sa04.listCta') }}</AyButton>
+        <AyButton to="/admin/bookings/new" size="sm">{{ $t('sa04.newCta') }}</AyButton>
       </template>
     </AyPageHeader>
 
@@ -95,14 +96,14 @@ useHead({ title: 'Lịch hẹn theo ngày — AOYAMA Admin' });
       class="card flex-row flex-wrap items-center gap-3"
       style="background: #fff; padding: 11px 14px"
     >
-      <div class="seg" role="radiogroup" aria-label="Khoảng hiển thị">
+      <div class="seg" role="radiogroup" :aria-label="$t('sa04.range')">
         <label class="seg-opt">
           <input v-model="mode" type="radio" value="DAY" name="calendar-mode" />
-          Ngày
+          {{ $t('sa04.day') }}
         </label>
         <label class="seg-opt">
           <input v-model="mode" type="radio" value="WEEK" name="calendar-mode" />
-          Tuần
+          {{ $t('sa04.week') }}
         </label>
       </div>
 
@@ -110,7 +111,7 @@ useHead({ title: 'Lịch hẹn theo ngày — AOYAMA Admin' });
         <button
           type="button"
           class="btn btn-secondary btn-icon"
-          :aria-label="mode === 'WEEK' ? 'Tuần trước' : 'Ngày trước'"
+          :aria-label="mode === 'WEEK' ? $t('sa04.prevWeek') : $t('sa04.prevDay')"
           @click="shift(-1)"
         >
           ←
@@ -119,12 +120,12 @@ useHead({ title: 'Lịch hẹn theo ngày — AOYAMA Admin' });
           v-model="anchor"
           class="input h-9 w-auto min-h-0 py-1 text-[13px]"
           type="date"
-          aria-label="Ngày xem"
+          :aria-label="$t('sa04.pickDate')"
         />
         <button
           type="button"
           class="btn btn-secondary btn-icon"
-          :aria-label="mode === 'WEEK' ? 'Tuần sau' : 'Ngày sau'"
+          :aria-label="mode === 'WEEK' ? $t('sa04.nextWeek') : $t('sa04.nextDay')"
           @click="shift(1)"
         >
           →
@@ -136,7 +137,7 @@ useHead({ title: 'Lịch hẹn theo ngày — AOYAMA Admin' });
         class="btn btn-ghost text-[12.5px]"
         @click="anchor = todayIso()"
       >
-        Hôm nay
+        {{ $t('sa04.today') }}
       </button>
 
       <p class="text-muted ml-auto text-[12.5px]">
@@ -144,9 +145,13 @@ useHead({ title: 'Lịch hẹn theo ngày — AOYAMA Admin' });
           {{ i18n(stores?.find((s) => s.id === storeId)?.name ?? null) }}
         </template>
         <template v-else>
-          Đang xem: {{ i18n(stores?.find((s) => s.id === storeId)?.name ?? null) }}
+          {{
+            $t('sa04.viewing', {
+              store: i18n(stores?.find((s) => s.id === storeId)?.name ?? null),
+            })
+          }}
         </template>
-        · {{ total }} lịch hẹn
+        · {{ $t('sa03.countHint', { n: total }) }}
       </p>
     </div>
 
@@ -156,7 +161,7 @@ useHead({ title: 'Lịch hẹn theo ngày — AOYAMA Admin' });
       <table class="table">
         <thead>
           <tr>
-            <th scope="col" class="w-20">Giờ</th>
+            <th scope="col" class="w-20">{{ $t('sa02.colTime') }}</th>
             <th v-for="d in dateColumns" :key="d" scope="col">
               {{ fmtDate(d, 'MM/dd (EEE)') }}
             </th>

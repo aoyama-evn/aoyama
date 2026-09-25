@@ -15,6 +15,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { i18n, money } = useFormat();
 
 const { data: refs } = await useAsyncData('admin-new-booking-refs', async () => {
@@ -158,7 +159,7 @@ async function submit(): Promise<void> {
       adminNote: form.adminNote.trim() || undefined,
     });
     // BR-12 — lich do nhan vien dat duoc xac nhan ngay, khach nhan SMS kem ma QR.
-    ui.success('Đã tạo và xác nhận lịch hẹn', `Mã ${created.code} — SMS đã gửi cho khách.`);
+    ui.success(t('sa06.created'), t('sa06.createdSub', { code: created.code }));
     await navigateTo(`/admin/bookings/${created.id}`);
   } catch (err) {
     error.value = normalizeError(err);
@@ -173,41 +174,41 @@ function toggleService(id: string): void {
     : [...form.serviceIds, id];
 }
 
-useHead({ title: 'Đặt lịch thay khách — AOYAMA Admin' });
+useHead({ title: () => `${t('sa06.title')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div class="admin-form admin-form-wide">
     <AyPageHeader
-      code="SA-06" title="Đặt lịch thay khách" back-to="/admin/bookings"
-      description="Lịch tạo từ đây được xác nhận ngay và gửi mã QR cho khách."
+      code="SA-06" :title="$t('sa06.title')" back-to="/admin/bookings"
+      :description="$t('sa06.lead')"
     />
 
     <div class="grid gap-4 lg:grid-cols-2">
       <section class="card flex flex-col gap-3" style="background: #fff">
-        <h2 class="font-heading text-[16px]">Khách hàng</h2>
+        <h2 class="font-heading text-[16px]">{{ $t('sa06.customer') }}</h2>
 
-        <AyField label="Số điện thoại" required hint="Nhập để tìm hồ sơ khách đã có">
+        <AyField :label="$t('sc14.phone')" required :hint="$t('sa06.phoneHint')">
           <template #default="{ id }">
             <input :id="id" v-model="form.contactPhone" class="input" type="tel" placeholder="090-1234-5678">
           </template>
         </AyField>
 
         <p v-if="matchedCustomer" class="rounded-xl bg-success-bg px-3 py-2 text-[13px] text-success">
-          Đã tìm thấy hồ sơ: <strong>{{ matchedCustomer.name }}</strong>
-          — lịch sẽ gắn vào hồ sơ này.
+          {{ $t('sa06.matched') }} <strong>{{ matchedCustomer.name }}</strong>
+          {{ $t('sa06.matchedTail') }}
         </p>
         <p v-else-if="form.contactPhone.length >= 8" class="rounded-sm bg-olive-100 px-3 py-2 text-[13px] text-olive-800">
-          Chưa có hồ sơ — hệ thống sẽ tạo mới khi lưu lịch hẹn.
+          {{ $t('sa06.noMatch') }}
         </p>
 
-        <AyField label="Họ tên" required>
+        <AyField :label="$t('sc14.fullName')" required>
           <template #default="{ id }">
             <input :id="id" v-model="form.contactName" class="input" type="text">
           </template>
         </AyField>
 
-        <AyField label="Email">
+        <AyField :label="$t('sc14.email')">
           <template #default="{ id }">
             <input :id="id" v-model="form.contactEmail" class="input" type="email">
           </template>
@@ -215,12 +216,12 @@ useHead({ title: 'Đặt lịch thay khách — AOYAMA Admin' });
       </section>
 
       <section class="card flex flex-col gap-3" style="background: #fff">
-        <h2 class="font-heading text-[16px]">Cửa hàng &amp; dịch vụ</h2>
+        <h2 class="font-heading text-[16px]">{{ $t('sa06.storeAndService') }}</h2>
 
-        <AyField label="Cửa hàng" required>
+        <AyField :label="$t('sa03.colStore')" required>
           <template #default="{ id }">
             <select :id="id" v-model="form.storeId" class="input">
-              <option value="">— Chọn cửa hàng —</option>
+              <option value="">{{ $t('sa06.pickStore') }}</option>
               <option v-for="store in refs?.stores ?? []" :key="store.id" :value="store.id">
                 {{ i18n(store.name) }}
               </option>
@@ -229,7 +230,7 @@ useHead({ title: 'Đặt lịch thay khách — AOYAMA Admin' });
         </AyField>
 
         <div>
-          <span class="label">Dịch vụ</span>
+          <span class="label">{{ $t('sa02.colService') }}</span>
           <ul class="flex max-h-56 flex-col gap-1 overflow-y-auto">
             <li v-for="service in refs?.services ?? []" :key="service.id">
               <label class="flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-[13.5px] hover:bg-accent-100">
@@ -239,7 +240,9 @@ useHead({ title: 'Đặt lịch thay khách — AOYAMA Admin' });
                   @change="toggleService(service.id)"
                 >
                 <span class="flex-1">{{ i18n(service.name) }}</span>
-                <span class="text-muted">{{ service.quoteOnly ? 'báo giá' : money(service.basePrice) }}</span>
+                <span class="text-muted">
+                  {{ service.quoteOnly ? $t('common.quoteOnly') : money(service.basePrice) }}
+                </span>
               </label>
             </li>
           </ul>
@@ -248,7 +251,7 @@ useHead({ title: 'Đặt lịch thay khách — AOYAMA Admin' });
     </div>
 
     <section class="card flex flex-col gap-3" style="background: #fff">
-      <h2 class="font-heading text-[16px]">Thông tin xe</h2>
+      <h2 class="font-heading text-[16px]">{{ $t('sa06.vehicleInfo') }}</h2>
 
       <div v-if="customerVehicles.length" class="flex flex-wrap gap-2">
         <button
@@ -263,7 +266,7 @@ useHead({ title: 'Đặt lịch thay khách — AOYAMA Admin' });
           type="button" class="btn btn-ghost text-[12.5px]"
           @click="selectedVehicleId = ''"
         >
-          Khai báo xe mới
+          {{ $t('sa06.newVehicle') }}
         </button>
       </div>
 
@@ -271,17 +274,17 @@ useHead({ title: 'Đặt lịch thay khách — AOYAMA Admin' });
     </section>
 
     <section class="card" style="background: #fff">
-      <h2 class="mb-3 font-heading text-[16px]">Ngày &amp; khung giờ</h2>
+      <h2 class="mb-3 font-heading text-[16px]">{{ $t('sc23.dateSlot') }}</h2>
       <AySlotPicker v-model="slot" :days="days" :loading="loadingSlots" />
     </section>
 
     <section class="card admin-grid" style="background: #fff">
-      <AyField label="Mô tả tình trạng xe">
+      <AyField :label="$t('sa06.symptom')">
         <template #default="{ id }">
           <textarea :id="id" v-model="form.symptomDescription" class="input min-h-[90px]" />
         </template>
       </AyField>
-      <AyField label="Ghi chú nội bộ">
+      <AyField :label="$t('sa06.internalNote')">
         <template #default="{ id }">
           <textarea :id="id" v-model="form.adminNote" class="input min-h-[90px]" />
         </template>
@@ -291,9 +294,9 @@ useHead({ title: 'Đặt lịch thay khách — AOYAMA Admin' });
     <AyErrorNote :error="error" />
 
     <div class="admin-actions">
-      <AyButton to="/admin/bookings" variant="secondary">Hủy</AyButton>
+      <AyButton to="/admin/bookings" variant="secondary">{{ $t('common.cancel') }}</AyButton>
       <AyButton :disabled="!canSubmit" :loading="submitting" @click="submit">
-        Tạo và xác nhận lịch hẹn
+        {{ $t('sa06.submit') }}
       </AyButton>
     </div>
   </div>

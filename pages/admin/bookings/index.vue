@@ -12,9 +12,10 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 const api = useApi();
 const ui = useUiStore();
 const route = useRoute();
+const { t } = useI18n();
 const { i18n, dayLabel, clock } = useFormat();
 
-setScreenTitle('Lịch hẹn');
+setScreenTitle(() => t('sa03.title'));
 
 const today = new Date().toISOString().slice(0, 10);
 
@@ -50,30 +51,27 @@ const hasFilters = computed(() =>
   Boolean(filters.keyword || filters.status || filters.serviceType || filters.from || filters.to),
 );
 
-const STATUS_LABELS: Record<string, string> = {
-  PENDING: 'Chờ xác nhận',
-  CONFIRMED: 'Đã xác nhận',
-  RECEIVED: 'Đã tiếp nhận',
-  DONE: 'Hoàn tất',
-  CANCELLED: 'Đã hủy',
-  NO_SHOW: 'Khách không đến',
-};
+const STATUS_KEYS = ['PENDING', 'CONFIRMED', 'RECEIVED', 'DONE', 'CANCELLED', 'NO_SHOW'];
 
 /** Dai "Dang loc" chi hien khi bo loc den tu duong dan, khong phai tu nguoi go. */
 const activeLabel = computed(() => {
-  if (filters.status) return `Đang lọc: ${STATUS_LABELS[filters.status] ?? filters.status}`;
-  if (filters.from && filters.from === filters.to) return `Đang lọc: ${dayLabel(filters.from)}`;
+  if (filters.status) {
+    return t('sa03.filtering', { what: t(`status.${filters.status}`) });
+  }
+  if (filters.from && filters.from === filters.to) {
+    return t('sa03.filtering', { what: dayLabel(filters.from) });
+  }
   return undefined;
 });
 
 const activeHint = computed(() =>
-  data.value ? `${data.value.meta.total} lịch hẹn` : undefined,
+  data.value ? t('sa03.countHint', { n: data.value.meta.total }) : undefined,
 );
 
-const STATUS_OPTIONS = [
-  { value: '', label: 'Tất cả' },
-  ...Object.entries(STATUS_LABELS).map(([value, label]) => ({ value, label })),
-];
+const STATUS_OPTIONS = computed(() => [
+  { value: '', label: t('common.all') },
+  ...STATUS_KEYS.map((value) => ({ value, label: t(`status.${value}`) })),
+]);
 
 function reset(): void {
   filters.keyword = '';
@@ -84,23 +82,23 @@ function reset(): void {
   page.value = 1;
 }
 
-const COLUMNS = [
-  { key: 'code', label: 'Mã', width: '130px' },
-  { key: 'scheduledAt', label: 'Thời gian', sortable: true, width: '170px' },
-  { key: 'contactName', label: 'Khách hàng' },
-  { key: 'vehicle', label: 'Xe' },
-  { key: 'store', label: 'Cửa hàng' },
-  { key: 'status', label: 'Trạng thái', width: '150px' },
-];
+const COLUMNS = computed(() => [
+  { key: 'code', label: t('sa03.colCode'), width: '130px' },
+  { key: 'scheduledAt', label: t('sa03.colWhen'), sortable: true, width: '170px' },
+  { key: 'contactName', label: t('sa03.colCustomer') },
+  { key: 'vehicle', label: t('sa03.colVehicle') },
+  { key: 'store', label: t('sa03.colStore') },
+  { key: 'status', label: t('sa02.colStatus'), width: '150px' },
+]);
 
-const SERVICE_TYPES = [
-  { value: '', label: 'Tất cả' },
-  { value: 'MAINTENANCE', label: 'Bảo dưỡng' },
-  { value: 'REPAIR', label: 'Sửa chữa' },
-  { value: 'BOTH', label: 'Cả hai' },
-];
+const SERVICE_TYPES = computed(() => [
+  { value: '', label: t('common.all') },
+  { value: 'MAINTENANCE', label: t('serviceType.MAINTENANCE') },
+  { value: 'REPAIR', label: t('serviceType.REPAIR') },
+  { value: 'BOTH', label: t('serviceType.BOTH') },
+]);
 
-useHead({ title: 'Lịch hẹn — AOYAMA Admin' });
+useHead({ title: () => `${t('sa03.title')} — AOYAMA Admin` });
 </script>
 
 <template>
@@ -113,10 +111,10 @@ useHead({ title: 'Lịch hẹn — AOYAMA Admin' });
         class="btn btn-secondary text-[13px]"
         style="min-height: 44px"
       >
-        Xem dạng lịch
+        {{ $t('sa03.calendarCta') }}
       </NuxtLink>
       <NuxtLink to="/admin/bookings/new" class="btn btn-primary text-[13px]" style="min-height: 44px">
-        + Tạo lịch hẹn
+        {{ $t('sa03.newCta') }}
       </NuxtLink>
     </div>
 
@@ -126,28 +124,28 @@ useHead({ title: 'Lịch hẹn — AOYAMA Admin' });
       :active-hint="activeHint"
       @reset="reset"
     >
-      <AyField label="Tìm kiếm" class="min-w-[210px] max-w-[300px] flex-1">
+      <AyField :label="$t('common.search')" class="min-w-[210px] max-w-[300px] flex-1">
         <template #default="{ id }">
           <input
             :id="id"
             v-model="filters.keyword"
             class="input"
             type="search"
-            placeholder="Tên, SĐT, mã lịch hẹn, xe, biển số"
+            :placeholder="$t('sa03.searchPlaceholder')"
           />
         </template>
       </AyField>
-      <AyField label="Từ ngày" class="min-w-[150px]">
+      <AyField :label="$t('sa03.fromDate')" class="min-w-[150px]">
         <template #default="{ id }">
           <input :id="id" v-model="filters.from" class="input" type="date" />
         </template>
       </AyField>
-      <AyField label="Đến ngày" class="min-w-[150px]">
+      <AyField :label="$t('sa03.toDate')" class="min-w-[150px]">
         <template #default="{ id }">
           <input :id="id" v-model="filters.to" class="input" type="date" />
         </template>
       </AyField>
-      <AyField label="Loại dịch vụ" class="min-w-[160px]">
+      <AyField :label="$t('sa03.serviceKind')" class="min-w-[160px]">
         <template #default="{ id }">
           <select :id="id" v-model="filters.serviceType" class="input">
             <option v-for="item in SERVICE_TYPES" :key="item.value" :value="item.value">
@@ -158,7 +156,7 @@ useHead({ title: 'Lịch hẹn — AOYAMA Admin' });
       </AyField>
 
       <template #chips>
-        <AyChipFilter v-model="filters.status" label="Trạng thái" :options="STATUS_OPTIONS" />
+        <AyChipFilter v-model="filters.status" :label="$t('sa02.colStatus')" :options="STATUS_OPTIONS" />
       </template>
     </AyFilterBar>
 
@@ -169,8 +167,8 @@ useHead({ title: 'Lịch hẹn — AOYAMA Admin' });
       :loading="pending"
       sort-by="scheduledAt"
       :sort-order="sortOrder"
-      empty-title="Không có lịch hẹn nào khớp bộ lọc"
-      empty-hint="Thử mở rộng khoảng ngày hoặc xóa bộ lọc."
+      :empty-title="$t('sa03.emptyTitle')"
+      :empty-hint="$t('sa03.emptyHint')"
       @update:page="page = $event"
       @update:sort="sortOrder = $event.sortOrder"
       @row-click="navigateTo(`/admin/bookings/${$event.id}`)"

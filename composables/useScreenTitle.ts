@@ -4,7 +4,8 @@
  * trang khai bao ten cua minh vao day va thanh tieu de doc ra.
  */
 export function useScreenTitle() {
-  return useState<string>('admin-screen-title', () => 'Trang quản trị');
+  // Chuoi rong = chua trang nao dat ten; CP-05 se dung ten mac dinh cua no.
+  return useState<string>('admin-screen-title', () => '');
 }
 
 /** Goi trong trang quan tri de dat ten hien tren CP-05. */

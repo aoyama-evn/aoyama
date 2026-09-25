@@ -59,7 +59,7 @@ async function logout(): Promise<void> {
       </svg>
     </button>
 
-    <h1 class="font-heading text-[16px]">{{ title }}</h1>
+    <h1 class="font-heading text-[16px]">{{ title || $t('adm.top.default') }}</h1>
 
     <div class="ml-auto flex items-center gap-2.5">
       <NuxtLink
