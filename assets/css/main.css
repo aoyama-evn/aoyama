@@ -234,11 +234,8 @@
     overscroll-behavior: contain;
   }
 
-  /** Thanh trang thai va cac chi tiet vo may chi hien khi dang ve khung. */
-  .ay-device-statusbar,
-  .ay-device-notch,
-  .ay-device-home,
-  .ay-device-btn {
+  /** Thanh trang thai chi co y nghia khi dang ve khung may. */
+  .ay-device-statusbar {
     display: none;
   }
 
@@ -253,11 +250,7 @@
       padding: 16px 16px 24px;
     }
 
-    /**
-     * Vo may: vien ngoai mau kim loai sang, vien trong toi, giua la man hinh.
-     * Ba lop nay la thu lam khung trong giong mot chiec dien thoai that chu
-     * khong phai mot hinh chu nhat bo tron.
-     */
+    /** Vo may: canh ngoai sang, than toi, bong do sau — dung nhu ban thiet ke. */
     .ay-device-frame {
       position: relative;
       display: block;
@@ -281,12 +274,10 @@
     }
 
     .ay-device-screen {
-      height: min(772px, calc(100dvh - 78px));
+      height: min(772px, calc(100dvh - 78px));  /* 16 tren + 24 duoi + 19 x 2 vo */
       min-height: 0;
       flex: none;
       border-radius: 42px;
-      /* Chua cho vach cham nha o day, de noi dung khong de len no. */
-      padding-bottom: 18px;
       box-shadow: inset 0 0 0 1px rgb(22 20 15 / 65%);
     }
 
@@ -294,58 +285,8 @@
       display: flex;
     }
 
-    /* Tai tho dang vien thuoc, de len khoang trong giua thanh trang thai. */
-    .ay-device-notch {
-      display: block;
-      position: absolute;
-      left: 50%;
-      top: 9px;
-      z-index: 5;
-      width: 112px;
-      height: 28px;
-      transform: translateX(-50%);
-      border-radius: 999px;
-      background: var(--ay-device-shell);
-    }
 
-    /* Vach cham nha o day man hinh. */
-    .ay-device-home {
-      display: block;
-      position: absolute;
-      left: 50%;
-      bottom: 7px;
-      z-index: 5;
-      width: 122px;
-      height: 4px;
-      transform: translateX(-50%);
-      border-radius: 999px;
-      background: var(--color-neutral-400);
-      pointer-events: none;
-    }
 
-    /* Nut nguon ben phai, hai nut am luong ben trai. */
-    .ay-device-btn {
-      display: block;
-      position: absolute;
-      width: 4px;
-      border-radius: 4px;
-      background: linear-gradient(180deg, var(--ay-device-edge), var(--ay-device-shell));
-    }
-    .ay-device-btn-power {
-      right: -4px;
-      top: 176px;
-      height: 86px;
-    }
-    .ay-device-btn-up {
-      left: -4px;
-      top: 146px;
-      height: 52px;
-    }
-    .ay-device-btn-down {
-      left: -4px;
-      top: 208px;
-      height: 52px;
-    }
   }
 
   /**
