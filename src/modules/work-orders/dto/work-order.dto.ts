@@ -36,12 +36,17 @@ export class IntakeDto {
   @Min(0)
   intakeOdometer!: number;
 
-  @ApiPropertyOptional({ description: 'Muc nhien lieu 0..100' })
+  @ApiPropertyOptional({ description: 'Muc nhien lieu theo phan tu binh: 0..4' })
   @IsOptional()
   @IsInt()
   @Min(0)
-  @Max(100)
+  @Max(4)
   intakeFuelLevel?: number;
+
+  @ApiPropertyOptional({ description: 'SA-08 — phu kien khach de lai cung xe' })
+  @IsOptional()
+  @IsString()
+  intakeAccessories?: string;
 
   @IsOptional() @IsString() intakeNote?: string;
   @IsOptional() @IsString() customerSymptom?: string;

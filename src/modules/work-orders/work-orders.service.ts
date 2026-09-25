@@ -109,6 +109,7 @@ export class WorkOrdersService {
         paymentStatus: PaymentStatus.UNPAID,
         intakeOdometer: dto.intakeOdometer,
         intakeFuelLevel: dto.intakeFuelLevel ?? null,
+        intakeAccessories: dto.intakeAccessories ?? null,
         intakeNote: dto.intakeNote ?? null,
         customerSymptom,
         receivedById: actor.id ?? null,

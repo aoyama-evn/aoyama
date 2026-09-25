@@ -15,7 +15,7 @@ import { Quotation, QuotationItem } from 'src/modules/quotations/entities';
 import { Payment } from 'src/modules/payments/entities';
 import { AiDiagnosis, KnowledgeDocument } from 'src/modules/ai/entities';
 import { AdminUser } from 'src/modules/admin-users/entities';
-import { OtpCode, RefreshToken } from 'src/modules/auth/entities';
+import { OtpCode, PasswordResetToken, RefreshToken } from 'src/modules/auth/entities';
 import { NotificationLog, NotificationTemplate } from 'src/modules/notifications/entities';
 import { AuditLog, SystemSetting } from 'src/modules/system/entities';
 import { ContactMessage, Faq } from 'src/modules/content/entities';
@@ -63,6 +63,7 @@ export const ENTITIES = [
   // Tai khoan va xac thuc
   AdminUser,
   OtpCode,
+  PasswordResetToken,
   RefreshToken,
   // Thong bao
   NotificationTemplate,

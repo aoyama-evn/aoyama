@@ -68,8 +68,13 @@ export class WorkOrder extends BaseEntity {
   intakeOdometer!: number;
 
   /** Muc nhien lieu 0..100 phan tram. */
+  /** Muc nhien lieu theo phan tu binh: 0..4 (SA-08 ghi dang "1/2"). */
   @Column({ name: 'intake_fuel_level', type: 'smallint', nullable: true })
   intakeFuelLevel!: number | null;
+
+  /** SA-08 — phu kien khach de lai cung xe, ghi rieng de doi chieu khi ban giao. */
+  @Column({ name: 'intake_accessories', type: 'varchar', length: 255, nullable: true })
+  intakeAccessories!: string | null;
 
   @Column({ name: 'intake_note', type: 'text', nullable: true })
   intakeNote!: string | null;
