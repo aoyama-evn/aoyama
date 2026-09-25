@@ -51,6 +51,13 @@ const dateColumns = computed(() =>
   }),
 );
 
+const total = computed(() => (bookings.value ?? []).length);
+
+/** Ngay hom nay theo gio Nhat Ban — nut "Hom nay" nhay ve day. */
+function todayIso(): string {
+  return fmtDate(new Date(), 'yyyy-MM-dd');
+}
+
 const slotRows = computed(() => {
   const set = new Set<string>();
   for (const slots of grid.value.values()) for (const t of slots.keys()) set.add(t);
@@ -79,30 +86,67 @@ useHead({ title: 'Lịch hẹn theo ngày — AOYAMA Admin' });
       </template>
     </AyPageHeader>
 
-    <div class="card flex flex-wrap items-center gap-3">
-      <div class="flex gap-1">
-        <button
-          type="button" class="btn text-[12.5px]"
-          :class="mode === 'DAY' ? 'btn-primary' : 'btn-secondary'" @click="mode = 'DAY'"
-        >
+    <!--
+      Thanh dieu khien lich: bo gat ngay/tuan ben trai, dieu huong ngay o giua,
+      ten cua hang dang xem day sang phai. Phai ep flex-row vi .card cua he
+      thong thiet ke mac dinh la mot cot.
+    -->
+    <div
+      class="card flex-row flex-wrap items-center gap-3"
+      style="background: #fff; padding: 11px 14px"
+    >
+      <div class="seg" role="radiogroup" aria-label="Khoảng hiển thị">
+        <label class="seg-opt">
+          <input v-model="mode" type="radio" value="DAY" name="calendar-mode" />
           Ngày
-        </button>
-        <button
-          type="button" class="btn text-[12.5px]"
-          :class="mode === 'WEEK' ? 'btn-primary' : 'btn-secondary'" @click="mode = 'WEEK'"
-        >
+        </label>
+        <label class="seg-opt">
+          <input v-model="mode" type="radio" value="WEEK" name="calendar-mode" />
           Tuần
+        </label>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <button
+          type="button"
+          class="btn btn-secondary btn-icon"
+          :aria-label="mode === 'WEEK' ? 'Tuần trước' : 'Ngày trước'"
+          @click="shift(-1)"
+        >
+          ←
+        </button>
+        <input
+          v-model="anchor"
+          class="input h-9 w-auto min-h-0 py-1 text-[13px]"
+          type="date"
+          aria-label="Ngày xem"
+        />
+        <button
+          type="button"
+          class="btn btn-secondary btn-icon"
+          :aria-label="mode === 'WEEK' ? 'Tuần sau' : 'Ngày sau'"
+          @click="shift(1)"
+        >
+          →
         </button>
       </div>
 
-      <div class="flex items-center gap-2">
-        <AyButton variant="secondary" size="sm" @click="shift(-1)">←</AyButton>
-        <input v-model="anchor" class="input h-9 min-h-0 w-auto py-1" type="date">
-        <AyButton variant="secondary" size="sm" @click="shift(1)">→</AyButton>
-      </div>
+      <button
+        type="button"
+        class="btn btn-ghost text-[12.5px]"
+        @click="anchor = todayIso()"
+      >
+        Hôm nay
+      </button>
 
-      <p v-if="!ui.activeStoreId" class="ml-auto text-[12.5px] text-muted">
-        Đang xem: {{ i18n(stores?.find((s) => s.id === storeId)?.name ?? null) }}
+      <p class="text-muted ml-auto text-[12.5px]">
+        <template v-if="ui.activeStoreId">
+          {{ i18n(stores?.find((s) => s.id === storeId)?.name ?? null) }}
+        </template>
+        <template v-else>
+          Đang xem: {{ i18n(stores?.find((s) => s.id === storeId)?.name ?? null) }}
+        </template>
+        · {{ total }} lịch hẹn
       </p>
     </div>
 

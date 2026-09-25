@@ -22,10 +22,15 @@ setScreenTitle(() => props.title);
 </script>
 
 <template>
+  <!--
+    Khong dat ca justify-between lan justify-end trong cung mot the: Tailwind
+    xep justify-between sau nen no luon thang, hang nut cua trang quan tri bi
+    dat ve trai. Chon dung mot lop.
+  -->
   <header
     :data-screen="code"
-    class="flex flex-wrap items-start justify-between gap-3"
-    :class="isAdmin ? 'justify-end' : ''"
+    class="flex flex-wrap items-start gap-3"
+    :class="isAdmin ? 'justify-end' : 'justify-between'"
   >
     <div v-if="!isAdmin">
       <NuxtLink v-if="backTo" :to="backTo" class="btn btn-ghost -ml-2 mb-1 text-[12.5px]">
