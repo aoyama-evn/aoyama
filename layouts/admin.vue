@@ -1,9 +1,12 @@
 <script setup lang="ts">
-/** Bo cuc trang quan tri — CP-04 va CP-05, noi dung dem 20px 22px 28px. */
+/**
+ * Bo cuc trang quan tri — CP-04 va CP-05.
+ * Vung noi dung dung nen neutral-100 nhu ban thiet ke, de the trang noi len.
+ */
 </script>
 
 <template>
-  <div class="flex min-h-screen" style="background: var(--color-bg)">
+  <div class="admin-surface flex min-h-screen">
     <AdminSidebar class="sticky top-0 hidden h-screen flex-none md:flex" />
     <div class="flex min-w-0 flex-1 flex-col">
       <AdminTopbar />

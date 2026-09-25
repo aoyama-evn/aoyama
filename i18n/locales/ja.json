@@ -12,7 +12,8 @@
     "noData": "データがありません",
     "all": "すべて",
     "yes": "はい",
-    "no": "いいえ"
+    "no": "いいえ",
+    "language": "言語"
   },
   "nav": {
     "services": "サービス",
@@ -22,7 +23,17 @@
     "contact": "お問い合わせ",
     "booking": "予約する",
     "login": "ログイン",
-    "account": "マイページ"
+    "account": "マイページ",
+    "menu": "メニュー",
+    "close": "メニューを閉じる",
+    "home": "ホーム",
+    "myProfile": "プロフィール",
+    "myVehicles": "マイバイク",
+    "myBookings": "予約一覧",
+    "lookup": "予約を照会",
+    "loginRegister": "ログイン／新規登録",
+    "bookNow": "今すぐ予約",
+    "logout": "ログアウト"
   },
   "booking": {
     "step1": "サービスと店舗の選択",

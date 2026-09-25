@@ -66,5 +66,38 @@ export function useFormat() {
     return dateTime(value);
   }
 
-  return { i18n, date, dateTime, time, clock, money, number, maskedPhone, relative };
+  /**
+   * Ten thu viet tat theo ngon ngu dang chon. Ban thiet ke luon ghi thu ngay
+   * sau ngay, dang "2026/10/22 (T5)".
+   */
+  const WEEKDAYS: Record<LanguageCode, string[]> = {
+    vi: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+    ja: ['日', '月', '火', '水', '木', '金', '土'],
+    en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+  };
+
+  function weekday(value: string | Date | null | undefined): string {
+    if (!value) return '';
+    const index = Number(date(value, 'i')) % 7;
+    return WEEKDAYS[(locale.value as LanguageCode)]?.[index] ?? WEEKDAYS.en[index];
+  }
+
+  /** "2026/10/22 (T5)" — dang ngay dung o hau het man hinh. */
+  function dayLabel(value: string | Date | null | undefined): string {
+    if (!value) return '';
+    return `${date(value)} (${weekday(value)})`;
+  }
+
+  /** "2026/10/22 (T5) · 14:00–15:00" tu mot lich hen. */
+  function slotRange(
+    booking: { scheduledAt: string; slotStartTime: string; slotEndTime: string } | null | undefined,
+  ): string {
+    if (!booking) return '';
+    return `${dayLabel(booking.scheduledAt)} · ${clock(booking.slotStartTime)}–${clock(booking.slotEndTime)}`;
+  }
+
+  return {
+    i18n, date, dateTime, time, clock, money, number, maskedPhone, relative,
+    weekday, dayLabel, slotRange,
+  };
 }

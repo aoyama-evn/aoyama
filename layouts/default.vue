@@ -13,5 +13,6 @@
       <slot />
     </main>
     <SiteFooter />
+    <SiteMenu />
   </div>
 </template>

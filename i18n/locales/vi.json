@@ -12,7 +12,8 @@
     "noData": "Chưa có dữ liệu",
     "all": "Tất cả",
     "yes": "Có",
-    "no": "Không"
+    "no": "Không",
+    "language": "Ngôn ngữ"
   },
   "nav": {
     "services": "Dịch vụ",
@@ -22,7 +23,17 @@
     "contact": "Liên hệ",
     "booking": "Đặt lịch",
     "login": "Đăng nhập",
-    "account": "Tài khoản"
+    "account": "Tài khoản",
+    "menu": "Menu",
+    "close": "Đóng menu",
+    "home": "Trang chủ",
+    "myProfile": "Hồ sơ cá nhân",
+    "myVehicles": "Xe của tôi",
+    "myBookings": "Lịch hẹn của tôi",
+    "lookup": "Tra cứu lịch hẹn",
+    "loginRegister": "Đăng nhập / Đăng ký",
+    "bookNow": "Đặt lịch ngay",
+    "logout": "Đăng xuất"
   },
   "booking": {
     "step1": "Chọn dịch vụ & cửa hàng",

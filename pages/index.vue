@@ -1,17 +1,33 @@
 <script setup lang="ts">
-import type { ServiceItem, Store } from '~/types/models';
+import type { Booking, Page, ServiceItem } from '~/types/models';
 
-/** SC-01 Trang chu — bam theo bo cuc trong ban thiet ke man hinh. */
+/**
+ * SC-01 Trang chu (khach) va SC-01a (thanh vien).
+ * Hai ban chi khac nhau o khoi cuoi: thanh vien thay lich hen sap toi, khach
+ * thay loi moi tra cuu bang ma.
+ */
 const api = useApi();
-const { i18n, money } = useFormat();
+const auth = useAuthStore();
+const { i18n, money, slotRange } = useFormat();
 
-const { data } = await useAsyncData('home', async () => {
-  const [services, stores] = await Promise.all([
-    api.get<ServiceItem[]>('/services/featured'),
-    api.get<Store[]>('/stores'),
-  ]);
-  return { services, stores };
-});
+const { data } = await useAsyncData('home-services', () =>
+  api.get<ServiceItem[]>('/services/featured'),
+);
+
+/** Lich hen sap toi chi co y nghia voi thanh vien, nen goi rieng. */
+const { data: upcoming } = await useAsyncData(
+  'home-upcoming',
+  async () => {
+    if (!auth.isCustomer) return null;
+    const page = await api.get<Page<Booking>>('/account/bookings', {
+      upcoming: true,
+      limit: 1,
+      sortOrder: 'ASC',
+    });
+    return page.items[0] ?? null;
+  },
+  { watch: [() => auth.isCustomer] },
+);
 
 useHead({ title: 'AOYAMA Service — Bảo dưỡng & sửa chữa xe máy' });
 
@@ -48,8 +64,8 @@ function priceLabel(service: ServiceItem): string {
       </p>
       <h2 class="text-[27px]">Hỗ trợ toàn diện cho cuộc sống xe máy của bạn</h2>
       <p class="mt-2 text-[13px]" style="color: var(--color-neutral-700)">
-        Aoyama Motorcycle xử lý mọi dịch vụ từ kiểm tra xe, kiểm tra và sửa vỏ, sơn và bảo hiểm.
-        Hãy để mọi thứ liên quan đến xe máy cho chúng tôi!
+        Aoyama Motorcycle xử lý mọi dịch vụ từ bảo dưỡng đến kiểm tra, sửa chữa vỏ, sơn, phụ tùng
+        các dòng xe máy. Hãy để mọi thứ liên quan đến xe của bạn cho chúng tôi!
       </p>
     </div>
 
@@ -76,52 +92,65 @@ function priceLabel(service: ServiceItem): string {
       </div>
 
       <NuxtLink
-        v-for="service in data?.services ?? []"
+        v-for="service in data ?? []"
         :key="service.id"
         :to="`/services/${service.slug}`"
-        class="flex items-center gap-3 px-3.5 py-3 text-left transition-colors hover:brightness-[0.98]"
-        style="background: var(--color-surface); border-radius: 20px; min-height: 48px"
+        class="ay-row"
       >
         <AyServiceIcon :icon-key="service.iconKey" />
         <span class="min-w-0 flex-1">
           <span class="block text-[14px] font-semibold">{{ i18n(service.name) }}</span>
-          <span class="block truncate text-[11.5px] text-muted">{{ subtitle(service) }}</span>
+          <span class="text-muted block truncate text-[11.5px]">{{ subtitle(service) }}</span>
         </span>
         <span class="whitespace-nowrap font-heading text-[13.5px]">{{ priceLabel(service) }}</span>
       </NuxtLink>
     </section>
 
-    <!-- Tra cuu lich hen -->
-    <div class="card gap-1.5">
+    <!-- SC-01a: lich hen sap toi cua thanh vien -->
+    <div
+      v-if="auth.isCustomer && upcoming"
+      style="background: var(--color-surface); border-radius: 24px; overflow: hidden"
+    >
+      <NuxtLink
+        :to="`/bookings/${upcoming.code}/progress`"
+        class="flex flex-col gap-1.5 p-3.5 text-left"
+      >
+        <span class="flex items-center justify-between gap-2.5">
+          <span class="card-kicker">Lịch hẹn sắp tới</span>
+          <AyStatusTag :status="upcoming.status" />
+        </span>
+        <span class="text-[14px] font-semibold">{{ slotRange(upcoming) }}</span>
+        <span class="text-muted text-[11.5px]">
+          {{ i18n(upcoming.store?.name ?? null) }}
+          <template v-if="upcoming.services?.length"> · {{ upcoming.services[0].serviceName }}</template>
+        </span>
+        <span v-if="upcoming.vehicle" class="text-muted text-[11.5px]">
+          {{ upcoming.vehicle.modelName }} · {{ upcoming.vehicle.plateNumber }}
+        </span>
+      </NuxtLink>
+      <div
+        class="flex justify-end px-3.5 pb-3 pt-2.5"
+        style="border-top: 1px solid var(--color-divider)"
+      >
+        <NuxtLink
+          to="/account/bookings"
+          class="btn btn-ghost px-1 text-[12.5px]"
+          style="color: var(--color-accent-700)"
+        >
+          Lịch hẹn của tôi →
+        </NuxtLink>
+      </div>
+    </div>
+
+    <!-- SC-01: khach chua dang nhap tra cuu bang ma -->
+    <div v-else-if="!auth.isCustomer" class="card gap-1.5">
       <div class="card-kicker">Đã có mã lịch hẹn?</div>
       <p class="text-[13px]" style="color: var(--color-neutral-700)">
         Tra cứu bằng mã lịch hẹn và số điện thoại — không cần đăng nhập.
       </p>
-      <NuxtLink to="/booking/lookup" class="btn btn-ghost self-start text-[13px]">
+      <NuxtLink to="/booking/lookup" class="btn btn-ghost self-start px-1 text-[13px]">
         Tra cứu lịch hẹn →
       </NuxtLink>
     </div>
-
-    <!-- Cua hang -->
-    <section class="flex flex-col gap-2.5">
-      <div class="flex items-baseline justify-between gap-2.5">
-        <h5>Cửa hàng · Stores</h5>
-        <NuxtLink to="/stores" class="btn btn-ghost text-[12px]">Xem tất cả →</NuxtLink>
-      </div>
-
-      <NuxtLink
-        v-for="store in data?.stores ?? []"
-        :key="store.id"
-        :to="`/stores/${store.id}`"
-        class="flex items-center gap-3 px-3.5 py-3 transition-colors hover:brightness-[0.98]"
-        style="background: var(--color-surface); border-radius: 20px; min-height: 48px"
-      >
-        <span class="min-w-0 flex-1">
-          <span class="block text-[14px] font-semibold">{{ i18n(store.name) }}</span>
-          <span class="block truncate text-[11.5px] text-muted">{{ i18n(store.address) }}</span>
-        </span>
-        <span class="whitespace-nowrap text-[12.5px] text-muted">{{ store.phone }}</span>
-      </NuxtLink>
-    </section>
   </div>
 </template>

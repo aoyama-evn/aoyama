@@ -12,7 +12,8 @@
     "noData": "No data yet",
     "all": "All",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "language": "Language"
   },
   "nav": {
     "services": "Services",
@@ -22,7 +23,17 @@
     "contact": "Contact",
     "booking": "Book now",
     "login": "Log in",
-    "account": "Account"
+    "account": "Account",
+    "menu": "Menu",
+    "close": "Close menu",
+    "home": "Home",
+    "myProfile": "My profile",
+    "myVehicles": "My vehicles",
+    "myBookings": "My bookings",
+    "lookup": "Look up a booking",
+    "loginRegister": "Log in / Sign up",
+    "bookNow": "Book now",
+    "logout": "Log out"
   },
   "booking": {
     "step1": "Service & store",

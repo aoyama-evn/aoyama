@@ -115,6 +115,36 @@
     color: var(--color-danger);
   }
 
+  /**
+   * Dong danh sach dang vien thuoc — kieu lap lai nhieu nhat trong ban thiet ke:
+   * nen mat the, bo tron 20px, cao it nhat 48px (C-05).
+   */
+  .ay-row {
+    display: flex;
+    min-height: 48px;
+    width: 100%;
+    align-items: center;
+    gap: 11px;
+    border-radius: 20px;
+    background: var(--color-surface);
+    padding: 12px 14px;
+    text-align: left;
+    font-family: var(--font-body);
+    color: var(--color-text);
+    transition: background 0.12s ease;
+  }
+  .ay-row:hover {
+    background: var(--color-accent-200);
+    text-decoration: none;
+  }
+
+  /** Bien the cho dong xep cot thay vi xep hang. */
+  .ay-row-stack {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
   /** Khung cuon ngang rieng cho bang, de than trang khong bi day rong. */
   .table-wrap {
     overflow-x: auto;

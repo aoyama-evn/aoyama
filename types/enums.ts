@@ -58,9 +58,12 @@ export const PaymentMethod = {
 } as const;
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod];
 
+/** Bon nhom cua danh muc dich vu — theo SC-02 cua ban thiet ke. */
 export const ServiceType = {
   MAINTENANCE: 'MAINTENANCE',
   REPAIR: 'REPAIR',
+  INSPECTION: 'INSPECTION',
+  PACKAGE: 'PACKAGE',
 } as const;
 export type ServiceType = (typeof ServiceType)[keyof typeof ServiceType];
 

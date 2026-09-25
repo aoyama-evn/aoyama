@@ -1,90 +1,61 @@
 <script setup lang="ts">
 /**
  * CP-04 Thanh dieu huong trang quan tri.
- * Ban thiet ke: rong 186px, nen neutral-900, muc menu phang co 12.5px khong kem
- * ma man hinh, nhom duoc ngan bang dong chu mo, nut "Quet ma QR" ghim duoi cung.
+ * Ban thiet ke: rong 186px, nen neutral-900, danh sach phang 12.5px khong chia
+ * nhom va khong kem ma man hinh, nut "Quet ma QR" ghim duoi cung. Man hinh con
+ * cua tung muc duoc vao tu chinh muc do chu khong len thanh dieu huong.
  */
 const auth = useAuthStore();
 
 interface NavItem {
   to: string;
   label: string;
+  /** Duong dan con van lam sang muc nay. */
+  match?: string[];
   adminOnly?: boolean;
 }
 
-interface NavGroup {
-  label?: string;
-  items: NavItem[];
-}
-
-const GROUPS: NavGroup[] = [
+const ITEMS: NavItem[] = [
+  { to: '/admin', label: 'Bảng điều khiển' },
+  { to: '/admin/bookings', label: 'Lịch hẹn' },
+  { to: '/admin/bookings/calendar', label: 'Lịch dạng tuần' },
+  { to: '/admin/scan', label: 'Tiếp nhận', match: ['/admin/work-orders'] },
+  { to: '/admin/quotations', label: 'Báo giá' },
+  { to: '/admin/customers', label: 'Khách hàng', match: ['/admin/vehicles'] },
   {
-    items: [
-      { to: '/admin', label: 'Bảng điều khiển' },
-      { to: '/admin/bookings', label: 'Lịch hẹn' },
-      { to: '/admin/work-orders', label: 'Phiếu dịch vụ' },
-      { to: '/admin/quotations', label: 'Báo giá' },
-    ],
-  },
-  {
-    label: 'Khách hàng',
-    items: [
-      { to: '/admin/customers', label: 'Hồ sơ khách hàng' },
-      { to: '/admin/vehicles', label: 'Phương tiện' },
-    ],
-  },
-  {
+    to: '/admin/services',
     label: 'Danh mục',
-    items: [
-      { to: '/admin/services', label: 'Dịch vụ' },
-      { to: '/admin/pricing', label: 'Bảng giá' },
-      { to: '/admin/parts', label: 'Phụ tùng' },
-      { to: '/admin/inventory', label: 'Tồn kho' },
-    ],
+    match: ['/admin/pricing', '/admin/parts', '/admin/inventory'],
   },
+  { to: '/admin/tech-assistant', label: 'Trợ lý AI', match: ['/admin/knowledge-base'] },
+  { to: '/admin/stores', label: 'Cửa hàng' },
+  // Ban thiet ke khong ve muc bao cao, nhung FR-RPT-01..12 yeu cau nen van giu.
+  { to: '/admin/reports', label: 'Báo cáo' },
   {
-    label: 'Trợ lý AI',
-    items: [
-      { to: '/admin/tech-assistant', label: 'Trợ lý kỹ thuật' },
-      { to: '/admin/knowledge-base', label: 'Kho tài liệu' },
-    ],
-  },
-  {
-    label: 'Cửa hàng',
-    items: [{ to: '/admin/stores', label: 'Cửa hàng & khung giờ' }],
-  },
-  {
-    label: 'Báo cáo',
-    items: [
-      { to: '/admin/reports', label: 'Tổng hợp' },
-      { to: '/admin/reports/revenue', label: 'Doanh thu' },
-      { to: '/admin/reports/parts', label: 'Phụ tùng & tồn kho' },
-    ],
-  },
-  {
+    to: '/admin/users',
     label: 'Hệ thống',
-    items: [
-      { to: '/admin/users', label: 'Tài khoản', adminOnly: true },
-      { to: '/admin/notifications/templates', label: 'Mẫu thông báo' },
-      { to: '/admin/notifications/logs', label: 'Nhật ký thông báo' },
-      { to: '/admin/settings', label: 'Cấu hình', adminOnly: true },
-      { to: '/admin/audit-logs', label: 'Nhật ký thao tác', adminOnly: true },
-    ],
+    match: ['/admin/notifications', '/admin/settings', '/admin/audit-logs'],
+    adminOnly: true,
   },
 ];
 
-/** RD muc 8 — tai khoan STAFF khong thay cac muc chi danh cho ADMIN. */
-const groups = computed(() =>
-  GROUPS.map((group) => ({
-    ...group,
-    items: group.items.filter((item) => !item.adminOnly || auth.isSuperAdmin),
-  })).filter((group) => group.items.length > 0),
-);
+/** RD muc 8 — tai khoan STAFF khong thay muc chi danh cho ADMIN. */
+const items = computed(() => ITEMS.filter((item) => !item.adminOnly || auth.isSuperAdmin));
+
+const route = useRoute();
+
+function isActive(item: NavItem): boolean {
+  const path = route.path.replace(/\/$/, '') || '/admin';
+  if (item.to === '/admin') return path === '/admin';
+  // "Lich dang tuan" la duong dan con cua "Lich hen", nen phai xet truoc.
+  if (item.to === '/admin/bookings') return path.startsWith('/admin/bookings') && !path.startsWith('/admin/bookings/calendar');
+  return path.startsWith(item.to) || (item.match ?? []).some((m) => path.startsWith(m));
+}
 </script>
 
 <template>
   <aside
-    class="flex flex-col gap-1 overflow-y-auto px-3 py-4"
+    class="flex flex-col gap-1 overflow-y-auto px-3 py-[18px]"
     style="width: 186px; background: var(--color-neutral-900)"
   >
     <NuxtLink
@@ -95,28 +66,18 @@ const groups = computed(() =>
       AOYAMA Admin
     </NuxtLink>
 
-    <template v-for="(group, gi) in groups" :key="gi">
-      <div
-        v-if="group.label"
-        class="px-2.5 pt-2.5 text-[12.5px]"
-        style="color: var(--color-neutral-500)"
-      >
-        {{ group.label }}
-      </div>
+    <NuxtLink
+      v-for="item in items"
+      :key="item.to"
+      :to="item.to"
+      class="ay-nav-item"
+      :class="isActive(item) ? 'ay-nav-active' : ''"
+      :aria-current="isActive(item) ? 'page' : undefined"
+    >
+      {{ item.label }}
+    </NuxtLink>
 
-      <NuxtLink
-        v-for="item in group.items"
-        :key="item.to"
-        :to="item.to"
-        class="rounded-lg px-2.5 py-1.5 text-[12.5px] transition-colors"
-        style="color: var(--color-neutral-100)"
-        active-class="ay-nav-active"
-      >
-        {{ item.label }}
-      </NuxtLink>
-    </template>
-
-    <NuxtLink to="/admin/scan" class="btn btn-primary mt-auto gap-2 text-[12.5px]">
+    <NuxtLink to="/admin/scan" class="btn btn-primary mt-auto gap-[7px] text-[12.5px]">
       <svg
         width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2.75" stroke-linecap="round" aria-hidden="true"
@@ -132,11 +93,18 @@ const groups = computed(() =>
 </template>
 
 <style scoped>
-a:hover {
+.ay-nav-item {
+  border-radius: 10px;
+  padding: 7px 10px;
+  font-size: 12.5px;
+  color: var(--color-neutral-100);
+  transition: background 0.12s ease;
+}
+.ay-nav-item:hover {
   background: rgb(255 255 255 / 9%);
   text-decoration: none;
 }
-a.ay-nav-active {
+.ay-nav-active {
   background: rgb(255 255 255 / 15%);
   font-weight: 600;
   color: #fff;
