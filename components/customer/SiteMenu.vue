@@ -119,7 +119,7 @@ async function signOut(): Promise<void> {
           </nav>
 
           <p class="text-muted mt-auto text-center text-[11px] leading-[1.5]">
-            © 2026 遠鉄グループ AOYAMA. All Rights Reserved.
+            © 2026 遠鉄のリフォーム All Rights Reserved.
           </p>
         </div>
       </div>

@@ -29,12 +29,10 @@ const ITEMS: NavItem[] = [
   },
   { to: '/admin/tech-assistant', label: 'Trợ lý AI', match: ['/admin/knowledge-base'] },
   { to: '/admin/stores', label: 'Cửa hàng' },
-  // Ban thiet ke khong ve muc bao cao, nhung FR-RPT-01..12 yeu cau nen van giu.
-  { to: '/admin/reports', label: 'Báo cáo' },
   {
     to: '/admin/users',
     label: 'Hệ thống',
-    match: ['/admin/notifications', '/admin/settings', '/admin/audit-logs'],
+    match: ['/admin/notifications', '/admin/settings', '/admin/audit-logs', '/admin/reports'],
     adminOnly: true,
   },
 ];

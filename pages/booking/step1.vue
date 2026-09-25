@@ -166,11 +166,44 @@ useHead({ title: 'Đặt lịch — Bước 1' });
       />
       <div class="flex flex-wrap gap-2">
         <AyImageUpload v-model="booking.symptomPhotoUrls" :max="5" compact />
+        <AyVideoUpload v-model="booking.symptomVideoUrl" compact />
         <AyVoiceRecorder compact @recorded="booking.symptomDescription += ' (có ghi âm kèm theo)'" />
       </div>
-      <p v-if="booking.symptomPhotoUrls.length" class="text-muted text-[11.5px]">
-        {{ booking.symptomPhotoUrls.length }} tệp · tối đa 5 ảnh
-      </p>
+
+      <div
+        v-if="booking.symptomPhotoUrls.length || booking.symptomVideoUrl"
+        class="flex flex-wrap items-center gap-2"
+      >
+        <img
+          v-for="(url, index) in booking.symptomPhotoUrls"
+          :key="index"
+          :src="url"
+          alt="Ảnh đã tải"
+          class="object-cover"
+          style="width: 58px; height: 58px; border-radius: 12px"
+        />
+        <span
+          v-if="booking.symptomVideoUrl"
+          class="grid place-items-center"
+          style="
+            width: 58px; height: 58px; border-radius: 12px;
+            background: var(--color-neutral-300); color: var(--color-neutral-700);
+          "
+          aria-label="Video đã tải"
+        >
+          <svg
+            width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+          >
+            <rect x="3" y="6" width="13" height="12" rx="3" />
+            <path d="m16 10 5-3v10l-5-3" />
+          </svg>
+        </span>
+        <span class="text-muted text-[11.5px]">
+          {{ booking.symptomPhotoUrls.length + (booking.symptomVideoUrl ? 1 : 0) }} tệp ·
+          tối đa 5 ảnh, 1 video ≤ 30 giây
+        </span>
+      </div>
       <button
         type="button"
         class="btn btn-primary btn-block gap-2.5 text-[14px]"

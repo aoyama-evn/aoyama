@@ -245,6 +245,14 @@ useHead({ title: `Lịch hẹn ${booking.value.code} — AOYAMA Admin` });
               <img :src="url" alt="Ảnh khách gửi" class="h-20 w-20 rounded-xl object-cover" />
             </li>
           </ul>
+
+          <video
+            v-if="booking.symptomVideoUrl"
+            :src="booking.symptomVideoUrl"
+            controls
+            class="mt-2 w-full"
+            style="border-radius: 16px; max-height: 240px"
+          />
         </div>
       </section>
 

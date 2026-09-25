@@ -39,6 +39,8 @@ export const useBookingStore = defineStore('booking', () => {
   });
   const symptomDescription = ref('');
   const symptomPhotoUrls = ref<string[]>([]);
+  /** SC-12 — mot doan video ngan khach gui kem. */
+  const symptomVideoUrl = ref<string | null>(null);
   const aiDiagnosisId = ref<string | null>(null);
 
   const estimatedTotal = computed(() =>
@@ -123,6 +125,7 @@ export const useBookingStore = defineStore('booking', () => {
       vehicle: vehicle.value.plateNumber || vehicle.value.vehicleId ? vehicle.value : undefined,
       symptomDescription: symptomDescription.value.trim() || undefined,
       symptomPhotoUrls: symptomPhotoUrls.value.length ? symptomPhotoUrls.value : undefined,
+      symptomVideoUrl: symptomVideoUrl.value ?? undefined,
       aiDiagnosisId: aiDiagnosisId.value ?? undefined,
     };
   }
@@ -186,6 +189,7 @@ export const useBookingStore = defineStore('booking', () => {
     vehicle.value = { plateNumber: '', maker: '', model: '', engineCc: null, odometer: null };
     symptomDescription.value = '';
     symptomPhotoUrls.value = [];
+    symptomVideoUrl.value = null;
     aiDiagnosisId.value = null;
     if (import.meta.client) {
       try {
@@ -209,6 +213,7 @@ export const useBookingStore = defineStore('booking', () => {
     vehicle,
     symptomDescription,
     symptomPhotoUrls,
+    symptomVideoUrl,
     aiDiagnosisId,
     estimatedTotal,
     estimatedMinutes,

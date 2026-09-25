@@ -261,6 +261,8 @@ export interface Booking {
   contactEmail: string | null;
   symptomDescription: string | null;
   symptomPhotoUrls: string[];
+  /** SC-12 — mot doan video ngan khach gui kem. */
+  symptomVideoUrl: string | null;
   aiDiagnosisId: string | null;
   createdByAdmin: boolean;
   qrToken: string | null;
