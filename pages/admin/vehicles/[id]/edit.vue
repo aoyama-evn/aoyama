@@ -6,6 +6,7 @@ import type { VehicleFormValue } from '~/components/ui/AyVehicleForm.vue';
 definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const route = useRoute();
+const { t } = useI18n();
 const api = useApi();
 const ui = useUiStore();
 
@@ -58,10 +59,10 @@ watch(customerKeyword, () => searchCustomers());
 
 function validate(): boolean {
   Object.keys(errors).forEach((k) => delete errors[k]);
-  if (!customerId.value) errors.customer = 'Vui lòng chọn chủ xe';
-  if (!form.value.plateNumber.trim()) errors.plateNumber = 'Vui lòng nhập biển số';
-  if (!form.value.maker.trim()) errors.maker = 'Vui lòng chọn hãng xe';
-  if (!form.value.model.trim()) errors.model = 'Vui lòng nhập dòng xe';
+  if (!customerId.value) errors.customer = t('sa21.ownerRequired');
+  if (!form.value.plateNumber.trim()) errors.plateNumber = t('validate.plate');
+  if (!form.value.maker.trim()) errors.maker = t('sc30.makerRequired');
+  if (!form.value.model.trim()) errors.model = t('validate.model');
   return Object.keys(errors).length === 0;
 }
 
@@ -75,11 +76,11 @@ async function save(): Promise<void> {
         ...form.value,
         customerId: customerId.value,
       });
-      ui.success('Đã thêm phương tiện');
+      ui.success(t('sa21.added'));
       await navigateTo(`/admin/vehicles/${created.id}`);
     } else {
       await api.put(`/admin/vehicles/${id}`, form.value);
-      ui.success('Đã lưu thay đổi');
+      ui.success(t('common.saved'));
       await navigateTo(`/admin/vehicles/${id}`);
     }
   } catch (err) {
@@ -89,18 +90,19 @@ async function save(): Promise<void> {
   }
 }
 
-useHead({ title: isNew ? 'Thêm phương tiện' : 'Sửa phương tiện' });
+setScreenTitle(() => (isNew ? t('sa21.addTitle') : t('sa21.editTitle')));
+useHead({ title: () => (isNew ? t('sa21.addTitle') : t('sa21.editTitle')) });
 </script>
 
 <template>
   <div class="admin-form">
     <AyPageHeader
-      code="SA-21" :title="isNew ? 'Thêm phương tiện' : 'Sửa phương tiện'"
+      code="SA-21" :title="isNew ? $t('sa21.addTitle') : $t('sa21.editTitle')"
       :back-to="isNew ? '/admin/vehicles' : `/admin/vehicles/${id}`"
     />
 
     <section v-if="isNew" class="card flex flex-col gap-2">
-      <AyField label="Chủ xe" required :error="errors.customer" hint="Tìm theo tên hoặc số điện thoại">
+      <AyField :label="$t('sa21.ownerLabel')" required :error="errors.customer" :hint="$t('sa21.ownerHint')">
         <template #default="{ id: fid }">
           <input :id="fid" v-model="customerKeyword" class="input" type="search">
         </template>
@@ -125,8 +127,8 @@ useHead({ title: isNew ? 'Thêm phương tiện' : 'Sửa phương tiện' });
       <AyVehicleForm v-model="form" :errors="errors" />
       <AyErrorNote :error="error" />
       <div class="admin-actions">
-        <AyButton :to="isNew ? '/admin/vehicles' : `/admin/vehicles/${id}`" variant="secondary">Hủy</AyButton>
-        <AyButton type="submit" :loading="saving">Lưu</AyButton>
+        <AyButton :to="isNew ? '/admin/vehicles' : `/admin/vehicles/${id}`" variant="secondary">{{ $t('common.cancel') }}</AyButton>
+        <AyButton type="submit" :loading="saving">{{ $t('common.save') }}</AyButton>
       </div>
     </form>
   </div>

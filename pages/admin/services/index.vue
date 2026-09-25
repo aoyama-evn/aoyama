@@ -7,6 +7,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { i18n, money } = useFormat();
 
 const filters = reactive({ keyword: '', type: '' });
@@ -31,7 +32,7 @@ async function deactivate(): Promise<void> {
   if (!deactivateTarget.value) return;
   try {
     await api.del(`/admin/services/${deactivateTarget.value.id}`);
-    ui.success('Đã ngừng bán dịch vụ', 'Lịch hẹn và phiếu cũ vẫn giữ nguyên thông tin.');
+    ui.success(t('sa22.retired'), t('sa22.retiredSub'));
     deactivateTarget.value = null;
     await refresh();
   } catch (error) {
@@ -39,25 +40,26 @@ async function deactivate(): Promise<void> {
   }
 }
 
-const COLUMNS = [
-  { key: 'code', label: 'Mã', width: '170px' },
-  { key: 'name', label: 'Tên dịch vụ' },
-  { key: 'type', label: 'Loại', width: '110px' },
-  { key: 'durationMinutes', label: 'Thời gian', align: 'center' as const, width: '110px' },
-  { key: 'basePrice', label: 'Giá cơ sở', align: 'right' as const, width: '130px' },
-  { key: 'isActive', label: 'Trạng thái', width: '120px' },
+const COLUMNS = computed(() => [
+  { key: 'code', label: t('sa03.colCode'), width: '170px' },
+  { key: 'name', label: t('sa22.colName') },
+  { key: 'type', label: t('sa22.colType'), width: '110px' },
+  { key: 'durationMinutes', label: t('sa22.colDuration'), align: 'center' as const, width: '110px' },
+  { key: 'basePrice', label: t('sa22.colBase'), align: 'right' as const, width: '130px' },
+  { key: 'isActive', label: t('sa02.colStatus'), width: '120px' },
   { key: 'actions', label: '', width: '90px' },
-];
+]);
 
-useHead({ title: 'Dịch vụ — AOYAMA Admin' });
+setScreenTitle(() => t('sa22.catalog'));
+useHead({ title: () => `${t('sa22.title')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
-    <AyPageHeader code="SA-22" title="Danh mục dịch vụ">
+    <AyPageHeader code="SA-22" :title="$t('sa22.catalog')">
       <template #actions>
-        <AyButton to="/admin/pricing" variant="secondary" size="sm">Bảng giá</AyButton>
-        <AyButton to="/admin/services/new/edit" size="sm">Thêm dịch vụ</AyButton>
+        <AyButton to="/admin/pricing" variant="secondary" size="sm">{{ $t('sa22.priceCta') }}</AyButton>
+        <AyButton to="/admin/services/new/edit" size="sm">{{ $t('sa22.addCta') }}</AyButton>
       </template>
     </AyPageHeader>
 
@@ -65,17 +67,17 @@ useHead({ title: 'Dịch vụ — AOYAMA Admin' });
       :has-active-filters="Boolean(filters.keyword || filters.type)"
       @reset="filters.keyword = ''; filters.type = ''"
     >
-      <AyField label="Từ khóa" class="min-w-[220px] flex-1">
+      <AyField :label="$t('common.keyword')" class="min-w-[220px] flex-1">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.keyword" class="input" type="search" placeholder="Mã hoặc tên dịch vụ">
+          <input :id="id" v-model="filters.keyword" class="input" type="search" :placeholder="$t('sa22.searchPlaceholder')">
         </template>
       </AyField>
-      <AyField label="Loại">
+      <AyField :label="$t('sa22.colType')">
         <template #default="{ id }">
           <select :id="id" v-model="filters.type" class="input">
-            <option value="">Tất cả</option>
-            <option :value="ServiceType.MAINTENANCE">Bảo dưỡng</option>
-            <option :value="ServiceType.REPAIR">Sửa chữa</option>
+            <option value="">{{ $t('common.all') }}</option>
+            <option :value="ServiceType.MAINTENANCE">{{ $t('serviceType.MAINTENANCE') }}</option>
+            <option :value="ServiceType.REPAIR">{{ $t('serviceType.REPAIR') }}</option>
           </select>
         </template>
       </AyField>
@@ -86,7 +88,7 @@ useHead({ title: 'Dịch vụ — AOYAMA Admin' });
       :rows="data?.items ?? []"
       :meta="data?.meta ?? null"
       :loading="pending"
-      empty-title="Chưa có dịch vụ nào"
+      :empty-title="$t('sa22.empty')"
       @update:page="page = $event"
     >
       <template #cell-code="{ row }">
@@ -98,15 +100,21 @@ useHead({ title: 'Dịch vụ — AOYAMA Admin' });
         </NuxtLink>
       </template>
       <template #cell-type="{ row }">
-        {{ row.type === 'MAINTENANCE' ? 'Bảo dưỡng' : 'Sửa chữa' }}
+        {{ $t(`serviceType.${row.type}`) }}
       </template>
-      <template #cell-durationMinutes="{ row }">{{ row.durationMinutes }} phút</template>
+      <template #cell-durationMinutes="{ row }">
+        {{ $t('common.minutesFull', { n: row.durationMinutes }) }}
+      </template>
       <template #cell-basePrice="{ row }">
-        {{ (row as unknown as ServiceItem).quoteOnly ? 'Báo giá riêng' : money(row.basePrice as number) }}
+        {{
+          (row as unknown as ServiceItem).quoteOnly
+            ? $t('common.quotePrivate')
+            : money(row.basePrice as number)
+        }}
       </template>
       <template #cell-isActive="{ row }">
         <span class="tag" :class="row.isActive ? 'bg-success-bg text-success' : 'bg-neutral-200 text-neutral-600'">
-          {{ row.isActive ? 'Đang bán' : 'Ngừng bán' }}
+          {{ row.isActive ? $t('sa22.onSale') : $t('sa22.offSale') }}
         </span>
       </template>
       <template #cell-actions="{ row }">
@@ -114,16 +122,16 @@ useHead({ title: 'Dịch vụ — AOYAMA Admin' });
           v-if="row.isActive" type="button" class="text-[12.5px] text-danger underline"
           @click.stop="deactivateTarget = row as unknown as ServiceItem"
         >
-          Ngừng bán
+          {{ $t('sa22.retire') }}
         </button>
       </template>
     </AyDataTable>
 
     <AyConfirmDialog
       :open="Boolean(deactivateTarget)"
-      title="Ngừng bán dịch vụ"
-      message="Dịch vụ sẽ không còn hiện cho khách đặt mới. Lịch hẹn và phiếu dịch vụ cũ không bị ảnh hưởng."
-      confirm-label="Ngừng bán"
+      :title="$t('sa22.askRetire')"
+      :message="$t('sa22.askRetireBody')"
+      :confirm-label="$t('sa22.retire')"
       danger
       @confirm="deactivate"
       @cancel="deactivateTarget = null"

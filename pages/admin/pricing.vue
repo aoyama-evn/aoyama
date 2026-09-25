@@ -6,6 +6,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { i18n, money } = useFormat();
 
 const serviceFilter = ref('');
@@ -44,7 +45,7 @@ async function save(): Promise<void> {
   saving.value = true;
   try {
     await api.post('/admin/pricing', editing.value);
-    ui.success('Đã lưu quy tắc giá');
+    ui.success(t('sa24.saved'));
     editing.value = null;
     await refresh();
   } catch (error) {
@@ -58,7 +59,7 @@ async function remove(): Promise<void> {
   if (!deleteTarget.value) return;
   try {
     await api.del(`/admin/pricing/${deleteTarget.value.id}`);
-    ui.success('Đã xóa quy tắc giá');
+    ui.success(t('sa24.deleted'));
     deleteTarget.value = null;
     await refresh();
   } catch (error) {
@@ -72,7 +73,7 @@ function serviceName(serviceId: string): string {
 }
 
 function storeName(storeId: string | null): string {
-  if (!storeId) return 'Mọi cửa hàng';
+  if (!storeId) return t('sa24.allStores');
   const found = refs.value?.stores.find((s) => s.id === storeId);
   return found ? i18n(found.name) : storeId;
 }
@@ -80,28 +81,29 @@ function storeName(storeId: string | null): string {
 function rangeLabel(rule: PriceRule): string {
   const from = rule.engineCcFrom ?? 0;
   const to = rule.engineCcTo;
-  return to ? `${from}–${to}cc` : `từ ${from}cc`;
+  return to ? t('sa24.ccRange', { from, to }) : t('sa24.ccFromOnly', { from });
 }
 
-useHead({ title: 'Bảng giá — AOYAMA Admin' });
+setScreenTitle(() => t('sa24.headTitle'));
+useHead({ title: () => `${t('sa24.headTitle')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
     <AyPageHeader
-      code="SA-24" title="Quản lý bảng giá"
-      description="Khi nhiều quy tắc cùng khớp, hệ thống chọn quy tắc hẹp nhất: ưu tiên quy tắc gắn cửa hàng cụ thể, rồi tới khoảng dung tích hẹp hơn."
+      code="SA-24" :title="$t('sa24.title')"
+      :description="$t('sa24.lead')"
     >
       <template #actions>
-        <AyButton size="sm" @click="startNew">Thêm quy tắc giá</AyButton>
+        <AyButton size="sm" @click="startNew">{{ $t('sa24.addRule') }}</AyButton>
       </template>
     </AyPageHeader>
 
     <AyFilterBar :has-active-filters="Boolean(serviceFilter)" @reset="serviceFilter = ''">
-      <AyField label="Lọc theo dịch vụ" class="min-w-[260px]">
+      <AyField :label="$t('sa24.filterBy')" class="min-w-[260px]">
         <template #default="{ id }">
           <select :id="id" v-model="serviceFilter" class="input">
-            <option value="">Tất cả dịch vụ</option>
+            <option value="">{{ $t('sa24.allServices') }}</option>
             <option v-for="service in refs?.services ?? []" :key="service.id" :value="service.id">
               {{ i18n(service.name) }}
             </option>
@@ -116,12 +118,12 @@ useHead({ title: 'Bảng giá — AOYAMA Admin' });
       <table class="table">
         <thead>
           <tr>
-            <th scope="col">Dịch vụ</th>
-            <th scope="col">Cửa hàng</th>
-            <th scope="col">Phân khúc</th>
-            <th scope="col" class="text-center">Độ khó</th>
-            <th scope="col" class="text-right">Giá</th>
-            <th scope="col">Hiệu lực</th>
+            <th scope="col">{{ $t('sa02.colService') }}</th>
+            <th scope="col">{{ $t('sa03.colStore') }}</th>
+            <th scope="col">{{ $t('sa24.segment') }}</th>
+            <th scope="col" class="text-center">{{ $t('sa24.difficulty') }}</th>
+            <th scope="col" class="text-right">{{ $t('money.total') }}</th>
+            <th scope="col">{{ $t('sa24.validity') }}</th>
             <th scope="col" class="w-24" />
           </tr>
         </thead>
@@ -136,15 +138,15 @@ useHead({ title: 'Bảng giá — AOYAMA Admin' });
               {{ rule.validFrom ?? '—' }} → {{ rule.validTo ?? '—' }}
             </td>
             <td>
-              <button type="button" class="text-[12.5px] underline" @click="editing = { ...rule }">Sửa</button>
-              <button type="button" class="ml-2 text-[12.5px] text-danger underline" @click="deleteTarget = rule">Xóa</button>
+              <button type="button" class="text-[12.5px] underline" @click="editing = { ...rule }">{{ $t('common.edit') }}</button>
+              <button type="button" class="ml-2 text-[12.5px] text-danger underline" @click="deleteTarget = rule">{{ $t('common.delete') }}</button>
             </td>
           </tr>
           <tr v-if="(rules ?? []).length === 0">
             <td colspan="7" class="p-0">
               <AyEmptyState
-                title="Chưa có quy tắc giá nào"
-                hint="Không có quy tắc, hệ thống dùng giá cơ sở khai báo ở màn hình dịch vụ."
+                :title="$t('sa24.empty')"
+                :hint="$t('sa24.emptyHint')"
               />
             </td>
           </tr>
@@ -155,10 +157,10 @@ useHead({ title: 'Bảng giá — AOYAMA Admin' });
     <!-- Bieu mau them hoac sua -->
     <div v-if="editing" class="card grid gap-3 sm:grid-cols-3">
       <h2 class="font-heading text-[16px] sm:col-span-3">
-        {{ editing.id ? 'Sửa quy tắc giá' : 'Thêm quy tắc giá' }}
+        {{ editing.id ? $t('sa24.editRule') : $t('sa24.addRule') }}
       </h2>
 
-      <AyField label="Dịch vụ" required>
+      <AyField :label="$t('sa02.colService')" required>
         <template #default="{ id }">
           <select :id="id" v-model="editing.serviceId" class="input">
             <option v-for="service in refs?.services ?? []" :key="service.id" :value="service.id">
@@ -168,10 +170,10 @@ useHead({ title: 'Bảng giá — AOYAMA Admin' });
         </template>
       </AyField>
 
-      <AyField label="Cửa hàng" hint="Bỏ trống = áp dụng mọi cửa hàng">
+      <AyField :label="$t('sa03.colStore')" :hint="$t('sa24.allStoresHint')">
         <template #default="{ id }">
           <select :id="id" v-model="editing.storeId" class="input">
-            <option :value="null">Mọi cửa hàng</option>
+            <option :value="null">{{ $t('sa24.allStores') }}</option>
             <option v-for="store in refs?.stores ?? []" :key="store.id" :value="store.id">
               {{ i18n(store.name) }}
             </option>
@@ -179,7 +181,7 @@ useHead({ title: 'Bảng giá — AOYAMA Admin' });
         </template>
       </AyField>
 
-      <AyField label="Độ khó" hint="1 tiêu chuẩn · 2 trung bình · 3 phức tạp">
+      <AyField :label="$t('sa24.difficulty')" :hint="$t('sa24.difficultyHint')">
         <template #default="{ id }">
           <select :id="id" v-model.number="editing.difficultyLevel" class="input">
             <option :value="1">1</option><option :value="2">2</option><option :value="3">3</option>
@@ -187,47 +189,47 @@ useHead({ title: 'Bảng giá — AOYAMA Admin' });
         </template>
       </AyField>
 
-      <AyField label="Dung tích từ (cc)">
+      <AyField :label="$t('sa24.ccFrom')">
         <template #default="{ id }">
           <input :id="id" v-model.number="editing.engineCcFrom" class="input" type="number" min="0">
         </template>
       </AyField>
 
-      <AyField label="Đến (cc)" hint="Bỏ trống = không giới hạn trên">
+      <AyField :label="$t('sa24.ccTo')" :hint="$t('sa24.ccToHint')">
         <template #default="{ id }">
           <input :id="id" v-model.number="editing.engineCcTo" class="input" type="number" min="0">
         </template>
       </AyField>
 
-      <AyField label="Giá (JPY)" required>
+      <AyField :label="$t('sa24.price')" required>
         <template #default="{ id }">
           <input :id="id" v-model.number="editing.price" class="input" type="number" min="0">
         </template>
       </AyField>
 
-      <AyField label="Hiệu lực từ">
+      <AyField :label="$t('sa24.validFrom')">
         <template #default="{ id }">
           <input :id="id" v-model="editing.validFrom" class="input" type="date">
         </template>
       </AyField>
 
-      <AyField label="Hiệu lực đến">
+      <AyField :label="$t('sa24.validTo')">
         <template #default="{ id }">
           <input :id="id" v-model="editing.validTo" class="input" type="date">
         </template>
       </AyField>
 
       <div class="flex items-end gap-2">
-        <AyButton :loading="saving" @click="save">Lưu</AyButton>
-        <AyButton variant="secondary" @click="editing = null">Hủy</AyButton>
+        <AyButton :loading="saving" @click="save">{{ $t('common.save') }}</AyButton>
+        <AyButton variant="secondary" @click="editing = null">{{ $t('common.cancel') }}</AyButton>
       </div>
     </div>
 
     <AyConfirmDialog
       :open="Boolean(deleteTarget)"
-      title="Xóa quy tắc giá"
-      message="Sau khi xóa, dịch vụ sẽ tính theo quy tắc còn lại hoặc giá cơ sở."
-      confirm-label="Xóa"
+      :title="$t('sa24.askDelete')"
+      :message="$t('sa24.askDeleteBody')"
+      :confirm-label="$t('common.delete')"
       danger
       @confirm="remove"
       @cancel="deleteTarget = null"

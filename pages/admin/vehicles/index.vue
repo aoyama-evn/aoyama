@@ -5,6 +5,7 @@ import type { Page, Vehicle } from '~/types/models';
 definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const api = useApi();
+const { t } = useI18n();
 const { number } = useFormat();
 
 const keyword = ref('');
@@ -17,29 +18,30 @@ const { data, pending } = await useAsyncData(
   { watch: [query] },
 );
 
-const COLUMNS = [
-  { key: 'plateNumber', label: 'Biển số', width: '160px' },
-  { key: 'maker', label: 'Hãng / dòng' },
-  { key: 'engineCc', label: 'Dung tích', align: 'center' as const, width: '110px' },
-  { key: 'currentOdometer', label: 'Số km', align: 'right' as const, width: '120px' },
-  { key: 'customer', label: 'Chủ xe' },
-];
+const COLUMNS = computed(() => [
+  { key: 'plateNumber', label: t('sa16.colPlate'), width: '160px' },
+  { key: 'maker', label: t('sa19.colMakerModel') },
+  { key: 'engineCc', label: t('sa19.colCc'), align: 'center' as const, width: '110px' },
+  { key: 'currentOdometer', label: t('sa16.colOdometer'), align: 'right' as const, width: '120px' },
+  { key: 'customer', label: t('sa19.colOwner') },
+]);
 
-useHead({ title: 'Phương tiện — AOYAMA Admin' });
+setScreenTitle(() => t('sa19.title'));
+useHead({ title: () => `${t('sa19.title')} — AOYAMA Admin` });
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
-    <AyPageHeader code="SA-19" title="Phương tiện">
+    <AyPageHeader code="SA-19" :title="$t('sa19.title')">
       <template #actions>
-        <AyButton to="/admin/vehicles/new/edit" size="sm">Thêm xe</AyButton>
+        <AyButton to="/admin/vehicles/new/edit" size="sm">{{ $t('sa19.addCta') }}</AyButton>
       </template>
     </AyPageHeader>
 
     <AyFilterBar :has-active-filters="Boolean(keyword)" @reset="keyword = ''">
-      <AyField label="Tìm kiếm" class="min-w-[240px] flex-1">
+      <AyField :label="$t('common.search')" class="min-w-[240px] flex-1">
         <template #default="{ id }">
-          <input :id="id" v-model="keyword" class="input" type="search" placeholder="Biển số, hãng, dòng xe, tên hoặc SĐT chủ xe">
+          <input :id="id" v-model="keyword" class="input" type="search" :placeholder="$t('sa19.searchPlaceholder')">
         </template>
       </AyField>
     </AyFilterBar>
@@ -49,7 +51,7 @@ useHead({ title: 'Phương tiện — AOYAMA Admin' });
       :rows="data?.items ?? []"
       :meta="data?.meta ?? null"
       :loading="pending"
-      empty-title="Không tìm thấy phương tiện nào"
+      :empty-title="$t('sa19.empty')"
       @update:page="page = $event"
       @row-click="navigateTo(`/admin/vehicles/${$event.id}`)"
     >
