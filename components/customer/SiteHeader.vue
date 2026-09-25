@@ -8,7 +8,8 @@ const auth = useAuthStore();
 const menu = useSiteMenu();
 const { locale, setLocale } = useI18n();
 
-const LANGS = ['ja', 'vi', 'en'] as const;
+/** Tieng Nhat dung truoc vi day la ngon ngu mac dinh cua he thong. */
+const LANGS = ['ja', 'en', 'vi'] as const;
 
 function onLangChange(event: Event): void {
   const value = (event.target as HTMLSelectElement).value as (typeof LANGS)[number];

@@ -8,12 +8,20 @@
 const { t } = useI18n();
 const auth = useAuthStore();
 const api = useApi();
+const { locale, setLocale } = useI18n();
 const router = useRouter();
 const title = useScreenTitle();
 
 const emit = defineEmits<{ (e: 'open-nav'): void }>();
 
 const accountMenuOpen = ref(false);
+
+/** Ba thu tieng he thong ho tro; tieng Nhat dung truoc vi la mac dinh. */
+const LANGS = ['ja', 'en', 'vi'] as const;
+
+function pickLang(code: (typeof LANGS)[number]): void {
+  setLocale(code);
+}
 
 const initials = computed(() => {
   const name = auth.user?.name || auth.user?.username || 'AY';
@@ -114,6 +122,25 @@ async function logout(): Promise<void> {
               auth.user?.adminRole === 'ADMIN' ? $t('adm.top.roleAdmin') : $t('adm.top.roleStaff')
             }}
           </p>
+          <div
+            class="flex items-center gap-2 px-3 py-2.5"
+            style="border-bottom: 1px solid var(--color-divider)"
+          >
+            <span class="text-muted text-[12px]">{{ $t('common.language') }}</span>
+            <div class="seg ml-auto" role="radiogroup" :aria-label="$t('ui.lang')">
+              <label v-for="code in LANGS" :key="code" class="seg-opt" style="font-size: 11px">
+                <input
+                  type="radio"
+                  name="ay-admin-lang"
+                  :value="code"
+                  :checked="locale === code"
+                  @change="pickLang(code)"
+                />
+                {{ code.toUpperCase() }}
+              </label>
+            </div>
+          </div>
+
           <NuxtLink
             to="/admin/change-password"
             class="block px-3 py-2.5 text-[13.5px] hover:bg-[var(--color-accent-100)]"

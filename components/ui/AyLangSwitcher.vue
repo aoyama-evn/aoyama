@@ -1,14 +1,16 @@
 <script setup lang="ts">
 /**
- * CP-03 Bo chuyen ngon ngu — FR-I18N-02.
- * Ban thiet ke dung nut gat ba o VI / EN / JA, khong phai danh sach tha xuong.
+ * Bo chuyen ngon ngu: mot nut gat ba o JA / EN / VI, khong phai danh sach tha
+ * xuong. Chon xong thi @nuxtjs/i18n ghi vao cookie aoyama_lang nen lua chon
+ * con lai o lan vao sau.
  */
 const { locale, setLocale } = useI18n();
 
+/** Tieng Nhat dung truoc vi day la ngon ngu mac dinh cua he thong. */
 const OPTIONS = [
-  { code: 'vi', label: 'VI' },
-  { code: 'en', label: 'EN' },
   { code: 'ja', label: 'JA' },
+  { code: 'en', label: 'EN' },
+  { code: 'vi', label: 'VI' },
 ] as const;
 </script>
 
