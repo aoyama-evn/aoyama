@@ -138,7 +138,7 @@ useHead({ title: 'Tiếp nhận xe — AOYAMA Admin' });
           </div>
           <ul class="flex flex-col gap-1.5 text-[13.5px]">
             <li v-for="(f, i) in diagnosis.findings" :key="i" class="flex gap-2">
-              <span class="tag bg-teal-100 text-teal-800">{{ Math.round(f.matchPercent) }}%</span>
+              <span class="tag bg-olive-100 text-olive-800">{{ Math.round(f.matchPercent) }}%</span>
               <span>{{ f.label }}</span>
             </li>
           </ul>

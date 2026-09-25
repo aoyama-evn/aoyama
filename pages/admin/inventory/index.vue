@@ -68,7 +68,9 @@ useHead({ title: 'Tồn kho — AOYAMA Admin' });
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-[15px]">
+    <AdminStoreBar />
+
     <AyPageHeader code="SA-28" title="Tồn kho theo cửa hàng">
       <template #actions>
         <AyButton to="/admin/inventory/transactions" variant="secondary" size="sm">

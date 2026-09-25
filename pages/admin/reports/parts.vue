@@ -32,7 +32,9 @@ useHead({ title: 'Báo cáo phụ tùng — AOYAMA Admin' });
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-[15px]">
+    <AdminStoreBar />
+
     <AyPageHeader code="SA-38" title="Báo cáo phụ tùng &amp; tồn kho" back-to="/admin/reports">
       <template #actions>
         <AyExportButtons report="parts" :from="range.from" :to="range.to" :store-id="storeId" />

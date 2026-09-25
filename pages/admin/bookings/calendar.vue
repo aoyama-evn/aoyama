@@ -69,7 +69,9 @@ useHead({ title: 'Lịch hẹn theo ngày — AOYAMA Admin' });
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-[15px]">
+    <AdminStoreBar />
+
     <AyPageHeader code="SA-04" title="Lịch hẹn theo ngày / tuần">
       <template #actions>
         <AyButton to="/admin/bookings" variant="secondary" size="sm">Xem danh sách</AyButton>

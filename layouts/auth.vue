@@ -1,16 +1,34 @@
 <script setup lang="ts">
-/** Bo cuc man hinh dang nhap, dang ky, nhap OTP — khong co menu de bot xao nhang. */
+/**
+ * Bo cuc man hinh dang nhap quan tri — SA-01 va SA-01b.
+ * Ban thiet ke ve mot the toi (neutral-900) rong toi da 430px, can giua tren
+ * nen neutral-200, khong co dieu huong de bot xao nhang.
+ */
 </script>
 
 <template>
-  <div class="flex min-h-screen flex-col bg-neutral-200">
-    <div class="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-10">
-      <NuxtLink to="/" class="mb-6 text-center">
-        <span class="block font-heading text-[20px] text-accent-700">AOYAMA Service</span>
-        <span class="block text-[11.5px] text-muted">バイクの整備・修理</span>
-      </NuxtLink>
+  <div
+    class="flex min-h-screen flex-col items-center justify-center px-4 py-10"
+    style="background: var(--color-neutral-200)"
+  >
+    <div
+      class="flex w-full flex-col gap-3.5 px-[26px] pb-[26px] pt-7"
+      style="
+        max-width: 430px;
+        background: var(--color-neutral-900);
+        border-radius: 26px;
+        box-shadow: var(--shadow-lg);
+      "
+    >
       <slot />
-      <div class="mt-6 flex justify-center"><AyLangSwitcher /></div>
     </div>
   </div>
 </template>
+
+<style scoped>
+/** Chu tren nen toi: nhan o nhap va chu phu deu phai sang len. */
+:deep(.field > label),
+:deep(.label) {
+  color: var(--color-neutral-300);
+}
+</style>

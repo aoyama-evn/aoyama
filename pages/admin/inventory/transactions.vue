@@ -96,7 +96,9 @@ useHead({ title: 'Nhập / xuất kho — AOYAMA Admin' });
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-[15px]">
+    <AdminStoreBar />
+
     <AyPageHeader
       code="SA-29" title="Nhập / xuất / điều chỉnh kho" back-to="/admin/inventory"
       description="Mọi thay đổi tồn kho đều để lại một dòng ở đây. Xuất kho cho phiếu dịch vụ được ghi tự động khi phiếu hoàn tất."

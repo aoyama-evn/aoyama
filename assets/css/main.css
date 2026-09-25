@@ -145,11 +145,15 @@
     gap: 6px;
   }
 
-  /** Khung cuon ngang rieng cho bang, de than trang khong bi day rong. */
+  /**
+   * Khung cuon ngang rieng cho bang. Ban thiet ke boc bang trong mot the trang
+   * khong co dem, de bang tran sat mep the.
+   */
   .table-wrap {
     overflow-x: auto;
-    background: var(--color-surface);
+    background: #fff;
     border-radius: calc(var(--radius-lg) * 1.15);
+    box-shadow: var(--shadow-sm);
   }
 
   /** Nhan cho o nhap dung ngoai .field. */

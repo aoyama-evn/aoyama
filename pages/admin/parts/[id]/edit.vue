@@ -114,7 +114,7 @@ useHead({ title: isNew ? 'Thêm phụ tùng' : 'Sửa phụ tùng' });
 
     <p
       v-if="form.createdSource === 'AI_IMAGE' && isNew"
-      class="rounded-xl bg-teal-100 px-3 py-2.5 text-[13px] text-teal-800"
+      class="rounded-xl bg-olive-100 px-3 py-2.5 text-[13px] text-olive-800"
     >
       Thông tin dưới đây do trợ lý AI điền sẵn từ ảnh. Hãy kiểm tra lại trước khi lưu.
     </p>

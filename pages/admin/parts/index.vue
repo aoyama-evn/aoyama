@@ -103,7 +103,7 @@ useHead({ title: 'Phụ tùng — AOYAMA Admin' });
       <template #cell-category="{ row }">{{ row.category ?? '—' }}</template>
       <template #cell-sellPrice="{ row }">{{ money(row.sellPrice as number) }}</template>
       <template #cell-createdSource="{ row }">
-        <span v-if="row.createdSource === 'AI_IMAGE'" class="tag bg-teal-100 text-teal-800">AI</span>
+        <span v-if="row.createdSource === 'AI_IMAGE'" class="tag bg-olive-100 text-olive-800">AI</span>
         <span v-else class="text-[12.5px] text-muted">Thủ công</span>
       </template>
       <template #cell-actions="{ row }">

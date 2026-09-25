@@ -47,7 +47,9 @@ useHead({ title: 'Báo giá — AOYAMA Admin' });
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-[15px]">
+    <AdminStoreBar />
+
     <AyPageHeader code="SA-13" title="Danh sách báo giá" />
 
     <AyFilterBar :has-active-filters="Boolean(filters.keyword || filters.status)" @reset="reset">

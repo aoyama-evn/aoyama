@@ -55,7 +55,9 @@ useHead({ title: 'Phiếu dịch vụ — AOYAMA Admin' });
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-[15px]">
+    <AdminStoreBar />
+
     <AyPageHeader code="SA-09" title="Phiếu dịch vụ">
       <template #actions>
         <AyButton to="/admin/scan" variant="secondary" size="sm">Quét mã tiếp nhận</AyButton>

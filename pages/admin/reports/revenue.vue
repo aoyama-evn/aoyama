@@ -38,7 +38,9 @@ useHead({ title: 'Báo cáo doanh thu — AOYAMA Admin' });
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-[15px]">
+    <AdminStoreBar />
+
     <AyPageHeader code="SA-37" title="Báo cáo doanh thu" back-to="/admin/reports">
       <template #actions>
         <AyExportButtons report="revenue" :from="range.from" :to="range.to" :store-id="storeId" />
@@ -83,7 +85,7 @@ useHead({ title: 'Báo cáo doanh thu — AOYAMA Admin' });
             class="flex min-w-[28px] flex-1 flex-col items-center gap-1"
           >
             <div
-              class="w-full rounded-t bg-teal-500"
+              class="w-full rounded-t bg-olive-500"
               :style="{ height: `${(day.amount / maxDay) * 100}%` }"
               :title="`${day.date}: ${money(day.amount)} · ${day.workOrders} phiếu`"
             />

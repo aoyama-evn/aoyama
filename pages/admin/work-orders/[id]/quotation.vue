@@ -194,7 +194,7 @@ useHead({ title: 'Lập báo giá — AOYAMA Admin' });
       <ul class="flex flex-col gap-1.5">
         <li
           v-for="(line, index) in suggestion.lines" :key="index"
-          class="flex items-center gap-3 rounded-xl bg-teal-100 px-3 py-2 text-[13.5px]"
+          class="flex items-center gap-3 rounded-xl bg-olive-100 px-3 py-2 text-[13.5px]"
         >
           <span class="flex-1">
             <strong>{{ line.name }}</strong>
