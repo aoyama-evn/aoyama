@@ -1,4 +1,4 @@
-<script setup lang="ts" generic="T extends Record<string, unknown>">
+<script setup lang="ts" generic="T extends object">
 import type { PageMeta } from '~/types/models';
 
 /**
@@ -35,8 +35,12 @@ const allSelected = computed(
   () => props.rows.length > 0 && selected.value.length === props.rows.length,
 );
 
+function cell(row: T, key: string): unknown {
+  return (row as Record<string, unknown>)[key];
+}
+
 function keyOf(row: T): string {
-  return String(row[props.rowKey as keyof T]);
+  return String(cell(row, props.rowKey));
 }
 
 function toggleAll(): void {
@@ -152,8 +156,8 @@ watch(
               :key="col.key"
               :class="col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : ''"
             >
-              <slot :name="`cell-${col.key}`" :row="row" :value="row[col.key]">
-                {{ row[col.key] ?? '—' }}
+              <slot :name="`cell-${col.key}`" :row="row" :value="cell(row, col.key)">
+                {{ cell(row, col.key) ?? '—' }}
               </slot>
             </td>
           </tr>

@@ -14,6 +14,9 @@ import type {
   WorkOrderStatus,
 } from './enums';
 
+/** Xuat lai de man hinh chi phai nho mot cho khi lay kieu. */
+export type * from './enums';
+
 /** Chuoi da ngon ngu tra ve tu API — C-02. */
 export type I18nText = Partial<Record<LanguageCode, string>>;
 

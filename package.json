@@ -37,5 +37,8 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.2",
     "vue-tsc": "^2.2.0"
+  },
+  "overrides": {
+    "@nuxt/schema": "3.17.7"
   }
 }

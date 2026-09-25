@@ -1,5 +1,15 @@
-import type { FetchOptions } from 'ofetch';
 import type { ApiError } from '~/types/models';
+
+/**
+ * Chi nhung tuy chon lop nay thuc su dung. Lay thang FetchOptions cua ofetch
+ * thi kieu method rong hon kieu $fetch cua Nitro chap nhan.
+ */
+type RequestOptions = {
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  query?: Record<string, unknown>;
+  body?: Record<string, unknown> | BodyInit | null;
+  headers?: Record<string, string>;
+};
 
 /**
  * Lop goi API dung chung.
@@ -42,16 +52,14 @@ export function useApi() {
     return refreshPromise;
   }
 
-  async function request<T>(path: string, options: FetchOptions = {}): Promise<T> {
-    const headers: Record<string, string> = {
-      ...((options.headers as Record<string, string>) ?? {}),
-    };
+  async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+    const headers: Record<string, string> = { ...(options.headers ?? {}) };
     if (auth.accessToken) {
       headers.Authorization = `Bearer ${auth.accessToken}`;
     }
 
     try {
-      return await $fetch<T>(path, { baseURL, ...options, headers } as FetchOptions<'json'>);
+      return await $fetch<T>(path, { baseURL, ...options, headers });
     } catch (error) {
       const status = (error as { statusCode?: number; status?: number }).statusCode
         ?? (error as { status?: number }).status;
@@ -60,11 +68,7 @@ export function useApi() {
         const refreshed = await tryRefresh();
         if (refreshed) {
           const retryHeaders = { ...headers, Authorization: `Bearer ${auth.accessToken}` };
-          return $fetch<T>(path, {
-            baseURL,
-            ...options,
-            headers: retryHeaders,
-          } as FetchOptions<'json'>);
+          return $fetch<T>(path, { baseURL, ...options, headers: retryHeaders });
         }
         if (import.meta.client) {
           await navigateTo('/session-expired');
@@ -77,9 +81,12 @@ export function useApi() {
   return {
     get: <T>(path: string, query?: Record<string, unknown>) =>
       request<T>(path, { method: 'GET', query }),
-    post: <T>(path: string, body?: unknown) => request<T>(path, { method: 'POST', body }),
-    put: <T>(path: string, body?: unknown) => request<T>(path, { method: 'PUT', body }),
-    patch: <T>(path: string, body?: unknown) => request<T>(path, { method: 'PATCH', body }),
+    post: <T>(path: string, body?: RequestOptions['body']) =>
+      request<T>(path, { method: 'POST', body }),
+    put: <T>(path: string, body?: RequestOptions['body']) =>
+      request<T>(path, { method: 'PUT', body }),
+    patch: <T>(path: string, body?: RequestOptions['body']) =>
+      request<T>(path, { method: 'PATCH', body }),
     del: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
     raw: request,
   };
