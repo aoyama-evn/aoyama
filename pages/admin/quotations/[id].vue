@@ -77,7 +77,7 @@ useHead({ title: `Báo giá ${quotation.value.code} — AOYAMA Admin` });
             >
               <td>
                 {{ item.name }}
-                <span v-if="item.isOptional" class="tag ml-1 bg-info-bg text-info">tùy chọn</span>
+                <span v-if="item.isOptional" class="tag ml-1 bg-olive-100 text-olive-800">tùy chọn</span>
                 <AyAiBadge v-if="item.suggestedByAi" class="ml-1" />
               </td>
               <td class="text-center text-[12px] text-muted">{{ item.kind }}</td>

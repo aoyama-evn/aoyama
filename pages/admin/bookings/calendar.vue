@@ -128,13 +128,14 @@ useHead({ title: 'Lịch hẹn theo ngày — AOYAMA Admin' });
                 <li v-for="booking in grid.get(d)?.get(slotTime) ?? []" :key="booking.id">
                   <NuxtLink
                     :to="`/admin/bookings/${booking.id}`"
-                    class="block rounded-lg px-2 py-1.5 text-[12.5px] transition-colors hover:brightness-95"
+                    class="block rounded-sm px-2 py-1.5 text-[12.5px] transition-colors hover:brightness-95"
                     :class="{
-                      'bg-warning-bg text-warning': booking.status === 'PENDING',
-                      'bg-info-bg text-info': booking.status === 'CONFIRMED',
-                      'bg-accent-200 text-accent-800': booking.status === 'RECEIVED',
+                      'bg-accent-200 text-accent-800': booking.status === 'PENDING',
+                      'bg-olive-200 text-olive-800': booking.status === 'CONFIRMED',
+                      'bg-neutral-300 text-neutral-800': booking.status === 'RECEIVED',
                       'bg-success-bg text-success': booking.status === 'DONE',
                       'bg-neutral-200 text-neutral-600': booking.status === 'NO_SHOW',
+                      'bg-danger-bg text-danger': booking.status === 'CANCELLED',
                     }"
                   >
                     <span class="block truncate font-semibold">{{ booking.contactName }}</span>

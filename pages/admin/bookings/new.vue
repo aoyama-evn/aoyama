@@ -197,7 +197,7 @@ useHead({ title: 'Đặt lịch thay khách — AOYAMA Admin' });
           Đã tìm thấy hồ sơ: <strong>{{ matchedCustomer.name }}</strong>
           — lịch sẽ gắn vào hồ sơ này.
         </p>
-        <p v-else-if="form.contactPhone.length >= 8" class="rounded-xl bg-info-bg px-3 py-2 text-[13px] text-info">
+        <p v-else-if="form.contactPhone.length >= 8" class="rounded-sm bg-olive-100 px-3 py-2 text-[13px] text-olive-800">
           Chưa có hồ sơ — hệ thống sẽ tạo mới khi lưu lịch hẹn.
         </p>
 
