@@ -355,7 +355,10 @@ export interface WorkOrder {
   status: WorkOrderStatus;
   paymentStatus: PaymentStatus;
   intakeOdometer: number;
+  /** Muc nhien lieu theo phan tu binh: 0..4. */
   intakeFuelLevel: number | null;
+  /** SA-08 — phu kien khach de lai cung xe. */
+  intakeAccessories: string | null;
   intakeNote: string | null;
   customerSymptom: string | null;
   diagnosisNote: string | null;
@@ -390,6 +393,7 @@ export interface PublicProgress {
   hasWorkOrder: boolean;
   status?: WorkOrderStatus;
   intakeOdometer?: number;
+  /** Muc nhien lieu theo phan tu binh: 0..4. */
   intakeFuelLevel?: number | null;
   totalAmount?: number;
   progressPercent?: number;

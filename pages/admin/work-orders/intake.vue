@@ -1,18 +1,26 @@
 <script setup lang="ts">
 import type { AiDiagnosis, ApiError, Booking, ServiceHistory, WorkOrder } from '~/types/models';
 
-/** SA-08 Tiep nhan xe — FR-QR-06, FR-QR-07, FR-WO-01, FR-WO-03, BR-18. */
+/**
+ * SA-08 Tiep nhan xe — FR-QR-06, FR-QR-07, FR-WO-01, FR-WO-03, BR-18.
+ * Ban thiet ke lap lai bo ba the tom tat cua SA-05, roi den the "Ghi nhan hien
+ * trang khi tiep nhan" va hang hanh dong can phai.
+ */
 definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
-const { i18n, dateTime, money, number } = useFormat();
+const { i18n, dayLabel, clock, money, number } = useFormat();
 
 const bookingId = route.query.bookingId as string | undefined;
 
 const { data: booking } = await useAsyncData(`intake-booking-${bookingId}`, () =>
   bookingId ? api.get<Booking>(`/admin/bookings/${bookingId}`) : Promise.resolve(null),
+);
+
+setScreenTitle(() =>
+  booking.value ? `Tiếp nhận xe · ${booking.value.code}` : 'Tiếp nhận xe',
 );
 
 const { data: diagnosis } = await useAsyncData(`intake-diag-${bookingId}`, () =>
@@ -23,13 +31,17 @@ const { data: diagnosis } = await useAsyncData(`intake-diag-${bookingId}`, () =>
 
 const { data: history } = await useAsyncData(`intake-history-${bookingId}`, () =>
   booking.value?.vehicleId
-    ? api.get<{ items: ServiceHistory[] }>(`/admin/vehicles/${booking.value.vehicleId}/history`, { limit: 3 })
+    ? api.get<{ items: ServiceHistory[] }>(`/admin/vehicles/${booking.value.vehicleId}/history`, {
+        limit: 3,
+      })
     : Promise.resolve(null),
 );
 
 const form = reactive({
   intakeOdometer: null as number | null,
-  intakeFuelLevel: 50,
+  /** Muc nhien lieu theo phan tu binh, dung nhu ban thiet ke ghi "1/2". */
+  intakeFuelLevel: 2,
+  intakeAccessories: '',
   intakeNote: '',
   customerSymptom: '',
 });
@@ -37,6 +49,14 @@ const photos = ref<string[]>([]);
 const submitting = ref(false);
 const error = ref<ApiError | null>(null);
 const errors = reactive<Record<string, string>>({});
+
+const FUEL_LEVELS = [
+  { value: 0, label: 'Cạn' },
+  { value: 1, label: '1/4' },
+  { value: 2, label: '1/2' },
+  { value: 3, label: '3/4' },
+  { value: 4, label: 'Đầy' },
+];
 
 watchEffect(() => {
   if (!booking.value) return;
@@ -46,8 +66,12 @@ watchEffect(() => {
   }
 });
 
+const estimatedTotal = computed(() =>
+  (booking.value?.services ?? []).reduce((sum, line) => sum + line.estimatedPrice, 0),
+);
+
 function validate(): boolean {
-  Object.keys(errors).forEach((k) => delete errors[k]);
+  Object.keys(errors).forEach((key) => delete errors[key]);
   // BR-18 — so km va anh hien trang la bat buoc khi tiep nhan.
   if (form.intakeOdometer === null || form.intakeOdometer < 0) {
     errors.intakeOdometer = 'Vui lòng nhập số km hiện tại';
@@ -74,14 +98,15 @@ async function submit(): Promise<void> {
       storeId: booking.value?.storeId,
       intakeOdometer: form.intakeOdometer,
       intakeFuelLevel: form.intakeFuelLevel,
+      intakeAccessories: form.intakeAccessories.trim() || undefined,
       intakeNote: form.intakeNote.trim() || undefined,
       customerSymptom: form.customerSymptom.trim() || undefined,
       intakePhotoUrls: photos.value,
     });
     ui.success('Đã tiếp nhận xe', `Phiếu dịch vụ ${created.code} đã được mở.`);
     await navigateTo(`/admin/work-orders/${created.id}`);
-  } catch (err) {
-    error.value = normalizeError(err);
+  } catch (caught) {
+    error.value = normalizeError(caught);
   } finally {
     submitting.value = false;
   }
@@ -91,114 +116,230 @@ useHead({ title: 'Tiếp nhận xe — AOYAMA Admin' });
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-4xl flex-col gap-4">
-    <AyPageHeader
-      code="SA-08" title="Tiếp nhận xe"
-      :back-to="booking ? `/admin/bookings/${booking.id}` : '/admin/scan'"
-      description="Ghi hiện trạng xe trước khi đưa vào xưởng. Số km và ảnh là bắt buộc."
-    />
-
+  <div class="flex flex-col gap-[15px]">
     <AyEmptyState
       v-if="!booking"
       title="Chưa chọn lịch hẹn"
       hint="Quét mã QR của khách hoặc mở chi tiết lịch hẹn rồi bấm Tiếp nhận xe."
     >
-      <AyButton to="/admin/scan" size="sm">Quét mã QR</AyButton>
+      <NuxtLink to="/admin/scan" class="btn btn-primary text-[12.5px]">Quét mã QR</NuxtLink>
     </AyEmptyState>
 
     <template v-else>
-      <!-- Thong tin hien ngay khi quet — FR-QR-06 -->
-      <section class="card">
-        <h2 class="mb-2 font-heading text-[16px]">Thông tin lịch hẹn</h2>
-        <dl class="grid gap-2 text-[14px] sm:grid-cols-2">
-          <div><dt class="text-muted">Mã</dt><dd class="font-mono">{{ booking.code }}</dd></div>
-          <div><dt class="text-muted">Giờ hẹn</dt><dd>{{ dateTime(booking.scheduledAt) }}</dd></div>
-          <div><dt class="text-muted">Khách hàng</dt><dd>{{ booking.contactName }} · {{ booking.contactPhone }}</dd></div>
-          <div><dt class="text-muted">Cửa hàng</dt><dd>{{ i18n(booking.store?.name ?? null) }}</dd></div>
-          <div class="sm:col-span-2">
-            <dt class="text-muted">Xe</dt>
-            <dd>
-              {{ booking.vehicle
-                ? `${booking.vehicle.plateNumber} · ${booking.vehicle.maker} ${booking.vehicle.model}`
-                : 'Chưa khai báo — cần tạo hồ sơ xe trước' }}
-            </dd>
-          </div>
-          <div class="sm:col-span-2">
-            <dt class="text-muted">Dịch vụ đã đặt</dt>
-            <dd>{{ (booking.services ?? []).map((s) => s.serviceName).join(', ') || '—' }}</dd>
-          </div>
-        </dl>
-      </section>
+      <!-- Ba the tom tat, giong SA-05 -->
+      <div
+        class="grid gap-[13px]"
+        style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr))"
+      >
+        <div class="card gap-1" style="background: #fff">
+          <div class="card-kicker">Khách hàng</div>
+          <p class="text-[14px] font-semibold">{{ booking.contactName }}</p>
+          <p class="text-muted text-[12px]">{{ booking.contactPhone }}</p>
+        </div>
+        <div class="card gap-1" style="background: #fff">
+          <div class="card-kicker">Xe</div>
+          <p class="text-[14px] font-semibold">
+            <template v-if="booking.vehicle">
+              {{ booking.vehicle.maker }} {{ booking.vehicle.model }}
+            </template>
+            <template v-else>Chưa khai báo</template>
+          </p>
+          <p v-if="booking.vehicle" class="text-muted text-[12px]">
+            {{ booking.vehicle.plateNumber }}
+            <template v-if="booking.vehicle.currentOdometer">
+              · {{ number(booking.vehicle.currentOdometer) }} km
+            </template>
+          </p>
+        </div>
+        <div class="card gap-1" style="background: #fff">
+          <div class="card-kicker">Thời gian &amp; cửa hàng</div>
+          <p class="text-[14px] font-semibold">
+            {{ dayLabel(booking.scheduledAt) }}
+            {{ clock(booking.slotStartTime) }}–{{ clock(booking.slotEndTime) }}
+          </p>
+          <p class="text-muted text-[12px]">{{ i18n(booking.store?.name ?? null) }}</p>
+        </div>
+      </div>
 
-      <div class="grid gap-4 lg:grid-cols-2">
-        <section v-if="diagnosis && diagnosis.findings.length" class="card">
-          <div class="mb-2 flex items-center gap-2">
-            <h2 class="font-heading text-[16px]">Chẩn đoán AI của khách</h2>
-            <AyAiBadge />
+      <div
+        class="grid gap-[13px]"
+        style="grid-template-columns: repeat(auto-fit, minmax(330px, 1fr))"
+      >
+        <section class="card gap-2.5" style="background: #fff">
+          <h5>Dịch vụ đã đặt</h5>
+          <table class="table" style="min-width: 270px">
+            <tbody>
+              <tr v-for="line in booking.services ?? []" :key="line.id">
+                <td>{{ line.serviceName }}</td>
+                <td class="text-right">
+                  {{ line.estimatedPrice ? money(line.estimatedPrice) : 'báo giá riêng' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="flex justify-between text-[13px]">
+            <span class="text-muted">Tham khảo</span>
+            <strong>{{ money(estimatedTotal) }}</strong>
           </div>
-          <ul class="flex flex-col gap-1.5 text-[13.5px]">
-            <li v-for="(f, i) in diagnosis.findings" :key="i" class="flex gap-2">
-              <span class="tag bg-olive-100 text-olive-800">{{ Math.round(f.matchPercent) }}%</span>
-              <span>{{ f.label }}</span>
-            </li>
-          </ul>
+          <div
+            v-if="booking.symptomDescription"
+            class="pt-2.5 text-[13px]"
+            style="border-top: 1px solid var(--color-divider)"
+          >
+            <p class="text-muted mb-1 text-[11px]">Mô tả của khách</p>
+            <p class="whitespace-pre-line">“{{ booking.symptomDescription }}”</p>
+          </div>
         </section>
 
-        <section v-if="(history?.items ?? []).length" class="card">
-          <h2 class="mb-2 font-heading text-[16px]">Lịch sử gần nhất</h2>
+        <section
+          v-if="diagnosis && diagnosis.findings.length"
+          class="flex flex-col gap-[11px] p-4"
+          style="
+            border: 1.5px dashed var(--color-accent-2-400);
+            background: var(--color-accent-2-100);
+            border-radius: 26px;
+          "
+        >
+          <div class="flex items-center gap-2">
+            <span class="tag" style="background: var(--color-accent-2-500); color: #fff">
+              ✦ Gợi ý bởi AI
+            </span>
+          </div>
+          <div class="flex flex-col gap-2.5">
+            <div v-for="(finding, index) in diagnosis.findings" :key="index">
+              <div class="mb-1 flex justify-between text-[13px] font-semibold">
+                <span>{{ finding.label }}</span>
+                <span>{{ Math.round(finding.matchPercent) }} %</span>
+              </div>
+              <div
+                style="height: 7px; border-radius: 999px; background: var(--color-accent-2-200)"
+                role="progressbar"
+                :aria-valuenow="Math.round(finding.matchPercent)"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                :aria-label="finding.label"
+              >
+                <div
+                  style="height: 100%; border-radius: 999px; background: var(--color-accent-2-600)"
+                  :style="{ width: `${Math.min(100, Math.max(0, finding.matchPercent))}%` }"
+                />
+              </div>
+            </div>
+          </div>
+          <p class="text-[11.5px] leading-[1.45]" style="color: var(--color-accent-2-800)">
+            Kết quả AI kèm hội thoại, ảnh và ghi âm được đính vào lịch hẹn này (FR-AI-12). Cần kỹ
+            thuật viên kiểm tra thực tế trước khi báo giá.
+          </p>
+        </section>
+
+        <section v-if="(history?.items ?? []).length" class="card gap-2" style="background: #fff">
+          <h5>Lịch sử gần nhất</h5>
           <ul class="flex flex-col gap-1.5 text-[13.5px]">
-            <li v-for="record in history?.items ?? []" :key="record.id" class="flex justify-between gap-2">
-              <span>{{ dateTime(record.servicedAt) }} · {{ record.summary }}</span>
+            <li
+              v-for="record in history?.items ?? []"
+              :key="record.id"
+              class="flex justify-between gap-2"
+            >
+              <span>{{ dayLabel(record.servicedAt) }} · {{ record.summary }}</span>
               <span class="whitespace-nowrap">{{ money(record.totalAmount) }}</span>
             </li>
           </ul>
         </section>
       </div>
 
-      <!-- Ghi hien trang — FR-WO-03 -->
-      <section class="card grid gap-3 sm:grid-cols-2">
-        <h2 class="font-heading text-[16px] sm:col-span-2">Hiện trạng xe khi nhận</h2>
+      <!-- Ghi hien trang — FR-WO-03, BR-18 -->
+      <section class="card gap-3" style="background: #fff">
+        <h5>Ghi nhận hiện trạng khi tiếp nhận</h5>
 
-        <AyField label="Số km hiện tại" required :error="errors.intakeOdometer">
-          <template #default="{ id, invalid }">
-            <input
-              :id="id" v-model.number="form.intakeOdometer" class="input" type="number"
-              min="0" :aria-invalid="invalid" inputmode="numeric"
-            >
-          </template>
-        </AyField>
+        <div
+          class="grid gap-3"
+          style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr))"
+        >
+          <AyField
+            label="Số km"
+            required
+            hint="cảnh báo nếu nhỏ hơn lần trước"
+            :error="errors.intakeOdometer"
+          >
+            <template #default="{ id, invalid }">
+              <input
+                :id="id"
+                v-model.number="form.intakeOdometer"
+                class="input"
+                type="number"
+                min="0"
+                inputmode="numeric"
+                :aria-invalid="invalid"
+              />
+            </template>
+          </AyField>
 
-        <AyField label="Mức nhiên liệu" :hint="`${form.intakeFuelLevel}%`">
-          <template #default="{ id }">
-            <input :id="id" v-model.number="form.intakeFuelLevel" class="w-full" type="range" min="0" max="100" step="5">
-          </template>
-        </AyField>
+          <AyField label="Mức nhiên liệu">
+            <template #default="{ id }">
+              <select :id="id" v-model.number="form.intakeFuelLevel" class="input">
+                <option v-for="level in FUEL_LEVELS" :key="level.value" :value="level.value">
+                  {{ level.label }}
+                </option>
+              </select>
+            </template>
+          </AyField>
 
-        <AyField label="Mô tả tình trạng do khách nêu" class="sm:col-span-2">
-          <template #default="{ id }">
-            <textarea :id="id" v-model="form.customerSymptom" class="input min-h-[80px]" />
-          </template>
-        </AyField>
-
-        <AyField label="Ghi chú tiếp nhận" hint="Vết xước, phụ kiện đi kèm, đồ khách để lại trong cốp…" class="sm:col-span-2">
-          <template #default="{ id }">
-            <textarea :id="id" v-model="form.intakeNote" class="input min-h-[80px]" />
-          </template>
-        </AyField>
-
-        <div class="sm:col-span-2">
-          <AyImageUpload v-model="photos" label="Ảnh hiện trạng xe (bắt buộc)" :max="6" />
-          <p v-if="errors.photos" class="field-error">{{ errors.photos }}</p>
+          <AyField label="Phụ kiện đi kèm">
+            <template #default="{ id }">
+              <input
+                :id="id"
+                v-model="form.intakeAccessories"
+                class="input"
+                placeholder="mũ bảo hiểm, cốp sau"
+              />
+            </template>
+          </AyField>
         </div>
+
+        <AyField label="Ảnh hiện trạng" required :error="errors.photos">
+          <AyImageUpload v-model="photos" :max="6" />
+        </AyField>
+
+        <AyField label="Mô tả tình trạng do khách nêu">
+          <template #default="{ id }">
+            <textarea :id="id" v-model="form.customerSymptom" class="input min-h-[62px]" />
+          </template>
+        </AyField>
+
+        <AyField
+          label="Ghi chú tiếp nhận"
+          hint="Vết xước, đồ khách để lại trong cốp…"
+        >
+          <template #default="{ id }">
+            <textarea
+              :id="id"
+              v-model="form.intakeNote"
+              class="input min-h-[62px]"
+              placeholder="Khách xin gọi trước khi thay phụ tùng…"
+            />
+          </template>
+        </AyField>
       </section>
 
       <AyErrorNote :error="error" />
 
-      <div class="sticky bottom-0 -mx-4 border-t border-divider bg-surface px-4 py-3">
-        <div class="flex gap-2">
-          <AyButton :loading="submitting" @click="submit">Tiếp nhận &amp; mở phiếu dịch vụ</AyButton>
-          <AyButton :to="`/admin/bookings/${booking.id}`" variant="secondary">Hủy</AyButton>
-        </div>
+      <div class="flex flex-wrap items-center justify-end gap-2.5">
+        <NuxtLink
+          :to="`/admin/bookings/${booking.id}`"
+          class="btn btn-secondary text-[13px]"
+          style="min-height: 48px; padding-inline: 20px"
+        >
+          Quay lại lịch hẹn
+        </NuxtLink>
+        <button
+          type="button"
+          class="btn btn-primary text-[15px]"
+          style="min-height: 48px; padding-inline: 26px"
+          :disabled="submitting"
+          @click="submit"
+        >
+          {{ submitting ? 'Đang lưu…' : 'Tiếp nhận xe' }}
+        </button>
       </div>
     </template>
   </div>

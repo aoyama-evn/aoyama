@@ -6,13 +6,12 @@ import jsQR from 'jsqr';
  * Luon co o nhap tay du phong: camera cua may quay quay hong, anh sang yeu,
  * hoac ma bi xuoc deu la tinh huong that o quay le tan (FR-QR-08).
  */
-const emit = defineEmits<{ (e: 'scanned', token: string): void; (e: 'manual', code: string): void }>();
+const emit = defineEmits<{ (e: 'scanned', token: string): void }>();
 
 const ui = useUiStore();
 const video = ref<HTMLVideoElement | null>(null);
 const canvas = ref<HTMLCanvasElement | null>(null);
 const scanning = ref(false);
-const manualCode = ref('');
 
 let stream: MediaStream | null = null;
 let frameId: number | null = null;
@@ -67,50 +66,122 @@ function stop(): void {
   stream = null;
 }
 
-function submitManual(): void {
-  const code = manualCode.value.trim().toUpperCase();
-  if (code) emit('manual', code);
+/** SA-07 — doc ma tu mot anh da chup, dung khi camera khong san sang. */
+async function readFromImage(event: Event): Promise<void> {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (!file || !canvas.value) return;
+  try {
+    const bitmap = await createImageBitmap(file);
+    const c = canvas.value;
+    c.width = bitmap.width;
+    c.height = bitmap.height;
+    const ctx = c.getContext('2d', { willReadFrequently: true });
+    if (!ctx) return;
+    ctx.drawImage(bitmap, 0, 0);
+    const image = ctx.getImageData(0, 0, c.width, c.height);
+    const found = jsQR(image.data, image.width, image.height);
+    if (found?.data) emit('scanned', found.data.trim());
+    else ui.warning('Không tìm thấy mã QR trong ảnh', 'Hãy thử ảnh rõ hơn hoặc nhập mã bằng tay.');
+  } catch {
+    ui.warning('Không đọc được ảnh', 'Hãy nhập mã lịch hẹn bằng tay.');
+  }
 }
 
 onBeforeUnmount(stop);
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
-    <div class="card flex flex-col items-center gap-3">
-      <div class="relative w-full max-w-sm overflow-hidden rounded-2xl bg-neutral-900" style="aspect-ratio: 1">
-        <video ref="video" class="h-full w-full object-cover" playsinline muted />
-        <div
-          v-if="!scanning"
-          class="absolute inset-0 grid place-items-center text-center text-[13px] text-neutral-300"
-        >
-          Camera chưa bật
-        </div>
-        <div
-          v-else
-          class="pointer-events-none absolute inset-8 rounded-2xl border-2 border-white/80"
-          aria-hidden="true"
-        />
-      </div>
-      <canvas ref="canvas" class="hidden" />
+  <div class="flex flex-col gap-3">
+    <div
+      class="relative grid place-items-center overflow-hidden"
+      style="border-radius: 20px; background: #171614; aspect-ratio: 4 / 3"
+    >
+      <video ref="video" class="h-full w-full object-cover" playsinline muted />
 
-      <AyButton v-if="!scanning" @click="start">Bật camera quét mã</AyButton>
-      <AyButton v-else variant="secondary" @click="stop">Tắt camera</AyButton>
+      <p
+        v-if="!scanning"
+        class="absolute inset-0 grid place-items-center text-[12px]"
+        style="color: var(--color-neutral-600)"
+      >
+        Xem trước camera · camera preview
+      </p>
+
+      <!-- Bon goc ngam, dung do day va bo tron cua ban thiet ke -->
+      <div
+        v-else
+        class="pointer-events-none absolute"
+        style="width: 58%; aspect-ratio: 1"
+        aria-hidden="true"
+      >
+        <span class="ay-corner ay-corner-tl" />
+        <span class="ay-corner ay-corner-tr" />
+        <span class="ay-corner ay-corner-bl" />
+        <span class="ay-corner ay-corner-br" />
+      </div>
     </div>
 
-    <div class="card">
-      <AyField label="Hoặc nhập mã lịch hẹn" hint="Dùng khi camera không đọc được mã">
-        <template #default="{ id }">
-          <div class="flex gap-2">
-            <input
-              :id="id" v-model="manualCode" class="input font-heading tracking-widest"
-              type="text" placeholder="AY-XXXXXXXX" autocomplete="off"
-              @keyup.enter="submitManual"
-            >
-            <AyButton :disabled="!manualCode.trim()" @click="submitManual">Tra cứu</AyButton>
-          </div>
-        </template>
-      </AyField>
+    <canvas ref="canvas" class="hidden" />
+
+    <div class="flex flex-wrap gap-2.5">
+      <button
+        v-if="!scanning"
+        type="button"
+        class="btn btn-secondary text-[12.5px]"
+        style="min-height: 44px"
+        @click="start"
+      >
+        Bật camera
+      </button>
+      <button
+        v-else
+        type="button"
+        class="btn btn-secondary text-[12.5px]"
+        style="min-height: 44px"
+        @click="stop"
+      >
+        Tắt camera
+      </button>
+
+      <label class="btn btn-secondary cursor-pointer text-[12.5px]" style="min-height: 44px">
+        Tải ảnh QR lên
+        <input type="file" class="sr-only" accept="image/*" @change="readFromImage" />
+      </label>
     </div>
   </div>
 </template>
+
+<style scoped>
+.ay-corner {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+}
+.ay-corner-tl {
+  top: 0;
+  left: 0;
+  border-top: 4px solid var(--color-accent-400);
+  border-left: 4px solid var(--color-accent-400);
+  border-radius: 14px 0 0 0;
+}
+.ay-corner-tr {
+  top: 0;
+  right: 0;
+  border-top: 4px solid var(--color-accent-400);
+  border-right: 4px solid var(--color-accent-400);
+  border-radius: 0 14px 0 0;
+}
+.ay-corner-bl {
+  bottom: 0;
+  left: 0;
+  border-bottom: 4px solid var(--color-accent-400);
+  border-left: 4px solid var(--color-accent-400);
+  border-radius: 0 0 0 14px;
+}
+.ay-corner-br {
+  bottom: 0;
+  right: 0;
+  border-bottom: 4px solid var(--color-accent-400);
+  border-right: 4px solid var(--color-accent-400);
+  border-radius: 0 0 14px 0;
+}
+</style>
