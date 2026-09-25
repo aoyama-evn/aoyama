@@ -107,3 +107,11 @@ export type NotificationSendStatus =
   (typeof NotificationSendStatus)[keyof typeof NotificationSendStatus];
 
 export type LanguageCode = 'en' | 'vi' | 'ja';
+
+/** Loai nhien lieu cua xe — SC-30 va SA-21 deu hoi truong nay. */
+export const VehicleFuelType = {
+  GASOLINE: 'GASOLINE',
+  ELECTRIC: 'ELECTRIC',
+  HYBRID: 'HYBRID',
+} as const;
+export type VehicleFuelType = (typeof VehicleFuelType)[keyof typeof VehicleFuelType];

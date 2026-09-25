@@ -1,5 +1,11 @@
 <script setup lang="ts">
-/** CP-13 Bieu mau thong tin xe — SC-14, SC-30, SA-21. */
+import { VehicleFuelType } from '~/types/enums';
+
+/**
+ * CP-13 Bieu mau thong tin xe — SC-14, SC-30, SA-21.
+ * Ban thiet ke xep hai cot: hang / dong xe, nhien lieu / bien so, roi so km va
+ * ten goi nho trai het hai cot. Anh xe la o rieng o duoi.
+ */
 export interface VehicleFormValue {
   plateNumber: string;
   maker: string;
@@ -8,10 +14,21 @@ export interface VehicleFormValue {
   engineCc?: number | null;
   color?: string | null;
   currentOdometer?: number | null;
+  nickname?: string | null;
+  fuelType?: VehicleFuelType;
+  photoUrls?: string[];
   note?: string | null;
 }
 
-const props = defineProps<{ modelValue: VehicleFormValue; errors?: Record<string, string> }>();
+const props = withDefaults(
+  defineProps<{
+    modelValue: VehicleFormValue;
+    errors?: Record<string, string>;
+    /** SC-14 chi hoi nhung o toi thieu; SC-30 va SA-21 hoi day du. */
+    compact?: boolean;
+  }>(),
+  { compact: false },
+);
 const emit = defineEmits<{ (e: 'update:modelValue', v: VehicleFormValue): void }>();
 
 function set<K extends keyof VehicleFormValue>(key: K, value: VehicleFormValue[K]): void {
@@ -19,71 +36,166 @@ function set<K extends keyof VehicleFormValue>(key: K, value: VehicleFormValue[K
 }
 
 const MAKERS = ['Honda', 'Yamaha', 'Suzuki', 'Kawasaki', 'Vespa', 'Khác'];
+
+const FUELS: { value: VehicleFuelType; label: string }[] = [
+  { value: VehicleFuelType.GASOLINE, label: 'Xăng' },
+  { value: VehicleFuelType.ELECTRIC, label: 'Điện' },
+  { value: VehicleFuelType.HYBRID, label: 'Hybrid' },
+];
+
+const photos = computed({
+  get: () => props.modelValue.photoUrls ?? [],
+  set: (value: string[]) => set('photoUrls', value),
+});
 </script>
 
 <template>
-  <div class="grid gap-3 sm:grid-cols-2">
-    <AyField label="Biển số" required :error="errors?.plateNumber" class="sm:col-span-2">
-      <template #default="{ id, invalid }">
-        <input
-          :id="id" class="input" type="text" :aria-invalid="invalid"
-          :value="modelValue.plateNumber" placeholder="浜松 あ 12-34"
-          @input="set('plateNumber', ($event.target as HTMLInputElement).value)"
-        >
-      </template>
-    </AyField>
+  <div class="flex flex-col gap-2.5">
+    <div class="grid grid-cols-2 gap-2.5">
+      <AyField label="Hãng" required :error="errors?.maker">
+        <template #default="{ id }">
+          <select
+            :id="id"
+            class="input"
+            :value="modelValue.maker"
+            @change="set('maker', ($event.target as HTMLSelectElement).value)"
+          >
+            <option value="">— Chọn hãng —</option>
+            <option v-for="m in MAKERS" :key="m" :value="m">{{ m }}</option>
+          </select>
+        </template>
+      </AyField>
 
-    <AyField label="Hãng xe" required :error="errors?.maker">
-      <template #default="{ id }">
-        <select :id="id" class="input" :value="modelValue.maker"
-          @change="set('maker', ($event.target as HTMLSelectElement).value)">
-          <option value="">— Chọn hãng —</option>
-          <option v-for="m in MAKERS" :key="m" :value="m">{{ m }}</option>
-        </select>
-      </template>
-    </AyField>
+      <AyField label="Dòng xe" required :error="errors?.model">
+        <template #default="{ id }">
+          <input
+            :id="id"
+            class="input"
+            type="text"
+            :value="modelValue.model"
+            placeholder="Lead 125"
+            @input="set('model', ($event.target as HTMLInputElement).value)"
+          />
+        </template>
+      </AyField>
 
-    <AyField label="Dòng xe" required :error="errors?.model">
-      <template #default="{ id }">
-        <input :id="id" class="input" type="text" :value="modelValue.model"
-          placeholder="PCX 125" @input="set('model', ($event.target as HTMLInputElement).value)">
-      </template>
-    </AyField>
+      <AyField label="Nhiên liệu" required>
+        <template #default="{ id }">
+          <select
+            :id="id"
+            class="input"
+            :value="modelValue.fuelType ?? VehicleFuelType.GASOLINE"
+            @change="set('fuelType', ($event.target as HTMLSelectElement).value as VehicleFuelType)"
+          >
+            <option v-for="fuel in FUELS" :key="fuel.value" :value="fuel.value">
+              {{ fuel.label }}
+            </option>
+          </select>
+        </template>
+      </AyField>
 
-    <AyField label="Dung tích (cc)" hint="Dùng để tính giá theo phân khúc xe">
-      <template #default="{ id }">
-        <input :id="id" class="input" type="number" min="0" :value="modelValue.engineCc ?? ''"
-          @input="set('engineCc', Number(($event.target as HTMLInputElement).value) || null)">
-      </template>
-    </AyField>
+      <AyField label="Biển số" required :error="errors?.plateNumber">
+        <template #default="{ id, invalid }">
+          <input
+            :id="id"
+            class="input"
+            type="text"
+            :aria-invalid="invalid"
+            :value="modelValue.plateNumber"
+            placeholder="34A1-234.56"
+            @input="set('plateNumber', ($event.target as HTMLInputElement).value)"
+          />
+        </template>
+      </AyField>
 
-    <AyField label="Số km hiện tại">
-      <template #default="{ id }">
-        <input :id="id" class="input" type="number" min="0" :value="modelValue.currentOdometer ?? ''"
-          @input="set('currentOdometer', Number(($event.target as HTMLInputElement).value) || null)">
-      </template>
-    </AyField>
+      <div class="col-span-2">
+        <AyField label="Số km hiện tại">
+          <template #default="{ id }">
+            <input
+              :id="id"
+              class="input"
+              type="number"
+              inputmode="numeric"
+              min="0"
+              :value="modelValue.currentOdometer ?? ''"
+              @input="set('currentOdometer', Number(($event.target as HTMLInputElement).value) || null)"
+            />
+          </template>
+        </AyField>
+      </div>
 
-    <AyField label="Năm sản xuất">
-      <template #default="{ id }">
-        <input :id="id" class="input" type="number" min="1970" :max="new Date().getFullYear()"
-          :value="modelValue.modelYear ?? ''"
-          @input="set('modelYear', Number(($event.target as HTMLInputElement).value) || null)">
-      </template>
-    </AyField>
+      <div class="col-span-2">
+        <AyField label="Tên gợi nhớ (tùy chọn)">
+          <template #default="{ id }">
+            <input
+              :id="id"
+              class="input"
+              type="text"
+              :value="modelValue.nickname ?? ''"
+              placeholder="Xe đi làm"
+              @input="set('nickname', ($event.target as HTMLInputElement).value)"
+            />
+          </template>
+        </AyField>
+      </div>
 
-    <AyField label="Màu xe">
-      <template #default="{ id }">
-        <input :id="id" class="input" type="text" :value="modelValue.color ?? ''"
-          @input="set('color', ($event.target as HTMLInputElement).value)">
-      </template>
-    </AyField>
+      <template v-if="!compact">
+        <AyField label="Dung tích (cc)" hint="Dùng để tính giá theo phân khúc xe">
+          <template #default="{ id }">
+            <input
+              :id="id"
+              class="input"
+              type="number"
+              min="0"
+              :value="modelValue.engineCc ?? ''"
+              @input="set('engineCc', Number(($event.target as HTMLInputElement).value) || null)"
+            />
+          </template>
+        </AyField>
 
-    <AyField label="Ghi chú" class="sm:col-span-2">
-      <template #default="{ id }">
-        <textarea :id="id" class="input min-h-[80px]" :value="modelValue.note ?? ''"
-          @input="set('note', ($event.target as HTMLTextAreaElement).value)" />
+        <AyField label="Năm sản xuất">
+          <template #default="{ id }">
+            <input
+              :id="id"
+              class="input"
+              type="number"
+              min="1970"
+              :max="new Date().getFullYear()"
+              :value="modelValue.modelYear ?? ''"
+              @input="set('modelYear', Number(($event.target as HTMLInputElement).value) || null)"
+            />
+          </template>
+        </AyField>
+
+        <AyField label="Màu xe">
+          <template #default="{ id }">
+            <input
+              :id="id"
+              class="input"
+              type="text"
+              :value="modelValue.color ?? ''"
+              @input="set('color', ($event.target as HTMLInputElement).value)"
+            />
+          </template>
+        </AyField>
       </template>
-    </AyField>
+    </div>
+
+    <template v-if="!compact">
+      <AyField label="Ảnh xe (tùy chọn)">
+        <AyImageUpload v-model="photos" :max="4" />
+      </AyField>
+
+      <AyField label="Ghi chú">
+        <template #default="{ id }">
+          <textarea
+            :id="id"
+            class="input min-h-[80px]"
+            :value="modelValue.note ?? ''"
+            @input="set('note', ($event.target as HTMLTextAreaElement).value)"
+          />
+        </template>
+      </AyField>
+    </template>
   </div>
 </template>

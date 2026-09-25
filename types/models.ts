@@ -11,6 +11,7 @@ import type {
   QuotationStatus,
   ServiceType,
   UserRole,
+  VehicleFuelType,
   WorkOrderStatus,
 } from './enums';
 
@@ -193,8 +194,16 @@ export interface Vehicle {
   vinNumber: string | null;
   currentOdometer: number | null;
   photoUrls: string[];
+  /** SC-30 — ten goi nho khach tu dat. */
+  nickname: string | null;
+  fuelType: VehicleFuelType;
   note: string | null;
   isActive: boolean;
+  /** FR-VEH-07 — moc gan nhat va moc de xuat, chi co o SC-29 va SC-31. */
+  lastServicedAt?: string | null;
+  lastServiceOdometer?: number | null;
+  nextServiceDueDate?: string | null;
+  nextServiceDueOdometer?: number | null;
 }
 
 export interface ServiceHistory {
