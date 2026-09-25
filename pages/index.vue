@@ -31,14 +31,12 @@ function priceLabel(service: ServiceItem): string {
   <div class="flex flex-col gap-4 pb-4">
     <!-- Anh mo dau tran ra sat mep cot noi dung -->
     <div class="-mx-4 -mt-4 px-3 pb-3 pt-2" style="background: var(--color-accent-200)">
-      <div
-        class="grid place-items-center rounded-xl"
-        style="aspect-ratio: 16 / 10; background: var(--color-accent-100)"
-      >
-        <p class="px-6 text-center font-heading text-[17px]" style="color: var(--color-accent-800)">
-          遠鉄グループ AOYAMA
-        </p>
-      </div>
+      <img
+        :src="'/design/hero-bike.jpg'"
+        alt="Xe máy tại AOYAMA"
+        class="block h-auto w-full"
+        style="mix-blend-mode: multiply"
+      />
     </div>
 
     <div>
@@ -48,7 +46,7 @@ function priceLabel(service: ServiceItem): string {
       >
         Bảo dưỡng &amp; sửa chữa xe máy
       </p>
-      <h2>Hỗ trợ toàn diện cho cuộc sống xe máy của bạn</h2>
+      <h2 class="text-[27px]">Hỗ trợ toàn diện cho cuộc sống xe máy của bạn</h2>
       <p class="mt-2 text-[13px]" style="color: var(--color-neutral-700)">
         Aoyama Motorcycle xử lý mọi dịch vụ từ kiểm tra xe, kiểm tra và sửa vỏ, sơn và bảo hiểm.
         Hãy để mọi thứ liên quan đến xe máy cho chúng tôi!

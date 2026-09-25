@@ -1,81 +1,42 @@
+/**
+ * organic.css la tep goc cua he thong thiet ke, lay nguyen tu ban xuat
+ * "AOYAMA sys.zip" (_ds/organic-596346b9-.../styles.css). KHONG SUA TEP DO —
+ * moi dieu chinh rieng cua ung dung dat o duoi day.
+ * Tep do duoc nap truoc tep nay qua nuxt.config.
+ */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/**
- * Design token va bo lop thanh phan — dung lai theo ban thiet ke man hinh
- * "AOYAMA Service - Screen Flow". Ban xuat thieu tep CSS goc cua he thong
- * thiet ke (_ds/organic-.../styles.css) nen GIA TRI MAU va FONT o day la suy
- * doan; TEN BIEN va moi kich thuoc, bo tron, khoang cach thi lay dung tu ban
- * thiet ke. Khi co tep goc, chi can thay khoi :root ben duoi.
- */
 @layer base {
   :root {
-    color-scheme: light;
+    /**
+     * Bien bo sung cho rieng ung dung. Bo token cua he thong thiet ke
+     * (--color-*, --font-*, --space-*, --radius-*, --shadow-*) nam trong
+     * organic.css.
+     */
 
-    --color-bg: #f4f1ea;
-    --color-surface: #fbf9f4;
-    --color-text: #241f1a;
-    --color-divider: #e4ded3;
-
-    --color-accent: #b4552a;
-    --color-accent-100: #fdf6f0;
-    --color-accent-200: #f7e7d9;
-    --color-accent-300: #edcbaf;
-    --color-accent-400: #dda57c;
-    --color-accent-500: #c87a43;
-    --color-accent-700: #8f4220;
-    --color-accent-800: #6d3218;
-
-    --color-accent-2: #2f6f6b;
-    --color-accent-2-100: #eef6f5;
-    --color-accent-2-200: #d5e8e6;
-    --color-accent-2-400: #7ab6b1;
-    --color-accent-2-500: #4b918b;
-    --color-accent-2-600: #3a7d77;
-    --color-accent-2-700: #2f6f6b;
-    --color-accent-2-800: #1f4f4c;
-
-    --color-neutral-100: #faf8f4;
-    --color-neutral-200: #f0ece4;
-    --color-neutral-300: #e0d9cd;
-    --color-neutral-400: #c2baab;
-    --color-neutral-500: #978f83;
-    --color-neutral-600: #6d655c;
-    --color-neutral-700: #4d463f;
-    --color-neutral-800: #322d28;
-    --color-neutral-900: #1c1916;
-
-    --color-success: #2f7d4f;
-    --color-success-bg: #e7f3ec;
+    /** Trang thai nghiep vu khong co trong he thong thiet ke. */
+    --color-success: #4a7c3f;
+    --color-success-bg: #e8f1e2;
     --color-warning: #9a6b16;
     --color-warning-bg: #fbf1dc;
     --color-danger: #a3342c;
     --color-danger-bg: #fbeae8;
-    --color-info: #2c5f8d;
-    --color-info-bg: #e8f0f7;
 
-    --font-heading: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Yu Gothic', system-ui,
-      sans-serif;
-    --font-body: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', system-ui, -apple-system, sans-serif;
-
-    --shadow-sm: 0 1px 2px rgba(36, 31, 26, 0.05), 0 4px 12px -8px rgba(36, 31, 26, 0.16);
-    --shadow-lg: 0 24px 60px -24px rgba(36, 31, 26, 0.35);
-
-    /** Be rong cot noi dung cua site khach hang — khung dien thoai 392px trong ban thiet ke. */
+    /** Be rong cot noi dung site khach hang — khung dien thoai 392px cua ban thiet ke. */
     --sp-width: 430px;
   }
 
-  html {
-    background: var(--color-bg);
-  }
-
+  /**
+   * Tailwind preflight dat lai mot so quy tac cua organic.css vi no nap sau.
+   * Khoi nay tra lai dung dinh dang cua he thong thiet ke.
+   */
   body {
-    margin: 0;
     background: var(--color-bg);
     color: var(--color-text);
     font-family: var(--font-body);
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
   }
@@ -84,45 +45,37 @@
   h2,
   h3,
   h4,
-  h5 {
+  h5,
+  h6 {
     font-family: var(--font-heading);
-    font-weight: 600;
-    line-height: 1.2;
-    margin: 0;
-    text-wrap: pretty;
+    font-weight: var(--font-heading-weight);
+    line-height: 1.12;
+    letter-spacing: -0.015em;
   }
 
+  h1 {
+    font-size: 42px;
+  }
   h2 {
-    font-size: 27px;
+    font-size: 32px;
   }
   h3 {
-    font-size: 21px;
+    font-size: 25px;
   }
   h4 {
-    font-size: 17px;
+    font-size: 20px;
   }
   h5 {
-    font-size: 14px;
+    font-size: 16px;
   }
 
   a {
-    color: var(--color-accent-700);
+    color: var(--color-accent);
     text-decoration: none;
+    text-underline-offset: 3px;
   }
   a:hover {
-    color: var(--color-accent);
     text-decoration: underline;
-  }
-
-  /** NFR-UX — vien tieu diem phai thay ro khi dieu huong bang ban phim. */
-  :focus-visible {
-    outline: 2px solid var(--color-accent-500);
-    outline-offset: 2px;
-    border-radius: 6px;
-  }
-
-  img {
-    max-width: 100%;
   }
 
   [hidden] {
@@ -131,46 +84,16 @@
 }
 
 @layer components {
-  /* ---------- Nut ---------- */
-  .btn {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-full border border-transparent
-      px-4 text-[13px] font-semibold transition-colors duration-150
-      disabled:cursor-not-allowed disabled:opacity-50;
-    font-family: var(--font-body);
-    /* C-05 — vung cham du lon cho nguoi lon tuoi. */
-    min-height: 40px;
-    cursor: pointer;
+  /* ---------- Bo sung ngoai he thong thiet ke ---------- */
+
+  /** Nut chinh cua mot man hinh: rong het dong, cao 48px (C-05). */
+  .btn-cta {
+    width: 100%;
+    min-height: 48px;
+    font-size: 15px;
   }
 
-  .btn-primary {
-    background: var(--color-accent);
-    color: var(--color-bg);
-  }
-  .btn-primary:hover:not(:disabled) {
-    background: var(--color-accent-700);
-  }
-
-  .btn-secondary {
-    background: var(--color-surface);
-    border-color: var(--color-neutral-300);
-    color: var(--color-neutral-800);
-  }
-  .btn-secondary:hover:not(:disabled) {
-    background: var(--color-accent-100);
-    border-color: var(--color-accent-300);
-  }
-
-  .btn-ghost {
-    @apply px-1;
-    background: transparent;
-    color: var(--color-accent-700);
-    min-height: 32px;
-  }
-  .btn-ghost:hover:not(:disabled) {
-    color: var(--color-accent);
-    text-decoration: underline;
-  }
-
+  /** Nut canh bao — he thong thiet ke khong co bien the nay. */
   .btn-danger {
     background: var(--color-danger);
     color: #fff;
@@ -179,199 +102,60 @@
     filter: brightness(0.92);
   }
 
-  .btn-block {
-    @apply w-full;
-  }
-
-  /** Nut chinh cua mot man hinh — cao 48px theo ban thiet ke. */
-  .btn-cta {
-    @apply w-full text-[15px];
-    min-height: 48px;
-  }
-
-  .btn-icon {
-    @apply px-0;
-    width: 36px;
-    min-height: 36px;
-  }
-
-  /* ---------- The ---------- */
-  .card {
-    @apply flex flex-col p-[14px];
-    background: var(--color-surface);
-    border-radius: 22px;
-  }
-
-  .elev-sm {
-    box-shadow: var(--shadow-sm);
-  }
-
-  .card-kicker {
-    @apply text-[10px] font-semibold uppercase;
-    letter-spacing: 0.09em;
-    color: var(--color-neutral-600);
-  }
-
-  .text-muted {
-    color: var(--color-neutral-600);
-  }
-
-  /* ---------- O nhap ---------- */
-  .field {
-    @apply flex flex-col gap-1;
-  }
-
-  .field > label {
-    @apply text-[12px] font-semibold;
-    color: var(--color-neutral-700);
-  }
-
-  .input {
-    @apply w-full rounded-2xl border px-3 py-2 text-[13.5px] transition-colors;
-    background: #fff;
-    border-color: var(--color-neutral-300);
-    color: var(--color-text);
-    min-height: 44px;
-    font-family: var(--font-body);
-  }
-  .input:focus {
-    border-color: var(--color-accent-400);
-    outline: none;
-    box-shadow: 0 0 0 3px var(--color-accent-200);
-  }
-  .input[aria-invalid='true'] {
-    border-color: var(--color-danger);
-  }
-  textarea.input {
-    @apply py-2.5;
-    min-height: 70px;
-  }
-  select.input {
-    @apply pr-8;
-  }
-
-  .field-error {
-    @apply text-[12px] font-medium;
-    color: var(--color-danger);
-  }
-
-  /* ---------- Nhan trang thai ---------- */
-  .tag {
-    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11.5px] font-semibold;
-    line-height: 1.25;
-  }
-  .tag-accent {
-    background: var(--color-accent-200);
-    color: var(--color-accent-800);
-  }
-  .tag-accent-2 {
-    background: var(--color-accent-2-200);
-    color: var(--color-accent-2-800);
-  }
-  .tag-neutral {
-    background: var(--color-neutral-200);
-    color: var(--color-neutral-700);
-  }
   .tag-success {
     background: var(--color-success-bg);
     color: var(--color-success);
+  }
+  .tag-warning {
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
   }
   .tag-danger {
     background: var(--color-danger-bg);
     color: var(--color-danger);
   }
 
-  /* ---------- Chon mot trong nhieu ---------- */
-  .radio {
-    @apply flex cursor-pointer items-start;
-  }
-  .radio > input[type='radio'],
-  .radio > input[type='checkbox'] {
-    @apply sr-only;
-  }
-  .radio > .dot {
-    @apply mt-0.5 grid flex-none place-items-center rounded-full border-2;
-    width: 18px;
-    height: 18px;
-    border-color: var(--color-neutral-400);
-    background: #fff;
-  }
-  .radio > input:checked + .dot {
-    border-color: var(--color-accent);
-  }
-  .radio > input:checked + .dot::after {
-    content: '';
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--color-accent);
-  }
-  .radio > input:focus-visible + .dot {
-    outline: 2px solid var(--color-accent-500);
-    outline-offset: 2px;
-  }
-
-  /* ---------- Nut gat nhieu lua chon (ngon ngu) ---------- */
-  .seg {
-    @apply inline-flex rounded-full p-0.5;
-    background: var(--color-neutral-200);
-  }
-  .seg-opt {
-    @apply cursor-pointer rounded-full px-2 py-1 text-[10.5px] font-semibold transition-colors;
-    color: var(--color-neutral-600);
-  }
-  .seg-opt > input {
-    @apply sr-only;
-  }
-  .seg-opt:has(input:checked) {
-    background: var(--color-surface);
-    color: var(--color-accent-800);
-    box-shadow: var(--shadow-sm);
-  }
-
-  /* ---------- Bang ---------- */
-  .table {
-    @apply w-full border-collapse text-left text-[13px];
-  }
-  .table thead th {
-    @apply whitespace-nowrap px-3 py-2 text-[11px] font-semibold uppercase;
-    letter-spacing: 0.06em;
-    color: var(--color-neutral-600);
-    border-bottom: 1px solid var(--color-divider);
-  }
-  .table tbody td {
-    @apply px-3 py-2.5 align-middle;
-    border-bottom: 1px solid var(--color-divider);
-  }
-  .table tbody tr:last-child td {
-    border-bottom: 0;
-  }
-  .table tbody tr[data-clickable]:hover {
-    background: var(--color-accent-100);
-  }
-
   /** Khung cuon ngang rieng cho bang, de than trang khong bi day rong. */
   .table-wrap {
-    @apply overflow-x-auto;
-    background: #fff;
-    border-radius: 22px;
+    overflow-x: auto;
+    background: var(--color-surface);
+    border-radius: calc(var(--radius-lg) * 1.15);
   }
 
   /** Nhan cho o nhap dung ngoai .field. */
   .label {
-    @apply mb-1 block text-[12px] font-semibold;
-    color: var(--color-neutral-700);
+    display: block;
+    margin-bottom: 5px;
+    font-size: 12px;
+    color: color-mix(in srgb, var(--color-text) 70%, transparent);
   }
 
   .hint {
-    @apply text-[11.5px];
-    color: var(--color-neutral-600);
+    font-size: 11.5px;
+    color: color-mix(in srgb, var(--color-text) 55%, transparent);
   }
 
-  /* ---------- Cot noi dung cua site khach hang ---------- */
+  .field-error {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-danger);
+  }
+
+  /** Cot noi dung cua site khach hang. */
   .sp-shell {
-    @apply mx-auto w-full;
+    margin-inline: auto;
+    width: 100%;
     max-width: var(--sp-width);
+  }
+
+  /** Bang cua ung dung co the bam vao tung dong. */
+  .table tbody tr[data-clickable] {
+    cursor: pointer;
+  }
+
+  /** Vung chinh cua trang quan tri dung nen sang hon de the noi len. */
+  .admin-surface {
+    background: var(--color-neutral-100);
   }
 }
 

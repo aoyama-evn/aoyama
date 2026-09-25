@@ -14,7 +14,8 @@ export default defineNuxtConfig({
     },
   },
 
-  css: ['~/assets/css/main.css'],
+  // organic.css la tep goc cua he thong thiet ke, phai nap truoc main.css.
+  css: ['~/assets/css/organic.css', '~/assets/css/main.css'],
 
   // Ten thanh phan lay thang tu ten tep, khong gan tien to thu muc — AyButton
   // doc de hon UiAyButton. Vi vay ten tep phai duy nhat tren toan bo components/.
