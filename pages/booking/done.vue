@@ -9,6 +9,7 @@ import type { Booking } from '~/types/models';
 const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
+const { t } = useI18n();
 const { i18n, slotRange } = useFormat();
 
 const code = route.query.code as string | undefined;
@@ -31,7 +32,7 @@ async function copyCode(): Promise<void> {
   const value = booking.value?.code ?? code ?? '';
   try {
     await navigator.clipboard.writeText(value);
-    ui.success('Đã sao chép mã lịch hẹn');
+    ui.success(t('sc16.copied'));
   } catch {
     ui.warning('Trình duyệt không cho sao chép', `Mã của bạn là ${value}`);
   }
@@ -51,7 +52,7 @@ function saveQr(): void {
   ui.success('Đã mở ảnh mã QR', 'Nhấn giữ để lưu về máy.');
 }
 
-useHead({ title: 'Đã nhận yêu cầu đặt lịch' });
+useHead({ title: () => t('sc16.title') });
 </script>
 
 <template>
@@ -70,15 +71,15 @@ useHead({ title: 'Đã nhận yêu cầu đặt lịch' });
     </span>
 
     <div>
-      <h3>Đặt lịch thành công</h3>
-      <p class="text-muted mt-1 text-[12.5px]">Booking confirmed</p>
+      <h3>{{ $t('sc16.title') }}</h3>
+      <p class="text-muted mt-1 text-[12.5px]">{{ $t('sc16.subtitle') }}</p>
     </div>
 
     <div
       class="flex w-full flex-col items-center gap-2.5 px-5 py-4"
       style="background: var(--color-surface); border-radius: 24px"
     >
-      <p class="text-muted text-[11px]">Mã lịch hẹn · Booking code</p>
+      <p class="text-muted text-[11px]">{{ $t('sc16.codeLabel') }}</p>
       <div class="flex items-center justify-center gap-2">
         <span class="select-all font-heading text-[23px]" style="letter-spacing: 0.02em">
           {{ booking?.code ?? code }}
@@ -86,8 +87,8 @@ useHead({ title: 'Đã nhận yêu cầu đặt lịch' });
         <button
           type="button"
           class="btn btn-ghost flex-none p-1"
-          aria-label="Sao chép mã"
-          title="Sao chép mã"
+          :aria-label="$t('sc16.copyCode')"
+          :title="$t('sc16.copyCode')"
           @click="copyCode"
         >
           <svg
@@ -123,31 +124,30 @@ useHead({ title: 'Đã nhận yêu cầu đặt lịch' });
             >
               <path d="M12 4v11M7.5 11 12 15.5 16.5 11M5 20h14" />
             </svg>
-            Lưu mã QR
+            {{ $t('sc16.saveQr') }}
           </button>
           <p class="text-muted text-center text-[11.5px] leading-[1.5]">
-            Đưa mã này cho lễ tân khi đến cửa hàng<br />Show this at the counter
+            {{ $t('sc16.qrHint') }}
           </p>
         </template>
 
         <p v-else class="text-muted text-center text-[11.5px] leading-[1.5]">
-          Cửa hàng sẽ xác nhận và gửi mã QR cho bạn sớm nhất có thể.<br />
-          Hãy giữ lại mã lịch hẹn ở trên để tra cứu.
+          {{ $t('sc16.qrPending') }}
         </p>
       </div>
     </div>
 
     <dl v-if="booking" class="flex w-full flex-col gap-2.5 text-left text-[13.5px]">
       <div class="flex gap-2.5">
-        <dt class="text-muted w-[78px] flex-none text-[12px]">Thời gian</dt>
+        <dt class="text-muted w-[78px] flex-none text-[12px]">{{ $t('sc15.datetime') }}</dt>
         <dd>{{ slotRange(booking) }}</dd>
       </div>
       <div class="flex gap-2.5">
-        <dt class="text-muted w-[78px] flex-none text-[12px]">Cửa hàng</dt>
+        <dt class="text-muted w-[78px] flex-none text-[12px]">{{ $t('sc16.store') }}</dt>
         <dd>{{ i18n(booking.store?.name ?? null) }}</dd>
       </div>
       <div class="flex gap-2.5">
-        <dt class="text-muted w-[78px] flex-none text-[12px]">Dịch vụ</dt>
+        <dt class="text-muted w-[78px] flex-none text-[12px]">{{ $t('sc15.service') }}</dt>
         <dd>{{ (booking.services ?? []).map((s) => s.serviceName).join(', ') }}</dd>
       </div>
     </dl>
@@ -157,10 +157,10 @@ useHead({ title: 'Đã nhận yêu cầu đặt lịch' });
       class="btn btn-primary btn-block"
       style="min-height: 48px; font-size: 15px; margin: 0"
     >
-      Theo dõi tiến độ
+      {{ $t('sc16.trackCta') }}
     </NuxtLink>
     <NuxtLink to="/" class="btn btn-secondary btn-block" style="min-height: 44px; margin: 0">
-      Về trang chủ
+      {{ $t('common.backHome') }}
     </NuxtLink>
   </div>
 </template>

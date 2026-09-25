@@ -68,7 +68,7 @@ function remove(index: number): void {
       <circle cx="9" cy="10" r="1.6" />
       <path d="m5 17 5-4.5 4 3.5 2.5-2 2.5 3" />
     </svg>
-    Ảnh ({{ modelValue.length }}/{{ max }})
+    {{ $t('sc10.photos', { n: modelValue.length, max }) }}
     <input
       type="file" class="sr-only" multiple :accept="ACCEPT.join(',')"
       @change="handleFiles(($event.target as HTMLInputElement).files)"

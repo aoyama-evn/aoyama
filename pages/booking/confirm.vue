@@ -6,6 +6,7 @@ const api = useApi();
 const booking = useBookingStore();
 const ui = useUiStore();
 const auth = useAuthStore();
+const { t } = useI18n();
 const { i18n, money, dayLabel } = useFormat();
 
 const store = ref<Store | null>(null);
@@ -66,14 +67,14 @@ useHead({ title: 'Đặt lịch — Xác nhận' });
 <template>
   <div class="flex flex-col gap-3 pb-4">
     <div>
-      <h4>Kiểm tra lại lịch hẹn</h4>
-      <p class="text-[12px] text-muted">Review before confirming.</p>
+      <h4>{{ $t('sc15.title') }}</h4>
+      <p class="text-muted text-[12px]">{{ $t('sc15.lead') }}</p>
     </div>
 
     <div class="card gap-1.5">
       <div class="flex items-baseline justify-between">
-        <div class="card-kicker">Dịch vụ</div>
-        <NuxtLink to="/booking/step1" class="btn btn-ghost text-[12px]">Sửa</NuxtLink>
+        <div class="card-kicker">{{ $t('sc15.service') }}</div>
+        <NuxtLink to="/booking/step1" class="btn btn-ghost text-[12px]">{{ $t('sc15.edit') }}</NuxtLink>
       </div>
       <div class="text-[13.5px]">
         {{ booking.selectedServices.map((s) => i18n(s.name)).join(' · ') }}
@@ -83,19 +84,19 @@ useHead({ title: 'Đặt lịch — Xác nhận' });
 
     <div class="card gap-1.5">
       <div class="flex items-baseline justify-between">
-        <div class="card-kicker">Thời gian</div>
-        <NuxtLink to="/booking/step2" class="btn btn-ghost text-[12px]">Sửa</NuxtLink>
+        <div class="card-kicker">{{ $t('sc15.datetime') }}</div>
+        <NuxtLink to="/booking/step2" class="btn btn-ghost text-[12px]">{{ $t('sc15.edit') }}</NuxtLink>
       </div>
       <div class="text-[13.5px]">{{ slotLabel }}</div>
       <div v-if="estimatedEnd" class="text-[11.5px] text-muted">
-        Dự kiến hoàn thành ≈ {{ estimatedEnd }}
+        {{ $t('sc13.estimatedEnd') }} ≈ {{ estimatedEnd }}
       </div>
     </div>
 
     <div class="card gap-1.5">
       <div class="flex items-baseline justify-between">
-        <div class="card-kicker">Khách &amp; xe</div>
-        <NuxtLink to="/booking/step3" class="btn btn-ghost text-[12px]">Sửa</NuxtLink>
+        <div class="card-kicker">{{ $t('sc15.customerVehicle') }}</div>
+        <NuxtLink to="/booking/step3" class="btn btn-ghost text-[12px]">{{ $t('sc15.edit') }}</NuxtLink>
       </div>
       <div class="text-[13.5px]">{{ booking.contactName }} · {{ booking.contactPhone }}</div>
       <div v-if="booking.vehicle.plateNumber" class="text-[11.5px] text-muted">
@@ -120,12 +121,11 @@ useHead({ title: 'Đặt lịch — Xác nhận' });
       class="p-3 text-[12.5px] leading-[1.55]"
       style="background: var(--color-accent-2-100); border-radius: 20px; color: var(--color-accent-2-800)"
     >
-      Lịch hẹn sẽ được lưu vào tài khoản <strong>{{ booking.contactName }}</strong> —
-      bạn có thể theo dõi tiến độ và xem lại lịch sử bất cứ lúc nào.
+      {{ $t('sc15.memberNote', { name: booking.contactName }) }}
     </div>
 
     <div class="flex items-baseline justify-between px-0.5 py-1">
-      <span class="text-[12px] text-muted">Tổng giá tham khảo</span>
+      <span class="text-muted text-[12px]">{{ $t('sc15.totalLabel') }}</span>
       <span class="font-heading text-[23px]">{{ money(booking.estimatedTotal) }}</span>
     </div>
 
@@ -138,15 +138,18 @@ useHead({ title: 'Đặt lịch — Xác nhận' });
       :disabled="submitting"
       @click="submit"
     >
-      {{ submitting ? 'Đang gửi…' : 'Xác nhận đặt lịch' }}
+      {{ submitting ? $t('sc15.submitting') : $t('sc15.confirm') }}
     </button>
 
-    <NuxtLink to="/" class="btn btn-ghost self-center text-[13px]">Hủy đặt lịch</NuxtLink>
+    <NuxtLink to="/" class="btn btn-ghost self-center text-[13px]">{{ $t('sc15.cancel') }}</NuxtLink>
 
     <p class="text-muted text-center text-[11px]">
-      Bấm xác nhận nghĩa là bạn đồng ý với
-      <NuxtLink to="/terms">Điều khoản</NuxtLink> và
-      <NuxtLink to="/privacy">Chính sách dữ liệu</NuxtLink>.
+      <i18n-t keypath="sc15.terms" tag="span">
+        <template #terms><NuxtLink to="/terms">{{ $t('sc15.termsLink') }}</NuxtLink></template>
+        <template #privacy>
+          <NuxtLink to="/privacy">{{ $t('sc15.privacyLink') }}</NuxtLink>
+        </template>
+      </i18n-t>
     </p>
   </div>
 </template>

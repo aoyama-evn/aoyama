@@ -85,7 +85,7 @@ const display = computed(() => {
       >
         <path d="M12 3v12M12 19v2M8 8v6M16 7v8M4 10v2M20 10v2" />
       </svg>
-      {{ compact ? 'Giọng nói' : 'Ghi âm mô tả' }}
+      {{ compact ? $t('sc10.voice') : $t('sc10.recordDesc') }}
     </button>
 
     <template v-if="recording">

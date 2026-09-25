@@ -13,6 +13,7 @@ const api = useApi();
 const auth = useAuthStore();
 const booking = useBookingStore();
 const ui = useUiStore();
+const { t } = useI18n();
 const { number } = useFormat();
 
 const session = ref<AiDiagnosis | null>(null);
@@ -64,7 +65,7 @@ async function send(): Promise<void> {
   } catch (error) {
     ui.error(
       normalizeError(error).message,
-      'Bạn vẫn có thể đặt lịch và mô tả trực tiếp tại cửa hàng.',
+      t('sc10.failLead'),
     );
   } finally {
     sending.value = false;
@@ -97,7 +98,7 @@ function vehicleLine(item: Vehicle): string {
   return parts.filter(Boolean).join(' · ');
 }
 
-useHead({ title: 'Trợ lý AOYAMA — chẩn đoán xe' });
+useHead({ title: () => t('sc10.assistant') });
 </script>
 
 <template>
@@ -121,10 +122,10 @@ useHead({ title: 'Trợ lý AOYAMA — chẩn đoán xe' });
         </svg>
       </span>
       <div class="leading-[1.2]">
-        <p class="font-heading text-[15px]">Trợ lý AOYAMA</p>
-        <p class="text-[10.5px]" style="color: var(--color-accent-2-800)">AOYAMA assistant</p>
+        <p class="font-heading text-[15px]">{{ $t('sc10.assistant') }}</p>
+        <p class="text-[10.5px]" style="color: var(--color-accent-2-800)">{{ $t('sc10.assistantSub') }}</p>
       </div>
-      <NuxtLink to="/" class="btn btn-ghost ml-auto px-2 text-[15px]" aria-label="Đóng trợ lý">
+      <NuxtLink to="/" class="btn btn-ghost ml-auto px-2 text-[15px]" :aria-label="$t('sc10.closeAssistant')">
         ✕
       </NuxtLink>
     </div>
@@ -132,8 +133,11 @@ useHead({ title: 'Trợ lý AOYAMA — chẩn đoán xe' });
     <!-- Dong tin nhan -->
     <div ref="scroller" class="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4">
       <p class="ay-bubble-bot">
-        Xin chào<template v-if="auth.user?.name"> <b>{{ auth.user.name }}</b></template
-        >! Bạn cần hỗ trợ gì cho xe của mình?
+        {{
+          auth.user?.name
+            ? $t('sc10.greetingNamed', { name: auth.user.name })
+            : $t('sc10.greeting')
+        }}
       </p>
 
       <div class="flex gap-2.5">
@@ -143,7 +147,7 @@ useHead({ title: 'Trợ lý AOYAMA — chẩn đoán xe' });
           :class="intent === 'MAINTENANCE' ? 'ay-chip-on' : ''"
           @click="intent = 'MAINTENANCE'"
         >
-          Bảo dưỡng
+          {{ $t('sc12.maintenance') }}
         </button>
         <button
           type="button"
@@ -151,13 +155,13 @@ useHead({ title: 'Trợ lý AOYAMA — chẩn đoán xe' });
           :class="intent === 'REPAIR' ? 'ay-chip-on' : ''"
           @click="intent = 'REPAIR'"
         >
-          Sửa chữa
+          {{ $t('sc12.repair') }}
         </button>
       </div>
 
       <!-- SC-10a: thanh vien chon xe tu ho so -->
       <template v-if="auth.isCustomer && (myVehicles ?? []).length">
-        <p class="ay-bubble-bot">Bạn muốn kiểm tra xe nào ạ?</p>
+        <p class="ay-bubble-bot">{{ $t('sc10.whichVehicle') }}</p>
         <div class="flex flex-col gap-2 self-stretch">
           <button
             v-for="item in myVehicles ?? []"
@@ -184,13 +188,13 @@ useHead({ title: 'Trợ lý AOYAMA — chẩn đoán xe' });
             class="btn btn-secondary text-[12.5px]"
             style="min-height: 44px"
           >
-            + Xe khác
+            {{ $t('sc10.otherVehicle') }}
           </NuxtLink>
         </div>
       </template>
 
       <p class="ay-bubble-bot">
-        Xe đang gặp hiện tượng gì? Bạn có thể mô tả, gửi ảnh hoặc ghi âm giọng nói.
+        {{ $t('sc10.askSymptom') }}
       </p>
 
       <!-- Lich su tin nhan -->
@@ -206,7 +210,7 @@ useHead({ title: 'Trợ lý AOYAMA — chẩn đoán xe' });
             v-for="(url, i) in message.imageUrls"
             :key="i"
             :src="url"
-            alt="Ảnh khách gửi"
+            :alt="$t('sc10.photos', { n: 1, max: 5 })"
             class="object-cover"
             style="width: 62px; height: 62px; border-radius: 14px"
           />
@@ -223,7 +227,7 @@ useHead({ title: 'Trợ lý AOYAMA — chẩn đoán xe' });
           <span class="ay-dot" style="background: var(--color-accent-400)" />
           <span class="ay-dot" style="background: var(--color-accent-300)" />
         </span>
-        Đang phân tích…
+        {{ $t('sc12.analysing') }}
       </div>
 
       <!-- SC-11 ket qua chan doan -->
@@ -235,13 +239,12 @@ useHead({ title: 'Trợ lý AOYAMA — chẩn đoán xe' });
       />
 
       <div v-else-if="analysisFailed" class="card gap-2">
-        <p class="text-[14px] font-semibold">Chưa đủ thông tin để chẩn đoán</p>
+        <p class="text-[14px] font-semibold">{{ $t('sc10.failTitle') }}</p>
         <p class="text-muted text-[13px]">
-          Bạn có thể mô tả thêm, hoặc đặt lịch để kỹ thuật viên kiểm tra trực tiếp — cách này luôn
-          chính xác nhất.
+          {{ $t('sc10.failLead') }}
         </p>
         <NuxtLink to="/booking/step1" class="btn btn-secondary self-start text-[12.5px]">
-          Đặt lịch kiểm tra
+          {{ $t('sc10.bookInspection') }}
         </NuxtLink>
       </div>
     </div>
@@ -260,8 +263,8 @@ useHead({ title: 'Trợ lý AOYAMA — chẩn đoán xe' });
           v-model="text"
           class="input flex-1"
           maxlength="1000"
-          placeholder="Mô tả tình trạng xe… (≤ 1.000 ký tự)"
-          aria-label="Mô tả tình trạng xe"
+          :placeholder="$t('sc10.inputPlaceholder')"
+          :aria-label="$t('sc10.inputPlaceholder')"
           @keydown.enter.exact.prevent="send"
         />
         <button
@@ -270,12 +273,12 @@ useHead({ title: 'Trợ lý AOYAMA — chẩn đoán xe' });
           :disabled="!canSend || sending"
           @click="send"
         >
-          Gửi
+          {{ $t('sc10.send') }}
         </button>
       </div>
       <p class="text-muted text-[11px] leading-[1.45]">
-        Ảnh và ghi âm chỉ dùng cho phiên chẩn đoán này.
-        <NuxtLink to="/privacy">Chính sách dữ liệu</NuxtLink>
+        {{ $t('sc10.privacyNote') }}
+        <NuxtLink to="/privacy">{{ $t('sc15.privacyLink') }}</NuxtLink>
       </p>
     </div>
   </div>

@@ -47,7 +47,7 @@ function pct(value: number): number {
   >
     <div class="flex flex-wrap items-center gap-2">
       <span class="tag" style="background: var(--color-accent-2-500); color: #fff">
-        ✦ Kết quả chẩn đoán
+        {{ $t('diag.badge') }}
       </span>
       <span v-if="vehicleLabel" class="text-[11px]" style="color: var(--color-accent-2-800)">
         {{ vehicleLabel }}
@@ -88,16 +88,16 @@ function pct(value: number): number {
       <span class="leading-[1.35]">
         <span class="block text-[13px] font-semibold">{{ i18n(suggested.name) }}</span>
         <span class="text-muted block text-[11px]">
-          Dịch vụ đề xuất · {{ suggested.durationMinutes }} mins
+          {{ $t('diag.suggested') }} · {{ $t('common.minutes', { n: suggested.durationMinutes }) }}
         </span>
       </span>
       <span class="whitespace-nowrap font-heading text-[15px]">
-        {{ suggested.quoteOnly ? 'báo giá' : `~ ${money(suggested.basePrice)}` }}
+        {{ suggested.quoteOnly ? $t('common.quoteOnly') : `~ ${money(suggested.basePrice)}` }}
       </span>
     </div>
 
     <p class="text-[11px] leading-[1.45]" style="color: var(--color-accent-2-800)">
-      Gợi ý bởi AI — cần kỹ thuật viên kiểm tra thực tế.
+      {{ $t('diag.disclaimer') }}
     </p>
 
     <div class="flex flex-wrap gap-2">
@@ -107,7 +107,7 @@ function pct(value: number): number {
         style="min-height: 42px"
         @click="emit('book', top?.suggestedServiceCodes)"
       >
-        Đặt lịch dịch vụ này
+        {{ $t('diag.bookThis') }}
       </button>
     </div>
   </article>

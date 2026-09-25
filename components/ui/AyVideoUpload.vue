@@ -72,7 +72,7 @@ function durationOf(src: string): Promise<number | null> {
       <rect x="3" y="6" width="13" height="12" rx="3" />
       <path d="m16 10 5-3v10l-5-3" />
     </svg>
-    {{ modelValue ? 'Đã có video' : 'Video' }}
+    {{ modelValue ? $t('sc10.videoSaved') : $t('sc10.video') }}
     <input type="file" class="sr-only" :accept="ACCEPT.join(',')" @change="handleFile" />
   </label>
 
