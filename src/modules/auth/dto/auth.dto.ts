@@ -7,6 +7,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUUID,
   Length,
   MinLength,
 } from 'class-validator';
@@ -50,6 +51,20 @@ export class VerifyOtpDto {
 export class AdminLoginDto {
   @IsString() @IsNotEmpty() username!: string;
   @IsString() @IsNotEmpty() password!: string;
+}
+
+export class ForgotPasswordDto {
+  @IsEmail() email!: string;
+}
+
+export class ResetPasswordDto {
+  @IsUUID('4') adminId!: string;
+  @IsString() @IsNotEmpty() token!: string;
+
+  @ApiProperty({ description: 'Mat khau moi, toi thieu 10 ky tu — NFR-SE-04' })
+  @IsString()
+  @MinLength(10)
+  newPassword!: string;
 }
 
 export class RefreshTokenDto {

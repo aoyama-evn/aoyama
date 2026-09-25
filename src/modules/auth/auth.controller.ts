@@ -1,4 +1,5 @@
 import { Body, Controller, Get, HttpCode, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { AuthUser, CurrentUser, Public } from 'src/common/decorators';
@@ -8,7 +9,9 @@ import { AuthService } from './auth.service';
 import {
   AdminLoginDto,
   ChangePasswordDto,
+  ForgotPasswordDto,
   RefreshTokenDto,
+  ResetPasswordDto,
   RequestOtpDto,
   UpdateProfileDto,
   VerifyOtpDto,
@@ -28,6 +31,7 @@ export class AuthController {
   constructor(
     private readonly service: AuthService,
     private readonly audit: AuditService,
+    private readonly config: ConfigService,
   ) {}
 
   @Public()
@@ -61,6 +65,26 @@ export class AuthController {
         language: result.customer.language,
       },
     };
+  }
+
+  @Public()
+  @Post('admin/forgot-password')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'SA-01b — gui duong dan dat lai mat khau quan tri' })
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    const base = `${this.config.get<string>('app.webUrl')}/admin/reset-password`;
+    await this.service.requestAdminPasswordReset(dto.email, base);
+    // Phan hoi giong nhau du email co ton tai hay khong — NFR-SE-06.
+    return { sent: true };
+  }
+
+  @Public()
+  @Post('admin/reset-password')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'SA-01b — dat mat khau moi bang ma trong duong dan' })
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    await this.service.resetAdminPassword(dto.adminId, dto.token, dto.newPassword);
+    return { reset: true };
   }
 
   @Public()

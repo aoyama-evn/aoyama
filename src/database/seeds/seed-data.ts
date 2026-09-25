@@ -370,6 +370,31 @@ export interface TemplateSeed {
  * Noi dung SMS giu ngan vi chi phi tinh theo do dai (RK-03).
  */
 export const NOTIFICATION_TEMPLATES: TemplateSeed[] = [
+  // --- Dat lai mat khau quan tri (SA-01b) ---
+  {
+    event: NotificationEvent.ADMIN_PASSWORD_RESET,
+    channel: NotificationChannel.EMAIL,
+    language: Language.JA,
+    subject: '【AOYAMA Admin】パスワード再設定',
+    body: '{{name}} 様\n\n下記のリンクからパスワードを再設定してください（{{minutes}}分間有効）。\n{{resetUrl}}\n\nお心当たりがない場合はこのメールを破棄してください。',
+    availableVariables: ['name', 'resetUrl', 'minutes'],
+  },
+  {
+    event: NotificationEvent.ADMIN_PASSWORD_RESET,
+    channel: NotificationChannel.EMAIL,
+    language: Language.EN,
+    subject: '[AOYAMA Admin] Password reset',
+    body: 'Hi {{name}},\n\nUse the link below to set a new password (valid {{minutes}} minutes).\n{{resetUrl}}\n\nIf you did not request this, you can ignore this email.',
+    availableVariables: ['name', 'resetUrl', 'minutes'],
+  },
+  {
+    event: NotificationEvent.ADMIN_PASSWORD_RESET,
+    channel: NotificationChannel.EMAIL,
+    language: Language.VI,
+    subject: '[AOYAMA Admin] Dat lai mat khau',
+    body: 'Chao {{name}},\n\nMo duong dan sau de dat mat khau moi (hieu luc {{minutes}} phut).\n{{resetUrl}}\n\nNeu ban khong yeu cau, hay bo qua email nay.',
+    availableVariables: ['name', 'resetUrl', 'minutes'],
+  },
   // --- OTP ---
   {
     event: NotificationEvent.OTP,

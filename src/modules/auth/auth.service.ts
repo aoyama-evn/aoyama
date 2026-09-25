@@ -1,7 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { randomBytes } from 'node:crypto';
 import * as bcrypt from 'bcryptjs';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { AuthUser } from 'src/common/decorators';
 import {
   AdminRole,
@@ -15,11 +16,13 @@ import { AdminUser } from 'src/modules/admin-users/entities/admin-user.entity';
 import { CustomersService } from 'src/modules/customers/customers.service';
 import { Customer } from 'src/modules/customers/entities/customer.entity';
 import { NotificationsService } from 'src/modules/notifications/notifications.service';
+import { PasswordResetToken } from './entities/password-reset-token.entity';
 import { OtpPurpose, OtpService } from './otp.service';
 import { TokenPair, TokenService } from './token.service';
 
 const MAX_FAILED_LOGINS = 5;
 const LOCK_MINUTES = 15;
+const RESET_TOKEN_MINUTES = 30;
 
 /**
  * M-01 — Xac thuc va tai khoan.
@@ -31,6 +34,8 @@ export class AuthService {
   constructor(
     @InjectRepository(Customer) private readonly customerRepo: Repository<Customer>,
     @InjectRepository(AdminUser) private readonly adminRepo: Repository<AdminUser>,
+    @InjectRepository(PasswordResetToken)
+    private readonly resetRepo: Repository<PasswordResetToken>,
     private readonly customers: CustomersService,
     private readonly otp: OtpService,
     private readonly tokens: TokenService,
@@ -268,6 +273,83 @@ export class AuthService {
     user.mustChangePassword = false;
     await this.adminRepo.save(user);
     // Doi mat khau thi moi phien cu deu mat hieu luc.
+    await this.tokens.revokeAll(adminId);
+  }
+
+  // ---------- Dat lai mat khau quan tri (SA-01b) ----------
+
+  /**
+   * SA-01b — gui duong dan dat lai mat khau.
+   * Luon tra ve cung mot phan hoi du email co ton tai hay khong, de khong lo
+   * danh sach tai khoan quan tri (NFR-SE-06).
+   */
+  async requestAdminPasswordReset(email: string, resetBaseUrl: string): Promise<void> {
+    const user = await this.adminRepo.findOne({
+      where: { email: email.trim().toLowerCase(), isActive: true },
+    });
+    if (!user) return;
+
+    // Moi lan yeu cau moi lam ma cu het hieu luc.
+    await this.resetRepo.update(
+      { adminUserId: user.id, consumedAt: IsNull() },
+      { consumedAt: new Date() },
+    );
+
+    const raw = randomBytes(32).toString('hex');
+    await this.resetRepo.save(
+      this.resetRepo.create({
+        adminUserId: user.id,
+        tokenHash: await bcrypt.hash(raw, 10),
+        expiresAt: new Date(Date.now() + RESET_TOKEN_MINUTES * 60_000),
+      }),
+    );
+
+    await this.notifications.send({
+      event: NotificationEvent.ADMIN_PASSWORD_RESET,
+      channel: NotificationChannel.EMAIL,
+      recipient: user.email!,
+      language: user.language,
+      variables: {
+        name: user.fullName,
+        resetUrl: `${resetBaseUrl}?token=${raw}&id=${user.id}`,
+        minutes: String(RESET_TOKEN_MINUTES),
+      },
+    });
+  }
+
+  /** SA-01b — dat mat khau moi bang ma trong duong dan. */
+  async resetAdminPassword(adminId: string, rawToken: string, newPassword: string): Promise<void> {
+    const candidates = await this.resetRepo.find({
+      where: { adminUserId: adminId, consumedAt: IsNull() },
+      order: { createdAt: 'DESC' },
+      take: 5,
+    });
+
+    const now = new Date();
+    let matched: PasswordResetToken | null = null;
+    for (const candidate of candidates) {
+      if (candidate.expiresAt <= now) continue;
+      if (await bcrypt.compare(rawToken, candidate.tokenHash)) {
+        matched = candidate;
+        break;
+      }
+    }
+    if (!matched) {
+      throw new UnauthorizedException({
+        code: 'RESET_TOKEN_INVALID',
+        message: 'Duong dan dat lai mat khau khong dung hoac da het han',
+      });
+    }
+
+    const user = await this.adminRepo.findOneOrFail({ where: { id: adminId } });
+    user.passwordHash = await bcrypt.hash(newPassword, 12);
+    user.mustChangePassword = false;
+    user.failedLoginCount = 0;
+    user.lockedUntil = null;
+    await this.adminRepo.save(user);
+
+    matched.consumedAt = now;
+    await this.resetRepo.save(matched);
     await this.tokens.revokeAll(adminId);
   }
 }

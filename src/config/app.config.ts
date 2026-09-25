@@ -6,6 +6,8 @@ export default registerAs('app', () => ({
   apiPrefix: process.env.API_PREFIX ?? 'api',
   /** C-03 — moi xu ly nghiep vu chay theo gio Nhat Ban. */
   timezone: process.env.APP_TIMEZONE ?? 'Asia/Tokyo',
+  /** Dia chi giao dien web — dung de dung duong dan trong email (SA-01b). */
+  webUrl: process.env.WEB_URL ?? 'http://localhost:3000',
   corsOrigins: (process.env.CORS_ORIGINS ?? 'http://localhost:3000')
     .split(',')
     .map((o) => o.trim())

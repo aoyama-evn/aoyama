@@ -10,6 +10,7 @@ import { NotificationsModule } from 'src/modules/notifications/notifications.mod
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { OtpCode } from './entities/otp-code.entity';
+import { PasswordResetToken } from './entities/password-reset-token.entity';
 import { RefreshToken } from './entities/refresh-token.entity';
 import { JwtStrategy } from './jwt.strategy';
 import { OtpService } from './otp.service';
@@ -18,7 +19,7 @@ import { TokenService } from './token.service';
 /** M-01 — Xac thuc va tai khoan. */
 @Module({
   imports: [
-    TypeOrmModule.forFeature([OtpCode, RefreshToken, Customer, AdminUser]),
+    TypeOrmModule.forFeature([OtpCode, RefreshToken, PasswordResetToken, Customer, AdminUser]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       inject: [ConfigService],

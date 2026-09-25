@@ -15,6 +15,8 @@ export enum NotificationEvent {
   VEHICLE_DELIVERED = 'VEHICLE_DELIVERED',
   MAINTENANCE_DUE = 'MAINTENANCE_DUE',
   OTP = 'OTP',
+  /** SA-01b — duong dan dat lai mat khau quan tri. */
+  ADMIN_PASSWORD_RESET = 'ADMIN_PASSWORD_RESET',
 }
 
 export enum NotificationSendStatus {
