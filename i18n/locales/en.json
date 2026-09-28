@@ -1225,14 +1225,18 @@
     "tabRepair": "Repair"
   },
   "sc03": {
+    "about": "About this service",
+    "atAGlance": "At a glance",
     "book": "Book",
     "bookThis": "Book this service",
     "category": "Category",
     "checklist": "What we check",
     "duration": "Estimated time",
+    "every": "Every {months} months",
     "interval": "Recommended interval",
     "months": "{n} months",
     "notFound": "Service not found",
+    "orKm": "or {km} km",
     "priceNote": "The final price depends on engine size and the actual condition.",
     "refPrice": "Reference price"
   },

@@ -1225,14 +1225,18 @@
     "tabRepair": "修理"
   },
   "sc03": {
+    "about": "このサービスについて",
+    "atAGlance": "概要",
     "book": "予約する",
     "bookThis": "このサービスを予約",
     "category": "区分",
     "checklist": "点検項目",
     "duration": "所要時間の目安",
+    "every": "{months}か月ごと",
     "interval": "推奨サイクル",
     "months": "{n}か月",
     "notFound": "サービスが見つかりません",
+    "orKm": "または {km} km",
     "priceNote": "最終価格は排気量と実際の状態によって変わります。",
     "refPrice": "参考価格"
   },

@@ -1225,14 +1225,18 @@
     "tabRepair": "Sửa chữa"
   },
   "sc03": {
+    "about": "Về dịch vụ này",
+    "atAGlance": "Thông tin nhanh",
     "book": "Đặt lịch",
     "bookThis": "Đặt lịch dịch vụ này",
     "category": "Phân loại",
     "checklist": "Hạng mục kiểm tra",
     "duration": "Thời gian ước tính",
+    "every": "Mỗi {months} tháng",
     "interval": "Chu kỳ đề xuất",
     "months": "{n} tháng",
     "notFound": "Không tìm thấy dịch vụ",
+    "orKm": "hoặc {km} km",
     "priceNote": "Giá cuối cùng thay đổi theo dung tích xe và tình trạng thực tế.",
     "refPrice": "Giá tham khảo"
   },
