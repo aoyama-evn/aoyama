@@ -266,14 +266,13 @@
         0 6px 16px -6px rgb(22 20 15 / 26%);
     }
 
+    /**
+     * Dung 812px co dinh — day la chieu cao that cua khung SP, khong co theo
+     * cua so trinh duyet. Cua so thap hon thi cuon trang de xem phan duoi,
+     * chu khong bop man hinh lai cho vua.
+     */
     .ay-device-screen {
-      /*
-       * 812px cua khung SP. Dat truoc mot gia tri don gian de trinh duyet nao
-       * chua hieu dvh van co chieu cao — thieu buoc nay thi ca khai bao bi bo,
-       * man hinh cao bang 0 va khung chi con lai vien den.
-       */
       height: 812px;
-      height: min(812px, calc(100dvh - 62px));
       min-height: 0;
       flex: none;
       border-radius: 36px;
@@ -282,9 +281,16 @@
     .ay-device-statusbar {
       display: flex;
     }
+  }
 
-
-
+  /**
+   * Cua so thap: thu lo quanh vo may de khung 834px lot vao duoc nhieu man hon
+   * truoc khi phai cuon. Van giu nguyen 812px cua man hinh.
+   */
+  @media (min-width: 560px) and (max-height: 920px) {
+    .ay-device {
+      padding: 8px 16px 12px;
+    }
   }
 
   /**
