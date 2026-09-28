@@ -10,4 +10,9 @@ export default registerAs('ai', () => ({
   apiKey: process.env.AI_API_KEY ?? '',
   model: process.env.AI_MODEL ?? 'claude-sonnet-5',
   timeoutMs: parseInt(process.env.AI_TIMEOUT_MS ?? '10000', 10),
+  /**
+   * Khi chua noi duoc mo hinh that: 'rules' dung bo luat chay tai cho,
+   * 'off' tra ve rong nhu truoc. Mac dinh 'rules'.
+   */
+  fallback: process.env.AI_FALLBACK ?? 'rules',
 }));
