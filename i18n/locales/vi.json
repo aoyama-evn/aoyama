@@ -1301,7 +1301,7 @@
     "failLead": "Bạn có thể mô tả thêm, hoặc đặt lịch để kỹ thuật viên kiểm tra trực tiếp — cách này luôn chính xác nhất.",
     "failTitle": "Chưa đủ thông tin để chẩn đoán",
     "greeting": "Xin chào! Bạn cần hỗ trợ gì cho xe của mình?",
-    "greetingNamed": "Xin chào {name}! Bạn cần hỗ trợ gì cho xe của mình?",
+    "greetingNamed": "Xin chào ông/bà {name}! Bạn cần hỗ trợ gì cho xe của mình?",
     "inputPlaceholder": "Mô tả tình trạng xe… (≤ 1.000 ký tự)",
     "intentHint": "Có thể chọn nhiều mục",
     "makerPlaceholder": "Honda",
