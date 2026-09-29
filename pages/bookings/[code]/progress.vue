@@ -19,6 +19,7 @@ const { data: progress, refresh } = await useAsyncData(`progress-${code}`, () =>
 );
 
 const qrOpen = ref(false);
+const { saveQr } = useSaveQr();
 const { data: qr } = await useAsyncData(`progress-qr-${code}`, () =>
   api
     .get<{ available: boolean; dataUrl?: string }>(`/bookings/${code}/qr`)
@@ -209,6 +210,20 @@ useHead({ title: () => t('sc26.headTitle', { code }) });
           style="width: 190px; height: 190px; border-radius: 16px"
         />
         <p class="font-heading text-[16px]">{{ progress.bookingCode }}</p>
+        <button
+          type="button"
+          class="btn btn-secondary gap-[7px] text-[12.5px]"
+          style="min-height: 42px"
+          @click="saveQr(qr?.dataUrl, progress.bookingCode)"
+        >
+          <svg
+            width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+          >
+            <path d="M12 4v11M7.5 11 12 15.5 16.5 11M5 20h14" />
+          </svg>
+          {{ $t('sc16.saveQr') }}
+        </button>
         <p class="text-muted text-center text-[11.5px]">
           {{ $t('sc26.qrHint') }}
         </p>

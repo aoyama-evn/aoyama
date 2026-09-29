@@ -40,31 +40,8 @@ async function copyCode(): Promise<void> {
   }
 }
 
-/**
- * Tai anh ma QR ve may. Nhung may cu khong tai duoc tep tu trang thi lui ve
- * cach cu: mo anh ra tab moi de khach nhan giu va luu tay.
- */
-function saveQr(): void {
-  if (!qr.value?.dataUrl) return;
-
-  const fileName = safeFileName(`aoyama-qr-${booking.value?.code ?? code ?? 'booking'}.png`);
-  if (downloadDataUrl(qr.value.dataUrl, fileName)) {
-    ui.success(t('sc16.qrSaved'), fileName);
-    return;
-  }
-
-  const win = window.open();
-  if (!win) {
-    ui.warning(t('sc16.popupBlocked'), t('sc16.screenshot'));
-    return;
-  }
-  win.document.write(
-    `<img src="${qr.value.dataUrl}" alt="${t('sc22.qrAlt', {
-      code: booking.value?.code ?? '',
-    })}" style="width:100%">`,
-  );
-  ui.success(t('sc16.qrOpened'), t('sc16.longPress'));
-}
+// Viec tai anh nam o composables/useSaveQr.ts vi SC-26 cung dung.
+const { saveQr } = useSaveQr();
 
 useHead({ title: () => t('sc16.title') });
 </script>
@@ -130,7 +107,7 @@ useHead({ title: () => t('sc16.title') });
             type="button"
             class="btn btn-secondary gap-[7px] text-[12.5px]"
             style="min-height: 42px"
-            @click="saveQr"
+            @click="saveQr(qr?.dataUrl, booking?.code ?? code ?? '')"
           >
             <svg
               width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
