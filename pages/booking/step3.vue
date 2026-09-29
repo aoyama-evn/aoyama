@@ -104,6 +104,15 @@ function pickVehicle(vehicle: Vehicle): void {
   booking.setVehicle(vehicle);
 }
 
+/** Them xe ngay tai cho — xem chu thich o SC-12. */
+const vehicleDialogOpen = ref(false);
+
+function onVehicleSaved(saved: Vehicle): void {
+  myVehicles.value = [...myVehicles.value, saved];
+  pickVehicle(saved);
+  vehicleDialogOpen.value = false;
+}
+
 function vehicleLine(item: Vehicle): string {
   const parts = [item.plateNumber];
   if (item.currentOdometer !== null) parts.push(`${number(item.currentOdometer)} km`);
@@ -393,12 +402,19 @@ useHead({ title: () => `${t('sc01.bookCta')} — 3` });
         </span>
       </label>
 
-      <NuxtLink
-        to="/account/vehicles/new/edit"
+      <button
+        type="button"
         class="btn btn-secondary self-start text-[12.5px]"
+        @click="vehicleDialogOpen = true"
       >
         {{ $t('sc12.addVehicle') }}
-      </NuxtLink>
+      </button>
+
+      <AyVehicleDialog
+        :open="vehicleDialogOpen"
+        @saved="onVehicleSaved"
+        @close="vehicleDialogOpen = false"
+      />
 
       <AyField for="odo" :label="$t('sc14.odometer')" :hint="$t('sc14.odometerHint')">
         <input

@@ -58,6 +58,18 @@ function pickVehicle(item: Vehicle): void {
   booking.setVehicle(item);
 }
 
+/**
+ * Them xe ngay tai cho bang popup. Truoc day nut nay dan sang trang SC-30,
+ * luu xong khach bi do ve danh sach xe trong tai khoan nen mat cho dang dat.
+ */
+const vehicleDialogOpen = ref(false);
+
+function onVehicleSaved(saved: Vehicle): void {
+  myVehicles.value = [...(myVehicles.value ?? []), saved];
+  pickVehicle(saved);
+  vehicleDialogOpen.value = false;
+}
+
 function vehicleLine(item: Vehicle): string {
   const parts = [item.plateNumber];
   if (item.currentOdometer !== null) parts.push(`${number(item.currentOdometer)} km`);
@@ -129,8 +141,9 @@ useHead({ title: () => `${t('sc01.bookCta')} — 1` });
   <div class="flex flex-col gap-[15px] pb-4">
     <BookingSteps :current="1" />
 
-    <!-- SC-12a: chon xe tu ho so -->
-    <section v-if="auth.isCustomer && (myVehicles ?? []).length" class="flex flex-col gap-2.5">
+    <!-- SC-12a: chon xe tu ho so. Hien ca khi ho so chua co chiec nao, vi
+         thanh vien moi dang ky van can cho de them xe. -->
+    <section v-if="auth.isCustomer" class="flex flex-col gap-2.5">
       <h5>{{ $t('sc12.pickVehicle') }}</h5>
       <label
         v-for="item in myVehicles ?? []"
@@ -160,13 +173,20 @@ useHead({ title: () => `${t('sc01.bookCta')} — 1` });
           <span class="text-muted block truncate text-[11.5px]">{{ vehicleLine(item) }}</span>
         </span>
       </label>
-      <NuxtLink
-        to="/account/vehicles/new/edit"
+      <button
+        type="button"
         class="btn btn-secondary btn-block text-[13px]"
         style="margin: 0; min-height: 44px"
+        @click="vehicleDialogOpen = true"
       >
         {{ $t('sc12.addVehicle') }}
-      </NuxtLink>
+      </button>
+
+      <AyVehicleDialog
+        :open="vehicleDialogOpen"
+        @saved="onVehicleSaved"
+        @close="vehicleDialogOpen = false"
+      />
     </section>
 
     <section>
