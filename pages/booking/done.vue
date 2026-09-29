@@ -40,9 +40,19 @@ async function copyCode(): Promise<void> {
   }
 }
 
-/** Trinh duyet khong cho tai tep tu trang nhung mo anh o tab moi thi duoc. */
+/**
+ * Tai anh ma QR ve may. Nhung may cu khong tai duoc tep tu trang thi lui ve
+ * cach cu: mo anh ra tab moi de khach nhan giu va luu tay.
+ */
 function saveQr(): void {
   if (!qr.value?.dataUrl) return;
+
+  const fileName = safeFileName(`aoyama-qr-${booking.value?.code ?? code ?? 'booking'}.png`);
+  if (downloadDataUrl(qr.value.dataUrl, fileName)) {
+    ui.success(t('sc16.qrSaved'), fileName);
+    return;
+  }
+
   const win = window.open();
   if (!win) {
     ui.warning(t('sc16.popupBlocked'), t('sc16.screenshot'));

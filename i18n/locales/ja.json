@@ -1423,7 +1423,8 @@
     "subtitle": "Booking confirmed",
     "title": "ご予約ありがとうございます",
     "trackCta": "進捗を確認",
-    "yourCode": "予約番号は {code} です"
+    "yourCode": "予約番号は {code} です",
+    "qrSaved": "QRコードを保存しました"
   },
   "sc17": {
     "agree": "{terms}と{privacy}に同意します。",

@@ -1423,7 +1423,8 @@
     "subtitle": "Booking confirmed",
     "title": "Booking confirmed",
     "trackCta": "Track progress",
-    "yourCode": "Your code is {code}"
+    "yourCode": "Your code is {code}",
+    "qrSaved": "QR code saved"
   },
   "sc17": {
     "agree": "I agree to the {terms} and the {privacy}.",

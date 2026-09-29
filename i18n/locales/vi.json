@@ -1423,7 +1423,8 @@
     "subtitle": "Booking confirmed",
     "title": "Đặt lịch thành công",
     "trackCta": "Theo dõi tiến độ",
-    "yourCode": "Mã của bạn là {code}"
+    "yourCode": "Mã của bạn là {code}",
+    "qrSaved": "Đã lưu mã QR về máy"
   },
   "sc17": {
     "agree": "Tôi đồng ý với {terms} và {privacy}.",
