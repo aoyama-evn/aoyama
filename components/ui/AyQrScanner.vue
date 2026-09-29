@@ -69,22 +69,17 @@ function stop(): void {
 
 /** SA-07 — doc ma tu mot anh da chup, dung khi camera khong san sang. */
 async function readFromImage(event: Event): Promise<void> {
-  const file = (event.target as HTMLInputElement).files?.[0];
-  if (!file || !canvas.value) return;
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (!file) return;
   try {
-    const bitmap = await createImageBitmap(file);
-    const c = canvas.value;
-    c.width = bitmap.width;
-    c.height = bitmap.height;
-    const ctx = c.getContext('2d', { willReadFrequently: true });
-    if (!ctx) return;
-    ctx.drawImage(bitmap, 0, 0);
-    const image = ctx.getImageData(0, 0, c.width, c.height);
-    const found = jsQR(image.data, image.width, image.height);
-    if (found?.data) emit('scanned', found.data.trim());
+    const found = await readQrFromFile(file);
+    if (found) emit('scanned', found);
     else ui.warning(t('qr.notFound'), t('qr.retry'));
   } catch {
     ui.warning(t('qr.unreadable'), t('qr.typeCode'));
+  } finally {
+    input.value = '';
   }
 }
 

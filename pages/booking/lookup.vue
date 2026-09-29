@@ -34,40 +34,53 @@ async function lookup(): Promise<void> {
 }
 
 /**
- * Doc ma QR tu anh khach chon. BarcodeDetector chi co tren mot so trinh duyet,
- * nen khi khong co thi bao khach nhap ma bang tay thay vi de man hinh im lang.
+ * Doc ma QR tu anh khach chon — xem utils/readQrFromFile.ts.
+ *
+ * Anh QR he thong sinh ra chua token cua lich hen chu khong phai ma lich hen,
+ * nen doc xong phai hoi may chu xem token do la lich nao roi dua thang khach
+ * sang man theo doi tien do. Khach cung co the tai len mot anh chua thang ma
+ * lich hen; truong hop do chi dien vao o ma, van doi so dien thoai nhu cu.
  */
 async function decodeQrImage(event: Event): Promise<void> {
-  const file = (event.target as HTMLInputElement).files?.[0];
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
   if (!file) return;
 
-  const Detector = (window as unknown as { BarcodeDetector?: new (o: object) => object })
-    .BarcodeDetector;
-  if (!Detector) {
-    ui.warning(t('sc20.qrNoReader'), t('sc20.qrTypeIn'));
+  decoding.value = true;
+  error.value = null;
+
+  let raw: string | null = null;
+  try {
+    raw = await readQrFromFile(file);
+  } catch {
+    ui.warning(t('sc20.qrUnreadable'), t('sc20.qrTypeIn'));
+    decoding.value = false;
+    input.value = '';
     return;
   }
 
-  decoding.value = true;
   try {
-    const bitmap = await createImageBitmap(file);
-    const detector = new Detector({ formats: ['qr_code'] }) as {
-      detect(source: ImageBitmap): Promise<{ rawValue: string }[]>;
-    };
-    const found = await detector.detect(bitmap);
-    const raw = found[0]?.rawValue;
     if (!raw) {
       ui.warning(t('sc20.qrNotFound'), t('sc20.qrRetry'));
       return;
     }
-    // Ma QR chua duong dan hoac chinh ma lich hen.
-    const matched = raw.match(/B-\d{8}-\d{4}/i);
-    code.value = (matched?.[0] ?? raw).toUpperCase();
-    ui.success(t('sc20.qrOk'), t('sc20.qrOkSub'));
-  } catch {
-    ui.warning(t('sc20.qrUnreadable'), t('sc20.qrTypeIn'));
+
+    const asCode = raw.match(/AY-[0-9A-Z]{6,12}/i)?.[0];
+    if (asCode) {
+      code.value = asCode.toUpperCase();
+      ui.success(t('sc20.qrOk'), t('sc20.qrOkSub'));
+      return;
+    }
+
+    const found = await api.post<{ code: string }>('/bookings/lookup-qr', { token: raw });
+    ui.success(t('sc20.qrOk'), found.code);
+    await navigateTo(`/bookings/${found.code}/progress`);
+  } catch (caught) {
+    error.value = normalizeError(caught);
   } finally {
     decoding.value = false;
+    // Xoa de chon lai dung tep do van kich hoat duoc su kien change.
+    input.value = '';
   }
 }
 

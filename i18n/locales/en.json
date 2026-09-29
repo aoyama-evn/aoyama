@@ -1467,7 +1467,6 @@
     "orCode": "or enter the code",
     "phoneLabel": "Phone number used for the booking",
     "qrLead": "Pick a saved QR image and we will find the booking",
-    "qrNoReader": "This browser cannot read QR images",
     "qrNotFound": "No QR code found in that image",
     "qrOk": "Code read from the image",
     "qrOkSub": "Enter your phone number to look it up.",
