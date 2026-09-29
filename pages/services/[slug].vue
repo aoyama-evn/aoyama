@@ -60,7 +60,12 @@ function bookThis(): void {
 
 <template>
   <div v-if="service" class="flex flex-col gap-3.5 pb-4">
-    <!-- Ten dich vu kem bieu tuong, lay lai cach ve o dong danh sach SC-02 -->
+    <!--
+      Ten dich vu kem bieu tuong, lay lai cach ve o dong danh sach SC-02.
+      The phan loai xuong dong duoi: de chung mot hang voi tieu de thi the
+      (flex-none) an mat gan mot phan ba be ngang, tieu de 20px chi con 199px
+      trong khung 375 nen vo dong xau.
+    -->
     <div class="flex items-start gap-3">
       <span
         class="grid flex-none place-items-center"
@@ -71,9 +76,11 @@ function bookThis(): void {
       </span>
       <div class="min-w-0 flex-1 leading-[1.25]">
         <h4>{{ i18n(service.name) }}</h4>
-        <p v-if="subtitle" class="text-muted mt-0.5 text-[11.5px]">{{ subtitle }}</p>
+        <p class="mt-1 flex flex-wrap items-center gap-2">
+          <span class="tag tag-accent-2">{{ $t(`serviceType.${service.type}`) }}</span>
+          <span v-if="subtitle" class="text-muted text-[11.5px]">{{ subtitle }}</span>
+        </p>
       </div>
-      <span class="tag tag-accent-2 flex-none">{{ $t(`serviceType.${service.type}`) }}</span>
     </div>
 
     <!-- Gia va cac so lieu chinh: tren dien thoai day la thu khach xem truoc -->
