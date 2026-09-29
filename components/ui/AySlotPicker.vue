@@ -13,7 +13,7 @@ const props = defineProps<{
   loading?: boolean;
 }>();
 const emit = defineEmits<{
-  (e: 'update:modelValue', v: { date: string; startTime: string }): void;
+  (e: 'update:modelValue', v: { date: string; startTime: string } | null): void;
   (e: 'need-range', from: string): void;
 }>();
 
@@ -48,7 +48,7 @@ interface Cell {
   key: string;
   date: string | null;
   label: string;
-  state: 'blank' | 'past' | 'closed' | 'open' | 'selected' | 'unknown';
+  state: 'blank' | 'past' | 'closed' | 'open' | 'active' | 'selected' | 'unknown';
 }
 
 const cells = computed<Cell[]>(() => {
@@ -72,6 +72,9 @@ const cells = computed<Cell[]>(() => {
       else if (day.slots.some((s) => s.available)) state = 'open';
       else state = 'past';
     }
+    // Bam vao ngay la to mau ngay — khong bat khach cho den khi chon xong
+    // gio moi thay ngay minh vua bam.
+    if (state === 'open' && activeDate.value === iso) state = 'active';
     if (props.modelValue?.date === iso) state = 'selected';
     out.push({ key: iso, date: iso, label: String(d), state });
   }
@@ -99,6 +102,12 @@ const activeDay = computed(() => (activeDate.value ? byDate.value.get(activeDate
 
 function pickDate(cell: Cell): void {
   if (!cell.date || cell.state === 'blank' || cell.state === 'closed') return;
+  // Doi sang ngay khac thi khung gio da chon cua ngay cu khong con dung nua.
+  // Bo di de moi luc chi co dung mot ngay sang len, khoi hieu nham dang dat
+  // ngay nao.
+  if (props.modelValue && props.modelValue.date !== cell.date) {
+    emit('update:modelValue', null);
+  }
   activeDate.value = cell.date;
 }
 
@@ -115,6 +124,11 @@ const CELL_STYLE: Record<Cell['state'], string> = {
   unknown: 'color: var(--color-neutral-400)',
   closed: 'background: var(--color-neutral-200); color: var(--color-neutral-500)',
   open: 'background: var(--color-surface)',
+  // Ngay dang xem: nen nhat kem vien, du noi de nhan ra nhung van khac voi
+  // ngay da chot ca gio.
+  active:
+    'background: var(--color-accent-200); color: var(--color-accent-800); font-weight: 700;'
+    + ' box-shadow: inset 0 0 0 1.5px var(--color-accent-500)',
   selected: 'background: var(--color-accent); color: var(--color-bg); font-weight: 700',
 };
 </script>
@@ -154,7 +168,7 @@ const CELL_STYLE: Record<Cell['state'], string> = {
             style="border-radius: 14px"
             :style="CELL_STYLE[cell.state]"
             :disabled="cell.state === 'closed' || cell.state === 'past' || cell.state === 'unknown'"
-            :aria-pressed="cell.state === 'selected'"
+            :aria-pressed="cell.state === 'selected' || cell.state === 'active'"
             :aria-label="$t('slot.day', { n: cell.label })"
             @click="pickDate(cell)"
           >
