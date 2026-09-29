@@ -35,16 +35,9 @@ function set<K extends keyof VehicleFormValue>(key: K, value: VehicleFormValue[K
   emit('update:modelValue', { ...props.modelValue, [key]: value });
 }
 
+// Danh sach hang dung chung voi chatbox — xem composables/useVehicleMakers.ts
 const { t } = useI18n();
-
-const MAKERS = computed(() => [
-  'Honda',
-  'Yamaha',
-  'Suzuki',
-  'Kawasaki',
-  'Vespa',
-  t('vehicle.makerOther'),
-]);
+const { withOther: MAKERS } = useVehicleMakers();
 
 const FUELS = computed(() => [
   { value: VehicleFuelType.GASOLINE, label: t('vehicle.fuelGasoline') },

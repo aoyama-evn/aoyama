@@ -39,6 +39,24 @@ const transcript = ref<string | null>(null);
 const sending = ref(false);
 const scroller = ref<HTMLElement | null>(null);
 
+const { makers: VEHICLE_MAKERS, otherLabel } = useVehicleMakers();
+
+/**
+ * Hang xe cho bam chon thay vi go tay. Bam "Khac" thi mo them mot o de go,
+ * vi danh sach chi gom nhung hang hay gap.
+ */
+const makerOther = ref(false);
+
+function pickMaker(name: string): void {
+  makerOther.value = false;
+  manualVehicle.maker = manualVehicle.maker === name ? '' : name;
+}
+
+function pickMakerOther(): void {
+  makerOther.value = !makerOther.value;
+  manualVehicle.maker = '';
+}
+
 const INTENT_OPTIONS: { value: Intent; labelKey: string }[] = [
   { value: 'REPAIR', labelKey: 'sc12.repair' },
   { value: 'MAINTENANCE', labelKey: 'sc12.maintenance' },
@@ -265,14 +283,41 @@ useHead({ title: () => t('sc10.assistant') });
 
           <!-- Khach vang lai — hoac thanh vien muon khai xe khac -->
           <div v-if="!vehicle" class="grid grid-cols-2 gap-2">
-            <AyField for="chat-maker" :label="$t('sc14.maker')">
+            <div class="col-span-2 flex flex-col gap-1.5">
+              <span class="label">{{ $t('sc14.maker') }}</span>
+              <div class="flex flex-wrap gap-[7px]">
+                <button
+                  v-for="name in VEHICLE_MAKERS"
+                  :key="name"
+                  type="button"
+                  class="btn btn-secondary px-3.5 text-[12.5px]"
+                  style="min-height: 38px"
+                  :class="manualVehicle.maker === name ? 'ay-chip-on' : ''"
+                  :aria-pressed="manualVehicle.maker === name"
+                  @click="pickMaker(name)"
+                >
+                  {{ name }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-secondary px-3.5 text-[12.5px]"
+                  style="min-height: 38px"
+                  :class="makerOther ? 'ay-chip-on' : ''"
+                  :aria-pressed="makerOther"
+                  @click="pickMakerOther"
+                >
+                  {{ otherLabel }}
+                </button>
+              </div>
               <input
-                id="chat-maker"
+                v-if="makerOther"
                 v-model="manualVehicle.maker"
                 class="input"
                 :placeholder="$t('sc10.makerPlaceholder')"
+                :aria-label="$t('sc14.maker')"
               />
-            </AyField>
+            </div>
+
             <AyField for="chat-model" :label="$t('sc14.model')">
               <input
                 id="chat-model"
