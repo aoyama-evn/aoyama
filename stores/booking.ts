@@ -42,6 +42,11 @@ export const useBookingStore = defineStore('booking', () => {
   /** SC-12 — mot doan video ngan khach gui kem. */
   const symptomVideoUrl = ref<string | null>(null);
   const aiDiagnosisId = ref<string | null>(null);
+  /**
+   * Ma nhung dich vu do AI de xuat, de SC-12 chi gan nhan "AI" dung vao chung.
+   * Hang muc khach tu chon tu danh muc thi khong co nhan.
+   */
+  const aiSuggestedServiceIds = ref<string[]>([]);
 
   const estimatedTotal = computed(() =>
     selectedServices.value.reduce((sum, s) => sum + (s.quoteOnly ? 0 : s.basePrice), 0),
@@ -83,6 +88,7 @@ export const useBookingStore = defineStore('booking', () => {
     if (selectedServiceIds.value.includes(service.id)) {
       selectedServiceIds.value = selectedServiceIds.value.filter((id) => id !== service.id);
       selectedServices.value = selectedServices.value.filter((s) => s.id !== service.id);
+      aiSuggestedServiceIds.value = aiSuggestedServiceIds.value.filter((id) => id !== service.id);
     } else {
       selectedServiceIds.value = [...selectedServiceIds.value, service.id];
       selectedServices.value = [...selectedServices.value, service];
@@ -109,7 +115,16 @@ export const useBookingStore = defineStore('booking', () => {
     if (payload.description) symptomDescription.value = payload.description;
     for (const service of payload.services) {
       if (!selectedServiceIds.value.includes(service.id)) toggleService(service);
+      if (!aiSuggestedServiceIds.value.includes(service.id)) {
+        aiSuggestedServiceIds.value = [...aiSuggestedServiceIds.value, service.id];
+      }
     }
+    persist();
+  }
+
+  /** Hang muc nay den tu goi y cua AI hay do khach tu chon. */
+  function isAiSuggested(serviceId: string): boolean {
+    return aiSuggestedServiceIds.value.includes(serviceId);
   }
 
   function toPayload() {
@@ -147,6 +162,7 @@ export const useBookingStore = defineStore('booking', () => {
           vehicle: vehicle.value,
           symptomDescription: symptomDescription.value,
           aiDiagnosisId: aiDiagnosisId.value,
+          aiSuggestedServiceIds: aiSuggestedServiceIds.value,
         }),
       );
     } catch {
@@ -171,6 +187,7 @@ export const useBookingStore = defineStore('booking', () => {
       vehicle.value = draft.vehicle ?? vehicle.value;
       symptomDescription.value = draft.symptomDescription ?? '';
       aiDiagnosisId.value = draft.aiDiagnosisId ?? null;
+      aiSuggestedServiceIds.value = draft.aiSuggestedServiceIds ?? [];
     } catch {
       reset();
     }
@@ -191,6 +208,7 @@ export const useBookingStore = defineStore('booking', () => {
     symptomPhotoUrls.value = [];
     symptomVideoUrl.value = null;
     aiDiagnosisId.value = null;
+    aiSuggestedServiceIds.value = [];
     if (import.meta.client) {
       try {
         sessionStorage.removeItem(DRAFT_KEY);
@@ -201,6 +219,8 @@ export const useBookingStore = defineStore('booking', () => {
   }
 
   return {
+    aiSuggestedServiceIds,
+    isAiSuggested,
     storeId,
     store,
     serviceType,

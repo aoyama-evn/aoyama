@@ -164,9 +164,17 @@ async function bookFromFinding(serviceCodes: string[]): Promise<void> {
   const matched = services.filter((s) => serviceCodes.includes(s.code));
 
   booking.restore();
+  // Gop het nhung gi khach da noi trong phien — truoc day chi lay cau dau tien,
+  // nen phan khach mo ta them o nhung luot sau bi mat khi sang buoc dat lich.
+  const saidByCustomer = (session.value?.messages ?? [])
+    .filter((m) => m.role === 'user')
+    .map((m) => (m.text || m.transcript || '').trim())
+    .filter(Boolean)
+    .join(' ');
+
   booking.applyDiagnosis({
     diagnosisId: session.value?.id ?? '',
-    description: session.value?.messages.find((m) => m.role === 'user')?.text,
+    description: saidByCustomer || undefined,
     services: matched,
   });
   if (vehicle.value) booking.setVehicle(vehicle.value);

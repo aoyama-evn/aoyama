@@ -109,7 +109,11 @@ async function addSuggested(serviceCodes: string[]): Promise<void> {
       booking.toggleService(service);
       added += 1;
     }
+    if (!booking.aiSuggestedServiceIds.includes(service.id)) {
+      booking.aiSuggestedServiceIds = [...booking.aiSuggestedServiceIds, service.id];
+    }
   }
+  booking.persist();
   findings.value = [];
   ui.success(t('diag.added', { n: added }));
 }
@@ -290,7 +294,12 @@ useHead({ title: () => `${t('sc01.bookCta')} — 1` });
         class="flex items-start gap-[11px] px-3.5 py-3"
         style="background: var(--color-surface); border-radius: 18px"
       >
-        <span v-if="aiFlow" class="tag tag-accent-2 mt-0.5 text-[10px]">✦ AI</span>
+        <span
+          v-if="booking.isAiSuggested(service.id)"
+          class="tag tag-accent-2 mt-0.5 text-[10px]"
+        >
+          ✦ AI
+        </span>
         <span class="min-w-0 flex-1">
           <span class="block text-[14px] font-semibold">{{ i18n(service.name) }}</span>
           <span class="text-muted block text-[11.5px]">
