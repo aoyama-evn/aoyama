@@ -70,6 +70,11 @@ const ICON_PATH: Record<string, string> = {
 /**
  * Vi tri: absolute khi nam trong khung dien thoai (bo cuc khach hang), fixed
  * khi dua thang vao body (trang quan tri).
+ *
+ * Luat thu hai phai boc TRON selector trong :global(). Neu chi boc ve trai —
+ * :global(.ay-device-screen) .ay-toast-host — trinh bien dich scoped cua Vue
+ * cat bo phan con lai va phat ra ".ay-device-screen { position: absolute }",
+ * bien ca khung dien thoai thanh absolute lam khung sap con moi phan padding.
  */
 .ay-toast-host {
   position: fixed;
@@ -77,7 +82,7 @@ const ICON_PATH: Record<string, string> = {
   right: 0;
   bottom: 30px;
 }
-:global(.ay-device-screen) .ay-toast-host {
+:global(.ay-device-screen .ay-toast-host) {
   position: absolute;
 }
 
