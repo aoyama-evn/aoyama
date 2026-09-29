@@ -1533,6 +1533,7 @@
     "continue": "Continue to confirm →",
     "lead": "We keep the same store, services and vehicle as last time — just pick a new time.",
     "previous": "Last time",
+    "servicesGone": "The services from that booking are no longer offered. Please make a new booking.",
     "title": "Book your next service"
   },
   "sc26": {

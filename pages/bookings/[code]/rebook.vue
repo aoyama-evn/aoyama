@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ApiError, Booking, DayAvailability } from '~/types/models';
+import type { ApiError, Booking, DayAvailability, ServiceItem } from '~/types/models';
 
 /** SC-25 Dat lai lich bao duong — FR-BOOK-17, FR-BOOK-18, BR-11. */
 definePageMeta({ middleware: 'auth' });
@@ -11,9 +11,21 @@ const { t } = useI18n();
 const { dateTime } = useFormat();
 
 const code = route.params.code as string;
-const { data: previous } = await useAsyncData(`rebook-${code}`, () =>
-  api.get<Booking>(`/bookings/${code}`),
-);
+
+/**
+ * Nap kem danh muc dich vu: lich hen chi luu ma dich vu va ten da chup lai luc
+ * dat, khong co gia. Phai doi chieu sang danh muc moi co gia de buoc xac nhan
+ * cong ra dung tien.
+ */
+const { data } = await useAsyncData(`rebook-${code}`, async () => {
+  const [previous, services] = await Promise.all([
+    api.get<Booking>(`/bookings/${code}`),
+    api.get<ServiceItem[]>('/services'),
+  ]);
+  return { previous, services };
+});
+
+const previous = computed(() => data.value?.previous ?? null);
 
 const days = ref<DayAvailability[]>([]);
 const slot = ref<{ date: string; startTime: string } | null>(null);
@@ -41,13 +53,25 @@ async function continueBooking(): Promise<void> {
   if (!previous.value || !slot.value) return;
   error.value = null;
 
+  // Doi chieu ma dich vu cua lan truoc sang danh muc dang ban. Truoc day cho
+  // selectedServices bang rong nen buoc xac nhan khong liet ke duoc hang muc
+  // nao va tong tien ra 0.
+  const wanted = (previous.value.services ?? [])
+    .map((line) => line.serviceId)
+    .filter((id): id is string => Boolean(id));
+  const picked = (data.value?.services ?? []).filter((item) => wanted.includes(item.id));
+
+  // Dich vu cu co the da ngung ban; khong con cai nao thi khong dat lai duoc.
+  if (picked.length === 0) {
+    error.value = { statusCode: 400, code: 'NO_SERVICE', message: t('sc25.servicesGone') };
+    return;
+  }
+
   booking.reset();
   booking.storeId = previous.value.storeId;
-  booking.serviceType = previous.value.serviceType;
-  booking.selectedServiceIds = (previous.value.services ?? [])
-    .map((s) => s.serviceId)
-    .filter((id): id is string => Boolean(id));
-  booking.selectedServices = [];
+  booking.selectedServices = picked;
+  booking.selectedServiceIds = picked.map((item) => item.id);
+  booking.serviceType = bookingServiceTypeOf(picked.map((item) => kindOfService(item.type)));
   booking.slot = slot.value;
   booking.contactName = previous.value.contactName;
   booking.contactPhone = previous.value.contactPhone;
