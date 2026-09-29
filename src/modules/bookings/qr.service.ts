@@ -15,13 +15,16 @@ export interface QrScanResult {
 
 /**
  * M-05 — Ma QR va tiep nhan xe. FR-QR-01..08, BR-17.
- * QR sinh khi lich hen duoc xac nhan; ma chi dung duoc mot lan.
+ *
+ * Ma QR sinh ngay khi khach dat lich thanh cong de SC-16 hien duoc cho khach
+ * luu lai. Viec quet ma van doi lich hen o trang thai CONFIRMED (xem validate),
+ * nen co ma khong dong nghia da duoc tiep nhan.
  */
 @Injectable()
 export class QrService {
   constructor(@InjectRepository(Booking) private readonly repo: Repository<Booking>) {}
 
-  /** FR-QR-01 — sinh token QR khi lich hen chuyen sang CONFIRMED. */
+  /** FR-QR-01 — sinh token QR khi tao lich hen; goi lai khong cap ma moi. */
   async issueToken(booking: Booking): Promise<string> {
     if (!booking.qrToken) {
       booking.qrToken = generatePublicToken();
@@ -104,7 +107,7 @@ export class QrService {
     if (!booking.qrToken) {
       throw new BadRequestException({
         code: 'QR_NOT_ISSUED',
-        message: 'Lich hen chua duoc xac nhan nen chua co ma QR',
+        message: 'Lich hen nay chua co ma QR',
       });
     }
     return this.validate(booking.qrToken);

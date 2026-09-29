@@ -152,6 +152,11 @@ export class BookingsService {
       return saved;
     });
 
+    // FR-QR-01 — sinh ma QR ngay khi dat lich thanh cong. Ban thiet ke ve ma
+    // QR ngay tren SC-16 nen khach phai co ma de luu lai tu luc nay, khong doi
+    // den khi cua hang xac nhan.
+    await this.qr.issueToken(booking);
+
     // FR-BOOK-10 — SMS xac nhan da nhan yeu cau, kem ma lich hen.
     await this.notify(booking, NotificationEvent.BOOKING_CREATED, {
       storeName: pickI18n(store.name, customer.language),
@@ -274,7 +279,12 @@ export class BookingsService {
 
   // ---------------- Chuyen trang thai ----------------
 
-  /** SA-05 — Admin xac nhan lich hen, sinh QR va gui SMS (Luong B). */
+  /**
+   * SA-05 — Admin xac nhan lich hen va gui SMS (Luong B).
+   *
+   * Ma QR da co tu luc khach dat lich; goi issueToken o day chi de vet nhung
+   * lich cu tao truoc khi doi cach sinh ma — ham nay khong cap lai ma neu da co.
+   */
   async confirm(id: string, actor: Actor): Promise<Booking> {
     const booking = await this.assertTransition(id, BookingStatus.CONFIRMED);
 

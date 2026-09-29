@@ -75,7 +75,7 @@ export class PublicBookingsController {
   async qrImage(@Param('code') code: string) {
     const booking = await this.service.findByCode(code);
     if (!booking.qrToken) {
-      return { available: false, message: 'Lich hen chua duoc xac nhan nen chua co ma QR' };
+      return { available: false, message: 'Lich hen nay chua co ma QR' };
     }
     return {
       available: true,
