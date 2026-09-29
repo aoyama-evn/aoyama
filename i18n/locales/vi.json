@@ -1393,6 +1393,8 @@
   },
   "sc15": {
     "cancel": "Hủy đặt lịch",
+    "cancelAsk": "Hủy đặt lịch?",
+    "cancelAskBody": "Những gì bạn vừa chọn sẽ không được lưu lại.",
     "confirm": "Xác nhận đặt lịch",
     "customerVehicle": "Khách & xe",
     "datetime": "Thời gian",

@@ -12,6 +12,19 @@ const { i18n, money, dayLabel } = useFormat();
 const store = ref<Store | null>(null);
 const submitting = ref(false);
 const error = ref<ApiError | null>(null);
+const cancelOpen = ref(false);
+
+/**
+ * Buoc nay chua tao lich hen tren may chu, nen "huy" o day la bo ban nhap roi
+ * ve trang chu. Truoc day nut nay dan thang ve trang chu, khong hoi lai va
+ * cung khong xoa ban nhap — khach bam nham la mat het lua chon ma lan sau vao
+ * dat lich lai thay ban nhap cu quay lai.
+ */
+async function discardBooking(): Promise<void> {
+  cancelOpen.value = false;
+  booking.reset();
+  await navigateTo('/');
+}
 
 onMounted(async () => {
   booking.restore();
@@ -141,7 +154,24 @@ useHead({ title: () => t('sc15.title') });
       {{ submitting ? $t('sc15.submitting') : $t('sc15.confirm') }}
     </button>
 
-    <NuxtLink to="/" class="btn btn-ghost self-center text-[13px]">{{ $t('sc15.cancel') }}</NuxtLink>
+    <button
+      type="button"
+      class="btn btn-ghost self-center text-[13px]"
+      @click="cancelOpen = true"
+    >
+      {{ $t('sc15.cancel') }}
+    </button>
+
+    <AyConfirmDialog
+      :open="cancelOpen"
+      :title="$t('sc15.cancelAsk')"
+      :message="$t('sc15.cancelAskBody')"
+      :confirm-label="$t('common.yes')"
+      :cancel-label="$t('common.no')"
+      danger
+      @confirm="discardBooking"
+      @cancel="cancelOpen = false"
+    />
 
     <p class="text-muted text-center text-[11px]">
       <i18n-t keypath="sc15.terms" tag="span">

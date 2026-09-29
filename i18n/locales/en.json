@@ -1393,6 +1393,8 @@
   },
   "sc15": {
     "cancel": "Cancel booking",
+    "cancelAsk": "Cancel this booking?",
+    "cancelAskBody": "Nothing you have chosen will be saved.",
     "confirm": "Confirm booking",
     "customerVehicle": "Customer & vehicle",
     "datetime": "Date & time",

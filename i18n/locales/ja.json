@@ -1393,6 +1393,8 @@
   },
   "sc15": {
     "cancel": "予約をやめる",
+    "cancelAsk": "予約をやめますか？",
+    "cancelAskBody": "入力した内容は保存されません。",
     "confirm": "予約を確定する",
     "customerVehicle": "お客様・バイク",
     "datetime": "日時",
