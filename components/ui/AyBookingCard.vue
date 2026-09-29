@@ -3,8 +3,11 @@ import type { Booking } from '~/types/models';
 
 /**
  * The lich hen cua khach — SC-01a va SC-21.
- * Ban thiet ke: than the bam duoc de xem tien do, chan the la hang nut tron
- * 38px. Lich con hieu luc thi cho doi lich va huy; lich da dong thi cho dat lai.
+ *
+ * Than the bam duoc de xem tien do. Chan the la hang nut co chu: chi mot cai
+ * bieu tuong thi khach phai doan y nghia, ma doi lich voi huy lich la hai viec
+ * khong the nham. Lich con hieu luc thi cho sua va huy; lich da dong thi cho
+ * dat lai. SC-01a thay ca hang nut nay bang khe cam actions cua rieng no.
  */
 const props = withDefaults(
   defineProps<{
@@ -60,47 +63,27 @@ const serviceNames = computed(() =>
         <template v-if="active">
           <NuxtLink
             :to="`/bookings/${booking.code}/reschedule`"
-            class="ay-round-btn"
+            class="ay-card-btn"
             :aria-label="$t('card.reschedule', { code: booking.code })"
-            :title="$t('card.reschedule', { code: booking.code })"
           >
-            <svg
-              width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
-            >
-              <rect x="3.5" y="5" width="17" height="16" rx="3" />
-              <path d="M8 3v4M16 3v4M3.5 10h17" />
-            </svg>
+            {{ $t('common.edit') }}
           </NuxtLink>
           <NuxtLink
             :to="`/bookings/${booking.code}/cancel`"
-            class="ay-round-btn"
+            class="ay-card-btn ay-card-btn-danger"
             :aria-label="$t('card.cancel', { code: booking.code })"
-            :title="$t('card.cancel', { code: booking.code })"
           >
-            <svg
-              width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2.75" stroke-linecap="round" aria-hidden="true"
-            >
-              <path d="M6 6l12 12M18 6 6 18" />
-            </svg>
+            {{ $t('common.cancel') }}
           </NuxtLink>
         </template>
 
         <NuxtLink
           v-else-if="closed"
           :to="`/bookings/${booking.code}/rebook`"
-          class="ay-round-btn ay-round-btn-accent"
+          class="ay-card-btn ay-card-btn-accent"
           :aria-label="$t('card.rebook', { code: booking.code })"
-          :title="$t('card.rebook', { code: booking.code })"
         >
-          <svg
-            width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
-          >
-            <path d="M20 12a8 8 0 1 1-2.6-5.9" />
-            <path d="M20 4v4h-4" />
-          </svg>
+          {{ $t('card.rebookShort') }}
         </NuxtLink>
       </slot>
     </div>
@@ -108,25 +91,30 @@ const serviceNames = computed(() =>
 </template>
 
 <style scoped>
-.ay-round-btn {
-  display: inline-grid;
-  min-width: 38px;
+/* Giu chieu cao 38px nhu hang nut tron cu de chan the khong xo lech. */
+.ay-card-btn {
+  display: inline-flex;
   min-height: 38px;
-  place-items: center;
+  align-items: center;
   border-radius: 999px;
   background: var(--color-neutral-200);
+  padding: 0 16px;
   color: var(--color-neutral-800);
-  padding: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
 }
-.ay-round-btn:hover {
+.ay-card-btn:hover {
   background: var(--color-neutral-300);
   text-decoration: none;
 }
-.ay-round-btn-accent {
+.ay-card-btn-danger {
+  color: var(--color-danger);
+}
+.ay-card-btn-accent {
   background: var(--color-accent-200);
   color: var(--color-accent-800);
 }
-.ay-round-btn-accent:hover {
+.ay-card-btn-accent:hover {
   background: var(--color-accent-300);
 }
 </style>

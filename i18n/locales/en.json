@@ -58,7 +58,8 @@
   "card": {
     "cancel": "Cancel booking {code}",
     "rebook": "Book again from {code}",
-    "reschedule": "Reschedule booking {code}"
+    "reschedule": "Edit booking {code}",
+    "rebookShort": "Book again"
   },
   "common": {
     "all": "All",

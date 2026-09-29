@@ -58,7 +58,8 @@
   "card": {
     "cancel": "予約 {code} をキャンセル",
     "rebook": "予約 {code} を取り直す",
-    "reschedule": "予約 {code} を変更"
+    "reschedule": "予約 {code} を編集",
+    "rebookShort": "取り直す"
   },
   "common": {
     "all": "すべて",

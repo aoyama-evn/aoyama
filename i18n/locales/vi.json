@@ -58,7 +58,8 @@
   "card": {
     "cancel": "Hủy lịch hẹn {code}",
     "rebook": "Đặt lại lịch hẹn {code}",
-    "reschedule": "Cập nhật lịch hẹn {code}"
+    "reschedule": "Sửa lịch hẹn {code}",
+    "rebookShort": "Đặt lại"
   },
   "common": {
     "all": "Tất cả",
