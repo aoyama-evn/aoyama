@@ -1291,7 +1291,9 @@
     "title": "Contact us"
   },
   "sc10": {
+    "askProblem": "What problem is your bike having?",
     "askSymptom": "What is happening? Tell us in text, photos or a voice note.",
+    "askVehicle": "Tell me about your bike.",
     "assistant": "AOYAMA assistant",
     "assistantSub": "AOYAMA assistant",
     "bookInspection": "Book an inspection",
@@ -1301,15 +1303,25 @@
     "greeting": "Hello! How can we help with your bike?",
     "greetingNamed": "Hello {name}! How can we help with your bike?",
     "inputPlaceholder": "Describe the problem… (max 1,000 characters)",
+    "inspection": "General inspection",
+    "intentHint": "You can choose more than one",
+    "makerPlaceholder": "Honda",
+    "modelPlaceholder": "Lead 125",
+    "needIntent": "Please choose what you need first.",
+    "needVehicle": "Please enter the make and model.",
     "otherVehicle": "+ Another bike",
     "photos": "Photos ({n}/{max})",
     "privacyNote": "Photos and voice notes are used only for this diagnosis.",
     "recordDesc": "Record a note",
     "send": "Send",
+    "suggestFor": "Suggestions for {label}",
+    "vehicleDone": "Continue with this",
+    "vehiclePicked": "Got it — {label}.",
     "video": "Video",
     "videoSaved": "Video added",
     "voice": "Voice",
-    "whichVehicle": "Which bike shall we look at?"
+    "whichVehicle": "Which bike shall we look at?",
+    "yearPlaceholder": "2022"
   },
   "sc12": {
     "addMore": "+ Add another service",

@@ -1291,7 +1291,9 @@
     "title": "Liên hệ"
   },
   "sc10": {
+    "askProblem": "Xe bạn đang gặp vấn đề gì?",
     "askSymptom": "Xe đang gặp hiện tượng gì? Bạn có thể mô tả, gửi ảnh hoặc ghi âm giọng nói.",
+    "askVehicle": "Cho tôi biết về xe của bạn nhé.",
     "assistant": "Trợ lý AOYAMA",
     "assistantSub": "AOYAMA assistant",
     "bookInspection": "Đặt lịch kiểm tra",
@@ -1301,15 +1303,25 @@
     "greeting": "Xin chào! Bạn cần hỗ trợ gì cho xe của mình?",
     "greetingNamed": "Xin chào {name}! Bạn cần hỗ trợ gì cho xe của mình?",
     "inputPlaceholder": "Mô tả tình trạng xe… (≤ 1.000 ký tự)",
+    "inspection": "Kiểm tra tổng quát",
+    "intentHint": "Có thể chọn nhiều mục",
+    "makerPlaceholder": "Honda",
+    "modelPlaceholder": "Lead 125",
+    "needIntent": "Hãy chọn trước bạn cần gì.",
+    "needVehicle": "Hãy nhập hãng và dòng xe.",
     "otherVehicle": "+ Xe khác",
     "photos": "Ảnh ({n}/{max})",
     "privacyNote": "Ảnh và ghi âm chỉ dùng cho phiên chẩn đoán này.",
     "recordDesc": "Ghi âm mô tả",
     "send": "Gửi",
+    "suggestFor": "Gợi ý cho {label}",
+    "vehicleDone": "Dùng thông tin này",
+    "vehiclePicked": "Đã ghi nhận: {label}.",
     "video": "Video",
     "videoSaved": "Đã có video",
     "voice": "Giọng nói",
-    "whichVehicle": "Bạn muốn kiểm tra xe nào ạ?"
+    "whichVehicle": "Bạn muốn kiểm tra xe nào ạ?",
+    "yearPlaceholder": "2022"
   },
   "sc12": {
     "addMore": "+ Thêm hạng mục khác",

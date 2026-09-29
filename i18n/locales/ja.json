@@ -1291,7 +1291,9 @@
     "title": "お問い合わせ"
   },
   "sc10": {
+    "askProblem": "お使いのバイクはどんな症状が出ていますか？",
     "askSymptom": "どのような症状ですか？文章・写真・音声で教えてください。",
+    "askVehicle": "お使いのバイクを教えてください。",
     "assistant": "アオヤマアシスタント",
     "assistantSub": "AOYAMA assistant",
     "bookInspection": "点検を予約",
@@ -1301,15 +1303,25 @@
     "greeting": "こんにちは！バイクのことで何かお困りですか？",
     "greetingNamed": "{name} 様、こんにちは！バイクのことで何かお困りですか？",
     "inputPlaceholder": "症状を入力…（1,000文字以内）",
+    "inspection": "車検・総合点検",
+    "intentHint": "複数選べます",
+    "makerPlaceholder": "ホンダ",
+    "modelPlaceholder": "リード125",
+    "needIntent": "まず、ご希望の内容をお選びください。",
+    "needVehicle": "メーカーと車種を入力してください。",
     "otherVehicle": "＋ 別のバイク",
     "photos": "写真 ({n}/{max})",
     "privacyNote": "写真と音声はこの診断のみに使用します。",
     "recordDesc": "音声で説明",
     "send": "送信",
+    "suggestFor": "{label} のおすすめ",
+    "vehicleDone": "この内容で進む",
+    "vehiclePicked": "{label} で承りました。",
     "video": "動画",
     "videoSaved": "動画あり",
     "voice": "音声",
-    "whichVehicle": "どのバイクを見ましょうか？"
+    "whichVehicle": "どのバイクを見ましょうか？",
+    "yearPlaceholder": "2022"
   },
   "sc12": {
     "addMore": "＋ サービスを追加",

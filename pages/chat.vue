@@ -5,9 +5,15 @@ import type { AiDiagnosis, ServiceItem, Vehicle } from '~/types/models';
  * SC-10 Chatbox AI chan doan (khach) va SC-10a (thanh vien).
  * Ban thiet ke: dai tro ly mau accent-2 tren cung, bong tin nhan bo tron lech
  * ve phia nguoi noi, va o soan ghim duoi cung tren nen neutral-100.
- * Ban thanh vien thay buoc "hang xe / doi xe" bang danh sach xe trong ho so.
+ *
+ * Tro ly hoi theo tung buoc: truoc het khach chon mot hoac nhieu viec can lam,
+ * roi tuy lua chon do ma hoi tiep. Bao duong va kiem tra tong quat thi hoi ve
+ * chiec xe; sua chua thi hoi xe dang gap van de gi. Chon ca hai thi hoi ca hai,
+ * theo dung thu tu do.
  */
 definePageMeta({ layout: 'chat' });
+
+type Intent = 'MAINTENANCE' | 'INSPECTION' | 'REPAIR';
 
 const api = useApi();
 const auth = useAuthStore();
@@ -17,13 +23,22 @@ const { t } = useI18n();
 const { number } = useFormat();
 
 const session = ref<AiDiagnosis | null>(null);
-const intent = ref<'MAINTENANCE' | 'REPAIR' | null>(null);
+const intents = ref<Intent[]>([]);
 const vehicle = ref<Vehicle | null>(null);
+/** Khach vang lai khong co ho so xe nen tu khai bao. */
+const manualVehicle = reactive({ maker: '', model: '', year: null as number | null });
+const vehicleConfirmed = ref(false);
 const text = ref('');
 const images = ref<string[]>([]);
 const transcript = ref<string | null>(null);
 const sending = ref(false);
 const scroller = ref<HTMLElement | null>(null);
+
+const INTENT_OPTIONS: { value: Intent; labelKey: string }[] = [
+  { value: 'REPAIR', labelKey: 'sc12.repair' },
+  { value: 'MAINTENANCE', labelKey: 'sc12.maintenance' },
+  { value: 'INSPECTION', labelKey: 'sc10.inspection' },
+];
 
 /** SC-10a — thanh vien chon xe tu ho so thay vi go tay hang va doi xe. */
 const { data: myVehicles } = await useAsyncData(
@@ -32,13 +47,56 @@ const { data: myVehicles } = await useAsyncData(
   { watch: [() => auth.isCustomer] },
 );
 
+function toggleIntent(value: Intent): void {
+  intents.value = intents.value.includes(value)
+    ? intents.value.filter((x) => x !== value)
+    : [...intents.value, value];
+}
+
+/** Bao duong va kiem tra tong quat deu can biet xe truoc khi goi y duoc gi. */
+const needsVehicle = computed(
+  () => intents.value.includes('MAINTENANCE') || intents.value.includes('INSPECTION'),
+);
+const needsSymptom = computed(() => intents.value.includes('REPAIR'));
+
+const hasProfileVehicles = computed(() => auth.isCustomer && (myVehicles.value ?? []).length > 0);
+
+/** Da du thong tin xe chua — tu ho so hoac tu ba o khach tu dien. */
+const vehicleReady = computed(() =>
+  Boolean(vehicle.value) || (manualVehicle.maker.trim() && manualVehicle.model.trim()),
+);
+
+const vehicleLabel = computed(() => {
+  if (vehicle.value) return `${vehicle.value.maker} ${vehicle.value.model}`;
+  const parts = [manualVehicle.maker.trim(), manualVehicle.model.trim()].filter(Boolean);
+  if (manualVehicle.year) parts.push(String(manualVehicle.year));
+  return parts.join(' ');
+});
+
+/** Chi hoi trieu chung sau khi da xong phan xe, de khong doi hai viec cung luc. */
+const symptomStage = computed(
+  () => needsSymptom.value && (!needsVehicle.value || vehicleConfirmed.value),
+);
+
+function confirmVehicle(): void {
+  if (!vehicleReady.value) {
+    ui.warning(t('sc10.needVehicle'));
+    return;
+  }
+  vehicleConfirmed.value = true;
+  // Chi bao duong / kiem tra thi khong con gi de go — gui luon cho tro ly.
+  if (!needsSymptom.value) void send();
+  else void scrollToEnd();
+}
+
 async function ensureSession(): Promise<AiDiagnosis> {
   if (session.value) return session.value;
   session.value = await api.post<AiDiagnosis>('/ai/diagnosis/sessions', {
     sessionKey: `web-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    serviceIntent: intent.value ?? undefined,
-    vehicleMaker: vehicle.value?.maker ?? undefined,
-    vehicleModel: vehicle.value?.model ?? undefined,
+    serviceIntents: intents.value.length ? intents.value : undefined,
+    vehicleMaker: vehicle.value?.maker ?? (manualVehicle.maker.trim() || undefined),
+    vehicleModel: vehicle.value?.model ?? (manualVehicle.model.trim() || undefined),
+    vehicleYear: vehicle.value?.modelYear ?? manualVehicle.year ?? undefined,
   });
   return session.value;
 }
@@ -48,8 +106,16 @@ async function scrollToEnd(): Promise<void> {
   scroller.value?.scrollTo({ top: scroller.value.scrollHeight, behavior: 'smooth' });
 }
 
+const canSend = computed(() => {
+  if (intents.value.length === 0) return false;
+  if (needsVehicle.value && !vehicleConfirmed.value) return false;
+  // Chi bao duong / kiem tra: xong phan xe la du, khong bat go them.
+  if (!needsSymptom.value) return true;
+  return Boolean(text.value.trim() || images.value.length || transcript.value);
+});
+
 async function send(): Promise<void> {
-  if (!text.value.trim() && images.value.length === 0 && !transcript.value) return;
+  if (!canSend.value) return;
   sending.value = true;
   try {
     const current = await ensureSession();
@@ -63,10 +129,7 @@ async function send(): Promise<void> {
     transcript.value = null;
     await scrollToEnd();
   } catch (error) {
-    ui.error(
-      normalizeError(error).message,
-      t('sc10.failLead'),
-    );
+    ui.error(normalizeError(error).message, t('sc10.failLead'));
   } finally {
     sending.value = false;
   }
@@ -89,7 +152,6 @@ async function bookFromFinding(serviceCodes: string[] | undefined): Promise<void
 
 const findings = computed(() => session.value?.findings ?? []);
 const analysisFailed = computed(() => session.value?.status === 'FAILED');
-const canSend = computed(() => Boolean(text.value.trim() || images.value.length || transcript.value));
 
 function vehicleLine(item: Vehicle): string {
   const parts = [item.plateNumber];
@@ -123,9 +185,15 @@ useHead({ title: () => t('sc10.assistant') });
       </span>
       <div class="leading-[1.2]">
         <p class="font-heading text-[15px]">{{ $t('sc10.assistant') }}</p>
-        <p class="text-[10.5px]" style="color: var(--color-accent-2-800)">{{ $t('sc10.assistantSub') }}</p>
+        <p class="text-[10.5px]" style="color: var(--color-accent-2-800)">
+          {{ $t('sc10.assistantSub') }}
+        </p>
       </div>
-      <NuxtLink to="/" class="btn btn-ghost ml-auto px-2 text-[15px]" :aria-label="$t('sc10.closeAssistant')">
+      <NuxtLink
+        to="/"
+        class="btn btn-ghost ml-auto px-2 text-[15px]"
+        :aria-label="$t('sc10.closeAssistant')"
+      >
         ✕
       </NuxtLink>
     </div>
@@ -140,61 +208,109 @@ useHead({ title: () => t('sc10.assistant') });
         }}
       </p>
 
-      <div class="flex gap-2.5">
-        <button
-          type="button"
-          class="btn btn-secondary text-[13px]"
-          :class="intent === 'MAINTENANCE' ? 'ay-chip-on' : ''"
-          @click="intent = 'MAINTENANCE'"
-        >
-          {{ $t('sc12.maintenance') }}
-        </button>
-        <button
-          type="button"
-          class="btn btn-secondary text-[13px]"
-          :class="intent === 'REPAIR' ? 'ay-chip-on' : ''"
-          @click="intent = 'REPAIR'"
-        >
-          {{ $t('sc12.repair') }}
-        </button>
+      <!-- Buoc 1: chon mot hoac nhieu viec can lam -->
+      <div class="flex flex-col gap-1.5 self-stretch">
+        <div class="flex flex-wrap gap-2">
+          <button
+            v-for="option in INTENT_OPTIONS"
+            :key="option.value"
+            type="button"
+            class="btn btn-secondary text-[13px]"
+            :class="intents.includes(option.value) ? 'ay-chip-on' : ''"
+            :aria-pressed="intents.includes(option.value)"
+            @click="toggleIntent(option.value)"
+          >
+            {{ $t(option.labelKey) }}
+          </button>
+        </div>
+        <p v-if="intents.length === 0" class="text-muted text-[11px]">
+          {{ $t('sc10.intentHint') }}
+        </p>
       </div>
 
-      <!-- SC-10a: thanh vien chon xe tu ho so -->
-      <template v-if="auth.isCustomer && (myVehicles ?? []).length">
-        <p class="ay-bubble-bot">{{ $t('sc10.whichVehicle') }}</p>
-        <div class="flex flex-col gap-2 self-stretch">
-          <button
-            v-for="item in myVehicles ?? []"
-            :key="item.id"
-            type="button"
-            class="ay-row"
-            :style="
-              vehicle?.id === item.id ? 'background: var(--color-accent-200)' : undefined
-            "
-            @click="vehicle = item"
-          >
-            <span class="min-w-0 flex-1">
-              <span
-                class="block text-[13.5px]"
-                :class="vehicle?.id === item.id ? 'font-semibold' : ''"
-              >
-                {{ item.maker }} {{ item.model }}
+      <!-- Buoc 2a: bao duong hoac kiem tra tong quat thi hoi ve chiec xe -->
+      <template v-if="needsVehicle">
+        <p class="ay-bubble-bot">
+          {{ hasProfileVehicles ? $t('sc10.whichVehicle') : $t('sc10.askVehicle') }}
+        </p>
+
+        <div v-if="!vehicleConfirmed" class="flex flex-col gap-2 self-stretch">
+          <!-- SC-10a: thanh vien chon xe tu ho so -->
+          <template v-if="hasProfileVehicles">
+            <button
+              v-for="item in myVehicles ?? []"
+              :key="item.id"
+              type="button"
+              class="ay-row"
+              :style="vehicle?.id === item.id ? 'background: var(--color-accent-200)' : undefined"
+              :aria-pressed="vehicle?.id === item.id"
+              @click="vehicle = vehicle?.id === item.id ? null : item"
+            >
+              <span class="min-w-0 flex-1">
+                <span
+                  class="block text-[13.5px]"
+                  :class="vehicle?.id === item.id ? 'font-semibold' : ''"
+                >
+                  {{ item.maker }} {{ item.model }}
+                </span>
+                <span class="text-muted block truncate text-[11.5px]">{{ vehicleLine(item) }}</span>
               </span>
-              <span class="text-muted block truncate text-[11.5px]">{{ vehicleLine(item) }}</span>
-            </span>
-          </button>
-          <NuxtLink
-            to="/account/vehicles/new/edit"
-            class="btn btn-secondary text-[12.5px]"
-            style="min-height: 44px"
+            </button>
+          </template>
+
+          <!-- Khach vang lai — hoac thanh vien muon khai xe khac -->
+          <div v-if="!vehicle" class="grid grid-cols-2 gap-2">
+            <AyField for="chat-maker" :label="$t('sc14.maker')">
+              <input
+                id="chat-maker"
+                v-model="manualVehicle.maker"
+                class="input"
+                :placeholder="$t('sc10.makerPlaceholder')"
+              />
+            </AyField>
+            <AyField for="chat-model" :label="$t('sc14.model')">
+              <input
+                id="chat-model"
+                v-model="manualVehicle.model"
+                class="input"
+                :placeholder="$t('sc10.modelPlaceholder')"
+              />
+            </AyField>
+            <div class="col-span-2">
+              <AyField for="chat-year" :label="$t('vehicle.modelYear')">
+                <input
+                  id="chat-year"
+                  v-model.number="manualVehicle.year"
+                  class="input"
+                  type="number"
+                  inputmode="numeric"
+                  min="1970"
+                  :max="new Date().getFullYear()"
+                  :placeholder="$t('sc10.yearPlaceholder')"
+                />
+              </AyField>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="btn btn-primary btn-block"
+            style="min-height: 44px; margin: 0"
+            :disabled="!vehicleReady"
+            @click="confirmVehicle"
           >
-            {{ $t('sc10.otherVehicle') }}
-          </NuxtLink>
+            {{ $t('sc10.vehicleDone') }}
+          </button>
         </div>
+
+        <p v-else class="ay-bubble-me">
+          {{ $t('sc10.vehiclePicked', { label: vehicleLabel }) }}
+        </p>
       </template>
 
-      <p class="ay-bubble-bot">
-        {{ $t('sc10.askSymptom') }}
+      <!-- Buoc 2b: sua chua thi hoi xe dang gap van de gi -->
+      <p v-if="symptomStage" class="ay-bubble-bot">
+        {{ $t('sc10.askProblem') }}
       </p>
 
       <!-- Lich su tin nhan -->
@@ -234,7 +350,7 @@ useHead({ title: () => t('sc10.assistant') });
       <AyDiagnosisCard
         v-if="findings.length"
         :findings="findings"
-        :vehicle-label="vehicle ? `${vehicle.maker} ${vehicle.model}` : null"
+        :vehicle-label="vehicleLabel || null"
         @book="bookFromFinding"
       />
 
@@ -249,8 +365,9 @@ useHead({ title: () => t('sc10.assistant') });
       </div>
     </div>
 
-    <!-- O soan -->
+    <!-- O soan — chi mo khi da toi buoc ta trieu chung -->
     <div
+      v-if="symptomStage"
       class="ay-safe-bottom flex flex-none flex-col gap-2.5 px-3.5 pb-4 pt-2.5"
       style="background: var(--color-neutral-100); border-top: 1px solid var(--color-divider)"
     >
