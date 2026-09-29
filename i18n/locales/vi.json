@@ -1303,7 +1303,6 @@
     "greeting": "Xin chào! Bạn cần hỗ trợ gì cho xe của mình?",
     "greetingNamed": "Xin chào {name}! Bạn cần hỗ trợ gì cho xe của mình?",
     "inputPlaceholder": "Mô tả tình trạng xe… (≤ 1.000 ký tự)",
-    "inspection": "Kiểm tra tổng quát",
     "intentHint": "Có thể chọn nhiều mục",
     "makerPlaceholder": "Honda",
     "modelPlaceholder": "Lead 125",

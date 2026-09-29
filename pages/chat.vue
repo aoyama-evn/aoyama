@@ -37,7 +37,7 @@ const scroller = ref<HTMLElement | null>(null);
 const INTENT_OPTIONS: { value: Intent; labelKey: string }[] = [
   { value: 'REPAIR', labelKey: 'sc12.repair' },
   { value: 'MAINTENANCE', labelKey: 'sc12.maintenance' },
-  { value: 'INSPECTION', labelKey: 'sc10.inspection' },
+  { value: 'INSPECTION', labelKey: 'serviceType.INSPECTION' },
 ];
 
 /** SC-10a — thanh vien chon xe tu ho so thay vi go tay hang va doi xe. */

@@ -1303,7 +1303,6 @@
     "greeting": "こんにちは！バイクのことで何かお困りですか？",
     "greetingNamed": "{name} 様、こんにちは！バイクのことで何かお困りですか？",
     "inputPlaceholder": "症状を入力…（1,000文字以内）",
-    "inspection": "車検・総合点検",
     "intentHint": "複数選べます",
     "makerPlaceholder": "ホンダ",
     "modelPlaceholder": "リード125",

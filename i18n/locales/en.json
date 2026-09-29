@@ -1303,7 +1303,6 @@
     "greeting": "Hello! How can we help with your bike?",
     "greetingNamed": "Hello {name}! How can we help with your bike?",
     "inputPlaceholder": "Describe the problem… (max 1,000 characters)",
-    "inspection": "General inspection",
     "intentHint": "You can choose more than one",
     "makerPlaceholder": "Honda",
     "modelPlaceholder": "Lead 125",
