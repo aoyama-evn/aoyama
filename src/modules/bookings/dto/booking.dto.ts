@@ -149,6 +149,19 @@ export class LookupBookingDto {
   @IsString() @IsNotEmpty() phone!: string;
 }
 
+/**
+ * SC-20 — noi dung doc duoc tu anh ma QR khach tai len. Anh QR he thong sinh
+ * ra chua token cua lich hen chu khong phai ma lich hen, nen tra cuu bang
+ * duong nay khong doi so dien thoai: cam duoc anh QR la du chung minh, giong
+ * nhu khi dua ma cho le tan quet.
+ */
+export class LookupQrDto {
+  @ApiProperty({ description: 'Chuoi doc duoc tu anh ma QR' })
+  @IsString()
+  @IsNotEmpty()
+  token!: string;
+}
+
 export class BookingQueryDto extends PaginationQueryDto {
   @IsOptional() @IsString() keyword?: string;
   @IsOptional() @IsUUID('4') storeId?: string;

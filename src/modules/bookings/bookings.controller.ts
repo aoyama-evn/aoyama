@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   Param,
   ParseUUIDPipe,
   Post,
@@ -23,6 +24,7 @@ import {
   CancelBookingDto,
   CreateBookingDto,
   LookupBookingDto,
+  LookupQrDto,
   RescheduleBookingDto,
 } from './dto/booking.dto';
 import { QrService } from './qr.service';
@@ -60,6 +62,16 @@ export class PublicBookingsController {
   @ApiOperation({ summary: 'SC-20 — Guest tra cuu lich hen bang ma va so dien thoai' })
   lookup(@Body() dto: LookupBookingDto) {
     return this.service.lookupForGuest(dto.code, dto.phone);
+  }
+
+  @Public()
+  @Post('lookup-qr')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'SC-20 — tim lich hen tu anh ma QR khach tai len' })
+  async lookupByQr(@Body() dto: LookupQrDto) {
+    const booking = await this.qr.findByToken(dto.token.trim());
+    // Chi tra ma lich hen; man theo doi tien do se tu lay phan con lai.
+    return { code: booking.code };
   }
 
   @Public()
