@@ -10,7 +10,17 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { IsArray, IsEnum, IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsIn,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 import { AuthUser, CurrentUser, Public } from 'src/common/decorators';
 import { PaginationQueryDto } from 'src/common/dto';
 import { Language } from 'src/common/enums';
@@ -22,8 +32,13 @@ class StartSessionDto {
   @IsOptional() @IsEnum(Language) language?: Language;
   @IsOptional() @IsString() vehicleMaker?: string;
   @IsOptional() @IsString() vehicleModel?: string;
+  @IsOptional() @IsInt() @Min(1970) @Max(2100) vehicleYear?: number;
 
-  @IsOptional() @IsIn(['MAINTENANCE', 'REPAIR']) serviceIntent?: string;
+  /** Khach chon duoc nhieu muc cung luc o dau phien chat (SC-10). */
+  @IsOptional()
+  @IsArray()
+  @IsIn(['MAINTENANCE', 'REPAIR', 'INSPECTION'], { each: true })
+  serviceIntents?: string[];
 }
 
 class SendMessageDto {

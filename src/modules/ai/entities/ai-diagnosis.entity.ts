@@ -47,7 +47,15 @@ export class AiDiagnosis extends BaseEntity {
   @Column({ type: 'varchar', name: 'vehicle_model', length: 64, nullable: true })
   vehicleModel!: string | null;
 
-  @Column({ type: 'varchar', name: 'service_intent', length: 16, nullable: true })
+  @Column({ type: 'int', name: 'vehicle_year', nullable: true })
+  vehicleYear!: number | null;
+
+  /**
+   * Mot hoac nhieu y dinh khach chon o dau phien, ngan cach bang dau phay:
+   * MAINTENANCE, REPAIR, INSPECTION. Khach chon duoc nhieu muc cung luc nen
+   * cot phai du cho ca ba.
+   */
+  @Column({ type: 'varchar', name: 'service_intent', length: 64, nullable: true })
   serviceIntent!: string | null;
 
   @Column({ type: 'jsonb', default: () => "'[]'" })

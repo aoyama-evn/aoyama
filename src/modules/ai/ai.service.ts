@@ -43,7 +43,9 @@ export class AiService {
     customerId?: string | null;
     vehicleMaker?: string;
     vehicleModel?: string;
-    serviceIntent?: string;
+    vehicleYear?: number;
+    /** SC-10 — khach chon duoc nhieu y dinh cung luc. */
+    serviceIntents?: string[];
   }): Promise<AiDiagnosis> {
     const retentionDays = this.settings.getNumber(
       SETTING_KEYS.AI_MEDIA_RETENTION_DAYS,
@@ -57,7 +59,9 @@ export class AiService {
         customerId: input.customerId ?? null,
         vehicleMaker: input.vehicleMaker ?? null,
         vehicleModel: input.vehicleModel ?? null,
-        serviceIntent: input.serviceIntent ?? null,
+        vehicleYear: input.vehicleYear ?? null,
+        // Luu thanh chuoi ngan cach dau phay; provider tach lai khi cham diem.
+        serviceIntent: input.serviceIntents?.length ? input.serviceIntents.join(',') : null,
         messages: [],
         findings: [],
         status: 'PENDING',

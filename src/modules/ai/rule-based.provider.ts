@@ -245,12 +245,35 @@ export class RuleBasedAiProvider implements AiProvider {
 
   async diagnose(input: DiagnoseInput): Promise<DiagnosisFinding[]> {
     const haystack = normalise([input.description, input.transcript].filter(Boolean).join(' '));
-
-    // Mo ta qua ngan thi khong du co so de doan — de man hinh moi khach noi them.
-    if (haystack.trim().length < 3) return [];
-
     const sellable = new Set(input.availableServices.map((s) => s.code));
     const lang = ['ja', 'en', 'vi'].includes(input.language) ? input.language : 'ja';
+
+    // SC-10 cho chon nhieu y dinh, luu thanh chuoi ngan cach dau phay.
+    const intents = (input.serviceIntent ?? '')
+      .split(',')
+      .map((x) => x.trim().toUpperCase())
+      .filter(Boolean);
+
+    const wantsPeriodic =
+      intents.includes('MAINTENANCE') || intents.includes('INSPECTION');
+
+    /**
+     * Khach chon bao duong hoac kiem tra tong quat thi khong co "trieu chung"
+     * de ta — ho chi bao muon lam gi. Truong hop do tra ve dung dich vu ho
+     * chon, khong cho den khi co mo ta.
+     */
+    if (haystack.trim().length < 3) {
+      const wanted = wantsPeriodic ? RULES.filter((r) => r.key === 'PERIODIC') : [];
+      if (wanted.length === 0) return [];
+      return wanted.map((rule) => ({
+        label: rule.label[lang] ?? rule.label.ja,
+        // Day la lua chon cua chinh khach, khong phai suy doan — de muc vua phai.
+        matchPercent: 60,
+        description: rule.description[lang] ?? rule.description.ja,
+        suggestedServiceCodes: rule.serviceCodes.filter((c) => sellable.has(c)),
+        severity: rule.severity,
+      }));
+    }
 
     const scored = RULES.map((rule) => {
       const hits = rule.keywords.filter((k) => haystack.includes(k));
@@ -258,11 +281,25 @@ export class RuleBasedAiProvider implements AiProvider {
 
       // Tu khoa dai hon thi cu the hon, nen tinh nang hon mot chut.
       const weight = hits.reduce((sum, k) => sum + (k.length >= 8 ? 2 : 1), 0);
-      // Khop dung y dinh khach chon o dau phien thi cong them.
-      const intentBonus = input.serviceIntent && input.serviceIntent === rule.intent ? 6 : 0;
+      // Khop mot trong cac y dinh khach chon o dau phien thi cong them.
+      // INSPECTION xep cung nhom bao duong vi deu la viec kiem tra dinh ky.
+      const matchesIntent =
+        (rule.intent === 'MAINTENANCE' && wantsPeriodic) ||
+        (rule.intent === 'REPAIR' && intents.includes('REPAIR'));
+      const intentBonus = matchesIntent ? 6 : 0;
 
       return { rule, hits: hits.length, score: Math.min(92, 46 + weight * 9 + intentBonus) };
     }).filter((x): x is { rule: SymptomRule; hits: number; score: number } => x !== null);
+
+    /**
+     * Khach da chon bao duong hoac kiem tra tong quat thi luon giu lai goi y
+     * bao duong dinh ky, ke ca khi mo ta chi noi ve mot hong hoc khac — do la
+     * viec ho da yeu cau, khong phai thu minh suy ra.
+     */
+    if (wantsPeriodic && !scored.some((x) => x.rule.key === 'PERIODIC')) {
+      const periodic = RULES.find((r) => r.key === 'PERIODIC');
+      if (periodic) scored.push({ rule: periodic, hits: 0, score: 60 });
+    }
 
     if (scored.length === 0) {
       this.logger.debug('Mo ta khong khop trieu chung nao — tra ve ket qua rong');
