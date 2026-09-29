@@ -1,4 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomBytes } from 'node:crypto';
 import * as bcrypt from 'bcryptjs';
@@ -40,7 +41,25 @@ export class AuthService {
     private readonly otp: OtpService,
     private readonly tokens: TokenService,
     private readonly notifications: NotificationsService,
+    private readonly config: ConfigService,
   ) {}
+
+  /**
+   * Khi chua noi cong SMS that (SMS_DRIVER=console) thi ma OTP chi duoc in ra
+   * nhat ky may chu, dien thoai khach khong nhan duoc gi va khong ai dang nhap
+   * duoc. O moi truong phat trien ta tra ma ve cho giao dien hien ra de con
+   * thu duoc.
+   *
+   * Tuyet doi khong mo o ban chay that: ai cung goi duoc cua nay cho so bat ky
+   * nen lo ma la mat tai khoan. Vi vay dieu kien doi ca hai: driver la console
+   * VA moi truong khong phai production.
+   */
+  private get exposeOtpCode(): boolean {
+    return (
+      this.config.get<string>('notification.sms.driver') === 'console' &&
+      this.config.get<string>('app.env') !== 'production'
+    );
+  }
 
   // ---------- Khach hang (SC-17, SC-18, SC-19) ----------
 
@@ -53,7 +72,7 @@ export class AuthService {
     purpose: OtpPurpose,
     language: Language = Language.JA,
     ipAddress?: string,
-  ): Promise<{ expiresAt: Date }> {
+  ): Promise<{ expiresAt: Date; devCode?: string }> {
     const phone = normalizePhone(rawPhone);
     const { code, expiresAt } = await this.otp.issue(phone, purpose, ipAddress);
 
@@ -67,7 +86,7 @@ export class AuthService {
       variables: { otpCode: code, minutes: Math.round((expiresAt.getTime() - Date.now()) / 60000) },
     });
 
-    return { expiresAt };
+    return this.exposeOtpCode ? { expiresAt, devCode: code } : { expiresAt };
   }
 
   /**
