@@ -226,6 +226,27 @@ const RULES: SymptomRule[] = [
 ];
 
 /**
+ * Khach chi bam "Kiem tra" o SC-10 thi ho khong ta trieu chung nao ca — day la
+ * mot yeu cau ro rang, khong phai suy doan. Truoc day moi truong hop khong co
+ * mo ta deu tra ve luat PERIODIC, nen chon "Kiem tra" va chon "Bao duong" cho
+ * ra y het nhau va hang muc kiem tra bi day xuong duoi bao duong dinh ky.
+ */
+const INSPECTION_REQUEST = {
+  label: {
+    ja: '点検のご依頼',
+    en: 'Inspection requested',
+    vi: 'Yêu cầu kiểm tra xe',
+  } as Record<string, string>,
+  description: {
+    ja: 'ご希望の点検内容です。技術者が車両を確認して最終的に判断します。',
+    en: 'The inspection you asked for. A technician confirms it on the bike.',
+    vi: 'Hạng mục kiểm tra bạn yêu cầu. Kỹ thuật viên sẽ xác nhận trực tiếp trên xe.',
+  } as Record<string, string>,
+  serviceCodes: ['SVC-MAINT-INSPECT', 'SVC-MAINT-PERIODIC'],
+  severity: 'LOW' as const,
+};
+
+/**
  * Bo dau tieng Viet va ha chu thuong de so khop khong phu thuoc cach go.
  * Tieng Nhat khong bi anh huong: dau daku (U+3099) nam ngoai khoang dau Latin,
  * va buoc normalize('NFC') cuoi cung ghep lai nhu cu.
@@ -263,16 +284,25 @@ export class RuleBasedAiProvider implements AiProvider {
      * chon, khong cho den khi co mo ta.
      */
     if (haystack.trim().length < 3) {
-      const wanted = wantsPeriodic ? RULES.filter((r) => r.key === 'PERIODIC') : [];
-      if (wanted.length === 0) return [];
-      return wanted.map((rule) => ({
-        label: rule.label[lang] ?? rule.label.ja,
-        // Day la lua chon cua chinh khach, khong phai suy doan — de muc vua phai.
-        matchPercent: 60,
-        description: rule.description[lang] ?? rule.description.ja,
-        suggestedServiceCodes: rule.serviceCodes.filter((c) => sellable.has(c)),
-        severity: rule.severity,
-      }));
+      if (!wantsPeriodic) return [];
+      // Chi hoi kiem tra thi tra dung viec do, hang muc kiem tra dung dau.
+      // Chon ca kiem tra lan bao duong thi giu luat bao duong dinh ky vi no
+      // bao gom ca phan kiem tra.
+      const onlyInspection =
+        intents.includes('INSPECTION') && !intents.includes('MAINTENANCE');
+      const source = onlyInspection
+        ? INSPECTION_REQUEST
+        : (RULES.find((r) => r.key === 'PERIODIC') as SymptomRule);
+      return [
+        {
+          label: source.label[lang] ?? source.label.ja,
+          // Day la lua chon cua chinh khach, khong phai suy doan — de muc vua phai.
+          matchPercent: 60,
+          description: source.description[lang] ?? source.description.ja,
+          suggestedServiceCodes: source.serviceCodes.filter((c) => sellable.has(c)),
+          severity: source.severity,
+        },
+      ];
     }
 
     const scored = RULES.map((rule) => {

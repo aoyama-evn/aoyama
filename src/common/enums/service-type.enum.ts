@@ -13,5 +13,7 @@ export enum ServiceType {
 export enum BookingServiceType {
   MAINTENANCE = 'MAINTENANCE',
   REPAIR = 'REPAIR',
+  INSPECTION = 'INSPECTION',
+  /** Khach chon tu hai nhom tro len trong cung mot lich hen. */
   BOTH = 'BOTH',
 }

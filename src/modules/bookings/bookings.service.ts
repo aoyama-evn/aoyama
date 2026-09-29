@@ -668,7 +668,9 @@ function serviceTypeLabel(type: BookingServiceType): string {
       return 'Bao duong';
     case BookingServiceType.REPAIR:
       return 'Sua chua';
+    case BookingServiceType.INSPECTION:
+      return 'Kiem tra';
     default:
-      return 'Bao duong va sua chua';
+      return 'Nhieu loai dich vu';
   }
 }
