@@ -12,7 +12,7 @@ const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
 const { t } = useI18n();
-const { i18n, money } = useFormat();
+const { i18n, money, date: fmtDate } = useFormat();
 
 const code = route.params.code as string;
 
@@ -27,12 +27,34 @@ const { data } = await useAsyncData(`resched-${code}`, async () => {
 
 const booking = computed(() => data.value?.booking ?? null);
 
+/**
+ * Ngay hen theo gio Nhat. scheduledAt la moc UTC nen cat muoi ky tu dau se ra
+ * sai ngay voi nhung khung gio som truoc 09:00 gio Nhat.
+ */
+const currentDate = computed(() =>
+  booking.value ? fmtDate(booking.value.scheduledAt, 'yyyy-MM-dd') : '',
+);
+
+/**
+ * Bieu mau dung ngay lich dang sua lam gia tri ban dau, gan thang luc khoi tao
+ * chu khong doi den onMounted. Dat o onMounted thi watcher cua storeId chay
+ * xen vao giua va xoa mat khung gio, con AySlotPicker da kip mo lich thang o
+ * thang hien tai truoc khi biet lich nay hen vao thang nao.
+ */
 const days = ref<DayAvailability[]>([]);
-const slot = ref<{ date: string; startTime: string } | null>(null);
-const storeId = ref<string>('');
-const selectedIds = ref<string[]>([]);
-const odometer = ref<number | null>(null);
-const note = ref('');
+const slot = ref<{ date: string; startTime: string } | null>(
+  booking.value
+    ? { date: currentDate.value, startTime: booking.value.slotStartTime.slice(0, 5) }
+    : null,
+);
+const storeId = ref<string>(booking.value?.storeId ?? '');
+const selectedIds = ref<string[]>(
+  (booking.value?.services ?? [])
+    .map((line) => line.serviceId)
+    .filter((id): id is string => Boolean(id)),
+);
+const odometer = ref<number | null>(booking.value?.vehicle?.currentOdometer ?? null);
+const note = ref(booking.value?.symptomDescription ?? '');
 const reason = ref('');
 const loading = ref(true);
 const submitting = ref(false);
@@ -53,17 +75,7 @@ async function loadAvailability(): Promise<void> {
   }
 }
 
-onMounted(async () => {
-  const current = booking.value;
-  if (!current) return;
-  storeId.value = current.storeId;
-  selectedIds.value = (current.services ?? [])
-    .map((line) => line.serviceId)
-    .filter((id): id is string => Boolean(id));
-  odometer.value = current.vehicle?.currentOdometer ?? null;
-  note.value = current.symptomDescription ?? '';
-  await loadAvailability();
-});
+onMounted(loadAvailability);
 
 watch(storeId, () => {
   slot.value = null;
@@ -98,7 +110,7 @@ async function submit(): Promise<void> {
   error.value = null;
   try {
     await api.put(`/bookings/${current.id}/reschedule`, {
-      date: slot.value?.date ?? current.scheduledAt.slice(0, 10),
+      date: slot.value?.date ?? currentDate.value,
       startTime: slot.value?.startTime ?? current.slotStartTime.slice(0, 5),
       storeId: storeId.value,
       serviceIds: selectedIds.value,

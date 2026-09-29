@@ -29,7 +29,11 @@ watch(
   () => props.days,
   (list) => {
     if (cursor.value || list.length === 0) return;
-    const first = new Date(`${list[0].date}T12:00:00+09:00`);
+    // Da co khung gio chon san (SC-23 mo lai lich cu) thi mo dung thang cua no,
+    // khong thi lich thang dung o thang hien tai con ngay dang chon nam thang
+    // khac — khach khong nhin thay no dau ca.
+    const anchor = props.modelValue?.date ?? list[0].date;
+    const first = new Date(`${anchor}T12:00:00+09:00`);
     cursor.value = { year: first.getFullYear(), month: first.getMonth() };
   },
   { immediate: true },
