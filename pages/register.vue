@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { OtpRequestResponse } from '~/types/models';
+
 /**
  * SC-17 Dang ky khach hang — FR-AUTH-01.
  * Ban thiet ke chi hoi ho ten, so dien thoai, email va o dong y dieu khoan;
@@ -24,13 +26,18 @@ async function submit(): Promise<void> {
 
   loading.value = true;
   try {
-    await api.post('/auth/otp/request', { phone: form.phone.trim(), purpose: 'REGISTER' });
+    const sent = await api.post<OtpRequestResponse>('/auth/otp/request', {
+      phone: form.phone.trim(),
+      purpose: 'REGISTER',
+    });
     const query = new URLSearchParams({
       phone: form.phone.trim(),
       purpose: 'REGISTER',
       name: form.name.trim(),
     });
     if (form.email.trim()) query.set('email', form.email.trim());
+    // May chu phat trien chua noi cong SMS thi gui kem ma de SC-19 hien ra.
+    if (sent.devCode) query.set('dev', sent.devCode);
     await navigateTo(`/verify-otp?${query}`);
   } catch (caught) {
     errors.phone = normalizeError(caught).message;

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { OtpRequestResponse } from '~/types/models';
+
 /**
  * SC-18 Dang nhap khach hang — FR-AUTH-02.
  * Chi can so dien thoai; ma OTP nhap o SC-19. Hai the duoi cung la loi moi
@@ -20,9 +22,14 @@ async function requestOtp(): Promise<void> {
   }
   sending.value = true;
   try {
-    await api.post('/auth/otp/request', { phone: phone.value.trim(), purpose: 'LOGIN' });
-    const query = new URLSearchParams({ phone: phone.value.trim(), purpose: 'LOGIN' }).toString();
-    await navigateTo(`/verify-otp?${query}`);
+    const sent = await api.post<OtpRequestResponse>('/auth/otp/request', {
+      phone: phone.value.trim(),
+      purpose: 'LOGIN',
+    });
+    const query = new URLSearchParams({ phone: phone.value.trim(), purpose: 'LOGIN' });
+    // May chu phat trien chua noi cong SMS thi gui kem ma de SC-19 hien ra.
+    if (sent.devCode) query.set('dev', sent.devCode);
+    await navigateTo(`/verify-otp?${query.toString()}`);
   } catch (caught) {
     error.value = normalizeError(caught).message;
     ui.error(error.value);

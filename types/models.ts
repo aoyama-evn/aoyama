@@ -88,6 +88,16 @@ export interface AdminUser {
   mustChangePassword: boolean;
 }
 
+/**
+ * Phan hoi khi xin ma OTP. `devCode` chi co khi may chu chay o moi truong phat
+ * trien va chua noi cong SMS that — luc do khong dien thoai nao nhan duoc ma
+ * nen phai hien thang ra man hinh. Ban chay that khong bao gio tra truong nay.
+ */
+export interface OtpRequestResponse {
+  expiresAt: string;
+  devCode?: string;
+}
+
 export interface TokenResponse {
   accessToken: string;
   refreshToken: string;

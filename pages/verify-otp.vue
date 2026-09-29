@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ApiError, TokenResponse } from '~/types/models';
+import type { ApiError, OtpRequestResponse, TokenResponse } from '~/types/models';
 
 /**
  * SC-19 Nhap ma OTP — FR-AUTH-03, FR-AUTH-04.
@@ -19,6 +19,12 @@ const email = route.query.email ? String(route.query.email) : undefined;
 const redirect = route.query.redirect ? String(route.query.redirect) : null;
 
 const code = ref('');
+/**
+ * Ma do may chu phat trien gui kem khi chua noi cong SMS that. Khong co cong
+ * thi khong dien thoai nao nhan duoc gi, nen phai hien thang ra day thi moi
+ * thu duoc luong dang nhap. Ban chay that khong bao gio co truong nay.
+ */
+const devCode = ref(route.query.dev ? String(route.query.dev) : '');
 const loading = ref(false);
 const error = ref<ApiError | null>(null);
 
@@ -89,7 +95,8 @@ async function verify(): Promise<void> {
 async function resend(): Promise<void> {
   error.value = null;
   try {
-    await api.post('/auth/otp/request', { phone, purpose });
+    const sent = await api.post<OtpRequestResponse>('/auth/otp/request', { phone, purpose });
+    devCode.value = sent.devCode ?? '';
     ui.success(t('sc19.resent'));
     startCooldown();
   } catch (caught) {
@@ -116,6 +123,31 @@ useHead({ title: () => t('sc19.titleLogin') });
           <template #target><strong>{{ maskedTarget }}</strong></template>
         </i18n-t>
       </p>
+    </div>
+
+    <div
+      v-if="devCode"
+      class="flex flex-wrap items-center gap-2 px-3.5 py-3"
+      style="
+        border: 1.5px dashed var(--color-accent-2-400);
+        background: var(--color-accent-2-100);
+        border-radius: 16px;
+      "
+    >
+      <p class="w-full text-[11.5px] leading-[1.45]" style="color: var(--color-accent-2-800)">
+        {{ $t('otpDev.notice') }}
+      </p>
+      <strong class="select-all font-heading text-[19px]" style="letter-spacing: 0.14em">
+        {{ devCode }}
+      </strong>
+      <button
+        type="button"
+        class="btn btn-secondary ml-auto text-[12px]"
+        style="min-height: 38px"
+        @click="code = devCode"
+      >
+        {{ $t('otpDev.fill') }}
+      </button>
     </div>
 
     <AyOtpInput v-model="code" />

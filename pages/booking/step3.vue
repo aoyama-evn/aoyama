@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TokenResponse, Vehicle } from '~/types/models';
+import type { OtpRequestResponse, TokenResponse, Vehicle } from '~/types/models';
 
 /**
  * SC-14 Dat lich buoc 3 — FR-BOOK-01, FR-BOOK-06..08.
@@ -26,6 +26,8 @@ const errors = reactive<Record<string, string>>({});
 
 /** SC-14a — o nhap OTP chi mo sau khi da bam gui ma. */
 const otpSent = ref(false);
+/** Ma may chu phat trien gui kem khi chua noi cong SMS — xem SC-19. */
+const otpDevCode = ref('');
 const otpCode = ref('');
 const otpBusy = ref(false);
 const marketingOptIn = ref(false);
@@ -63,7 +65,11 @@ async function requestOtp(): Promise<void> {
   }
   otpBusy.value = true;
   try {
-    await api.post('/auth/otp/request', { phone: booking.contactPhone.trim(), purpose: 'LOGIN' });
+    const sent = await api.post<OtpRequestResponse>('/auth/otp/request', {
+      phone: booking.contactPhone.trim(),
+      purpose: 'LOGIN',
+    });
+    otpDevCode.value = sent.devCode ?? '';
     otpSent.value = true;
     ui.success(t('common.otpSent'), t('common.otpValidNote'));
   } catch (error) {
@@ -162,6 +168,31 @@ useHead({ title: () => `${t('sc01.bookCta')} — 3` });
           </button>
         </div>
         <p v-if="errors.contactPhone" class="field-error mt-1">{{ errors.contactPhone }}</p>
+      </div>
+
+      <div
+        v-if="otpDevCode"
+        class="flex flex-wrap items-center gap-2 px-3.5 py-3"
+        style="
+          border: 1.5px dashed var(--color-accent-2-400);
+          background: var(--color-accent-2-100);
+          border-radius: 16px;
+        "
+      >
+        <p class="w-full text-[11.5px] leading-[1.45]" style="color: var(--color-accent-2-800)">
+          {{ $t('otpDev.notice') }}
+        </p>
+        <strong class="select-all font-heading text-[19px]" style="letter-spacing: 0.14em">
+          {{ otpDevCode }}
+        </strong>
+        <button
+          type="button"
+          class="btn btn-secondary ml-auto text-[12px]"
+          style="min-height: 38px"
+          @click="otpCode = otpDevCode"
+        >
+          {{ $t('otpDev.fill') }}
+        </button>
       </div>
 
       <div class="field">

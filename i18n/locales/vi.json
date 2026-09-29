@@ -1451,6 +1451,10 @@
     "titleRegister": "Xác thực đăng ký",
     "verifying": "Đang xác thực…"
   },
+  "otpDev": {
+    "notice": "Môi trường thử nghiệm. Chưa nối cổng SMS nên mã không gửi tới điện thoại.",
+    "fill": "Điền mã"
+  },
   "sc20": {
     "codeLabel": "Mã lịch hẹn",
     "lead": "Dành cho khách chưa đăng nhập — xem, đổi hoặc hủy lịch hẹn của bạn.",

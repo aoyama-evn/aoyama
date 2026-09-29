@@ -1451,6 +1451,10 @@
     "titleRegister": "Verify your registration",
     "verifying": "Verifying…"
   },
+  "otpDev": {
+    "notice": "Test environment. No SMS gateway is connected, so the code is not sent to the phone.",
+    "fill": "Fill in the code"
+  },
   "sc20": {
     "codeLabel": "Booking code",
     "lead": "For guests — view, reschedule or cancel your booking.",
