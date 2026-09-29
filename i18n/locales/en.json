@@ -89,6 +89,7 @@
     "prev": "Previous",
     "quoteOnly": "quote",
     "quotePrivate": "Quote on request",
+    "removeItem": "Remove item",
     "required": "required",
     "save": "Save",
     "saveChanges": "Save changes",
@@ -555,7 +556,6 @@
     "order": "Work order",
     "overStock": "{n} parts exceed the stock on hand. Receive more stock before finishing the work order.",
     "quickAdd": "Quick add from the service catalog",
-    "removeItem": "Remove item",
     "removePart": "Remove part",
     "saved": "Diagnosis and items saved",
     "screenTitle": "Diagnosis · {code}",
@@ -1340,6 +1340,7 @@
     "pickedTitle": "Selected services",
     "priceNote": "The price is estimated after a technician checks the bike.",
     "priceNoteAi": "The price is estimated after the AI analysis and a technician check.",
+    "removePicked": "Remove {name}",
     "repair": "Repair",
     "whichService": "What do you need?"
   },

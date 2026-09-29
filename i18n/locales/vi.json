@@ -89,6 +89,7 @@
     "prev": "Trước",
     "quoteOnly": "báo giá",
     "quotePrivate": "Báo giá riêng",
+    "removeItem": "Xóa hạng mục",
     "required": "bắt buộc",
     "save": "Lưu",
     "saveChanges": "Lưu thay đổi",
@@ -555,7 +556,6 @@
     "order": "Phiếu",
     "overStock": "{n} phụ tùng vượt tồn kho hiện có. Nhập thêm kho trước khi hoàn tất phiếu.",
     "quickAdd": "Thêm nhanh từ danh mục dịch vụ",
-    "removeItem": "Xóa hạng mục",
     "removePart": "Xóa phụ tùng",
     "saved": "Đã lưu chẩn đoán và hạng mục",
     "screenTitle": "Chẩn đoán · {code}",
@@ -1340,6 +1340,7 @@
     "pickedTitle": "Hạng mục đã chọn",
     "priceNote": "Giá sẽ được ước tính sau khi kỹ thuật viên kiểm tra thực tế.",
     "priceNoteAi": "Giá sẽ được ước tính sau khi AI phân tích và kỹ thuật viên kiểm tra thực tế.",
+    "removePicked": "Bỏ {name}",
     "repair": "Sửa chữa",
     "whichService": "Bạn cần dịch vụ nào?"
   },

@@ -160,7 +160,7 @@ useHead({ title: () => `${t('sc01.bookCta')} — 1` });
       <textarea
         v-model="booking.symptomDescription"
         class="input"
-        style="min-height: 92px"
+        style="min-height: 92px; border-radius: var(--radius-sm)"
         maxlength="1000"
         :placeholder="$t('sc12.describePlaceholder')"
         @change="booking.persist()"
@@ -235,7 +235,7 @@ useHead({ title: () => `${t('sc01.bookCta')} — 1` });
       <textarea
         v-model="booking.symptomDescription"
         class="input"
-        style="min-height: 76px"
+        style="min-height: 76px; border-radius: var(--radius-sm)"
         maxlength="1000"
         :placeholder="$t('sc12.notePlaceholder')"
         @change="booking.persist()"
@@ -276,6 +276,20 @@ useHead({ title: () => `${t('sc01.bookCta')} — 1` });
         <span class="whitespace-nowrap font-heading text-[14px]">
           {{ service.quoteOnly ? $t('common.quoteOnly') : `~ ${money(service.basePrice)}` }}
         </span>
+        <button
+          type="button"
+          class="ay-remove-item"
+          :aria-label="$t('sc12.removePicked', { name: i18n(service.name) })"
+          :title="$t('common.removeItem')"
+          @click="booking.toggleService(service)"
+        >
+          <svg
+            width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="3" stroke-linecap="round" aria-hidden="true"
+          >
+            <path d="M6 6l12 12M18 6 6 18" />
+          </svg>
+        </button>
       </div>
 
       <p v-if="booking.selectedServices.length === 0" class="text-muted text-[12.5px]">
@@ -314,3 +328,24 @@ useHead({ title: () => `${t('sc01.bookCta')} — 1` });
     <NuxtLink to="/" class="btn btn-ghost self-center text-[13px]">{{ $t('common.back') }}</NuxtLink>
   </div>
 </template>
+
+<style scoped>
+/**
+ * Nut bo mot hang muc da chon. Vung bam 38px cho vua ngon tay tren dien thoai,
+ * mau xam nhat de khong canh tranh voi nut chinh o cuoi man.
+ */
+.ay-remove-item {
+  display: inline-grid;
+  min-width: 38px;
+  min-height: 38px;
+  flex: none;
+  place-items: center;
+  margin: -6px -6px -6px 0;
+  border-radius: 999px;
+  color: var(--color-neutral-500);
+}
+.ay-remove-item:hover {
+  background: var(--color-neutral-200);
+  color: var(--color-danger);
+}
+</style>

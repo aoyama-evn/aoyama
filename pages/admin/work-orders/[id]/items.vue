@@ -334,7 +334,7 @@ useHead({ title: () => `${t('sa11.headTitle')} — AOYAMA Admin` });
                 <td><input v-model.number="item.quantity" class="input h-9 min-h-0 py-1 text-center" type="number" min="1"></td>
                 <td class="text-right whitespace-nowrap">{{ money(item.unitPrice * item.quantity) }}</td>
                 <td>
-                  <button type="button" class="text-danger" :aria-label="$t('sa11.removeItem')" @click="items.splice(index, 1)">×</button>
+                  <button type="button" class="text-danger" :aria-label="$t('common.removeItem')" @click="items.splice(index, 1)">×</button>
                 </td>
               </tr>
               <tr v-if="items.length === 0">

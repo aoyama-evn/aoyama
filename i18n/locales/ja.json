@@ -89,6 +89,7 @@
     "prev": "前へ",
     "quoteOnly": "見積",
     "quotePrivate": "別途お見積",
+    "removeItem": "項目を削除",
     "required": "必須",
     "save": "保存",
     "saveChanges": "変更を保存",
@@ -555,7 +556,6 @@
     "order": "伝票",
     "overStock": "{n} 点の部品が在庫を超えています。伝票を完了する前に入庫してください。",
     "quickAdd": "サービスマスタから追加",
-    "removeItem": "項目を削除",
     "removePart": "部品を削除",
     "saved": "診断と作業項目を保存しました",
     "screenTitle": "診断 · {code}",
@@ -1340,6 +1340,7 @@
     "pickedTitle": "選択したサービス",
     "priceNote": "整備士が実車を確認したうえでお見積りします。",
     "priceNoteAi": "AIの分析と整備士の実車確認のうえでお見積りします。",
+    "removePicked": "{name} を外す",
     "repair": "修理",
     "whichService": "ご希望のサービスは？"
   },
