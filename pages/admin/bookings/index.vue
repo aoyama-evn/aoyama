@@ -95,6 +95,7 @@ const SERVICE_TYPES = computed(() => [
   { value: '', label: t('common.all') },
   { value: 'MAINTENANCE', label: t('serviceType.MAINTENANCE') },
   { value: 'REPAIR', label: t('serviceType.REPAIR') },
+  { value: 'INSPECTION', label: t('serviceType.INSPECTION') },
   { value: 'BOTH', label: t('serviceType.BOTH') },
 ]);
 

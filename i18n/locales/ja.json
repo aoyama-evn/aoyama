@@ -1660,7 +1660,7 @@
     "title": "通知と言語の設定"
   },
   "serviceType": {
-    "BOTH": "両方",
+    "BOTH": "複合",
     "INSPECTION": "車検・点検",
     "MAINTENANCE": "点検・整備",
     "PACKAGE": "パッケージ",

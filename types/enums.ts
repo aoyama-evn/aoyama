@@ -70,6 +70,8 @@ export type ServiceType = (typeof ServiceType)[keyof typeof ServiceType];
 export const BookingServiceType = {
   MAINTENANCE: 'MAINTENANCE',
   REPAIR: 'REPAIR',
+  INSPECTION: 'INSPECTION',
+  /** Khach chon tu hai nhom tro len trong cung mot lich hen. */
   BOTH: 'BOTH',
 } as const;
 export type BookingServiceType = (typeof BookingServiceType)[keyof typeof BookingServiceType];

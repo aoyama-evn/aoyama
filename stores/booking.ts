@@ -97,12 +97,15 @@ export const useBookingStore = defineStore('booking', () => {
     persist();
   }
 
-  /** Chon ca hai loai dich vu thi lich hen duoc danh dau BOTH. */
+  /**
+   * Loai dich vu cua lich hen suy ra tu chinh nhung hang muc khach da chon.
+   * Truoc day chi biet bao duong va sua chua, nen khach chon "Kiem tra" o SC-10
+   * sang SC-12 lai thay nhom "Bao duong" sang len.
+   */
   function syncServiceType(): void {
-    const types = new Set(selectedServices.value.map((s) => s.type));
-    if (types.size > 1) serviceType.value = 'BOTH';
-    else if (types.has('REPAIR')) serviceType.value = 'REPAIR';
-    else serviceType.value = 'MAINTENANCE';
+    serviceType.value = bookingServiceTypeOf(
+      selectedServices.value.map((s) => kindOfService(s.type)),
+    );
   }
 
   /** Dan ket qua chan doan AI sang luong dat lich — SC-11 bam "Dat lich". */

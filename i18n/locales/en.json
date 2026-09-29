@@ -1660,7 +1660,7 @@
     "title": "Notification & language settings"
   },
   "serviceType": {
-    "BOTH": "Both",
+    "BOTH": "Combined",
     "INSPECTION": "Inspection",
     "MAINTENANCE": "Maintenance",
     "PACKAGE": "Package",

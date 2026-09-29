@@ -115,9 +115,7 @@ function pickVehicle(id: string): void {
 
 const serviceType = computed(() => {
   const selected = (refs.value?.services ?? []).filter((s) => form.serviceIds.includes(s.id));
-  const types = new Set(selected.map((s) => s.type));
-  if (types.size > 1) return 'BOTH';
-  return types.has('REPAIR') ? 'REPAIR' : 'MAINTENANCE';
+  return bookingServiceTypeOf(selected.map((s) => kindOfService(s.type)));
 });
 
 const canSubmit = computed(

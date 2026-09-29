@@ -13,7 +13,7 @@ const api = useApi();
 const auth = useAuthStore();
 const booking = useBookingStore();
 const ui = useUiStore();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { i18n, money, number } = useFormat();
 
 const analysing = ref(false);
@@ -31,23 +31,26 @@ onMounted(() => {
 /** Luong AI khi khach den tu SC-10 hoac tu bam nut phan tich o day. */
 const aiFlow = computed(() => Boolean(booking.aiDiagnosisId) || booking.symptomPhotoUrls.length > 0);
 
+/**
+ * Ba nhom, dung bang voi ba lua chon o chatbox SC-10. Thieu "Kiem tra" o day
+ * thi khach chon kiem tra ben chatbox sang toi buoc nay lai thay nhom "Bao
+ * duong" sang len.
+ */
 const KINDS = computed(() => [
   { value: 'MAINTENANCE' as const, label: t('sc12.maintenance') },
   { value: 'REPAIR' as const, label: t('sc12.repair') },
+  { value: 'INSPECTION' as const, label: t('serviceType.INSPECTION') },
 ]);
 
-/** BR — chon ca hai nhom thi loai dich vu cua lich hen la BOTH. */
-const kinds = computed<Set<'MAINTENANCE' | 'REPAIR'>>(() => {
-  if (booking.serviceType === 'BOTH') return new Set(['MAINTENANCE', 'REPAIR']);
-  return new Set([booking.serviceType as 'MAINTENANCE' | 'REPAIR']);
-});
+/** BR — chon tu hai nhom tro len thi loai dich vu cua lich hen la BOTH. */
+const kinds = computed<Set<BookingKind>>(() => kindsOfBookingServiceType(booking.serviceType));
 
-function toggleKind(kind: 'MAINTENANCE' | 'REPAIR'): void {
+function toggleKind(kind: BookingKind): void {
   const next = new Set(kinds.value);
   if (next.has(kind)) next.delete(kind);
   else next.add(kind);
-  if (next.size === 2) booking.serviceType = 'BOTH';
-  else if (next.size === 1) booking.serviceType = [...next][0];
+  if (next.size === 0) return;
+  booking.serviceType = bookingServiceTypeOf(next);
   booking.persist();
 }
 
@@ -79,7 +82,8 @@ async function analyse(): Promise<void> {
   try {
     const session = await api.post<AiDiagnosis>('/ai/diagnosis/sessions', {
       sessionKey: `book-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      serviceIntents: booking.serviceType === 'BOTH' ? ['MAINTENANCE', 'REPAIR'] : [booking.serviceType],
+      language: locale.value,
+      serviceIntents: [...kinds.value],
       vehicleMaker: booking.vehicle.maker || undefined,
       vehicleModel: booking.vehicle.model || undefined,
     });

@@ -24,7 +24,7 @@ const api = useApi();
 const auth = useAuthStore();
 const booking = useBookingStore();
 const ui = useUiStore();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { number } = useFormat();
 
 const session = ref<AiDiagnosis | null>(null);
@@ -116,6 +116,9 @@ async function ensureSession(): Promise<AiDiagnosis> {
   if (session.value) return session.value;
   session.value = await api.post<AiDiagnosis>('/ai/diagnosis/sessions', {
     sessionKey: `web-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    // Khong gui thi may chu mac dinh tieng Nhat, ket qua chan doan hien ra se
+    // lech ngon ngu voi phan con lai cua man hinh.
+    language: locale.value,
     serviceIntents: intents.value.length ? intents.value : undefined,
     vehicleMaker: vehicle.value?.maker ?? (manualVehicle.maker.trim() || undefined),
     vehicleModel: vehicle.value?.model ?? (manualVehicle.model.trim() || undefined),
