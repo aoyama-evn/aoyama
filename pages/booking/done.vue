@@ -3,8 +3,10 @@ import type { Booking } from '~/types/models';
 
 /**
  * SC-16 Dat lich hoan tat (khach) va SC-16a (thanh vien) — FR-BOOK-10, FR-BOOK-11.
- * Ban thiet ke dat ma QR ngay tren man hinh nay. BR-17 chi sinh ma sau khi cua
- * hang xac nhan, nen khi chua co ma thi cho no bang mot dong nhac cho.
+ *
+ * Ban thiet ke dat ma QR ngay tren man hinh nay, canh ma lich hen. Ma duoc
+ * sinh ngay luc dat lich thanh cong nen gan nhu luon co; dong nhac o duoi chi
+ * con la loi thoat khi khong tai duoc anh.
  */
 const route = useRoute();
 const api = useApi();
