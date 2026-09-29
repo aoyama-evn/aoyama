@@ -102,7 +102,8 @@
     "sending": "Sending…",
     "verified": "Verified",
     "viewAll": "View all →",
-    "yes": "Yes"
+    "yes": "Yes",
+    "agree": "Agree"
   },
   "diag": {
     "addCount": "Add {n} selected",
@@ -1522,12 +1523,10 @@
     "keep": "Keep the booking",
     "lead": "You are cancelling booking {code} on {date}.",
     "noReason": "— No reason given —",
-    "reasonBusy": "Something came up",
-    "reasonElsewhere": "Repaired somewhere else",
+    "qrWarning": "* The QR code stops working and cannot be restored.",
     "reasonHint": "It helps us improve our service",
     "reasonLabel": "Reason for cancelling",
-    "reasonOther": "Other",
-    "reasonOtherDay": "Want a different day",
+    "reasonPlaceholder": "e.g. something came up",
     "title": "Cancel booking"
   },
   "sc25": {

@@ -19,6 +19,13 @@ const props = withDefaults(
   { showActions: true },
 );
 
+/**
+ * Nut Huy bao len cho man hinh cha xu ly, vi SC-21 mo popup xac nhan ngay tai
+ * cho chu khong roi danh sach. SC-01a khong dung hang nut nay — trang chu thay
+ * ca khe cam actions.
+ */
+const emit = defineEmits<{ (e: 'cancel', booking: Booking): void }>();
+
 const { i18n, slotRange } = useFormat();
 
 /** BR-04, BR-05 — chi lich chua dien ra va chua tiep nhan moi doi hoac huy duoc. */
@@ -68,13 +75,14 @@ const serviceNames = computed(() =>
           >
             {{ $t('common.edit') }}
           </NuxtLink>
-          <NuxtLink
-            :to="`/bookings/${booking.code}/cancel`"
+          <button
+            type="button"
             class="ay-card-btn ay-card-btn-danger"
             :aria-label="$t('card.cancel', { code: booking.code })"
+            @click="emit('cancel', booking)"
           >
             {{ $t('common.cancel') }}
-          </NuxtLink>
+          </button>
         </template>
 
         <NuxtLink

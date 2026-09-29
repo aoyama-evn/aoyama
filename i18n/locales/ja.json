@@ -102,7 +102,8 @@
     "sending": "送信中…",
     "verified": "認証できました",
     "viewAll": "すべて見る →",
-    "yes": "はい"
+    "yes": "はい",
+    "agree": "同意する"
   },
   "diag": {
     "addCount": "選んだ {n} 件を追加",
@@ -1522,12 +1523,10 @@
     "keep": "予約を残す",
     "lead": "{date} の予約 {code} をキャンセルしようとしています。",
     "noReason": "— 理由を選ばない —",
-    "reasonBusy": "急な用事ができた",
-    "reasonElsewhere": "他店で修理した",
+    "qrWarning": "※ QRコードは無効になり、元に戻せません。",
     "reasonHint": "サービス改善の参考にさせていただきます",
     "reasonLabel": "キャンセルの理由",
-    "reasonOther": "その他",
-    "reasonOtherDay": "別の日に変更したい",
+    "reasonPlaceholder": "例：急な用事ができた",
     "title": "予約のキャンセル"
   },
   "sc25": {

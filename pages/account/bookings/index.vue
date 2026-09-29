@@ -13,11 +13,19 @@ const api = useApi();
 
 const page = ref(1);
 
-const { data, pending } = await useAsyncData(
+const { data, pending, refresh } = await useAsyncData(
   'my-bookings',
   () => api.get<Page<Booking>>('/account/bookings', { page: page.value, limit: 10 }),
   { watch: [page] },
 );
+
+/** Lich dang cho khach xac nhan huy; null la popup dong. */
+const cancelling = ref<Booking | null>(null);
+
+async function onCancelled(): Promise<void> {
+  cancelling.value = null;
+  await refresh();
+}
 
 useHead({ title: () => t('sc21.title') });
 </script>
@@ -40,6 +48,14 @@ useHead({ title: () => t('sc21.title') });
       v-for="booking in data?.items ?? []"
       :key="booking.id"
       :booking="booking"
+      @cancel="cancelling = $event"
+    />
+
+    <AyCancelBookingDialog
+      :open="cancelling !== null"
+      :booking="cancelling"
+      @cancelled="onCancelled"
+      @close="cancelling = null"
     />
 
     <div v-if="data?.meta && data.meta.totalPages > 1" class="flex justify-center gap-2 pt-1">

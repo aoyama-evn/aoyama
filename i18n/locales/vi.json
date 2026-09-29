@@ -102,7 +102,8 @@
     "sending": "Đang gửi…",
     "verified": "Xác thực thành công",
     "viewAll": "Xem tất cả →",
-    "yes": "Có"
+    "yes": "Có",
+    "agree": "Đồng ý"
   },
   "diag": {
     "addCount": "Thêm {n} hạng mục",
@@ -1522,12 +1523,10 @@
     "keep": "Giữ lịch hẹn",
     "lead": "Bạn đang hủy lịch hẹn {code} vào {date}.",
     "noReason": "— Không nêu lý do —",
-    "reasonBusy": "Bận việc đột xuất",
-    "reasonElsewhere": "Đã sửa ở nơi khác",
+    "qrWarning": "* Mã QR sẽ hết hiệu lực và không thể khôi phục.",
     "reasonHint": "Giúp cửa hàng cải thiện dịch vụ",
     "reasonLabel": "Lý do hủy",
-    "reasonOther": "Lý do khác",
-    "reasonOtherDay": "Muốn đổi sang ngày khác",
+    "reasonPlaceholder": "vd: bận đột xuất",
     "title": "Hủy lịch hẹn"
   },
   "sc25": {

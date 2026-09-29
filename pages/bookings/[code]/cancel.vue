@@ -20,13 +20,6 @@ const submitting = ref(false);
 const error = ref<ApiError | null>(null);
 const confirmOpen = ref(false);
 
-const REASONS = computed(() => [
-  t('sc24.reasonBusy'),
-  t('sc24.reasonElsewhere'),
-  t('sc24.reasonOtherDay'),
-  t('sc24.reasonOther'),
-]);
-
 async function cancel(): Promise<void> {
   if (!booking.value) return;
   submitting.value = true;
@@ -63,10 +56,14 @@ useHead({ title: () => t('sc24.headTitle', { code }) });
     <section class="card flex flex-col gap-3">
       <AyField :label="$t('sc24.reasonLabel')" :hint="$t('sc24.reasonHint')">
         <template #default="{ id }">
-          <select :id="id" v-model="reason" class="input">
-            <option value="">{{ $t('sc24.noReason') }}</option>
-            <option v-for="item in REASONS" :key="item" :value="item">{{ item }}</option>
-          </select>
+          <input
+            :id="id"
+            v-model="reason"
+            class="input"
+            type="text"
+            maxlength="200"
+            :placeholder="$t('sc24.reasonPlaceholder')"
+          >
         </template>
       </AyField>
 
