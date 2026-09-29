@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Vehicle } from '~/types/models';
+import type { AiDiagnosis, DiagnosisFinding, ServiceItem, Vehicle } from '~/types/models';
 
 /**
  * SC-12 Dat lich buoc 1 (khach) va SC-12a (thanh vien) — FR-BOOK-02, FR-BOOK-03.
@@ -62,28 +62,56 @@ function vehicleLine(item: Vehicle): string {
   return parts.filter(Boolean).join(' · ');
 }
 
-/** SC-12 — bam "AI phan tich van de" thi gui mo ta sang phien chan doan. */
+/**
+ * SC-12 — bam "AI phan tich van de" thi phan tich ngay tai man nay va tra ve
+ * danh sach hang muc de xuat. Truoc day nut nay day nguoi dung sang chatbox,
+ * bo do ca mo ta vua go.
+ */
+const findings = ref<DiagnosisFinding[]>([]);
+
 async function analyse(): Promise<void> {
   if (!booking.symptomDescription.trim() && booking.symptomPhotoUrls.length === 0) {
     ui.warning(t('sc12.needDescribe'));
     return;
   }
   analysing.value = true;
+  findings.value = [];
   try {
-    const session = await api.post<{ id: string }>('/ai/diagnosis/sessions', {
+    const session = await api.post<AiDiagnosis>('/ai/diagnosis/sessions', {
       sessionKey: `book-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      serviceIntent: booking.serviceType === 'BOTH' ? undefined : booking.serviceType,
+      serviceIntents: booking.serviceType === 'BOTH' ? ['MAINTENANCE', 'REPAIR'] : [booking.serviceType],
       vehicleMaker: booking.vehicle.maker || undefined,
       vehicleModel: booking.vehicle.model || undefined,
     });
     booking.aiDiagnosisId = session.id;
     booking.persist();
-    await navigateTo('/chat');
+
+    const analysed = await api.post<AiDiagnosis>(`/ai/diagnosis/sessions/${session.id}/messages`, {
+      text: booking.symptomDescription.trim() || undefined,
+      imageUrls: booking.symptomPhotoUrls.length ? booking.symptomPhotoUrls : undefined,
+    });
+    findings.value = analysed.findings ?? [];
+    if (findings.value.length === 0) ui.info(t('sc10.failTitle'), t('sc12.aiNoResult'));
   } catch (error) {
     ui.error(normalizeError(error).message, t('sc10.failLead'));
   } finally {
     analysing.value = false;
   }
+}
+
+/** Them nhung hang muc khach tick vao danh sach dang chon cua lich hen. */
+async function addSuggested(serviceCodes: string[]): Promise<void> {
+  const all = await api.get<ServiceItem[]>('/services');
+  const picked = all.filter((s) => serviceCodes.includes(s.code));
+  let added = 0;
+  for (const service of picked) {
+    if (!booking.selectedServiceIds.includes(service.id)) {
+      booking.toggleService(service);
+      added += 1;
+    }
+  }
+  findings.value = [];
+  ui.success(t('diag.added', { n: added }));
 }
 
 useHead({ title: () => `${t('sc01.bookCta')} — 1` });
@@ -224,6 +252,17 @@ useHead({ title: () => `${t('sc01.bookCta')} — 1` });
         </svg>
         {{ $t('sc12.analyseAi') }}
       </button>
+
+      <!-- CP-16 — ket qua phan tich kem danh sach hang muc de tick -->
+      <AyDiagnosisCard
+        v-if="findings.length"
+        :findings="findings"
+        :vehicle-label="booking.vehicle.maker ? `${booking.vehicle.maker} ${booking.vehicle.model}` : null"
+        mode="add"
+        class="self-stretch"
+        style="max-width: none"
+        @book="addSuggested"
+      />
     </section>
 
     <!-- Luong danh muc -->
@@ -243,22 +282,7 @@ useHead({ title: () => `${t('sc01.bookCta')} — 1` });
     </section>
 
     <section class="flex flex-col gap-2.5">
-      <div class="flex items-baseline justify-between gap-2.5">
-        <h5>{{ $t('sc12.pickedTitle') }}</h5>
-        <NuxtLink
-          :to="aiFlow ? '/chat' : '/services?pick=1'"
-          class="btn btn-ghost px-1"
-          :aria-label="$t('sc12.editPicked')"
-          :title="$t('sc12.editPicked')"
-        >
-          <svg
-            width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
-          >
-            <path d="M18 3 21 6l-9.5 9.5H8v-3.5L18 3Z" />
-          </svg>
-        </NuxtLink>
-      </div>
+      <h5>{{ $t('sc12.pickedTitle') }}</h5>
 
       <div
         v-for="service in booking.selectedServices"

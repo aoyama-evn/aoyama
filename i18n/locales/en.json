@@ -102,9 +102,14 @@
     "yes": "Yes"
   },
   "diag": {
+    "addCount": "Add {n} selected",
+    "added": "Added {n} items",
     "badge": "✦ Diagnosis",
+    "bookCount": "Book {n} selected",
     "bookThis": "Book this service",
     "disclaimer": "Suggested by AI — a technician still needs to check the bike.",
+    "noItems": "No items to suggest for this.",
+    "pickItems": "Choose the items you want",
     "suggested": "Suggested service"
   },
   "difficulty": {
@@ -1325,11 +1330,12 @@
   "sc12": {
     "addMore": "+ Add another service",
     "addVehicle": "+ Add another vehicle",
+    "aiAnalysed": "AI analysis complete",
+    "aiNoResult": "We could not tell from this. Add more detail, or pick items directly below.",
     "analyseAi": "Analyse with AI",
     "analysing": "Analysing…",
     "describePlaceholder": "e.g. odd noise when braking hard, front brake not gripping",
     "describeTitle": "Describe the problem",
-    "editPicked": "Edit services",
     "fileCount": "{n} files · up to 5 photos and 1 video (30s)",
     "maintenance": "Maintenance",
     "needDescribe": "Describe the problem or send a photo first",

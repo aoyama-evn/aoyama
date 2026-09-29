@@ -102,9 +102,14 @@
     "yes": "はい"
   },
   "diag": {
+    "addCount": "選んだ {n} 件を追加",
+    "added": "{n} 件を追加しました",
     "badge": "✦ 診断結果",
+    "bookCount": "選んだ {n} 件で予約",
     "bookThis": "このサービスを予約",
     "disclaimer": "AIによる提案です。整備士の実車確認が必要です。",
+    "noItems": "ご提案できる項目がありませんでした。",
+    "pickItems": "ご希望の項目をお選びください",
     "suggested": "おすすめサービス"
   },
   "difficulty": {
@@ -1325,11 +1330,12 @@
   "sc12": {
     "addMore": "＋ サービスを追加",
     "addVehicle": "＋ 別のバイクを追加",
+    "aiAnalysed": "AIの分析が終わりました",
+    "aiNoResult": "この内容では判断できませんでした。もう少し詳しく書いていただくか、下から直接お選びください。",
     "analyseAi": "AIで問題を分析",
     "analysing": "分析中…",
     "describePlaceholder": "例：急ブレーキで異音、フロントブレーキが効かない",
     "describeTitle": "バイクの症状",
-    "editPicked": "サービスを変更",
     "fileCount": "{n}件 · 写真5枚、動画1本（30秒以内）まで",
     "maintenance": "メンテナンス",
     "needDescribe": "先に症状を入力するか写真を送ってください",

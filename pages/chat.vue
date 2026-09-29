@@ -159,9 +159,9 @@ async function send(): Promise<void> {
 }
 
 /** SC-11 — bam dat lich tu ket qua chan doan thi mang theo phien AI sang. */
-async function bookFromFinding(serviceCodes: string[] | undefined): Promise<void> {
+async function bookFromFinding(serviceCodes: string[]): Promise<void> {
   const services = await api.get<ServiceItem[]>('/services');
-  const matched = services.filter((s) => (serviceCodes ?? []).includes(s.code));
+  const matched = services.filter((s) => serviceCodes.includes(s.code));
 
   booking.restore();
   booking.applyDiagnosis({

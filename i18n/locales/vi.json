@@ -102,9 +102,14 @@
     "yes": "Có"
   },
   "diag": {
+    "addCount": "Thêm {n} hạng mục",
+    "added": "Đã thêm {n} hạng mục",
     "badge": "✦ Kết quả chẩn đoán",
+    "bookCount": "Đặt lịch · {n} hạng mục",
     "bookThis": "Đặt lịch dịch vụ này",
     "disclaimer": "Gợi ý bởi AI — cần kỹ thuật viên kiểm tra thực tế.",
+    "noItems": "Chưa có hạng mục nào để gợi ý.",
+    "pickItems": "Chọn hạng mục bạn muốn làm",
     "suggested": "Dịch vụ đề xuất"
   },
   "difficulty": {
@@ -1325,11 +1330,12 @@
   "sc12": {
     "addMore": "+ Thêm hạng mục khác",
     "addVehicle": "+ Thêm xe khác",
+    "aiAnalysed": "AI đã phân tích xong",
+    "aiNoResult": "Chưa đủ căn cứ để phân tích. Bạn mô tả thêm, hoặc chọn thẳng hạng mục bên dưới.",
     "analyseAi": "AI phân tích vấn đề",
     "analysing": "Đang phân tích…",
     "describePlaceholder": "vd: xe kêu lạ khi phanh gấp, phanh trước không ăn",
     "describeTitle": "Mô tả hiện tượng của xe",
-    "editPicked": "Sửa hạng mục",
     "fileCount": "{n} tệp · tối đa 5 ảnh, 1 video ≤ 30 giây",
     "maintenance": "Bảo dưỡng",
     "needDescribe": "Hãy mô tả hiện tượng hoặc gửi ảnh trước khi phân tích",
