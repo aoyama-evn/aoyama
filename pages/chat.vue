@@ -6,6 +6,11 @@ import type { AiDiagnosis, ServiceItem, Vehicle } from '~/types/models';
  * Ban thiet ke: dai tro ly mau accent-2 tren cung, bong tin nhan bo tron lech
  * ve phia nguoi noi, va o soan ghim duoi cung tren nen neutral-100.
  *
+ * Chi chao kem ten khi nguoi dang dang nhap la KHACH HANG. Hai site dung chung
+ * mot kho phien, nen mot tai khoan quan tri dang mo o tab khac van co
+ * auth.user — nhung day la site khach, khong duoc goi ho bang ten tai khoan
+ * quan tri.
+ *
  * Tro ly hoi theo tung buoc: truoc het khach chon mot hoac nhieu viec can lam,
  * roi tuy lua chon do ma hoi tiep. Bao duong va kiem tra tong quat thi hoi ve
  * chiec xe; sua chua thi hoi xe dang gap van de gi. Chon ca hai thi hoi ca hai,
@@ -202,7 +207,7 @@ useHead({ title: () => t('sc10.assistant') });
     <div ref="scroller" class="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4">
       <p class="ay-bubble-bot">
         {{
-          auth.user?.name
+          auth.isCustomer && auth.user?.name
             ? $t('sc10.greetingNamed', { name: auth.user.name })
             : $t('sc10.greeting')
         }}
