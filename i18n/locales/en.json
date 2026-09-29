@@ -34,7 +34,9 @@
       "logout": "Log out",
       "roleAdmin": "Administrator",
       "roleStaff": "Staff",
-      "unread": "{n} new notifications"
+      "unread": "{n} new notifications",
+      "logoutAsk": "Sign out of the admin site?",
+      "logoutAskBody": "You will need to sign in again with your username and password."
     }
   },
   "ai": {
@@ -1645,7 +1647,8 @@
     "logoutAsk": "Log out of your account?",
     "memberSince": "Member since {year}",
     "phoneHint": "identifies your account",
-    "title": "My profile"
+    "title": "My profile",
+    "logoutAskBody": "You will need to sign in again with an OTP code to see your bookings."
   },
   "sc34": {
     "channels": "Notification channels",

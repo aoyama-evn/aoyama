@@ -34,7 +34,9 @@
       "logout": "Đăng xuất",
       "roleAdmin": "Quản trị viên",
       "roleStaff": "Nhân viên",
-      "unread": "{n} thông báo mới"
+      "unread": "{n} thông báo mới",
+      "logoutAsk": "Đăng xuất khỏi hệ thống quản trị?",
+      "logoutAskBody": "Bạn sẽ cần đăng nhập lại bằng tên đăng nhập và mật khẩu."
     }
   },
   "ai": {
@@ -1645,7 +1647,8 @@
     "logoutAsk": "Đăng xuất khỏi tài khoản?",
     "memberSince": "Thành viên từ {year}",
     "phoneHint": "định danh tài khoản",
-    "title": "Hồ sơ cá nhân"
+    "title": "Hồ sơ cá nhân",
+    "logoutAskBody": "Bạn sẽ cần đăng nhập lại bằng mã OTP để xem lịch hẹn của mình."
   },
   "sc34": {
     "channels": "Kênh nhận thông báo",

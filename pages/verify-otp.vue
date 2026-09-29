@@ -83,7 +83,9 @@ async function verify(): Promise<void> {
     });
     auth.setSession(result, 'R-USER');
     ui.success(result.isNewAccount ? t('sc19.accountCreated') : t('common.verified'));
-    await navigateTo(redirect ?? '/account/bookings');
+    // Khong co duong dan cho san thi ve trang chu. Truoc day day thang sang
+    // lich su dat lich, nguoi vua dang ky xong khong hieu vi sao lai o do.
+    await navigateTo(redirect ?? '/');
   } catch (caught) {
     error.value = normalizeError(caught);
     code.value = '';

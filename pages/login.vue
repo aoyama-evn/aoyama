@@ -10,6 +10,13 @@ const { t } = useI18n();
 const api = useApi();
 const ui = useUiStore();
 
+/**
+ * middleware/auth gan ?redirect= khi day nguoi chua dang nhap ve day. Phai
+ * chuyen tiep sang SC-19 thi xac thuc xong moi quay lai dung trang ho dinh mo.
+ */
+const route = useRoute();
+const redirect = computed(() => (route.query.redirect ? String(route.query.redirect) : null));
+
 const phone = ref('');
 const sending = ref(false);
 const error = ref<string | null>(null);
@@ -27,6 +34,7 @@ async function requestOtp(): Promise<void> {
       purpose: 'LOGIN',
     });
     const query = new URLSearchParams({ phone: phone.value.trim(), purpose: 'LOGIN' });
+    if (redirect.value) query.set('redirect', redirect.value);
     // May chu phat trien chua noi cong SMS thi gui kem ma de SC-19 hien ra.
     if (sent.devCode) query.set('dev', sent.devCode);
     await navigateTo(`/verify-otp?${query.toString()}`);

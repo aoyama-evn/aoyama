@@ -166,6 +166,7 @@ useHead({ title: () => t('sc33.title') });
     <AyConfirmDialog
       :open="logoutOpen"
       :title="$t('sc33.logoutAsk')"
+      :message="$t('sc33.logoutAskBody')"
       :confirm-label="$t('sc33.logout')"
       :cancel-label="$t('common.close')"
       @confirm="logout"

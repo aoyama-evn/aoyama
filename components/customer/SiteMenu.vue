@@ -36,9 +36,20 @@ const guestItems = computed<Item[]>(() => [
 
 const items = computed(() => (auth.isCustomer ? memberItems.value : guestItems.value));
 
-async function signOut(): Promise<void> {
-  auth.clear();
+const logoutOpen = ref(false);
+
+/**
+ * Dong ngan keo roi moi mo hop thoai: ngan keo o z-60 con hop thoai o z-50
+ * nen de chong nhau thi hop thoai bi khuat sau ngan keo.
+ */
+function askSignOut(): void {
   menu.close();
+  logoutOpen.value = true;
+}
+
+async function signOut(): Promise<void> {
+  logoutOpen.value = false;
+  auth.clear();
   await navigateTo('/');
 }
 </script>
@@ -107,7 +118,7 @@ async function signOut(): Promise<void> {
               {{ item.label }}
             </NuxtLink>
 
-            <button v-if="auth.isCustomer" type="button" class="ay-menu-item" @click="signOut">
+            <button v-if="auth.isCustomer" type="button" class="ay-menu-item" @click="askSignOut">
               <svg
                 width="18" height="18" viewBox="0 0 24 24" fill="none"
                 stroke="var(--color-accent-700)" stroke-width="2.75" stroke-linecap="round"
@@ -127,6 +138,16 @@ async function signOut(): Promise<void> {
       </div>
     </Transition>
   </Teleport>
+
+  <AyConfirmDialog
+    :open="logoutOpen"
+    :title="$t('sc33.logoutAsk')"
+    :message="$t('sc33.logoutAskBody')"
+    :confirm-label="$t('sc33.logout')"
+    :cancel-label="$t('common.close')"
+    @confirm="signOut"
+    @cancel="logoutOpen = false"
+  />
 </template>
 
 <style scoped>

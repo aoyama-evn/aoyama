@@ -34,7 +34,9 @@
       "logout": "ログアウト",
       "roleAdmin": "管理者",
       "roleStaff": "スタッフ",
-      "unread": "新着のお知らせ {n} 件"
+      "unread": "新着のお知らせ {n} 件",
+      "logoutAsk": "管理サイトからログアウトしますか？",
+      "logoutAskBody": "再度ユーザー名とパスワードでのログインが必要になります。"
     }
   },
   "ai": {
@@ -1645,7 +1647,8 @@
     "logoutAsk": "ログアウトしますか？",
     "memberSince": "{year}年から会員",
     "phoneHint": "アカウントの識別に使います",
-    "title": "プロフィール"
+    "title": "プロフィール",
+    "logoutAskBody": "ご予約の確認には、再度OTPコードでのログインが必要になります。"
   },
   "sc34": {
     "channels": "通知の受け取り方法",

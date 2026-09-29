@@ -37,7 +37,15 @@ const { data: unread } = await useAsyncData('admin-unread', () =>
   api.get<{ count: number }>('/admin/notifications/unread-count').catch(() => ({ count: 0 })),
 );
 
+const logoutOpen = ref(false);
+
+function askLogout(): void {
+  accountMenuOpen.value = false;
+  logoutOpen.value = true;
+}
+
 async function logout(): Promise<void> {
+  logoutOpen.value = false;
   try {
     if (auth.refreshToken) await api.post('/auth/logout', { refreshToken: auth.refreshToken });
   } finally {
@@ -151,12 +159,22 @@ async function logout(): Promise<void> {
             type="button"
             class="w-full px-3 py-2.5 text-left text-[13.5px]"
             style="color: var(--color-danger)"
-            @click="logout"
+            @click="askLogout"
           >
             {{ $t('adm.top.logout') }}
           </button>
         </div>
       </div>
     </div>
+
+    <AyConfirmDialog
+      :open="logoutOpen"
+      :title="$t('adm.top.logoutAsk')"
+      :message="$t('adm.top.logoutAskBody')"
+      :confirm-label="$t('adm.top.logout')"
+      :cancel-label="$t('common.close')"
+      @confirm="logout"
+      @cancel="logoutOpen = false"
+    />
   </header>
 </template>
