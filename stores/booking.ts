@@ -110,15 +110,30 @@ export const useBookingStore = defineStore('booking', () => {
     diagnosisId: string;
     description?: string;
     services: ServiceItem[];
+    /**
+     * true khi khach bat dau dat lich tu ket qua chan doan: danh sach hang muc
+     * phai dung bang nhung gi ho vua tick. Khong co co nay thi hang muc cua ban
+     * nhap cu con lai se bi cong don vao, khach thay thua ra may dong khong
+     * hieu tu dau. Cac muc khac cua ban nhap (cua hang, khung gio, lien he, xe)
+     * van giu vi chung khong lien quan toi lan chan doan nay.
+     */
+    replaceServices?: boolean;
   }): void {
     aiDiagnosisId.value = payload.diagnosisId;
     if (payload.description) symptomDescription.value = payload.description;
+    if (payload.replaceServices) {
+      selectedServiceIds.value = [];
+      selectedServices.value = [];
+      aiSuggestedServiceIds.value = [];
+    }
     for (const service of payload.services) {
       if (!selectedServiceIds.value.includes(service.id)) toggleService(service);
       if (!aiSuggestedServiceIds.value.includes(service.id)) {
         aiSuggestedServiceIds.value = [...aiSuggestedServiceIds.value, service.id];
       }
     }
+    // Xoa het hang muc thi loai dich vu cung phai tinh lai.
+    syncServiceType();
     persist();
   }
 

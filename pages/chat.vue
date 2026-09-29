@@ -176,6 +176,7 @@ async function bookFromFinding(serviceCodes: string[]): Promise<void> {
     diagnosisId: session.value?.id ?? '',
     description: saidByCustomer || undefined,
     services: matched,
+    replaceServices: true,
   });
   if (vehicle.value) booking.setVehicle(vehicle.value);
   await navigateTo('/booking/step1');
