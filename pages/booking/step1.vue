@@ -216,7 +216,7 @@ useHead({ title: () => `${t('sc01.bookCta')} — 1` });
       <textarea
         v-model="booking.symptomDescription"
         class="input"
-        style="min-height: 92px; border-radius: var(--radius-sm)"
+        style="min-height: 92px"
         maxlength="1000"
         :placeholder="$t('sc12.describePlaceholder')"
         @change="booking.persist()"
@@ -302,7 +302,7 @@ useHead({ title: () => `${t('sc01.bookCta')} — 1` });
       <textarea
         v-model="booking.symptomDescription"
         class="input"
-        style="min-height: 76px; border-radius: var(--radius-sm)"
+        style="min-height: 76px"
         maxlength="1000"
         :placeholder="$t('sc12.notePlaceholder')"
         @change="booking.persist()"

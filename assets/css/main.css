@@ -476,6 +476,26 @@
   }
 }
 
+@layer components {
+  /**
+   * O nhap bot tron — dung cho ca site khach hang lan site quan tri.
+   *
+   * organic.css bo tron het co cac o nhap (.btn, .tag, .seg, .input deu
+   * 999px). Voi nut bam thi dep, nhung mot o nhap cao 44px bo tron 22px moi
+   * ben trong nhu vien thuoc, con vung van ban nhieu dong thi goc cong ra rat
+   * ro. Ha ve --radius-sm cho vuong vao mot chut.
+   *
+   * Ghi de o day chu khong sua organic.css: do la tep goc cua he thong thiet
+   * ke, main.css nap sau nen chi can mot luat la du.
+   */
+  .input,
+  input.input,
+  select.input,
+  textarea.input {
+    border-radius: var(--radius-sm);
+  }
+}
+
 @layer utilities {
   .ay-safe-top {
     padding-top: env(safe-area-inset-top, 0px);
