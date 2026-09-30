@@ -51,7 +51,10 @@ watchEffect(() => {
 /** RD muc 5.2 — chi hien nhung buoc chuyen hop le tu trang thai hien tai. */
 const TRANSITIONS: Record<string, WorkOrderStatus[]> = {
   RECEIVED: [WorkOrderStatus.DIAGNOSING, WorkOrderStatus.CANCELLED],
-  DIAGNOSING: [WorkOrderStatus.IN_PROGRESS, WorkOrderStatus.CANCELLED],
+  // QUOTED bi bo sot o day nen tu man chan doan khong co nut nao chuyen sang
+  // "Da bao gia", du may chu van cho phep — buoc bao gia trong ban thiet ke
+  // (SA-12 → SA-12c) coi nhu bien mat khoi luong.
+  DIAGNOSING: [WorkOrderStatus.QUOTED, WorkOrderStatus.IN_PROGRESS, WorkOrderStatus.CANCELLED],
   QUOTED: [WorkOrderStatus.IN_PROGRESS, WorkOrderStatus.CANCELLED],
   IN_PROGRESS: [WorkOrderStatus.COMPLETED, WorkOrderStatus.CANCELLED],
   COMPLETED: [WorkOrderStatus.DELIVERED],
