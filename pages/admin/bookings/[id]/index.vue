@@ -46,8 +46,11 @@ const { data: history } = await useAsyncData(`admin-booking-history-${id}`, () =
 /** Phieu dich vu va bao gia mo tu lich hen nay, neu co. */
 const { data: linked } = await useAsyncData(`admin-booking-docs-${id}`, async () => {
   try {
+    // Tim theo dinh danh lich hen. Truoc day dua ma lich hen vao o tim kiem,
+    // ma o do chi so khop ma phieu, ten khach, so dien thoai va bien so — nen
+    // the "phieu lien quan" luon bao chua co phieu du phieu da duoc mo.
     const page = await api.get<{ items: WorkOrder[] }>('/admin/work-orders', {
-      keyword: booking.value?.code,
+      bookingId: id,
       limit: 1,
     });
     const workOrder = page.items[0] ?? null;
@@ -105,6 +108,18 @@ async function saveNote(): Promise<void> {
 const canConfirm = computed(() => booking.value?.status === 'PENDING');
 const canCancel = computed(() => ['PENDING', 'CONFIRMED'].includes(booking.value?.status ?? ''));
 const canIntake = computed(() => booking.value?.status === 'CONFIRMED');
+
+/**
+ * Xe da tiep nhan thi moi nut o tren deu tat: khong xac nhan, khong tiep nhan,
+ * khong doi lich, khong huy — hang hanh dong rong tron, man hinh thanh ngo
+ * cut. Tu luc nay viec nam o phieu dich vu, nen dua thang nguoi dung sang do.
+ */
+const openOrder = computed(() => linked.value?.workOrder ?? null);
+
+/** Khong con viec gi lam o day nua — it nhat cho mot duong quay ra. */
+const noActions = computed(
+  () => !canCancel.value && !canConfirm.value && !canIntake.value && !openOrder.value,
+);
 
 const estimatedTotal = computed(() =>
   (booking.value?.services ?? []).reduce((sum, line) => sum + line.estimatedPrice, 0),
@@ -397,6 +412,22 @@ useHead({ title: () => `${t('sa05.headTitle', { code: booking.value?.code ?? '' 
         style="min-height: 48px; padding-inline: 26px"
       >
         {{ $t('sa05.intake') }}
+      </NuxtLink>
+      <NuxtLink
+        v-if="openOrder"
+        :to="`/admin/work-orders/${openOrder.id}`"
+        class="btn btn-primary text-[15px]"
+        style="min-height: 48px; padding-inline: 26px"
+      >
+        {{ $t('sa05.openOrder', { code: openOrder.code }) }}
+      </NuxtLink>
+      <NuxtLink
+        v-if="noActions"
+        to="/admin/bookings"
+        class="btn btn-secondary text-[13px]"
+        style="min-height: 48px; padding-inline: 20px"
+      >
+        {{ $t('sa05.backToList') }}
       </NuxtLink>
     </div>
 
