@@ -21,7 +21,17 @@ const ACCEPT = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
 /**
  * Giai doan nay anh duoc doc thanh data URL de xem truoc va gui kem yeu cau.
  * Khi co dich vu luu tru tep, thay cho nay bang mot lan tai len roi giu lai URL.
+ *
+ * Vi anh di thang trong than yeu cau, phai thu nho truoc khi ma hoa. Anh chup
+ * dien thoai thuong 3–5 MB, ma hoa base64 con phinh them 37%: ba anh la vuot
+ * gioi han 15 MB cua may chu va yeu cau do 500. Thu ve canh dai 1600px roi
+ * xuat JPEG chat luong 0,82 thi moi anh con vai tram KB, van du ro de soi vet
+ * xuoc tren man hinh.
  */
+const MAX_EDGE = 1600;
+const JPEG_QUALITY = 0.82;
+/** Duoi muc nay thi anh da du nhe, giu nguyen cho khoi ma hoa lai mat net. */
+const KEEP_AS_IS_BYTES = 600 * 1024;
 async function handleFiles(files: FileList | null): Promise<void> {
   if (!files) return;
   const room = props.max - props.modelValue.length;
@@ -40,9 +50,37 @@ async function handleFiles(files: FileList | null): Promise<void> {
       ui.warning(t('upload.imageTooBig', { mb: props.maxSizeMb }), file.name);
       continue;
     }
-    accepted.push(await readAsDataUrl(file));
+    accepted.push(await toStoredDataUrl(file));
   }
   if (accepted.length > 0) emit('update:modelValue', [...props.modelValue, ...accepted]);
+}
+
+/** Thu nho roi ma hoa. Trinh duyet khong giai ma duoc thi giu nguyen tep goc. */
+async function toStoredDataUrl(file: File): Promise<string> {
+  let bitmap: ImageBitmap;
+  try {
+    bitmap = await createImageBitmap(file);
+  } catch {
+    // HEIC va vai dinh dang khac canvas khong doc duoc.
+    return readAsDataUrl(file);
+  }
+
+  try {
+    const scale = Math.min(1, MAX_EDGE / Math.max(bitmap.width, bitmap.height));
+    if (scale === 1 && file.size <= KEEP_AS_IS_BYTES) return readAsDataUrl(file);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return readAsDataUrl(file);
+
+    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL('image/jpeg', JPEG_QUALITY);
+  } finally {
+    bitmap.close?.();
+  }
 }
 
 function readAsDataUrl(file: File): Promise<string> {
