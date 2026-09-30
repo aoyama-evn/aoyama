@@ -506,7 +506,6 @@
     "collected": "入金済み",
     "customerProgress": "お客様に見える進捗",
     "diagnosis": "整備士の診断",
-    "difficultyIs": "難易度：{level}",
     "editItems": "診断と作業項目を編集 →",
     "eta": "完了予定",
     "finding": "所見：",
@@ -532,7 +531,6 @@
     "noQuotes": "見積はまだありません。",
     "notFound": "整備伝票が見つかりません",
     "opened": "伝票作成",
-    "openedAt": "伝票作成 {at}",
     "parts": "部品",
     "percentDone": "進捗 {n}%",
     "progressNote": "進捗メモ",
@@ -547,9 +545,7 @@
     "summary1": "お客様・バイク・店舗",
     "summary2": "受付時の状態",
     "symptom": "症状：",
-    "technician": "整備士",
-    "title": "整備伝票 {code}",
-    "unassigned": "未割当"
+    "title": "作業票"
   },
   "sa10b": {
     "backToBookings": "予約一覧へ戻る",

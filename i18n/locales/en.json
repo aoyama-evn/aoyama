@@ -506,7 +506,6 @@
     "collected": "Collected",
     "customerProgress": "Progress shown to the customer",
     "diagnosis": "Technician diagnosis",
-    "difficultyIs": "difficulty: {level}",
     "editItems": "Edit diagnosis & items →",
     "eta": "Expected done",
     "finding": "Findings:",
@@ -532,7 +531,6 @@
     "noQuotes": "No quotations yet.",
     "notFound": "Work order not found",
     "opened": "Opened",
-    "openedAt": "Opened {at}",
     "parts": "Parts",
     "percentDone": "{n}% complete",
     "progressNote": "Progress note",
@@ -547,9 +545,7 @@
     "summary1": "Customer · bike · store",
     "summary2": "Condition at intake",
     "symptom": "Symptom:",
-    "technician": "Technician",
-    "title": "Work order {code}",
-    "unassigned": "Not assigned"
+    "title": "Work order"
   },
   "sa10b": {
     "backToBookings": "Back to the booking list",

@@ -506,7 +506,6 @@
     "collected": "Đã thu",
     "customerProgress": "Tiến độ hiển thị cho khách",
     "diagnosis": "Chẩn đoán kỹ thuật viên",
-    "difficultyIs": "mức độ khó: {level}",
     "editItems": "Sửa chẩn đoán & hạng mục →",
     "eta": "Dự kiến xong",
     "finding": "Ghi nhận:",
@@ -532,7 +531,6 @@
     "noQuotes": "Chưa có báo giá.",
     "notFound": "Không tìm thấy phiếu",
     "opened": "Mở phiếu",
-    "openedAt": "Mở phiếu {at}",
     "parts": "Phụ tùng",
     "percentDone": "Hoàn thành {n}%",
     "progressNote": "Ghi chú tiến độ",
@@ -547,9 +545,7 @@
     "summary1": "Khách · xe · cửa hàng",
     "summary2": "Hiện trạng khi tiếp nhận",
     "symptom": "Triệu chứng:",
-    "technician": "Kỹ thuật viên",
-    "title": "Phiếu dịch vụ {code}",
-    "unassigned": "Chưa phân công"
+    "title": "Phiếu dịch vụ"
   },
   "sa10b": {
     "backToBookings": "Về danh sách lịch hẹn",

@@ -27,7 +27,7 @@ if (!workOrder.value) {
   throw createError({ statusCode: 404, statusMessage: t('sa10.notFound') });
 }
 
-setScreenTitle(() => t('sa10.title', { code: workOrder.value?.code ?? '' }));
+setScreenTitle(() => t('sa10.title'));
 
 const { data: quotations } = await useAsyncData(`wo-quotes-${id}`, () =>
   api.get<Quotation[]>(`/admin/work-orders/${id}/quotations`),
@@ -166,7 +166,7 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
 
 <template>
   <div v-if="workOrder" class="flex flex-col gap-[15px]">
-    <!-- Ba the tom tat -->
+    <!-- Hai the tom tat: khach - xe - cua hang, va hien trang khi tiep nhan -->
     <div class="grid gap-[13px]" style="grid-template-columns: repeat(auto-fit, minmax(230px, 1fr))">
       <div class="card gap-1" style="background: #fff">
         <div class="card-kicker">{{ $t('sa10.summary1') }}</div>
@@ -202,18 +202,6 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
         <p v-if="workOrder.intakeNote" class="text-muted text-[12px]">{{ workOrder.intakeNote }}</p>
       </div>
 
-      <div class="card gap-1" style="background: #fff">
-        <div class="card-kicker">{{ $t('sa10.technician') }}</div>
-        <p class="text-[13.5px]">
-          {{ workOrder.assignedTechnician?.fullName ?? $t('sa10.unassigned') }}
-          <template v-if="workOrder.difficulty">
-            · {{ $t('sa10.difficultyIs', { level: $t(`difficulty.${workOrder.difficulty}`) }) }}
-          </template>
-        </p>
-        <p class="text-muted text-[12px]">
-          {{ $t('sa10.openedAt', { at: dateTime(workOrder.createdAt) }) }}
-        </p>
-      </div>
     </div>
 
     <AyProgressSteps :steps="progressSteps" />
