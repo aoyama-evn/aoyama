@@ -59,7 +59,9 @@ const { data: services } = await useAsyncData('wo-items-services', () =>
   api.get<ServiceItem[]>('/services'),
 );
 
-setScreenTitle(() => t('sa11.screenTitle', { code: workOrder.value?.code ?? '' }));
+// Buoc nay la luc dang lap phieu, chua phai luc tra cuu mot phieu da co —
+// nen tieu de khong keo theo ma phieu.
+setScreenTitle(() => t('sa11.headTitle'));
 
 /** Danh sach ky thuat vien de phan cong — SA-10a. */
 const { data: technicians } = await useAsyncData('wo-technicians', () =>
@@ -216,11 +218,6 @@ useHead({ title: () => `${t('sa11.headTitle')} — AOYAMA Admin` });
         <p v-if="workOrder.intakeAccessories" class="text-muted text-[12px]">
           {{ workOrder.intakeAccessories }}
         </p>
-      </div>
-      <div class="card gap-1" style="background: #fff">
-        <div class="card-kicker">{{ $t('sa11.order') }}</div>
-        <p class="font-heading text-[16px]">{{ workOrder.code }}</p>
-        <AyStatusTag :status="workOrder.status" />
       </div>
     </div>
 
@@ -385,18 +382,56 @@ useHead({ title: () => `${t('sa11.headTitle')} — AOYAMA Admin` });
       </section>
     </div>
 
-    <section class="card flex flex-wrap items-center justify-between gap-3">
-      <dl class="flex gap-6 text-[14px]">
-        <div><dt class="text-muted">{{ $t('money.labor') }}</dt><dd class="font-heading text-[17px]">{{ money(laborTotal) }}</dd></div>
-        <div><dt class="text-muted">{{ $t('money.parts') }}</dt><dd class="font-heading text-[17px]">{{ money(partsTotal) }}</dd></div>
-        <div><dt class="text-muted">{{ $t('money.subtotal') }}</dt><dd class="font-heading text-[17px]">{{ money(laborTotal + partsTotal) }}</dd></div>
-      </dl>
-
-      <div class="flex gap-2">
-        <AyButton :loading="saving" @click="save">{{ $t('sa11.saveAndQuote') }}</AyButton>
-        <AyButton :to="`/admin/work-orders/${id}`" variant="secondary">{{ $t('common.cancel') }}</AyButton>
+    <!-- Tong du kien: tung dong mot, so tien can phai, tong nam duoi vach ke -
+         dung bo cuc ban thiet ke ve, thay vi ba con so ken nhau tren mot hang
+         chung voi may cai nut. -->
+    <section
+      class="card gap-1.5"
+      style="
+        width: 100%;
+        max-width: 360px;
+        align-self: flex-end;
+        background: var(--color-surface);
+      "
+    >
+      <div class="flex justify-between text-[13px]">
+        <span class="text-muted">{{ $t('money.labor') }}</span>
+        <span>{{ money(laborTotal) }}</span>
+      </div>
+      <div class="flex justify-between text-[13px]">
+        <span class="text-muted">{{ $t('money.parts') }}</span>
+        <span>{{ money(partsTotal) }}</span>
+      </div>
+      <div
+        class="flex items-baseline justify-between pt-2"
+        style="border-top: 1px solid var(--color-divider)"
+      >
+        <strong class="text-[13px]">{{ $t('sa11.estTotal') }}</strong>
+        <span class="font-heading text-[24px]">{{ money(laborTotal + partsTotal) }}</span>
       </div>
     </section>
+
+    <div
+      class="flex flex-wrap items-center justify-end gap-2.5 pt-[15px]"
+      style="border-top: 1px solid var(--color-divider)"
+    >
+      <NuxtLink
+        :to="`/admin/work-orders/${id}`"
+        class="btn btn-secondary text-[13px]"
+        style="min-height: 48px; padding-inline: 20px"
+      >
+        {{ $t('common.cancel') }}
+      </NuxtLink>
+      <button
+        type="button"
+        class="btn btn-primary text-[15px]"
+        style="min-height: 48px; padding-inline: 26px"
+        :disabled="saving"
+        @click="save"
+      >
+        {{ saving ? $t('common.saving') : $t('sa11.saveAndQuote') }}
+      </button>
+    </div>
 
     <AyErrorNote :error="error" />
   </div>
