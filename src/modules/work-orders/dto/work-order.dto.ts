@@ -134,6 +134,8 @@ export class WorkOrderQueryDto extends PaginationQueryDto {
   @IsOptional() @IsUUID('4') storeId?: string;
   /** SA-16 — loc phieu cua mot khach hang. */
   @IsOptional() @IsUUID('4') customerId?: string;
+  /** SA-05 — tim phieu mo tu mot lich hen. */
+  @IsOptional() @IsUUID('4') bookingId?: string;
   @IsOptional() @IsEnum(WorkOrderStatus) status?: WorkOrderStatus;
   @IsOptional() @IsEnum(PaymentStatus) paymentStatus?: PaymentStatus;
   @IsOptional() @IsString() from?: string;

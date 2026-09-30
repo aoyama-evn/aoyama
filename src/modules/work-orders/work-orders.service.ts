@@ -197,6 +197,9 @@ export class WorkOrdersService {
     if (query.customerId) {
       qb.andWhere('w.customer_id = :customerId', { customerId: query.customerId });
     }
+    if (query.bookingId) {
+      qb.andWhere('w.booking_id = :bookingId', { bookingId: query.bookingId });
+    }
     if (query.status) qb.andWhere('w.status = :status', { status: query.status });
     if (query.paymentStatus) {
       qb.andWhere('w.payment_status = :ps', { ps: query.paymentStatus });
