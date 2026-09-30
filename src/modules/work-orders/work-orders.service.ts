@@ -448,6 +448,25 @@ export class WorkOrdersService {
       });
     }
 
+    /**
+     * BR-42 — soat kho TRUOC khi ghi trang thai.
+     *
+     * Truoc day trang thai duoc ghi xuong roi moi goi onCompleted(); kho thieu
+     * thi onCompleted nem loi nhung phieu da mang trang thai COMPLETED, khong
+     * tru kho, khong ghi lich su dich vu va khong bao cho khach. Nhan vien
+     * thay bao loi nhung phieu van "da hoan tat" — so sach sai ma khong ai
+     * biet.
+     */
+    if (to === WorkOrderStatus.COMPLETED && !workOrder.stockDeducted) {
+      const full = await this.findById(id);
+      const lines = (full.parts ?? [])
+        .filter((p) => p.partId)
+        .map((p) => ({ partId: p.partId as string, quantity: p.quantity }));
+      if (lines.length > 0) {
+        await this.inventory.assertStockFor(full.storeId, lines);
+      }
+    }
+
     const from = workOrder.status;
     // update() thay vi save(): thuc the nap kem quan he cascade, save() se ghi
     // de lai items va parts bang ban sao dang nam trong bo nho.

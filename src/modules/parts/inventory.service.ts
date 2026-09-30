@@ -139,6 +139,32 @@ export class InventoryService {
     }
   }
 
+  /**
+   * BR-42 — kiem tra du kho cho ca phieu truoc khi tru bat ky dong nao.
+   *
+   * deductForWorkOrder tru tung dong mot: thieu o dong thu hai thi dong dau da
+   * tru mat roi. Goi ham nay truoc de hoac tru duoc het, hoac khong tru gi.
+   */
+  async assertStockFor(storeId: string, lines: StockLine[]): Promise<void> {
+    // Cung mot phu tung co the nam o nhieu dong — cong lai roi moi so.
+    const needed = new Map<string, number>();
+    for (const line of lines) {
+      needed.set(line.partId, (needed.get(line.partId) ?? 0) + line.quantity);
+    }
+
+    for (const [partId, quantity] of needed) {
+      const inventory = await this.repo.findOne({ where: { storeId, partId } });
+      const available = inventory?.quantity ?? 0;
+      if (available < quantity) {
+        throw new BadRequestException({
+          code: 'INSUFFICIENT_STOCK',
+          message: 'Ton kho khong du de xuat',
+          details: { partId, available, requested: quantity },
+        });
+      }
+    }
+  }
+
   /** Hoan kho khi phieu bi huy sau khi da tru. */
   async returnForWorkOrder(workOrderId: string, performedById: string | null): Promise<void> {
     const outs = await this.txRepo.find({
