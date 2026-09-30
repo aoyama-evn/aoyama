@@ -117,7 +117,8 @@ useHead({ title: () => `${t('sa08.title')} — AOYAMA Admin` });
 </script>
 
 <template>
-  <div class="flex flex-col gap-[15px]">
+  <!-- .admin-stack chan be rong o 1040px nhu ban thiet ke ve cho SA-07/SA-08 -->
+  <div class="admin-stack gap-[15px]">
     <AyEmptyState
       v-if="!booking"
       :title="$t('sa08.noBooking')"
@@ -297,28 +298,35 @@ useHead({ title: () => `${t('sa08.title')} — AOYAMA Admin` });
         </div>
 
         <AyField :label="$t('sa08.photos')" required :error="errors.photos">
-          <AyImageUpload v-model="photos" :max="6" />
+          <!-- O keo tha chi rong bang mot khung anh; trai het the thi no thanh
+               mot dai trong gan met ruoi tren man rong. -->
+          <div style="max-width: 460px">
+            <AyImageUpload v-model="photos" :max="6" />
+          </div>
         </AyField>
 
-        <AyField :label="$t('sa08.symptom')">
-          <template #default="{ id }">
-            <textarea :id="id" v-model="form.customerSymptom" class="input min-h-[62px]" />
-          </template>
-        </AyField>
-
-        <AyField
-          :label="$t('sa08.note')"
-          :hint="$t('sa08.noteHint')"
+        <!-- Hai o ghi chu deu ngan, xep canh nhau thay vi moi cai mot dong dai -->
+        <div
+          class="grid gap-3"
+          style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr))"
         >
-          <template #default="{ id }">
-            <textarea
-              :id="id"
-              v-model="form.intakeNote"
-              class="input min-h-[62px]"
-              :placeholder="$t('sa08.notePlaceholder')"
-            />
-          </template>
-        </AyField>
+          <AyField :label="$t('sa08.symptom')">
+            <template #default="{ id }">
+              <textarea :id="id" v-model="form.customerSymptom" class="input min-h-[62px]" />
+            </template>
+          </AyField>
+
+          <AyField :label="$t('sa08.note')" :hint="$t('sa08.noteHint')">
+            <template #default="{ id }">
+              <textarea
+                :id="id"
+                v-model="form.intakeNote"
+                class="input min-h-[62px]"
+                :placeholder="$t('sa08.notePlaceholder')"
+              />
+            </template>
+          </AyField>
+        </div>
       </section>
 
       <AyErrorNote :error="error" />

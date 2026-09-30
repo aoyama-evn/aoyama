@@ -351,6 +351,19 @@
     max-width: 1180px;
   }
 
+  /**
+   * Man quan tri co ca the tom tat lan bieu mau — SA-08 Tiep nhan xe.
+   *
+   * Ban thiet ke chan be rong tung man trong khoang 820–1040px chu khong de
+   * noi dung trai het tam the. Khong chan thi tren man 1920 mot o ghi chu dai
+   * gan mot met rieng no mot dong, nhin rat troi.
+   */
+  .admin-stack {
+    display: flex;
+    max-width: 1040px;
+    flex-direction: column;
+  }
+
   /** Luoi o nhap — tu chia cot theo be rong con lai. */
   .admin-grid {
     display: grid;
