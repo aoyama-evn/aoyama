@@ -19,7 +19,13 @@ export class WorkOrderPhoto extends BaseEntity {
   @Column({ length: 16 })
   stage!: string;
 
-  @Column({ length: 512 })
+  /**
+   * Giai doan nay anh duoc gui kem ngay trong yeu cau duoi dang data URL (xem
+   * CP-14 AyImageUpload) nen mot anh dai hang chuc nghin ky tu. Gioi han 512
+   * lam moi lan tiep nhan xe co anh deu do 500 "value too long". Cac bang anh
+   * khac — bookings, vehicles, stores, parts — deu da khong gioi han do dai.
+   */
+  @Column({ type: 'text' })
   url!: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
