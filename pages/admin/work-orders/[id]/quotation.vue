@@ -169,7 +169,12 @@ async function save(): Promise<void> {
     } else {
       ui.success(t('sa12.draftSaved'), created.code);
     }
-    await navigateTo(`/admin/work-orders/${id}`);
+    // Sang buoc chot bao gia; con la ban nhap thi ve man chi tiet phieu.
+    await navigateTo(
+      sendAfterSave.value
+        ? `/admin/work-orders/${id}/quote-confirm?quote=${created.id}`
+        : `/admin/work-orders/${id}`,
+    );
   } catch (err) {
     error.value = normalizeError(err);
   } finally {

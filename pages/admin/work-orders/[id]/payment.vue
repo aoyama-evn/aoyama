@@ -100,7 +100,7 @@ async function recordAndHandover(): Promise<void> {
     }
     await api.put(`/admin/work-orders/${id}/status`, { status: 'DELIVERED' });
     ui.success(t('sa14.handedOver'));
-    await navigateTo(`/admin/work-orders/${id}`);
+    await navigateTo(`/admin/work-orders/${id}/handover`);
   } catch (caught) {
     error.value = normalizeError(caught);
   } finally {

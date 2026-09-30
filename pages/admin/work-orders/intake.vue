@@ -105,7 +105,9 @@ async function submit(): Promise<void> {
       intakePhotoUrls: photos.value,
     });
     ui.success(t('sa08.done'), t('sa08.doneSub', { code: created.code }));
-    await navigateTo(`/admin/work-orders/${created.id}`);
+    // Ban thiet ke noi thang sang buoc chan doan, khong do le tan ve man chi
+    // tiet phieu roi bat tu tim duong di tiep.
+    await navigateTo(`/admin/work-orders/${created.id}/items`);
   } catch (caught) {
     error.value = normalizeError(caught);
   } finally {

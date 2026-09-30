@@ -89,15 +89,27 @@ const confirmMessage = computed(() => {
 
 async function changeStatus(): Promise<void> {
   if (!statusTarget.value) return;
+  const moving = statusTarget.value;
   busy.value = true;
   try {
     await api.put(`/admin/work-orders/${id}/status`, {
-      status: statusTarget.value,
+      status: moving,
       note: statusNote.value || undefined,
     });
     ui.success(t('sa10.statusSaved'));
     statusTarget.value = null;
     statusNote.value = '';
+
+    // Ban thiet ke: xong viec sua thi di thang sang buoc thu tien va ban giao,
+    // con ban giao xong thi sang man xac nhan da ban giao.
+    if (moving === WorkOrderStatus.COMPLETED) {
+      await navigateTo(`/admin/work-orders/${id}/payment`);
+      return;
+    }
+    if (moving === WorkOrderStatus.DELIVERED) {
+      await navigateTo(`/admin/work-orders/${id}/handover`);
+      return;
+    }
     await refresh();
   } catch (error) {
     ui.error(normalizeError(error).message);

@@ -201,6 +201,10 @@
     "VEHICLE_DELIVERED": "Đã bàn giao xe",
     "WORK_ORDER_COMPLETED": "Xe đã sửa xong"
   },
+  "otpDev": {
+    "notice": "Môi trường thử nghiệm. Chưa nối cổng SMS nên mã không gửi tới điện thoại.",
+    "fill": "Điền mã"
+  },
   "part": {
     "noResult": "Không tìm thấy phụ tùng phù hợp.",
     "search": "Tìm phụ tùng",
@@ -545,6 +549,19 @@
     "title": "Phiếu dịch vụ {code}",
     "unassigned": "Chưa phân công"
   },
+  "sa10b": {
+    "backToBookings": "Về danh sách lịch hẹn",
+    "deliveredAt": "Bàn giao lúc",
+    "done": "Đã bàn giao phiếu {code}",
+    "lead": "Phiếu này không còn việc gì cần làm nữa.",
+    "money": "Thanh toán",
+    "openOrder": "Mở phiếu dịch vụ",
+    "outstanding": "Còn lại",
+    "paid": "Đã thu",
+    "title": "Đã bàn giao",
+    "total": "Tổng cộng",
+    "unpaidNote": "Phiếu vẫn còn khoản chưa thu. Hãy xử lý theo quy định của cửa hàng."
+  },
   "sa11": {
     "aiCompare": "✦ Đối chiếu chẩn đoán AI",
     "aiCompareLead": "So sánh dự đoán của AI (từ chatbox khách) với kết luận của kỹ thuật viên.",
@@ -566,6 +583,7 @@
     "overStock": "{n} phụ tùng vượt tồn kho hiện có. Nhập thêm kho trước khi hoàn tất phiếu.",
     "quickAdd": "Thêm nhanh từ danh mục dịch vụ",
     "removePart": "Xóa phụ tùng",
+    "saveAndQuote": "Lưu và tạo báo giá",
     "saved": "Đã lưu chẩn đoán và hạng mục",
     "screenTitle": "Chẩn đoán · {code}",
     "stockIs": "tồn {n}",
@@ -614,6 +632,25 @@
     "summary": "Tổng kết",
     "taxPercent": "Thuế (%)",
     "validUntil": "Hiệu lực đến"
+  },
+  "sa12c": {
+    "askBody": "Phiếu chuyển sang Đang sửa và khách thấy ngay ở màn theo dõi tiến độ.",
+    "askTitle": "Bắt đầu sửa theo báo giá này?",
+    "cancelBooking": "Hủy lịch hẹn",
+    "deposit": "Đặt cọc {amount}",
+    "editQuote": "Sửa báo giá",
+    "lead": "Chỉ chốt sau khi khách đã đồng ý. Chốt xong là bắt đầu sửa.",
+    "lines": "Các hạng mục báo giá",
+    "noQuote": "Phiếu này chưa có báo giá nào",
+    "noQuoteHint": "Hãy lập báo giá trước.",
+    "notSent": "Chưa gửi",
+    "quoteCode": "Mã báo giá",
+    "sentAt": "Gửi lúc",
+    "startRepair": "Chốt báo giá & bắt đầu sửa",
+    "started": "Đã bắt đầu sửa",
+    "title": "Chốt báo giá",
+    "total": "Tổng cộng",
+    "version": "Bản {n}"
   },
   "sa13": {
     "colCode": "Mã báo giá",
@@ -1457,10 +1494,6 @@
     "titleLogin": "Nhập mã đăng nhập",
     "titleRegister": "Xác thực đăng ký",
     "verifying": "Đang xác thực…"
-  },
-  "otpDev": {
-    "notice": "Môi trường thử nghiệm. Chưa nối cổng SMS nên mã không gửi tới điện thoại.",
-    "fill": "Điền mã"
   },
   "sc20": {
     "codeLabel": "Mã lịch hẹn",

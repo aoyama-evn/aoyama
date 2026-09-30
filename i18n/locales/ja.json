@@ -201,6 +201,10 @@
     "VEHICLE_DELIVERED": "車両を引き渡しました",
     "WORK_ORDER_COMPLETED": "整備が完了しました"
   },
+  "otpDev": {
+    "notice": "テスト環境です。SMS連携が未設定のため、認証コードは携帯電話に届きません。",
+    "fill": "コードを入力"
+  },
   "part": {
     "noResult": "該当する部品が見つかりません。",
     "search": "部品を検索",
@@ -545,6 +549,19 @@
     "title": "整備伝票 {code}",
     "unassigned": "未割当"
   },
+  "sa10b": {
+    "backToBookings": "予約一覧へ戻る",
+    "deliveredAt": "お引渡し日時",
+    "done": "作業票 {code} をお引渡ししました",
+    "lead": "この作業票の対応は完了です。",
+    "money": "お会計",
+    "openOrder": "作業票を開く",
+    "outstanding": "未収",
+    "paid": "入金済み",
+    "title": "お引渡し済み",
+    "total": "合計",
+    "unpaidNote": "未収が残っています。店舗の規定に従ってご対応ください。"
+  },
   "sa11": {
     "aiCompare": "✦ AI診断との照合",
     "aiCompareLead": "お客様のチャットからのAIの予測と、整備士の結論を見比べます。",
@@ -566,6 +583,7 @@
     "overStock": "{n} 点の部品が在庫を超えています。伝票を完了する前に入庫してください。",
     "quickAdd": "サービスマスタから追加",
     "removePart": "部品を削除",
+    "saveAndQuote": "保存して見積へ",
     "saved": "診断と作業項目を保存しました",
     "screenTitle": "診断 · {code}",
     "stockIs": "在庫 {n}",
@@ -614,6 +632,25 @@
     "summary": "合計",
     "taxPercent": "消費税（%）",
     "validUntil": "有効期限"
+  },
+  "sa12c": {
+    "askBody": "作業票は「作業中」に変わり、お客様の進捗画面にも反映されます。",
+    "askTitle": "この見積で作業を開始しますか？",
+    "cancelBooking": "予約をキャンセル",
+    "deposit": "内金 {amount}",
+    "editQuote": "見積を修正",
+    "lead": "お客様の同意を得てから確定してください。確定すると作業を開始します。",
+    "lines": "見積明細",
+    "noQuote": "この作業票にはまだ見積がありません",
+    "noQuoteHint": "先に見積を作成してください。",
+    "notSent": "未送信",
+    "quoteCode": "見積番号",
+    "sentAt": "送信日時",
+    "startRepair": "確定して作業開始",
+    "started": "作業を開始しました",
+    "title": "見積の確定",
+    "total": "合計",
+    "version": "第 {n} 版"
   },
   "sa13": {
     "colCode": "見積番号",
@@ -1457,10 +1494,6 @@
     "titleLogin": "ログインコードの入力",
     "titleRegister": "登録の認証",
     "verifying": "認証中…"
-  },
-  "otpDev": {
-    "notice": "テスト環境です。SMS連携が未設定のため、認証コードは携帯電話に届きません。",
-    "fill": "コードを入力"
   },
   "sc20": {
     "codeLabel": "予約番号",

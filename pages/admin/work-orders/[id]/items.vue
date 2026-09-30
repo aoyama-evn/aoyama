@@ -177,7 +177,8 @@ async function save(): Promise<void> {
       parts: parts.value.map(({ available, ...rest }) => rest),
     });
     ui.success(t('sa11.saved'));
-    await navigateTo(`/admin/work-orders/${id}`);
+    // "Luu va tao bao gia" — di thang sang buoc lap bao gia nhu ban thiet ke.
+    await navigateTo(`/admin/work-orders/${id}/quotation`);
   } catch (err) {
     error.value = normalizeError(err);
   } finally {
@@ -392,7 +393,7 @@ useHead({ title: () => `${t('sa11.headTitle')} — AOYAMA Admin` });
       </dl>
 
       <div class="flex gap-2">
-        <AyButton :loading="saving" @click="save">{{ $t('common.save') }}</AyButton>
+        <AyButton :loading="saving" @click="save">{{ $t('sa11.saveAndQuote') }}</AyButton>
         <AyButton :to="`/admin/work-orders/${id}`" variant="secondary">{{ $t('common.cancel') }}</AyButton>
       </div>
     </section>

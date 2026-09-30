@@ -454,6 +454,9 @@ export interface Quotation {
   taxAmount: number;
   totalAmount: number;
   validUntil: string | null;
+  /** SA-12 cho dat coc truoc khi bat dau sua; may chu da tra ve hai truong nay. */
+  depositAmount: number | null;
+  depositDueAt: string | null;
   note: string | null;
   sentAt: string | null;
   respondedAt: string | null;

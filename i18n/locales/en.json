@@ -201,6 +201,10 @@
     "VEHICLE_DELIVERED": "Bike delivered",
     "WORK_ORDER_COMPLETED": "Service completed"
   },
+  "otpDev": {
+    "notice": "Test environment. No SMS gateway is connected, so the code is not sent to the phone.",
+    "fill": "Fill in the code"
+  },
   "part": {
     "noResult": "No matching parts found.",
     "search": "Find a part",
@@ -545,6 +549,19 @@
     "title": "Work order {code}",
     "unassigned": "Not assigned"
   },
+  "sa10b": {
+    "backToBookings": "Back to the booking list",
+    "deliveredAt": "Handed over at",
+    "done": "Work order {code} has been handed over",
+    "lead": "Nothing further is needed on this work order.",
+    "money": "Payment",
+    "openOrder": "Open the work order",
+    "outstanding": "Outstanding",
+    "paid": "Paid",
+    "title": "Handed over",
+    "total": "Total",
+    "unpaidNote": "There is still an outstanding amount. Follow the store policy for collecting it."
+  },
   "sa11": {
     "aiCompare": "✦ Compare with the AI diagnosis",
     "aiCompareLead": "Compare the AI’s prediction from the customer chat with the technician’s conclusion.",
@@ -566,6 +583,7 @@
     "overStock": "{n} parts exceed the stock on hand. Receive more stock before finishing the work order.",
     "quickAdd": "Quick add from the service catalog",
     "removePart": "Remove part",
+    "saveAndQuote": "Save and create a quote",
     "saved": "Diagnosis and items saved",
     "screenTitle": "Diagnosis · {code}",
     "stockIs": "stock {n}",
@@ -614,6 +632,25 @@
     "summary": "Summary",
     "taxPercent": "Tax (%)",
     "validUntil": "Valid until"
+  },
+  "sa12c": {
+    "askBody": "The work order moves to In progress and the customer sees it on their progress page.",
+    "askTitle": "Start the repair on this quote?",
+    "cancelBooking": "Cancel the booking",
+    "deposit": "Deposit {amount}",
+    "editQuote": "Edit the quote",
+    "lead": "Confirm once the customer has agreed. Confirming starts the repair.",
+    "lines": "Quote lines",
+    "noQuote": "This work order has no quote yet",
+    "noQuoteHint": "Create a quote first.",
+    "notSent": "Not sent yet",
+    "quoteCode": "Quote number",
+    "sentAt": "Sent at",
+    "startRepair": "Confirm and start the repair",
+    "started": "The repair has started",
+    "title": "Confirm the quote",
+    "total": "Total",
+    "version": "Version {n}"
   },
   "sa13": {
     "colCode": "Quotation",
@@ -1457,10 +1494,6 @@
     "titleLogin": "Enter your login code",
     "titleRegister": "Verify your registration",
     "verifying": "Verifying…"
-  },
-  "otpDev": {
-    "notice": "Test environment. No SMS gateway is connected, so the code is not sent to the phone.",
-    "fill": "Fill in the code"
   },
   "sc20": {
     "codeLabel": "Booking code",
