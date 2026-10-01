@@ -370,6 +370,8 @@
     "confirmed": "予約を確定しました",
     "confirmedSub": "確定のSMSをお客様に送信しました。",
     "createdLog": "新規作成",
+    "goDiagnosis": "診断へ進む",
+    "goQuote": "見積へ進む",
     "headTitle": "予約 {code}",
     "intake": "車両を受け付ける",
     "internalHint": "この内容はスタッフのみが見られます",

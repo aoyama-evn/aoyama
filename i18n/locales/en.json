@@ -370,6 +370,8 @@
     "confirmed": "Booking confirmed",
     "confirmedSub": "A confirmation SMS was sent to the customer.",
     "createdLog": "Created",
+    "goDiagnosis": "Diagnosis",
+    "goQuote": "Quotation",
     "headTitle": "Booking {code}",
     "intake": "Receive the bike",
     "internalHint": "Only staff can see this",

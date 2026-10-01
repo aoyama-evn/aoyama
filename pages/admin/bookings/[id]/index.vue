@@ -109,8 +109,14 @@ const canIntake = computed(() => booking.value?.status === 'CONFIRMED');
  * khong doi lich, khong huy — hang hanh dong rong tron, man hinh thanh ngo
  * cut. Tu luc nay viec nam o phieu dich vu, nen dua thang nguoi dung sang do.
  *
- * Khong con viec gi lam o day nua — it nhat cho mot duong quay ra.
+ * Phieu con o nhung buoc dau thi dua thang sang hai buoc ke tiep cua luong
+ * (chan doan, bao gia) thay vi bat nguoi dung ghe qua man chi tiet phieu roi
+ * tu tim duong. Qua buoc do roi thi chi con mo phieu ra xem.
  */
+const EARLY_STAGES = ['RECEIVED', 'DIAGNOSING', 'QUOTED'];
+const atEarlyStage = computed(() => EARLY_STAGES.includes(openOrder.value?.status ?? ''));
+
+/** Khong con viec gi lam o day nua — it nhat cho mot duong quay ra. */
 const noActions = computed(
   () => !canCancel.value && !canConfirm.value && !canIntake.value && !openOrder.value,
 );
@@ -361,8 +367,24 @@ useHead({ title: () => `${t('sa05.headTitle', { code: booking.value?.code ?? '' 
       >
         {{ $t('sa05.intake') }}
       </NuxtLink>
+      <template v-if="openOrder && atEarlyStage">
+        <NuxtLink
+          :to="`/admin/work-orders/${openOrder.id}/quotation`"
+          class="btn btn-secondary text-[13px]"
+          style="min-height: 48px; padding-inline: 20px"
+        >
+          {{ $t('sa05.goQuote') }}
+        </NuxtLink>
+        <NuxtLink
+          :to="`/admin/work-orders/${openOrder.id}/items`"
+          class="btn btn-primary text-[15px]"
+          style="min-height: 48px; padding-inline: 26px"
+        >
+          {{ $t('sa05.goDiagnosis') }}
+        </NuxtLink>
+      </template>
       <NuxtLink
-        v-if="openOrder"
+        v-else-if="openOrder"
         :to="`/admin/work-orders/${openOrder.id}`"
         class="btn btn-primary text-[15px]"
         style="min-height: 48px; padding-inline: 26px"
