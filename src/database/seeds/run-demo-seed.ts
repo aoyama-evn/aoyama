@@ -822,7 +822,12 @@ async function seedServiceHistory(ds: DataSource, workOrders: WorkOrder[], vehic
       storeId: workOrder.storeId,
       servicedAt: workOrder.deliveredAt ?? workOrder.createdAt,
       type: count % 3 === 0 ? ServiceType.MAINTENANCE : ServiceType.REPAIR,
-      summary: workOrder.code,
+      // Tom tat phai ta viec da lam, giong cach onCompleted() dung o ban chay
+      // that. Truoc day nhet ma phieu vao day nen man chi tiet lich hen hien
+      // ra "WO-2026..." thay vi ten hang muc.
+      summary: items.length
+        ? items.map((i) => i.name).join(', ')
+        : (workOrder.diagnosisNote ?? ''),
       detail: workOrder.diagnosisCause,
       odometer: workOrder.intakeOdometer,
       totalAmount: workOrder.totalAmount,
