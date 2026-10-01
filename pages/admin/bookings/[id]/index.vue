@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AiDiagnosis, Booking, Quotation, ServiceHistory, WorkOrder } from '~/types/models';
+import type { AiDiagnosis, Booking, ServiceHistory, WorkOrder } from '~/types/models';
 
 /**
  * SA-05 Chi tiet lich hen — FR-BOOK-22..26, FR-AI-12.
@@ -43,24 +43,19 @@ const { data: history } = await useAsyncData(`admin-booking-history-${id}`, () =
     : Promise.resolve(null),
 );
 
-/** Phieu dich vu va bao gia mo tu lich hen nay, neu co. */
-const { data: linked } = await useAsyncData(`admin-booking-docs-${id}`, async () => {
+/**
+ * Phieu dich vu mo tu lich hen nay, neu co — chi dung de biet co nen hien nut
+ * "Mo phieu dich vu" hay khong. Man nay khong trinh bay gi ve phieu nua.
+ */
+const { data: openOrder } = await useAsyncData(`admin-booking-order-${id}`, async () => {
   try {
-    // Tim theo dinh danh lich hen. Truoc day dua ma lich hen vao o tim kiem,
-    // ma o do chi so khop ma phieu, ten khach, so dien thoai va bien so — nen
-    // the "phieu lien quan" luon bao chua co phieu du phieu da duoc mo.
     const page = await api.get<{ items: WorkOrder[] }>('/admin/work-orders', {
       bookingId: id,
       limit: 1,
     });
-    const workOrder = page.items[0] ?? null;
-    if (!workOrder) return { workOrder: null, quotation: null };
-    const quotes = await api
-      .get<Quotation[]>(`/admin/work-orders/${workOrder.id}/quotations`)
-      .catch(() => []);
-    return { workOrder, quotation: quotes[0] ?? null };
+    return page.items[0] ?? null;
   } catch {
-    return { workOrder: null, quotation: null };
+    return null;
   }
 });
 
@@ -113,10 +108,9 @@ const canIntake = computed(() => booking.value?.status === 'CONFIRMED');
  * Xe da tiep nhan thi moi nut o tren deu tat: khong xac nhan, khong tiep nhan,
  * khong doi lich, khong huy — hang hanh dong rong tron, man hinh thanh ngo
  * cut. Tu luc nay viec nam o phieu dich vu, nen dua thang nguoi dung sang do.
+ *
+ * Khong con viec gi lam o day nua — it nhat cho mot duong quay ra.
  */
-const openOrder = computed(() => linked.value?.workOrder ?? null);
-
-/** Khong con viec gi lam o day nua — it nhat cho mot duong quay ra. */
 const noActions = computed(
   () => !canCancel.value && !canConfirm.value && !canIntake.value && !openOrder.value,
 );
@@ -185,52 +179,6 @@ useHead({ title: () => `${t('sa05.headTitle', { code: booking.value?.code ?? '' 
         <p class="text-muted text-[12px]">{{ i18n(booking.store?.name ?? null) }}</p>
       </div>
     </div>
-
-    <!-- Phieu dich vu va bao gia lien ket -->
-    <section class="card gap-[11px]" style="background: #fff">
-      <h5>{{ $t('sa05.linked') }}</h5>
-
-      <p v-if="!linked?.workOrder" class="text-muted text-[12.5px]">
-        {{ $t('sa05.noWorkOrder') }}
-      </p>
-
-      <div
-        v-else
-        class="grid gap-[11px]"
-        style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr))"
-      >
-        <NuxtLink :to="`/admin/work-orders/${linked.workOrder.id}`" class="ay-doc">
-          <span class="card-kicker">{{ $t('sa09.title') }}</span>
-          <span class="font-heading text-[16px]">{{ linked.workOrder.code }}</span>
-          <span class="flex flex-wrap items-center gap-2">
-            <AyStatusTag :status="linked.workOrder.status" />
-            <span class="text-muted text-[11.5px]">
-              {{ money(linked.workOrder.totalAmount) }}
-            </span>
-          </span>
-        </NuxtLink>
-
-        <NuxtLink
-          v-if="linked.quotation"
-          :to="`/admin/quotations/${linked.quotation.id}`"
-          class="ay-doc"
-        >
-          <span class="card-kicker">{{ $t('sa10.quotes') }}</span>
-          <span class="flex items-baseline justify-between gap-2">
-            <span class="font-heading text-[16px]">
-              {{ linked.quotation.code }} · v{{ linked.quotation.version }}
-            </span>
-            <span class="font-heading text-[16px]">{{ money(linked.quotation.totalAmount) }}</span>
-          </span>
-          <span class="text-muted text-[11.5px]">
-            <template v-if="linked.quotation.sentAt">
-              {{ $t('sa05.sentAt', { at: dateTime(linked.quotation.sentAt) }) }}
-            </template>
-            <template v-else>{{ $t('sa05.notSent') }}</template>
-          </span>
-        </NuxtLink>
-      </div>
-    </section>
 
     <div class="grid gap-[13px]" style="grid-template-columns: repeat(auto-fit, minmax(330px, 1fr))">
       <!-- Dich vu da dat -->
@@ -419,7 +367,7 @@ useHead({ title: () => `${t('sa05.headTitle', { code: booking.value?.code ?? '' 
         class="btn btn-primary text-[15px]"
         style="min-height: 48px; padding-inline: 26px"
       >
-        {{ $t('sa05.openOrder', { code: openOrder.code }) }}
+        {{ $t('sa05.openOrder') }}
       </NuxtLink>
       <NuxtLink
         v-if="noActions"
