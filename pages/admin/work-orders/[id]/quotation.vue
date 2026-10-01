@@ -221,11 +221,18 @@ useHead({ title: () => `${t('sa12.headTitle')} — AOYAMA Admin` });
           <table class="table">
             <thead>
               <tr>
-                <th scope="col" class="w-24">{{ $t('sa12.colKind') }}</th>
+<!--
+                  Be rong tung cot: o chon loai phai chua lot chu dai nhat
+                  ("Phu tung" can 51px) cong dem va mui ten cua trinh duyet,
+                  khong thi chu bi cat con "Phu t" va khong doc duoc dang chon
+                  cai gi. Lay bot cho tu hai cot "Don gia" va "Tuy chon" nen
+                  tong be rong bang khong doi.
+                -->
+                <th scope="col" class="w-28">{{ $t('sa12.colKind') }}</th>
                 <th scope="col">{{ $t('sa12.colContent') }}</th>
-                <th scope="col" class="w-28 text-right">{{ $t('sa10.colUnit') }}</th>
-                <th scope="col" class="w-16 text-center">{{ $t('sa10.colQty') }}</th>
-                <th scope="col" class="w-20 text-center">{{ $t('sa12.colOptional') }}</th>
+                <th scope="col" class="w-24 text-right">{{ $t('sa10.colUnit') }}</th>
+                <th scope="col" class="w-20 text-center">{{ $t('sa10.colQty') }}</th>
+                <th scope="col" class="w-16 text-center">{{ $t('sa12.colOptional') }}</th>
                 <th scope="col" class="w-28 text-right">{{ $t('sa10.colAmount') }}</th>
                 <th scope="col" class="w-10" />
               </tr>
@@ -233,7 +240,11 @@ useHead({ title: () => `${t('sa12.headTitle')} — AOYAMA Admin` });
             <tbody>
               <tr v-for="(line, index) in lines" :key="index">
                 <td>
-                  <select v-model="line.kind" class="input h-9 min-h-0 py-1 text-[12.5px]">
+                  <select
+                    v-model="line.kind"
+                    class="input h-9 min-h-0 py-1 text-[12.5px]"
+                    style="padding-inline: 7px"
+                  >
                     <option value="LABOR">{{ $t('sa12.kindLabor') }}</option>
                     <option value="PART">{{ $t('sa12.kindPart') }}</option>
                     <option value="OTHER">{{ $t('sa12.kindOther') }}</option>
