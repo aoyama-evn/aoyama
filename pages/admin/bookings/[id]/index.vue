@@ -53,7 +53,11 @@ const { data: openOrder } = await useAsyncData(`admin-booking-order-${id}`, asyn
       bookingId: id,
       limit: 1,
     });
-    return page.items[0] ?? null;
+    const found = page.items[0];
+    if (!found) return null;
+    // Nap ban day du: danh sach phieu khong kem anh, ma man nay can anh hien
+    // trang luc tiep nhan.
+    return await api.get<WorkOrder>(`/admin/work-orders/${found.id}`);
   } catch {
     return null;
   }
@@ -115,6 +119,24 @@ const canIntake = computed(() => booking.value?.status === 'CONFIRMED');
  */
 const EARLY_STAGES = ['RECEIVED', 'DIAGNOSING', 'QUOTED'];
 const atEarlyStage = computed(() => EARLY_STAGES.includes(openOrder.value?.status ?? ''));
+
+/** Anh chup luc tiep nhan — cac giai doan sau co anh rieng, khong tron vao day. */
+const intakePhotos = computed(() =>
+  (openOrder.value?.photos ?? []).filter((photo) => photo.stage === 'INTAKE'),
+);
+
+/** Co gi de hien trong the "hien trang khi tiep nhan" khong. */
+const hasIntakeInfo = computed(() =>
+  Boolean(
+    openOrder.value &&
+      (openOrder.value.intakeOdometer ||
+        openOrder.value.intakeFuelLevel !== null ||
+        openOrder.value.intakeAccessories ||
+        openOrder.value.intakeNote ||
+        openOrder.value.customerSymptom ||
+        intakePhotos.value.length),
+  ),
+);
 
 /** Khong con viec gi lam o day nua — it nhat cho mot duong quay ra. */
 const noActions = computed(
@@ -185,6 +207,50 @@ useHead({ title: () => `${t('sa05.headTitle', { code: booking.value?.code ?? '' 
         <p class="text-muted text-[12px]">{{ i18n(booking.store?.name ?? null) }}</p>
       </div>
     </div>
+
+    <!-- Hien trang ghi nhan luc tiep nhan xe -->
+    <section v-if="hasIntakeInfo" class="card gap-2.5" style="background: #fff">
+      <h5>{{ $t('sa10.summary2') }}</h5>
+
+      <div class="flex flex-wrap gap-x-6 gap-y-1 text-[13.5px]">
+        <span v-if="openOrder?.intakeOdometer">
+          <span class="text-muted">{{ $t('sa08.odometer') }}:</span>
+          {{ number(openOrder.intakeOdometer) }} km
+        </span>
+        <span v-if="openOrder && openOrder.intakeFuelLevel !== null">
+          <span class="text-muted">{{ $t('sa08.fuel') }}:</span>
+          {{ $t(`fuel.${openOrder.intakeFuelLevel}`) }}
+        </span>
+        <span v-if="openOrder?.intakeAccessories">
+          <span class="text-muted">{{ $t('sa08.accessories') }}:</span>
+          {{ openOrder.intakeAccessories }}
+        </span>
+      </div>
+
+      <div v-if="openOrder?.customerSymptom">
+        <p class="text-muted mb-1 text-[11px]">{{ $t('sa08.symptom') }}</p>
+        <p class="whitespace-pre-line text-[13.5px]">{{ openOrder.customerSymptom }}</p>
+      </div>
+
+      <div v-if="openOrder?.intakeNote">
+        <p class="text-muted mb-1 text-[11px]">{{ $t('sa08.note') }}</p>
+        <p class="whitespace-pre-line text-[13.5px]">{{ openOrder.intakeNote }}</p>
+      </div>
+
+      <div v-if="intakePhotos.length">
+        <p class="text-muted mb-1.5 text-[11px]">{{ $t('sa08.photos') }}</p>
+        <ul class="flex flex-wrap gap-2">
+          <li v-for="photo in intakePhotos" :key="photo.id">
+            <img
+              :src="photo.url"
+              :alt="photo.caption ?? $t('sa08.photos')"
+              class="object-cover"
+              style="width: 84px; height: 84px; border-radius: 14px"
+            />
+          </li>
+        </ul>
+      </div>
+    </section>
 
     <div class="grid gap-[13px]" style="grid-template-columns: repeat(auto-fit, minmax(330px, 1fr))">
       <!-- Dich vu da dat -->
