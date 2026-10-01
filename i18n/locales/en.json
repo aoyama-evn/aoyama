@@ -586,9 +586,9 @@
     "unassigned": "— Not assigned —"
   },
   "sa12": {
-    "addLabor": "+ Labour",
     "addOther": "+ Other",
     "addPart": "Add parts",
+    "addService": "+ Service item",
     "aiEmpty": "No suggestions for this work order.",
     "aiFailed": "Could not get AI suggestions",
     "aiFailedSub": "Creating a quotation still works as usual.",
@@ -598,7 +598,6 @@
     "aiUse": "Use",
     "colContent": "Description",
     "colKind": "Kind",
-    "colOptional": "Optional",
     "depositAmount": "Deposit amount",
     "depositDue": "Deposit due by",
     "draftSaved": "Quotation saved as a draft",
@@ -613,8 +612,7 @@
     "needLineName": "A line still has no name",
     "noLines": "No lines yet",
     "noteToCustomer": "Note for the customer",
-    "optionalAria": "Optional item: {name}",
-    "optionalNote": "Mark items the customer may drop when they respond as “Optional”.",
+    "pickService": "— Pick an item —",
     "remainingOnHandover": "Due on handover: {amount}",
     "removeLine": "Remove line",
     "requireDeposit": "Require a deposit up front",

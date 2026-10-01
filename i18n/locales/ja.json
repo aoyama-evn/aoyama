@@ -586,9 +586,9 @@
     "unassigned": "— 未割当 —"
   },
   "sa12": {
-    "addLabor": "+ 技術料",
     "addOther": "+ その他",
     "addPart": "部品を追加",
+    "addService": "+ 作業項目",
     "aiEmpty": "この伝票に対する提案はありません。",
     "aiFailed": "AIの提案を取得できませんでした",
     "aiFailedSub": "お見積の作成は通常どおり使えます。",
@@ -598,7 +598,6 @@
     "aiUse": "採用",
     "colContent": "内容",
     "colKind": "区分",
-    "colOptional": "任意",
     "depositAmount": "前金の額",
     "depositDue": "前金の期限",
     "draftSaved": "お見積を下書き保存しました",
@@ -613,8 +612,7 @@
     "needLineName": "名前のない行があります",
     "noLines": "明細がまだありません",
     "noteToCustomer": "お客様へのメモ",
-    "optionalAria": "任意の項目：{name}",
-    "optionalNote": "お客様が回答時に外せる項目には「任意」を付けてください。",
+    "pickService": "— 項目を選ぶ —",
     "remainingOnHandover": "引渡時の残額：{amount}",
     "removeLine": "行を削除",
     "requireDeposit": "前金をお願いする",

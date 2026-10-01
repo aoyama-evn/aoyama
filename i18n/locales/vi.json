@@ -586,9 +586,9 @@
     "unassigned": "— Chưa phân công —"
   },
   "sa12": {
-    "addLabor": "+ Tiền công",
     "addOther": "+ Khác",
     "addPart": "Thêm phụ tùng",
+    "addService": "+ Thêm hạng mục",
     "aiEmpty": "Trợ lý chưa có gợi ý nào cho phiếu này.",
     "aiFailed": "Không lấy được gợi ý AI",
     "aiFailedSub": "Chức năng lập báo giá vẫn dùng bình thường.",
@@ -598,7 +598,6 @@
     "aiUse": "Chọn",
     "colContent": "Nội dung",
     "colKind": "Loại",
-    "colOptional": "Tùy chọn",
     "depositAmount": "Số tiền cọc",
     "depositDue": "Hạn đặt cọc",
     "draftSaved": "Đã lưu báo giá nháp",
@@ -613,8 +612,7 @@
     "needLineName": "Còn dòng chưa có tên hạng mục",
     "noLines": "Chưa có dòng nào",
     "noteToCustomer": "Ghi chú gửi khách",
-    "optionalAria": "Hạng mục tùy chọn: {name}",
-    "optionalNote": "Đánh dấu “Tùy chọn” cho hạng mục khách có thể bỏ khi phản hồi báo giá.",
+    "pickService": "— Chọn hạng mục —",
     "remainingOnHandover": "Còn phải thu khi bàn giao: {amount}",
     "removeLine": "Xóa dòng",
     "requireDeposit": "Yêu cầu tiền cọc trước",

@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import type { ApiError, Part, QuotationSuggestion, WorkOrder } from '~/types/models';
+import type {
+  ApiError,
+  Part,
+  QuotationSuggestion,
+  ServiceItem,
+  WorkOrder,
+} from '~/types/models';
 
 /** SA-12 Lap bao gia co AI goi y — FR-QUO-01..06, FR-QUO-11, AI-02. */
 definePageMeta({ layout: 'admin', middleware: 'admin' });
@@ -10,9 +16,21 @@ interface Line {
   description?: string;
   unitPrice: number;
   quantity: number;
+  /**
+   * Da dua vao bao gia tuc la chot lam, nen khong con o danh dau "tuy chon"
+   * tren man nua; truong nay luon false, giu lai de khong phai doi hop dong
+   * voi may chu.
+   */
   isOptional: boolean;
   suggestedByAi: boolean;
   partId?: string | null;
+  serviceId?: string | null;
+  /**
+   * Dong vua them bang nut "Them hang muc": o noi dung la o chon trong danh
+   * muc dich vu chu khong phai o go tay. Chi dung de ve giao dien — phai go
+   * bo truoc khi gui len vi may chu khong nhan truong la.
+   */
+  fromCatalog?: boolean;
 }
 
 const route = useRoute();
@@ -25,6 +43,11 @@ const id = route.params.id as string;
 
 const { data: workOrder } = await useAsyncData(`wo-quote-${id}`, () =>
   api.get<WorkOrder>(`/admin/work-orders/${id}`),
+);
+
+/** Danh muc dich vu de nhan vien chon hang muc thay vi go tay. */
+const { data: services } = await useAsyncData('quote-services', () =>
+  api.get<ServiceItem[]>('/services'),
 );
 if (!workOrder.value) {
   throw createError({ statusCode: 404, statusMessage: t('sa10.notFound') });
@@ -112,6 +135,36 @@ function addLine(kind: Line['kind']): void {
   ];
 }
 
+/** Them mot dong de nhan vien chon hang muc tu danh muc dich vu. */
+function addServiceLine(): void {
+  lines.value = [
+    ...lines.value,
+    {
+      kind: 'LABOR',
+      name: '',
+      unitPrice: 0,
+      quantity: 1,
+      isOptional: false,
+      suggestedByAi: false,
+      serviceId: null,
+      fromCatalog: true,
+    },
+  ];
+}
+
+/** Chon hang muc thi dien luon ten va don gia theo bang gia dang ban. */
+function pickService(line: Line, serviceId: string): void {
+  const service = (services.value ?? []).find((s) => s.id === serviceId);
+  line.serviceId = serviceId || null;
+  if (!service) {
+    line.name = '';
+    line.unitPrice = 0;
+    return;
+  }
+  line.name = i18n(service.name);
+  line.unitPrice = service.quoteOnly ? 0 : service.basePrice;
+}
+
 function addPart(part: Part): void {
   lines.value = [
     ...lines.value,
@@ -151,7 +204,8 @@ async function save(): Promise<void> {
     const created = await api.post<{ id: string; code: string }>(
       `/admin/work-orders/${id}/quotations`,
       {
-        items: lines.value,
+        // fromCatalog chi phuc vu giao dien; may chu bat loi truong la.
+        items: lines.value.map(({ fromCatalog, ...rest }) => rest),
         discountAmount: discountAmount.value,
         taxRate: taxRate.value,
         validUntil: validUntil.value || undefined,
@@ -212,7 +266,7 @@ useHead({ title: () => `${t('sa12.headTitle')} — AOYAMA Admin` });
         <div class="mb-3 flex flex-wrap items-baseline justify-between gap-2">
           <h2 class="font-heading text-[16px]">{{ $t('sa12.lines') }}</h2>
           <div class="flex gap-1">
-            <AyButton variant="ghost" size="sm" @click="addLine('LABOR')">{{ $t('sa12.addLabor') }}</AyButton>
+            <AyButton variant="ghost" size="sm" @click="addServiceLine">{{ $t('sa12.addService') }}</AyButton>
             <AyButton variant="ghost" size="sm" @click="addLine('OTHER')">{{ $t('sa12.addOther') }}</AyButton>
           </div>
         </div>
@@ -232,7 +286,6 @@ useHead({ title: () => `${t('sa12.headTitle')} — AOYAMA Admin` });
                 <th scope="col">{{ $t('sa12.colContent') }}</th>
                 <th scope="col" class="w-24 text-right">{{ $t('sa10.colUnit') }}</th>
                 <th scope="col" class="w-20 text-center">{{ $t('sa10.colQty') }}</th>
-                <th scope="col" class="w-16 text-center">{{ $t('sa12.colOptional') }}</th>
                 <th scope="col" class="w-28 text-right">{{ $t('sa10.colAmount') }}</th>
                 <th scope="col" class="w-10" />
               </tr>
@@ -251,33 +304,36 @@ useHead({ title: () => `${t('sa12.headTitle')} — AOYAMA Admin` });
                   </select>
                 </td>
                 <td>
-                  <input v-model="line.name" class="input h-9 min-h-0 py-1" type="text">
+                  <!-- Dong them bang nut "Them hang muc" thi chon trong danh
+                       muc; cac dong khac van go tay duoc nhu cu. -->
+                  <select
+                    v-if="line.fromCatalog"
+                    class="input h-9 min-h-0 py-1"
+                    :value="line.serviceId ?? ''"
+                    :aria-label="$t('sa12.pickService')"
+                    @change="pickService(line, ($event.target as HTMLSelectElement).value)"
+                  >
+                    <option value="">{{ $t('sa12.pickService') }}</option>
+                    <option v-for="item in services ?? []" :key="item.id" :value="item.id">
+                      {{ i18n(item.name) }}
+                    </option>
+                  </select>
+                  <input v-else v-model="line.name" class="input h-9 min-h-0 py-1" type="text">
                   <AyAiBadge v-if="line.suggestedByAi" class="mt-1" />
                 </td>
                 <td><input v-model.number="line.unitPrice" class="input h-9 min-h-0 py-1 text-right" type="number" min="0"></td>
                 <td><input v-model.number="line.quantity" class="input h-9 min-h-0 py-1 text-center" type="number" min="1"></td>
-                <td class="text-center">
-                  <input
-                    v-model="line.isOptional" type="checkbox"
-                    class="h-4 w-4 accent-[var(--color-accent)]"
-                    :aria-label="$t('sa12.optionalAria', { name: line.name })"
-                  >
-                </td>
                 <td class="text-right whitespace-nowrap">{{ money(line.unitPrice * line.quantity) }}</td>
                 <td>
                   <button type="button" class="text-danger" :aria-label="$t('sa12.removeLine')" @click="lines.splice(index, 1)">×</button>
                 </td>
               </tr>
               <tr v-if="lines.length === 0">
-                <td colspan="7" class="py-6 text-center text-muted">{{ $t('sa12.noLines') }}</td>
+                <td colspan="6" class="py-6 text-center text-muted">{{ $t('sa12.noLines') }}</td>
               </tr>
             </tbody>
           </table>
         </div>
-
-        <p class="mt-2 text-[12px] text-muted">
-          {{ $t('sa12.optionalNote') }}
-        </p>
       </section>
 
       <div class="flex flex-col gap-3.5">
