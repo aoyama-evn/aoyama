@@ -194,7 +194,7 @@ useHead({ title: () => `${t('sa12.headTitle')} — AOYAMA Admin` });
 <template>
   <div v-if="workOrder" class="flex flex-col gap-4">
     <AyPageHeader
-      code="SA-12" :title="$t('sa12.headTitle')" :back-to="`/admin/work-orders/${id}`"
+      code="SA-12" :title="$t('sa12.headTitle')" :back-to="`/admin/work-orders/${id}/items`"
       :description="`${workOrder.code} · ${workOrder.vehicle?.plateNumber} · ${workOrder.customer?.name}`"
     >
       <template #actions>

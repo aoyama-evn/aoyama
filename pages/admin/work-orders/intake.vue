@@ -24,6 +24,25 @@ setScreenTitle(() =>
   booking.value ? t('sa08.titleCode', { code: booking.value.code }) : t('sa08.title'),
 );
 
+/**
+ * Lich hen nay da mo phieu chua. May chu chan tiep nhan lan hai bang
+ * WORK_ORDER_EXISTS, nhung truoc day man hinh van bay ra bieu mau trong roi
+ * de nguoi dung dien xong moi bao loi. Biet truoc thi hien thang duong di
+ * tiep — day cung la cho ma nut "Quay lai" cua buoc chan doan tro ve.
+ */
+const { data: existingOrder } = await useAsyncData(`intake-existing-${bookingId}`, async () => {
+  if (!bookingId) return null;
+  try {
+    const page = await api.get<{ items: WorkOrder[] }>('/admin/work-orders', {
+      bookingId,
+      limit: 1,
+    });
+    return page.items[0] ?? null;
+  } catch {
+    return null;
+  }
+});
+
 const { data: diagnosis } = await useAsyncData(`intake-diag-${bookingId}`, () =>
   booking.value?.aiDiagnosisId
     ? api.get<AiDiagnosis>(`/ai/diagnosis/sessions/${booking.value.aiDiagnosisId}`)
@@ -127,6 +146,26 @@ useHead({ title: () => `${t('sa08.title')} — AOYAMA Admin` });
       :hint="$t('sa08.noBookingHint')"
     >
       <NuxtLink to="/admin/scan" class="btn btn-primary text-[12.5px]">{{ $t('sa07.title') }}</NuxtLink>
+    </AyEmptyState>
+
+    <!-- Da tiep nhan roi: khong cho ghi lai hien trang, chi dua di tiep -->
+    <AyEmptyState
+      v-else-if="existingOrder"
+      :title="$t('sa08.alreadyDone')"
+      :hint="$t('sa08.alreadyDoneHint')"
+    >
+      <NuxtLink
+        :to="`/admin/work-orders/${existingOrder.id}/items`"
+        class="btn btn-primary text-[12.5px]"
+      >
+        {{ $t('sa11.headTitle') }}
+      </NuxtLink>
+      <NuxtLink
+        :to="`/admin/bookings/${booking.id}`"
+        class="btn btn-secondary text-[12.5px]"
+      >
+        {{ $t('sa08.backToBooking') }}
+      </NuxtLink>
     </AyEmptyState>
 
     <template v-else>

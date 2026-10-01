@@ -443,6 +443,8 @@
     "accessories": "Accessories left with the bike",
     "accessoriesPlaceholder": "helmet, rear box",
     "aiNote": "The AI result, with its chat, photos and recordings, is attached to this booking. A technician must inspect the bike before quoting.",
+    "alreadyDone": "This booking has already been received",
+    "alreadyDoneHint": "The condition was recorded at intake. Carry on to the diagnosis.",
     "backToBooking": "Back to the booking",
     "bookedServices": "Booked services",
     "condition": "Record the condition at intake",

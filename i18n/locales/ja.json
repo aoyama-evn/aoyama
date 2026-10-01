@@ -443,6 +443,8 @@
     "accessories": "付属品",
     "accessoriesPlaceholder": "ヘルメット、リアボックス",
     "aiNote": "AIの結果は会話・写真・音声とあわせてこの予約に紐づいています。お見積の前に整備士の実車確認が必要です。",
+    "alreadyDone": "この予約はすでに受付済みです",
+    "alreadyDoneHint": "車両の状態は受付時に記録済みです。続けて診断にお進みください。",
     "backToBooking": "予約に戻る",
     "bookedServices": "ご予約のサービス",
     "condition": "受付時の状態を記録",

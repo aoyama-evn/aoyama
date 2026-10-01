@@ -443,6 +443,8 @@
     "accessories": "Phụ kiện đi kèm",
     "accessoriesPlaceholder": "mũ bảo hiểm, cốp sau",
     "aiNote": "Kết quả AI kèm hội thoại, ảnh và ghi âm được đính vào lịch hẹn này. Cần kỹ thuật viên kiểm tra thực tế trước khi báo giá.",
+    "alreadyDone": "Lịch hẹn này đã tiếp nhận xe rồi",
+    "alreadyDoneHint": "Hiện trạng xe đã ghi lúc tiếp nhận. Hãy đi tiếp sang bước chẩn đoán.",
     "backToBooking": "Quay lại lịch hẹn",
     "bookedServices": "Dịch vụ đã đặt",
     "condition": "Ghi nhận hiện trạng khi tiếp nhận",

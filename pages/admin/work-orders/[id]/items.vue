@@ -416,7 +416,7 @@ useHead({ title: () => `${t('sa11.headTitle')} — AOYAMA Admin` });
       style="border-top: 1px solid var(--color-divider)"
     >
       <NuxtLink
-        :to="`/admin/work-orders/${id}`"
+        :to="`/admin/work-orders/intake?bookingId=${workOrder.bookingId}`"
         class="btn btn-secondary text-[13px]"
         style="min-height: 48px; padding-inline: 20px"
       >
