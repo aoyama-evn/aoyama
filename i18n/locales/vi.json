@@ -637,7 +637,12 @@
     "sentSub": "{code} — khách nhận SMS kèm đường dẫn xem báo giá.",
     "summary": "Tổng kết",
     "taxPercent": "Thuế (%)",
-    "validUntil": "Hiệu lực đến"
+    "validUntil": "Hiệu lực đến",
+    "aiLabor": "Hạng mục dịch vụ đề xuất",
+    "aiParts": "Phụ tùng cần thay",
+    "aiAdded": "Đã thêm",
+    "aiBecause": "Căn cứ: {reason}",
+    "aiRuleBased": "Gợi ý từ bộ luật chạy tại chỗ, đối chiếu chẩn đoán với danh mục dịch vụ và kho phụ tùng. Cắm AI_API_KEY để dùng mô hình đầy đủ."
   },
   "sa12c": {
     "askBody": "Phiếu chuyển sang Đang sửa và khách thấy ngay ở màn theo dõi tiến độ.",

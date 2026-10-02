@@ -637,7 +637,12 @@
     "sentSub": "{code} — お客様に見積リンクのSMSを送信しました。",
     "summary": "合計",
     "taxPercent": "消費税（%）",
-    "validUntil": "有効期限"
+    "validUntil": "有効期限",
+    "aiLabor": "提案する作業項目",
+    "aiParts": "交換が必要な部品",
+    "aiAdded": "追加済み",
+    "aiBecause": "根拠: {reason}",
+    "aiRuleBased": "ローカルのルールベースによる提案です。診断内容をサービス一覧と部品在庫に照合しています。AI_API_KEY を設定すると本番モデルに切り替わります。"
   },
   "sa12c": {
     "askBody": "作業票は「作業中」に変わり、お客様の進捗画面にも反映されます。",

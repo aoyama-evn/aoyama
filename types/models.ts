@@ -571,6 +571,8 @@ export interface QuotationSuggestion {
   }[];
   generatedAt: string;
   isFallback: boolean;
+  /** True khi goi y den tu bo luat chay tai cho chu khong phai mo hinh AI. */
+  isRuleBased: boolean;
 }
 
 export interface PartRecognition {

@@ -637,7 +637,12 @@
     "sentSub": "{code} — the customer got an SMS with a link to the quotation.",
     "summary": "Summary",
     "taxPercent": "Tax (%)",
-    "validUntil": "Valid until"
+    "validUntil": "Valid until",
+    "aiLabor": "Suggested service items",
+    "aiParts": "Parts to replace",
+    "aiAdded": "Added",
+    "aiBecause": "Based on: {reason}",
+    "aiRuleBased": "Suggested by the local rule engine, matching the diagnosis against the service catalogue and parts stock. Set AI_API_KEY to use the full model."
   },
   "sa12c": {
     "askBody": "The work order moves to In progress and the customer sees it on their progress page.",

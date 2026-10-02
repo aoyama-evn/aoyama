@@ -36,7 +36,7 @@ interface Line {
 const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { i18n, money } = useFormat();
 
 const id = route.params.id as string;
@@ -98,11 +98,39 @@ function defaultValidUntil(): string {
 const suggestion = ref<QuotationSuggestion | null>(null);
 const loadingSuggestion = ref(false);
 
+/**
+ * Danh muc phu tung, chi nap khi can: goi y tra ve MA phu tung, con bao gia
+ * phai luu ID thi kho moi tru duoc hang luc hoan tat phieu.
+ */
+const partsByCode = ref<Map<string, Part> | null>(null);
+
+async function ensurePartsLoaded(): Promise<void> {
+  if (partsByCode.value) return;
+  try {
+    const page = await api.get<{ items: Part[] }>('/admin/parts', {
+      limit: 100,
+      isActive: true,
+    });
+    partsByCode.value = new Map((page.items ?? []).map((p) => [p.code, p]));
+  } catch {
+    // Khong nap duoc thi van them dong duoc, chi la khong gan duoc ma phu tung.
+    partsByCode.value = new Map();
+  }
+}
+
 async function loadSuggestion(): Promise<void> {
   loadingSuggestion.value = true;
   try {
-    suggestion.value = await api.get<QuotationSuggestion>(`/admin/ai/quotation-suggestion/${id}`);
-    if (suggestion.value.isFallback) {
+    // Ten hang muc goi y duoc chep thang vao bao gia gui khach, nen phai xin
+    // may chu tra dung thu tieng nhan vien dang dung.
+    const [found] = await Promise.all([
+      api.get<QuotationSuggestion>(`/admin/ai/quotation-suggestion/${id}`, {
+        lang: locale.value,
+      }),
+      ensurePartsLoaded(),
+    ]);
+    suggestion.value = found;
+    if (found.isFallback) {
       ui.info(t('sa12.aiNone'), t('sa12.aiNoneSub'));
     }
   } catch {
@@ -112,8 +140,37 @@ async function loadSuggestion(): Promise<void> {
   }
 }
 
+/** Tach hai nhom de nhan vien doc duoc ngay cai nao la cong, cai nao la do. */
+const suggestedLabor = computed(() =>
+  (suggestion.value?.lines ?? []).filter((l) => l.kind === 'LABOR'),
+);
+const suggestedParts = computed(() =>
+  (suggestion.value?.lines ?? []).filter((l) => l.kind === 'PART'),
+);
+
+const suggestionGroups = computed(() => [
+  { key: 'LABOR', label: t('sa12.aiLabor'), lines: suggestedLabor.value },
+  { key: 'PART', label: t('sa12.aiParts'), lines: suggestedParts.value },
+]);
+
+/** Da bam roi thi doi nut thanh "da them", tranh them trung hai lan. */
+const acceptedCodes = ref<string[]>([]);
+function isAccepted(line: QuotationSuggestion['lines'][number]): boolean {
+  return !!line.code && acceptedCodes.value.includes(`${line.kind}:${line.code}`);
+}
+
 /** AI-02 — luon phai co nguoi duyet: goi y chi duoc them khi Admin bam. */
 function acceptSuggestion(line: QuotationSuggestion['lines'][number]): void {
+  if (isAccepted(line)) return;
+
+  /**
+   * Noi dong vua them ve danh muc that. Khong co buoc nay thi dong phu tung
+   * la chu suong, kho khong biet duong tru hang khi phieu hoan tat.
+   */
+  const service =
+    line.kind === 'LABOR' ? (services.value ?? []).find((s) => s.code === line.code) : undefined;
+  const part = line.kind === 'PART' ? partsByCode.value?.get(line.code ?? '') : undefined;
+
   lines.value = [
     ...lines.value,
     {
@@ -124,8 +181,11 @@ function acceptSuggestion(line: QuotationSuggestion['lines'][number]): void {
       quantity: line.quantity,
       isOptional: false,
       suggestedByAi: true,
+      serviceId: service?.id ?? null,
+      partId: part?.id ?? null,
     },
   ];
+  if (line.code) acceptedCodes.value = [...acceptedCodes.value, `${line.kind}:${line.code}`];
 }
 
 function addLine(kind: Line['kind']): void {
@@ -365,20 +425,44 @@ useHead({ title: () => `${t('sa12.headTitle')} — AOYAMA Admin` });
             {{ $t('sa12.aiEmpty') }}
           </p>
 
-          <div v-for="(line, index) in suggestion?.lines ?? []" :key="index" class="ay-ai-line">
-            <p class="text-[13.5px] font-semibold">{{ line.name }}</p>
-            <p class="text-muted text-[11.5px]">
-              ~{{ money(line.unitPrice) }} × {{ line.quantity }}
-              <span v-if="line.reason" class="block">{{ line.reason }}</span>
-            </p>
-            <button
-              type="button"
-              class="btn btn-secondary ay-ai-btn self-start text-[12.5px]"
-              @click="acceptSuggestion(line)"
-            >
-              {{ $t('sa12.aiUse') }}
-            </button>
-          </div>
+          <!--
+            Hai nhom tach roi: cong tho mot ben, do phai thay mot ben. Nhan
+            vien quet mat la biet bao gia nay gom nhung gi.
+          -->
+          <template v-for="group in suggestionGroups" :key="group.key">
+            <div v-if="group.lines.length" class="flex flex-col gap-2">
+              <div class="card-kicker" style="color: var(--color-accent-2-800)">
+                {{ group.label }}
+              </div>
+              <div v-for="line in group.lines" :key="`${line.kind}:${line.code ?? line.name}`" class="ay-ai-line">
+                <p class="text-[13.5px] font-semibold">{{ line.name }}</p>
+                <p class="text-muted text-[11.5px]">
+                  ~{{ money(line.unitPrice) }} × {{ line.quantity }}
+                  <span v-if="line.reason" class="block">{{ $t('sa12.aiBecause', { reason: line.reason }) }}</span>
+                </p>
+                <button
+                  type="button"
+                  class="btn btn-secondary ay-ai-btn self-start text-[12.5px]"
+                  :disabled="isAccepted(line)"
+                  @click="acceptSuggestion(line)"
+                >
+                  {{ isAccepted(line) ? $t('sa12.aiAdded') : $t('sa12.aiUse') }}
+                </button>
+              </div>
+            </div>
+          </template>
+
+          <!--
+            Noi that voi nhan vien ket qua nay tu dau ra: bo luat tai cho hay
+            mo hinh AI day du. Khong de ho tuong may da "hieu" nhieu hon thuc te.
+          -->
+          <p
+            v-if="suggestion && suggestion.lines.length > 0 && suggestion.isRuleBased"
+            class="text-[11px] leading-[1.45]"
+            style="color: var(--color-accent-2-800)"
+          >
+            {{ $t('sa12.aiRuleBased') }}
+          </p>
         </section>
 
         <section class="card gap-2" style="background: #fff">
