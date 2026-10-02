@@ -44,21 +44,21 @@ const serviceNames = computed(() =>
  *
  * Lich hen khong co trang thai rieng cho viec nay — ca giai doan sua xe deu
  * nam duoi RECEIVED "Da tiep nhan". Nhung day lai la luc duy nhat KHACH phai
- * lam gi do, nen the phai noi ro va bam vao la mo thang ban bao gia, khong
- * bat ho di qua man tien do roi tu mo.
+ * lam gi do, nen the phai noi ro bang nhan rieng va mot dong tien.
+ *
+ * Than the van di den man tien do nhu moi lich khac: bam vao mot the ma
+ * nhay sang man khac han cac the con lai thi khach khong doan duoc dieu gi
+ * se xay ra. Duong sang ban bao gia nam o nut rieng duoi chan the.
  */
 const awaitingQuote = computed(() => props.booking.pendingQuotation ?? null);
-
-const cardLink = computed(() =>
-  awaitingQuote.value
-    ? `/quotations/${awaitingQuote.value.token}`
-    : `/bookings/${props.booking.code}/progress`,
-);
 </script>
 
 <template>
   <div style="background: var(--color-surface); border-radius: 24px; overflow: hidden">
-    <NuxtLink :to="cardLink" class="flex w-full flex-col gap-[7px] p-3.5 text-left">
+    <NuxtLink
+      :to="`/bookings/${booking.code}/progress`"
+      class="flex w-full flex-col gap-[7px] p-3.5 text-left"
+    >
       <span class="flex items-center justify-between gap-2.5">
         <span v-if="kicker" class="card-kicker">{{ kicker }}</span>
         <span v-else class="font-heading text-[14px]">{{ booking.code }}</span>
@@ -87,6 +87,16 @@ const cardLink = computed(() =>
       style="border-top: 1px solid var(--color-divider)"
     >
       <slot name="actions">
+        <!-- Viec dang cho khach lam, dat truoc cac nut khac. -->
+        <NuxtLink
+          v-if="awaitingQuote"
+          :to="`/quotations/${awaitingQuote.token}`"
+          class="ay-card-btn ay-card-btn-accent"
+          :aria-label="$t('card.viewQuote', { code: booking.code })"
+        >
+          {{ $t('sc26.viewQuote') }}
+        </NuxtLink>
+
         <template v-if="active">
           <NuxtLink
             :to="`/bookings/${booking.code}/reschedule`"

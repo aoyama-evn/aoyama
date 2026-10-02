@@ -59,7 +59,8 @@
     "cancel": "予約 {code} をキャンセル",
     "rebook": "予約 {code} を取り直す",
     "reschedule": "予約 {code} を編集",
-    "rebookShort": "取り直す"
+    "rebookShort": "取り直す",
+    "viewQuote": "予約 {code} の見積を見る"
   },
   "common": {
     "all": "すべて",

@@ -59,7 +59,8 @@
     "cancel": "Cancel booking {code}",
     "rebook": "Book again from {code}",
     "reschedule": "Edit booking {code}",
-    "rebookShort": "Book again"
+    "rebookShort": "Book again",
+    "viewQuote": "View quotation for booking {code}"
   },
   "common": {
     "all": "All",

@@ -59,7 +59,8 @@
     "cancel": "Hủy lịch hẹn {code}",
     "rebook": "Đặt lại lịch hẹn {code}",
     "reschedule": "Sửa lịch hẹn {code}",
-    "rebookShort": "Đặt lại"
+    "rebookShort": "Đặt lại",
+    "viewQuote": "Xem báo giá lịch hẹn {code}"
   },
   "common": {
     "all": "Tất cả",
