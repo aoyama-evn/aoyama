@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
   ArrayNotEmpty,
   IsArray,
   IsBoolean,
@@ -138,6 +139,17 @@ export class CancelBookingDto {
   @IsOptional()
   @IsString()
   reason?: string;
+}
+
+/** SA-03 — xac nhan nhieu lich hen cung luc. */
+export class ConfirmManyDto {
+  @ApiProperty({ type: [String], description: 'Danh sach ma lich hen can xac nhan' })
+  @IsArray()
+  @ArrayNotEmpty()
+  // Chan mot lan bam keo ca nghin ban ghi: moi lich con sinh ma QR va gui SMS.
+  @ArrayMaxSize(100)
+  @IsUUID('4', { each: true })
+  ids!: string[];
 }
 
 export class LookupBookingDto {

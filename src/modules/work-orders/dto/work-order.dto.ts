@@ -4,6 +4,7 @@ import {
   IsArray,
   IsBoolean,
   IsEnum,
+  IsIn,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -140,6 +141,20 @@ export class WorkOrderQueryDto extends PaginationQueryDto {
   @IsOptional() @IsEnum(PaymentStatus) paymentStatus?: PaymentStatus;
   @IsOptional() @IsString() from?: string;
   @IsOptional() @IsString() to?: string;
+
+  /**
+   * SA-09 — ba nut loc nhanh cua ban thiet ke. Day khong phai mot trang thai
+   * don le ma la mot cau hoi nghiep vu bac ra nhieu trang thai, nen de may
+   * chu dinh nghia mot cho thay vi moi man hinh tu ghep danh sach trang thai
+   * roi lech nhau.
+   *
+   *  IN_SHOP         — xe dang nam trong xuong, chua ban giao
+   *  AWAITING_PAYMENT— da xong viec nhung chua thu du tien
+   *  AWAITING_QUOTE  — da gui bao gia, dang cho khach duyet
+   */
+  @IsOptional()
+  @IsIn(['IN_SHOP', 'AWAITING_PAYMENT', 'AWAITING_QUOTE'])
+  bucket?: 'IN_SHOP' | 'AWAITING_PAYMENT' | 'AWAITING_QUOTE';
 }
 
 export class UpdateAmountsDto {

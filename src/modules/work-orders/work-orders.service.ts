@@ -206,6 +206,33 @@ export class WorkOrdersService {
     if (query.paymentStatus) {
       qb.andWhere('w.payment_status = :ps', { ps: query.paymentStatus });
     }
+
+    /** SA-09 — ba nut loc nhanh; dinh nghia nam o day de moi man hieu giong nhau. */
+    switch (query.bucket) {
+      case 'IN_SHOP':
+        qb.andWhere('w.status NOT IN (:...closed)', {
+          closed: [WorkOrderStatus.DELIVERED, WorkOrderStatus.CANCELLED],
+        });
+        break;
+      case 'AWAITING_PAYMENT':
+        /**
+         * "Cho thanh toan" = da xong viec ma chua thu du tien, chu khong phai
+         * moi phieu chua tra. Phieu dang chan doan thi dang nhien chua tra —
+         * cho no vao day thi nut mat tac dung, va canh bao "qua 7 ngay chua
+         * thu" cua ban thiet ke cung vo nghia vi tien chua den han.
+         */
+        qb.andWhere('w.status IN (:...done)', {
+          done: [WorkOrderStatus.COMPLETED, WorkOrderStatus.DELIVERED],
+        })
+          .andWhere('w.payment_status != :paid', { paid: PaymentStatus.PAID })
+          .andWhere('w.total_amount > 0');
+        break;
+      case 'AWAITING_QUOTE':
+        qb.andWhere('w.status = :quoted', { quoted: WorkOrderStatus.QUOTED });
+        break;
+      default:
+        break;
+    }
     if (query.from) qb.andWhere('w.created_at >= :from', { from: query.from });
     if (query.to) qb.andWhere('w.created_at <= :to', { to: query.to });
     if (query.keyword) {
@@ -522,9 +549,12 @@ export class WorkOrdersService {
     if (to === WorkOrderStatus.COMPLETED) {
       await this.onCompleted(workOrder, actor);
     }
-    if (to === WorkOrderStatus.CANCELLED && workOrder.stockDeducted) {
-      await this.inventory.returnForWorkOrder(workOrder.id, actor.id ?? null);
-      await this.repo.update(id, { stockDeducted: false });
+    if (to === WorkOrderStatus.CANCELLED) {
+      if (workOrder.stockDeducted) {
+        await this.inventory.returnForWorkOrder(workOrder.id, actor.id ?? null);
+        await this.repo.update(id, { stockDeducted: false });
+      }
+      await this.onCancelled(workOrder, actor, note);
     }
     if (to === WorkOrderStatus.DELIVERED) {
       await this.onDelivered(workOrder, actor);
@@ -568,6 +598,28 @@ export class WorkOrdersService {
 
     await this.scheduleNextMaintenance(full);
     await this.notifyCustomer(full, NotificationEvent.WORK_ORDER_COMPLETED);
+  }
+
+  /**
+   * Huy phieu thi dong luon lich hen di kem.
+   *
+   * Khong lam buoc nay thi lich hen nam lai o RECEIVED vinh vien: duong ra
+   * duy nhat cua no la DONE luc ban giao, ma xe thi khong con duoc sua nua.
+   * Lich do se mai bi dem la lich dang mo, va khach van thay "dang xu ly"
+   * tren dien thoai.
+   *
+   * Dong lich that bai thi khong keo theo viec huy phieu — phieu la ban ghi
+   * chinh, va con nguoi con sua tay duoc o man lich hen.
+   */
+  private async onCancelled(workOrder: WorkOrder, actor: Actor, note?: string): Promise<void> {
+    if (!workOrder.bookingId) return;
+    try {
+      await this.bookings.cancel(workOrder.bookingId, actor, note ?? undefined);
+    } catch (error) {
+      this.logger.warn(
+        `Khong dong duoc lich hen cua phieu ${workOrder.code}: ${(error as Error).message}`,
+      );
+    }
   }
 
   private async onDelivered(workOrder: WorkOrder, actor: Actor): Promise<void> {

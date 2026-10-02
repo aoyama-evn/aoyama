@@ -22,6 +22,7 @@ import {
   BookingQueryDto,
   CalendarQueryDto,
   CancelBookingDto,
+  ConfirmManyDto,
   CreateBookingDto,
   LookupBookingDto,
   LookupQrDto,
@@ -181,6 +182,32 @@ export class AdminBookingsController {
       entityId: booking.id,
     });
     return booking;
+  }
+
+  /**
+   * Dat trong `:id/confirm` de Nest khop duong dan tinh truoc duong dan dong,
+   * neu khong "bulk-confirm" se bi doc thanh mot ma lich hen va ParseUUIDPipe
+   * nem loi 400.
+   */
+  @Put('bulk-confirm')
+  @ApiOperation({ summary: 'SA-03 — xac nhan nhieu lich hen cung luc' })
+  async bulkConfirm(@Body() dto: ConfirmManyDto, @CurrentUser() user: AuthUser) {
+    const result = await this.service.confirmMany(dto.ids, {
+      type: 'ADMIN',
+      id: user.sub,
+      name: user.name,
+    });
+    for (const id of result.confirmed) {
+      await this.audit.record({
+        actorId: user.sub,
+        actorName: user.name,
+        actorType: 'ADMIN',
+        action: 'CONFIRM',
+        entity: 'Booking',
+        entityId: id,
+      });
+    }
+    return result;
   }
 
   @Put(':id/confirm')

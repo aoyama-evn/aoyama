@@ -18,7 +18,16 @@ export const BOOKING_TRANSITIONS: Record<BookingStatus, BookingStatus[]> = {
     BookingStatus.CANCELLED,
     BookingStatus.NO_SHOW,
   ],
-  [BookingStatus.RECEIVED]: [BookingStatus.DONE],
+  /**
+   * Xe da vao xuong thi duong ra binh thuong la DONE luc ban giao. Nhung
+   * phieu dich vu co the bi huy giua chung (khach doi y, xe khong sua duoc),
+   * khi do lich hen phai duoc dong theo — truoc day no ket lai o RECEIVED
+   * vinh vien vi day la duong cut duy nhat trong ca may trang thai.
+   *
+   * Duong nay danh cho buoc huy phieu goi sang, khong phai de khach tu bam:
+   * xem chot chan trong BookingsService.cancel.
+   */
+  [BookingStatus.RECEIVED]: [BookingStatus.DONE, BookingStatus.CANCELLED],
   [BookingStatus.DONE]: [],
   [BookingStatus.CANCELLED]: [],
   [BookingStatus.NO_SHOW]: [],

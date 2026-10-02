@@ -285,6 +285,38 @@ export class BookingsService {
    * Ma QR da co tu luc khach dat lich; goi issueToken o day chi de vet nhung
    * lich cu tao truoc khi doi cach sinh ma — ham nay khong cap lai ma neu da co.
    */
+  /**
+   * SA-03 — xac nhan nhieu lich hen trong mot lan bam.
+   *
+   * Le tan mo may buoi sang thuong co ca chuc lich cho duyet; xac nhan tung
+   * cai mot la vao chi tiet roi quay ra, lap lai hang chuc lan. O day chay
+   * tuan tu tung cai de moi lich van di qua dung quy trinh (sinh ma QR, ghi
+   * nhat ky, gui SMS) chu khong ghi thang mot phat vao CSDL.
+   *
+   * Mot lich hong khong lam hong ca me: thu nao loi thi ghi lai ly do va di
+   * tiep, cuoi cung tra ve ca hai danh sach de man hinh noi ro cai nao khong
+   * xac nhan duoc va vi sao.
+   */
+  async confirmMany(
+    ids: string[],
+    actor: Actor,
+  ): Promise<{ confirmed: string[]; failed: { id: string; message: string }[] }> {
+    const confirmed: string[] = [];
+    const failed: { id: string; message: string }[] = [];
+
+    for (const id of ids) {
+      try {
+        await this.confirm(id, actor);
+        confirmed.push(id);
+      } catch (error) {
+        const body = (error as { response?: { message?: string } }).response;
+        failed.push({ id, message: body?.message ?? (error as Error).message });
+      }
+    }
+
+    return { confirmed, failed };
+  }
+
   async confirm(id: string, actor: Actor): Promise<Booking> {
     const booking = await this.assertTransition(id, BookingStatus.CONFIRMED);
 
@@ -311,6 +343,19 @@ export class BookingsService {
     const booking = await this.assertTransition(id, BookingStatus.CANCELLED);
 
     if (actor.type === 'CUSTOMER') {
+      /**
+       * Xe da vao xuong roi thi khach khong tu huy tren dien thoai duoc nua —
+       * phai goi cua hang, vi con chiec xe dang nam trong xuong va cong viec
+       * dang lam do. Moc gio o duoi thuong da chan san truong hop nay vi gio
+       * hen da troi qua, nhung khach gui xe som hon hen thi van lot.
+       */
+      if (booking.status === BookingStatus.RECEIVED) {
+        throw new BadRequestException({
+          code: 'CANCEL_AFTER_INTAKE',
+          message: 'Xe da duoc tiep nhan vao xuong. Vui long goi cua hang de huy.',
+        });
+      }
+
       const cutoff = this.settings.getNumber(
         SETTING_KEYS.BOOKING_CANCEL_CUTOFF_HOURS,
         'booking.cancelCutoffHours',
