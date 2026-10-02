@@ -2,11 +2,12 @@ import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, Repository } from 'typeorm';
 import { PageDto, PaginationQueryDto } from 'src/common/dto';
-import { DEFAULT_LANGUAGE, Language } from 'src/common/enums';
+import { BookingStatus, DEFAULT_LANGUAGE, Language } from 'src/common/enums';
 import { pickI18n } from 'src/common/types';
 import { CatalogService } from 'src/modules/catalog/catalog.service';
 import { PartsService } from 'src/modules/parts/parts.service';
 import { SettingsService, SETTING_KEYS } from 'src/modules/system/settings.service';
+import { Booking } from 'src/modules/bookings/entities/booking.entity';
 import { WorkOrdersService } from 'src/modules/work-orders/work-orders.service';
 import {
   AI_PROVIDER,
@@ -27,6 +28,7 @@ export class AiService {
     @InjectRepository(AiDiagnosis) private readonly diagnosisRepo: Repository<AiDiagnosis>,
     @InjectRepository(KnowledgeDocument)
     private readonly knowledgeRepo: Repository<KnowledgeDocument>,
+    @InjectRepository(Booking) private readonly bookingRepo: Repository<Booking>,
     @Inject(AI_PROVIDER) private readonly provider: AiProvider,
     private readonly catalog: CatalogService,
     private readonly parts: PartsService,
@@ -205,6 +207,42 @@ export class AiService {
   ): Promise<PartRecognitionResult & { isFallback: boolean }> {
     const result = await this.provider.recognizePart(imageUrls);
     return { ...result, isFallback: Object.keys(result).length === 0 };
+  }
+
+  // ---------------- AI-05 — Doc bien so tu anh (SA-07) ----------------
+
+  /**
+   * Le tan chup bien so thay vi go tay. Mo hinh nhin anh doc ra bien so, man
+   * hinh dien san roi nguoi van phai xac nhan (cung nguyen tac BR-43 nhu nhan
+   * dang phu tung).
+   *
+   * Chua noi mo hinh that thi khong tra ve rong — o moi truong khong phai
+   * production, lay bien so cua mot lich hen dang cho tiep nhan de con dien
+   * thu duoc ca luong. Luon kem co isDemo de man hinh noi ro day la so lieu
+   * dung thu, khong phai ket qua doc anh.
+   */
+  async recognizePlate(imageUrls: string[]): Promise<{
+    plateNumber?: string;
+    confidence?: number;
+    isDemo: boolean;
+  }> {
+    const result = await this.provider.recognizePlate(imageUrls);
+    if (result.plateNumber) return { ...result, isDemo: false };
+
+    if (process.env.NODE_ENV === 'production') return { isDemo: false };
+
+    const booking = await this.bookingRepo
+      .createQueryBuilder('b')
+      .innerJoinAndSelect('b.vehicle', 'v')
+      .where('b.status = :status', { status: BookingStatus.CONFIRMED })
+      .orderBy('b.scheduledAt', 'ASC')
+      .getOne();
+
+    return {
+      plateNumber: booking?.vehicle?.plateNumber,
+      confidence: booking?.vehicle?.plateNumber ? 0.5 : undefined,
+      isDemo: true,
+    };
   }
 
   // ---------------- AI-03 — Tro ly ky thuat (SA-30, SA-31) ----------------

@@ -6,6 +6,11 @@ import { BookingStatus } from 'src/common/enums';
 import { generatePublicToken, hoursBetween } from 'src/common/utils';
 import { Booking } from './entities/booking.entity';
 
+/** Bo moi ky tu khong phai chu hoac so de so khop bien so khong phu thuoc cach go. */
+function squashPlate(plate: string): string {
+  return (plate ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+}
+
 export interface QrScanResult {
   valid: boolean;
   reason?: 'NOT_FOUND' | 'ALREADY_RECEIVED' | 'CANCELLED' | 'EXPIRED' | 'NOT_CONFIRMED';
@@ -96,6 +101,55 @@ export class QrService {
       throw new NotFoundException({ code: 'QR_NOT_FOUND', message: 'Ma QR khong ton tai' });
     }
     return booking;
+  }
+
+  /**
+   * SA-07 — tra theo bien so khi khach khong mo duoc ma QR va khong nho ma
+   * lich hen.
+   *
+   * So khop long: bo het dau cach, gach va cham roi moi so, vi bien so duoc
+   * go moi noi mot kieu (29T1-122.12, 29T1.122.12, 29t1 12212) va may doc anh
+   * cung tra ve khong thong nhat.
+   */
+  async validateByPlate(plate: string): Promise<QrScanResult> {
+    const needle = squashPlate(plate);
+    if (needle.length < 4) {
+      throw new BadRequestException({
+        code: 'PLATE_TOO_SHORT',
+        message: 'Bien so qua ngan de tra cuu',
+      });
+    }
+
+    const booking = await this.repo
+      .createQueryBuilder('b')
+      .leftJoinAndSelect('b.customer', 'c')
+      .leftJoinAndSelect('b.vehicle', 'v')
+      .leftJoinAndSelect('b.store', 's')
+      .leftJoinAndSelect('b.services', 'bs')
+      .where("regexp_replace(upper(v.plate_number), '[^A-Z0-9]', '', 'g') = :needle", { needle })
+      .andWhere('b.status != :cancelled', { cancelled: BookingStatus.CANCELLED })
+      // Mot chiec xe co the co nhieu lich. Le tan dang can cai khach toi hom
+      // nay, nen uu tien lich con cho xu ly truoc, roi moi den lich gan nhat.
+      .addSelect(
+        `CASE WHEN b.status IN ('${BookingStatus.CONFIRMED}', '${BookingStatus.PENDING}')
+              THEN 0 ELSE 1 END`,
+        'uu_tien',
+      )
+      .orderBy('uu_tien', 'ASC')
+      .addOrderBy('b.scheduledAt', 'ASC')
+      .getOne();
+
+    if (!booking) {
+      return {
+        valid: false,
+        reason: 'NOT_FOUND',
+        message: 'Khong tim thay lich hen nao cho bien so nay',
+      };
+    }
+    if (!booking.qrToken) {
+      return { valid: false, reason: 'NOT_FOUND', message: 'Lich hen nay chua co ma QR', booking };
+    }
+    return this.validate(booking.qrToken);
   }
 
   /** Dung khi le tan nhap tay ma lich hen thay vi quet — FR-QR-08. */

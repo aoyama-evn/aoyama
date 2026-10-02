@@ -121,6 +121,12 @@ export class AdminAiController {
     return this.service.recognizePart(dto.imageUrls);
   }
 
+  @Post('plate-recognition')
+  @ApiOperation({ summary: 'SA-07 — doc bien so tu anh chup tai quay (AI-05)' })
+  recognizePlate(@Body() dto: RecognizePartDto) {
+    return this.service.recognizePlate(dto.imageUrls);
+  }
+
   @Post('tech-assistant')
   @ApiOperation({ summary: 'SA-30 — hoi tro ly ky thuat, tra loi kem trich dan (AI-03)' })
   ask(@Body() dto: AskTechnicalDto) {

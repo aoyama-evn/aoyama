@@ -43,6 +43,12 @@ export interface PartRecognitionResult {
   confidence?: number;
 }
 
+/** AI-05 (SA-07) — doc bien so tu anh chup tai quay. */
+export interface PlateRecognitionResult {
+  plateNumber?: string;
+  confidence?: number;
+}
+
 export interface TechAnswer {
   answer: string;
   citations: { documentId: string; title: string; excerpt: string }[];
@@ -54,6 +60,7 @@ export interface AiProvider {
   diagnose(input: DiagnoseInput): Promise<DiagnosisFinding[]>;
   suggestQuotation(input: QuotationSuggestionInput): Promise<QuotationSuggestionLine[]>;
   recognizePart(imageUrls: string[]): Promise<PartRecognitionResult>;
+  recognizePlate(imageUrls: string[]): Promise<PlateRecognitionResult>;
   answerTechnical(question: string, context: string[]): Promise<TechAnswer>;
 }
 
@@ -76,6 +83,10 @@ export class DisabledAiProvider implements AiProvider {
   }
 
   async recognizePart(): Promise<PartRecognitionResult> {
+    return {};
+  }
+
+  async recognizePlate(): Promise<PlateRecognitionResult> {
     return {};
   }
 
@@ -116,6 +127,11 @@ export class LlmAiProvider implements AiProvider {
   async recognizePart(imageUrls: string[]): Promise<PartRecognitionResult> {
     if (!this.apiKey) return {};
     return this.callModel<PartRecognitionResult>('part', { imageUrls }, {});
+  }
+
+  async recognizePlate(imageUrls: string[]): Promise<PlateRecognitionResult> {
+    if (!this.apiKey) return {};
+    return this.callModel<PlateRecognitionResult>('plate', { imageUrls }, {});
   }
 
   async answerTechnical(question: string, context: string[]): Promise<TechAnswer> {

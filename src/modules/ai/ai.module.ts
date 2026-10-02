@@ -8,13 +8,15 @@ import { AdminAiController, PublicAiController } from './ai.controller';
 import { AI_PROVIDER, DisabledAiProvider, LlmAiProvider } from './ai.provider';
 import { RuleBasedAiProvider } from './rule-based.provider';
 import { AiService } from './ai.service';
+import { Booking } from 'src/modules/bookings/entities/booking.entity';
 import { AiDiagnosis } from './entities/ai-diagnosis.entity';
 import { KnowledgeDocument } from './entities/knowledge-document.entity';
 
 /** M-03 Chatbox AI chan doan va M-12 Tro ly AI ky thuat. */
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AiDiagnosis, KnowledgeDocument]),
+    // Booking chi de lay mot bien so that khi dung che do demo doc bien so.
+    TypeOrmModule.forFeature([AiDiagnosis, KnowledgeDocument, Booking]),
     CatalogModule,
     PartsModule,
     WorkOrdersModule,

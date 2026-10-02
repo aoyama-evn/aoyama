@@ -8,6 +8,9 @@ class ScanDto {
   @IsOptional() @IsString() token?: string;
 
   @IsOptional() @IsString() code?: string;
+
+  /** SA-07 — tra theo bien so khi khong quet duoc ma QR. */
+  @IsOptional() @IsString() plate?: string;
 }
 
 class ScanTokenDto {
@@ -29,7 +32,8 @@ export class QrController {
   async scan(@Body() dto: ScanDto) {
     if (dto.token) return this.qr.validate(dto.token);
     if (dto.code) return this.qr.validateByCode(dto.code);
-    return { valid: false, reason: 'NOT_FOUND', message: 'Can ma QR hoac ma lich hen' };
+    if (dto.plate) return this.qr.validateByPlate(dto.plate);
+    return { valid: false, reason: 'NOT_FOUND', message: 'Can ma QR, ma lich hen hoac bien so' };
   }
 
   @Post('validate')

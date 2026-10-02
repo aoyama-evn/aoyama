@@ -4,6 +4,7 @@ import {
   AiProvider,
   DiagnoseInput,
   PartRecognitionResult,
+  PlateRecognitionResult,
   QuotationSuggestionInput,
   QuotationSuggestionLine,
   TechAnswer,
@@ -355,6 +356,11 @@ export class RuleBasedAiProvider implements AiProvider {
    */
   async suggestQuotation(_input: QuotationSuggestionInput): Promise<QuotationSuggestionLine[]> {
     return [];
+  }
+
+  /** Doc bien so can mo hinh nhin anh — bo luat chay tai cho khong lam duoc. */
+  async recognizePlate(): Promise<PlateRecognitionResult> {
+    return {};
   }
 
   async recognizePart(): Promise<PartRecognitionResult> {
