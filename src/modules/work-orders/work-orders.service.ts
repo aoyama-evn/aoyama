@@ -162,6 +162,8 @@ export class WorkOrdersService {
         booking: true,
         // SA-10 hien ten ky thuat vien phu trach ngay tren the tom tat.
         assignedTechnician: true,
+        // Dong ky ten duoi ket qua chan doan.
+        diagnosedBy: true,
         items: { service: true },
         parts: true,
         photos: true,
@@ -339,6 +341,18 @@ export class WorkOrdersService {
       if (dto.difficulty !== undefined) patch.difficulty = dto.difficulty;
       if (dto.assignedTechnicianId !== undefined) {
         patch.assignedTechnicianId = dto.assignedTechnicianId;
+      }
+
+      /**
+       * Ky ten nguoi kham xe. Chi ghi khi lan luu nay thuc su co chu chan
+       * doan — bam luu de doi hang muc hay phan cong lai thi nguoi da kham
+       * truoc do van giu nguyen, khong bi nguoi sau de len.
+       */
+      const wroteDiagnosis =
+        (dto.diagnosisNote ?? '').trim().length > 0 || (dto.diagnosisCause ?? '').trim().length > 0;
+      if (wroteDiagnosis && actor.id) {
+        patch.diagnosedById = actor.id;
+        patch.diagnosedAt = new Date();
       }
 
       // Buoc ghi chan doan dau tien dua phieu sang DIAGNOSING.

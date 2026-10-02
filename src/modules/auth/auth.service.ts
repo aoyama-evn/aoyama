@@ -161,7 +161,12 @@ export class AuthService {
       message: 'Ten dang nhap hoac mat khau khong dung',
     });
 
-    const user = await this.adminRepo.findOne({ where: { username: username.trim() } });
+    // passwordHash la cot select: false — cho doi chieu mat khau moi xin them.
+    const user = await this.adminRepo
+      .createQueryBuilder('u')
+      .addSelect('u.passwordHash')
+      .where('u.username = :username', { username: username.trim() })
+      .getOne();
     if (!user) throw invalid;
 
     if (user.lockedUntil && user.lockedUntil.getTime() > Date.now()) {
@@ -280,7 +285,11 @@ export class AuthService {
     currentPassword: string,
     newPassword: string,
   ): Promise<void> {
-    const user = await this.adminRepo.findOneOrFail({ where: { id: adminId } });
+    const user = await this.adminRepo
+      .createQueryBuilder('u')
+      .addSelect('u.passwordHash')
+      .where('u.id = :adminId', { adminId })
+      .getOneOrFail();
     const matched = await bcrypt.compare(currentPassword, user.passwordHash);
     if (!matched) {
       throw new UnauthorizedException({

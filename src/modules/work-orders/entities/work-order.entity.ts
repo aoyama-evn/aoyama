@@ -90,6 +90,22 @@ export class WorkOrder extends BaseEntity {
   @Column({ name: 'diagnosis_cause', type: 'text', nullable: true })
   diagnosisCause!: string | null;
 
+  /**
+   * Nguoi viet chan doan — he thong tu lay theo tai khoan dang nhap luc bam
+   * luu, khong ai chon tay. Khac voi assignedTechnician la nguoi se sua xe:
+   * mot nguoi kham, mot nguoi lam, va ban thiet ke ky ten nguoi kham ngay
+   * duoi ket qua chan doan.
+   */
+  @Column({ name: 'diagnosed_by_id', type: 'uuid', nullable: true })
+  diagnosedById!: string | null;
+
+  @ManyToOne(() => AdminUser, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({ name: 'diagnosed_by_id' })
+  diagnosedBy!: AdminUser | null;
+
+  @Column({ name: 'diagnosed_at', type: 'timestamptz', nullable: true })
+  diagnosedAt!: Date | null;
+
   @Column({ name: 'assigned_technician_id', type: 'uuid', nullable: true })
   assignedTechnicianId!: string | null;
 

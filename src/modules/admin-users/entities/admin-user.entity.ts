@@ -17,7 +17,18 @@ export class AdminUser extends SoftDeletableEntity {
   @Column({ type: 'varchar', length: 128, nullable: true })
   email!: string | null;
 
-  @Column({ type: 'varchar', name: 'password_hash', length: 255 })
+  /**
+   * select: false — ma bam mat khau khong duoc di theo thuc the ra ngoai.
+   *
+   * Phieu dich vu nap kem quan he toi tai khoan quan tri (ky thuat vien phu
+   * trach, nguoi chan doan), nen moi lan mot man hinh goi chi tiet phieu la
+   * ca ban ghi tai khoan theo ra trinh duyet, ke ca ma bam. Chan ngay o tang
+   * du lieu thay vi loc o tung endpoint: quan he them ve sau cung an toan.
+   *
+   * Hai cho can doi chieu mat khau phai xin them bang addSelect — xem
+   * auth.service.
+   */
+  @Column({ type: 'varchar', name: 'password_hash', length: 255, select: false })
   passwordHash!: string;
 
   @Column({ name: 'full_name', length: 128 })
