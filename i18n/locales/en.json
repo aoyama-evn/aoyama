@@ -336,7 +336,12 @@
     "searchPlaceholder": "Name, phone, booking code, bike, plate",
     "serviceKind": "Service type",
     "title": "Bookings",
-    "toDate": "To"
+    "toDate": "To",
+    "selectedPending": "{n} pending booking(s) selected",
+    "confirmSelected": "Confirm selected",
+    "confirmedOne": "Confirmed {code}",
+    "confirmedMany": "Confirmed {n} booking(s)",
+    "confirmFailed": "{n} booking(s) could not be confirmed"
   },
   "sa04": {
     "day": "Day",
@@ -489,7 +494,10 @@
     "empty": "No work orders match these filters",
     "scanCta": "Scan to receive",
     "searchPlaceholder": "Work order, customer name, plate",
-    "title": "Work orders"
+    "title": "Work orders",
+    "bucketInShop": "In the shop",
+    "bucketAwaitingPayment": "Awaiting payment",
+    "bucketAwaitingQuote": "Awaiting quote approval"
   },
   "sa10": {
     "act": {

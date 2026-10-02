@@ -15,6 +15,12 @@ const filters = reactive({
   keyword: '',
   status: (route.query.status as string) ?? '',
   paymentStatus: (route.query.paymentStatus as string) ?? '',
+  /**
+   * SA-09 — ba nut loc nhanh. Dinh nghia tung nut nam o may chu (tham so
+   * `bucket`) chu khong ghep danh sach trang thai o day: cung mot cau hoi
+   * "xe nao dang o xuong" ma moi man tu ghep thi som muon cung lech nhau.
+   */
+  bucket: (route.query.bucket as string) ?? '',
 });
 const page = ref(1);
 
@@ -25,7 +31,20 @@ const query = computed(() => ({
   keyword: filters.keyword || undefined,
   status: filters.status || undefined,
   paymentStatus: filters.paymentStatus || undefined,
+  bucket: filters.bucket || undefined,
 }));
+
+const BUCKETS = computed(() => [
+  { value: 'IN_SHOP', label: t('sa09.bucketInShop') },
+  { value: 'AWAITING_PAYMENT', label: t('sa09.bucketAwaitingPayment') },
+  { value: 'AWAITING_QUOTE', label: t('sa09.bucketAwaitingQuote') },
+]);
+
+/** Bam lai dung nut dang bat thi tat no di — khong can nut "bo loc" rieng. */
+function toggleBucket(value: string): void {
+  filters.bucket = filters.bucket === value ? '' : value;
+  page.value = 1;
+}
 
 const { data, pending } = await useAsyncData(
   'admin-work-orders',
@@ -33,12 +52,15 @@ const { data, pending } = await useAsyncData(
   { watch: [query] },
 );
 
-const hasFilters = computed(() => Boolean(filters.keyword || filters.status || filters.paymentStatus));
+const hasFilters = computed(() =>
+  Boolean(filters.keyword || filters.status || filters.paymentStatus || filters.bucket),
+);
 
 function reset(): void {
   filters.keyword = '';
   filters.status = '';
   filters.paymentStatus = '';
+  filters.bucket = '';
   page.value = 1;
 }
 
@@ -65,6 +87,26 @@ useHead({ title: () => `${t('sa09.title')} — AOYAMA Admin` });
         <AyButton to="/admin/scan" variant="secondary" size="sm">{{ $t('sa09.scanCta') }}</AyButton>
       </template>
     </AyPageHeader>
+
+    <!-- Ba cau hoi quan ly hoi nhieu nhat moi ngay, de ngay tren danh sach. -->
+    <div class="flex flex-wrap gap-2">
+      <button
+        v-for="b in BUCKETS"
+        :key="b.value"
+        type="button"
+        class="tag"
+        :class="filters.bucket === b.value ? 'tag-accent' : ''"
+        :style="
+          filters.bucket === b.value
+            ? 'background: var(--color-accent); color: #fff'
+            : 'background: #fff; cursor: pointer'
+        "
+        :aria-pressed="filters.bucket === b.value"
+        @click="toggleBucket(b.value)"
+      >
+        {{ b.label }}
+      </button>
+    </div>
 
     <AyFilterBar :has-active-filters="hasFilters" @reset="reset">
       <AyField :label="$t('common.keyword')" class="min-w-[200px] flex-1">

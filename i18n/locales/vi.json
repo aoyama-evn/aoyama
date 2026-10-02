@@ -336,7 +336,12 @@
     "searchPlaceholder": "Tên, SĐT, mã lịch hẹn, xe, biển số",
     "serviceKind": "Loại dịch vụ",
     "title": "Lịch hẹn",
-    "toDate": "Đến ngày"
+    "toDate": "Đến ngày",
+    "selectedPending": "Đã chọn {n} lịch chờ xác nhận",
+    "confirmSelected": "Xác nhận các lịch đã chọn",
+    "confirmedOne": "Đã xác nhận {code}",
+    "confirmedMany": "Đã xác nhận {n} lịch hẹn",
+    "confirmFailed": "{n} lịch không xác nhận được"
   },
   "sa04": {
     "day": "Ngày",
@@ -489,7 +494,10 @@
     "empty": "Không có phiếu dịch vụ nào khớp bộ lọc",
     "scanCta": "Quét mã tiếp nhận",
     "searchPlaceholder": "Mã phiếu, tên khách, biển số",
-    "title": "Phiếu dịch vụ"
+    "title": "Phiếu dịch vụ",
+    "bucketInShop": "Đang ở xưởng",
+    "bucketAwaitingPayment": "Chờ thanh toán",
+    "bucketAwaitingQuote": "Chờ khách duyệt báo giá"
   },
   "sa10": {
     "act": {

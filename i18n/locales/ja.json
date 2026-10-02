@@ -336,7 +336,12 @@
     "searchPlaceholder": "名前・電話番号・予約番号・車両・ナンバー",
     "serviceKind": "サービス種別",
     "title": "予約",
-    "toDate": "終了日"
+    "toDate": "終了日",
+    "selectedPending": "承認待ちの予約を{n}件選択中",
+    "confirmSelected": "選択した予約を確定",
+    "confirmedOne": "{code} を確定しました",
+    "confirmedMany": "{n}件の予約を確定しました",
+    "confirmFailed": "{n}件は確定できませんでした"
   },
   "sa04": {
     "day": "日",
@@ -489,7 +494,10 @@
     "empty": "条件に合う整備伝票がありません",
     "scanCta": "QRで受け付ける",
     "searchPlaceholder": "伝票番号・お客様名・ナンバー",
-    "title": "整備伝票"
+    "title": "整備伝票",
+    "bucketInShop": "入庫中",
+    "bucketAwaitingPayment": "入金待ち",
+    "bucketAwaitingQuote": "見積承認待ち"
   },
   "sa10": {
     "act": {
