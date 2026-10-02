@@ -248,6 +248,28 @@ const INSPECTION_REQUEST = {
 };
 
 /**
+ * Phu tung thuong phai thay cho tung nhom hong hoc (AI-02, SA-12).
+ *
+ * Doi chieu voi TEN va MA phu tung cua hang thay vi ghi cung ma phu tung:
+ * cua hang doi nha cung cap hay them hang moi thi goi y van chay, va chi
+ * nhung thu dang thuc su co trong kho moi duoc de xuat.
+ */
+const PART_KEYWORDS: Record<string, string[]> = {
+  BRAKE: ['ma phanh', 'brake pad', 'brake', 'パッド', 'ブレーキ'],
+  TYRE: ['lop', 'vo xe', 'tyre', 'tire', 'タイヤ'],
+  ENGINE: ['bugi', 'spark plug', 'plug', 'プラグ'],
+  OIL: ['dau may', 'nhot', 'oil', 'オイル', 'loc dau', 'filter'],
+  ELECTRIC: ['ac quy', 'binh dien', 'battery', 'バッテリー'],
+  DRIVETRAIN: ['xich', 'sen', 'chain', 'チェーン', 'nhong', 'sprocket', 'curoa', 'belt', 'ベルト'],
+  // Son va dong lam theo thuc te hu hong, khong co phu tung ban san.
+  BODY: [],
+  PERIODIC: ['dau may', 'oil', 'オイル', 'bugi', 'plug', 'プラグ'],
+};
+
+/** Khong do thang mot bao gia dai dang dac vao mat nhan vien. */
+const MAX_SUGGESTED_LINES = 8;
+
+/**
  * Bo dau tieng Viet va ha chu thuong de so khop khong phu thuoc cach go.
  * Tieng Nhat khong bi anh huong: dau daku (U+3099) nam ngoai khoang dau Latin,
  * va buoc normalize('NFC') cuoi cung ghep lai nhu cu.
@@ -351,11 +373,90 @@ export class RuleBasedAiProvider implements AiProvider {
   }
 
   /**
-   * Cac tac vu con lai chua co ban chay tai cho — giu nguyen hanh vi cu de
-   * khong am tham doi ket qua o nhung man hinh khac.
+   * AI-02 (SA-12) — de xuat hang muc cong viec va phu tung cho ban bao gia.
+   *
+   * Can cu theo dung thu tu tin cay: NGUYEN NHAN ky thuat vien ket luan truoc,
+   * roi den chan doan, cuoi cung moi den loi khach ke. Khach noi "xe keu lach
+   * cach" con ky thuat vien ket luan "xich chung" — ket luan moi la cai dang
+   * tin, nen no duoc tinh nang hon.
+   *
+   * Chi de xuat dich vu cua hang dang ban va phu tung dang co trong kho, lay
+   * tu danh muc that chu khong bia ten. Khong khop tu khoa nao thi tra ve rong
+   * de man hinh noi thang la chua goi y duoc, hon la doan bua mot bao gia.
+   *
+   * Day van chi la de xuat: nhan vien phai bam chon tung dong moi vao bao gia.
    */
-  async suggestQuotation(_input: QuotationSuggestionInput): Promise<QuotationSuggestionLine[]> {
-    return [];
+  async suggestQuotation(input: QuotationSuggestionInput): Promise<QuotationSuggestionLine[]> {
+    const lang = ['ja', 'en', 'vi'].includes(input.language) ? input.language : 'ja';
+
+    /**
+     * Ket luan cua ky thuat vien duoc lap lai de no nang diem hon loi khach
+     * ke: cung mot tu khoa, nam trong nguyen nhan thi dang hai lan trong
+     * chuoi so khop.
+     */
+    const weighted = [input.cause, input.diagnosis, input.cause, input.diagnosis, input.symptom]
+      .filter(Boolean)
+      .join(' ');
+    const haystack = normalise(weighted);
+    if (haystack.trim().length < 3) {
+      this.logger.debug('Chua co chan doan de can cu — khong goi y bao gia');
+      return [];
+    }
+
+    const matched = RULES.map((rule) => {
+      const hits = rule.keywords.filter((k) => haystack.includes(k));
+      if (hits.length === 0) return null;
+      const weight = hits.reduce((sum, k) => sum + (k.length >= 8 ? 2 : 1), 0);
+      return { rule, hits: hits.length, weight };
+    })
+      .filter((x): x is { rule: SymptomRule; hits: number; weight: number } => x !== null)
+      .sort((a, b) => b.weight - a.weight || b.hits - a.hits)
+      .slice(0, 3);
+
+    if (matched.length === 0) {
+      this.logger.debug('Chan doan khong khop nhom hong hoc nao — khong goi y bao gia');
+      return [];
+    }
+
+    const lines: QuotationSuggestionLine[] = [];
+    const taken = new Set<string>();
+
+    for (const { rule } of matched) {
+      // Ly do hien ngay duoi tung dong, de nguoi duyet biet vi sao no o day.
+      const reason = rule.label[lang] ?? rule.label.ja;
+
+      for (const code of rule.serviceCodes) {
+        const service = input.availableServices.find((s) => s.code === code);
+        if (!service || taken.has(`LABOR:${code}`)) continue;
+        taken.add(`LABOR:${code}`);
+        lines.push({
+          kind: 'LABOR',
+          code,
+          name: service.name,
+          unitPrice: service.basePrice,
+          quantity: 1,
+          reason,
+        });
+      }
+
+      for (const part of input.availableParts) {
+        const needles = PART_KEYWORDS[rule.key] ?? [];
+        const hay = normalise(`${part.name} ${part.code}`);
+        if (!needles.some((n) => hay.includes(n))) continue;
+        if (taken.has(`PART:${part.code}`)) continue;
+        taken.add(`PART:${part.code}`);
+        lines.push({
+          kind: 'PART',
+          code: part.code,
+          name: part.name,
+          unitPrice: part.sellPrice,
+          quantity: 1,
+          reason,
+        });
+      }
+    }
+
+    return lines.slice(0, MAX_SUGGESTED_LINES);
   }
 
   /** Doc bien so can mo hinh nhin anh — bo luat chay tai cho khong lam duoc. */

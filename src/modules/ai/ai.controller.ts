@@ -48,6 +48,10 @@ class SendMessageDto {
   @IsOptional() @IsString() transcript?: string;
 }
 
+class SuggestQuotationQueryDto {
+  @IsOptional() @IsEnum(Language) lang?: Language;
+}
+
 class RecognizePartDto {
   @IsArray() @IsString({ each: true }) imageUrls!: string[];
 }
@@ -111,8 +115,13 @@ export class AdminAiController {
 
   @Get('quotation-suggestion/:workOrderId')
   @ApiOperation({ summary: 'SA-12 — AI goi y hang muc va phu tung cho bao gia (AI-02)' })
-  suggestQuotation(@Param('workOrderId', ParseUUIDPipe) workOrderId: string) {
-    return this.service.suggestQuotation(workOrderId);
+  suggestQuotation(
+    @Param('workOrderId', ParseUUIDPipe) workOrderId: string,
+    // Ten hang muc goi y duoc chep thang vao bao gia gui khach, nen phai ra
+    // dung thu tieng nhan vien dang dung chu khong phai mac dinh cua he thong.
+    @Query() query: SuggestQuotationQueryDto,
+  ) {
+    return this.service.suggestQuotation(workOrderId, query.lang);
   }
 
   @Post('part-recognition')

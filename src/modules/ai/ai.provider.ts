@@ -20,6 +20,10 @@ export interface QuotationSuggestionInput {
   engineCc?: number | null;
   symptom?: string | null;
   diagnosis?: string | null;
+  /** Nguyen nhan ky thuat vien ket luan — can cu chac hon ca trieu chung. */
+  cause?: string | null;
+  /** Ngon ngu cua nhan vien dang lap bao gia, de tra ten va ly do dung thu. */
+  language: string;
   availableServices: { code: string; name: string; basePrice: number }[];
   availableParts: { code: string; name: string; sellPrice: number }[];
 }

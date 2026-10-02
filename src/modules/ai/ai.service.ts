@@ -16,6 +16,7 @@ import {
   QuotationSuggestionLine,
   TechAnswer,
 } from './ai.provider';
+import { RuleBasedAiProvider } from './rule-based.provider';
 import { AiDiagnosis, DiagnosisFinding, DiagnosisMessage } from './entities/ai-diagnosis.entity';
 import { KnowledgeDocument } from './entities/knowledge-document.entity';
 
@@ -158,10 +159,14 @@ export class AiService {
    * FR-QUO-11 — AI goi y hang muc va phu tung cho bao gia.
    * Ket qua la de xuat; Admin bat buoc phai duyet truoc khi gui khach.
    */
-  async suggestQuotation(workOrderId: string): Promise<{
+  async suggestQuotation(
+    workOrderId: string,
+    language: Language = DEFAULT_LANGUAGE,
+  ): Promise<{
     lines: QuotationSuggestionLine[];
     generatedAt: string;
     isFallback: boolean;
+    isRuleBased: boolean;
   }> {
     const workOrder = await this.workOrders.findById(workOrderId);
     const services = await this.catalog.findPublic();
@@ -180,14 +185,17 @@ export class AiService {
       engineCc: workOrder.vehicle?.engineCc,
       symptom: workOrder.customerSymptom,
       diagnosis: workOrder.diagnosisNote,
+      // Nguyen nhan ky thuat vien ket luan — can cu chac nhat de chon hang muc.
+      cause: workOrder.diagnosisCause,
+      language,
       availableServices: services.map((s) => ({
         code: s.code,
-        name: pickI18n(s.name, DEFAULT_LANGUAGE),
+        name: pickI18n(s.name, language),
         basePrice: s.basePrice,
       })),
       availableParts: parts.items.map((p) => ({
         code: p.code,
-        name: pickI18n(p.name, DEFAULT_LANGUAGE),
+        name: pickI18n(p.name, language),
         sellPrice: p.sellPrice,
       })),
     });
@@ -196,6 +204,8 @@ export class AiService {
       lines,
       generatedAt: new Date().toISOString(),
       isFallback: lines.length === 0,
+      // Man hinh noi ro day la bo luat tai cho hay mo hinh AI day du.
+      isRuleBased: this.provider instanceof RuleBasedAiProvider,
     };
   }
 
