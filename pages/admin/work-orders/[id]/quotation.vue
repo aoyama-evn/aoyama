@@ -63,6 +63,8 @@ const lines = ref<Line[]>([
     quantity: i.quantity,
     isOptional: false,
     suggestedByAi: i.suggestedByAi,
+    // Giu lai moi noi ve danh muc dich vu, neu khong bao gia chi con ten chu.
+    serviceId: i.serviceId,
   })),
   ...(workOrder.value.parts ?? []).map<Line>((p) => ({
     kind: 'PART',
@@ -318,17 +320,17 @@ useHead({ title: () => `${t('sa12.headTitle')} — AOYAMA Admin` });
       </template>
     </AyPageHeader>
 
-    <div
-      class="grid items-start gap-3.5"
-      style="grid-template-columns: repeat(auto-fit, minmax(330px, 1fr))"
-    >
-      <section class="card" style="background: #fff">
-        <div class="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-          <h2 class="font-heading text-[16px]">{{ $t('sa12.lines') }}</h2>
-          <div class="flex gap-1">
-            <AyButton variant="ghost" size="sm" @click="addServiceLine">{{ $t('sa12.addService') }}</AyButton>
-            <AyButton variant="ghost" size="sm" @click="addLine('OTHER')">{{ $t('sa12.addOther') }}</AyButton>
-          </div>
+    <!--
+      Mot bieu mau bao gia duy nhat: hang muc, phu tung, tien nong va nut gui
+      nam lien mach trong cung mot the. Truoc day bang hang muc la mot the
+      rieng ben trai con phan tien o the khac ben phai, nhin nhu hai viec
+      tach roi trong khi that ra chung la mot to bao gia.
+    -->
+    <div class="admin-two-col">
+      <section class="card flex flex-col gap-3" style="background: #fff">
+        <div class="flex flex-wrap items-center justify-end gap-1">
+          <AyButton variant="ghost" size="sm" @click="addServiceLine">{{ $t('sa12.addService') }}</AyButton>
+          <AyButton variant="ghost" size="sm" @click="addLine('OTHER')">{{ $t('sa12.addOther') }}</AyButton>
         </div>
 
         <div class="table-wrap !shadow-none">
@@ -378,8 +380,13 @@ useHead({ title: () => `${t('sa12.headTitle')} — AOYAMA Admin` });
                       {{ i18n(item.name) }}
                     </option>
                   </select>
+                  <!--
+                    Khong gan nhan "Goi y boi AI" o day nua: dong da nam trong
+                    bao gia tuc la nhan vien da duyet, no la hang muc cua cua
+                    hang chu khong con la de xuat cua may. Co suggestedByAi
+                    van duoc luu xuong de con thong ke do huu dung cua AI.
+                  -->
                   <input v-else v-model="line.name" class="input h-9 min-h-0 py-1" type="text">
-                  <AyAiBadge v-if="line.suggestedByAi" class="mt-1" />
                 </td>
                 <td><input v-model.number="line.unitPrice" class="input h-9 min-h-0 py-1 text-right" type="number" min="0"></td>
                 <td><input v-model.number="line.quantity" class="input h-9 min-h-0 py-1 text-center" type="number" min="1"></td>
@@ -393,6 +400,95 @@ useHead({ title: () => `${t('sa12.headTitle')} — AOYAMA Admin` });
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <div class="card-kicker">{{ $t('sa12.addPart') }}</div>
+          <AyPartPicker :store-id="workOrder.storeId" @select="addPart" />
+        </div>
+
+        <div class="flex flex-col gap-3 border-t border-divider pt-3">
+          <div class="card-kicker">{{ $t('sa12.summary') }}</div>
+
+          <div class="admin-grid">
+            <AyField :label="$t('money.discount')">
+              <template #default="{ id: fid }">
+                <input :id="fid" v-model.number="discountAmount" class="input" type="number" min="0">
+              </template>
+            </AyField>
+
+            <AyField :label="$t('sa12.taxPercent')">
+              <template #default="{ id: fid }">
+                <input :id="fid" v-model.number="taxRate" class="input" type="number" min="0" max="100">
+              </template>
+            </AyField>
+          </div>
+
+          <div class="ay-deposit">
+            <label class="flex cursor-pointer items-center gap-2.5 text-[13.5px] font-semibold">
+              <input v-model="requireDeposit" type="checkbox" />
+              {{ $t('sa12.requireDeposit') }}
+            </label>
+            <div
+              v-if="requireDeposit"
+              class="grid gap-2.5"
+              style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))"
+            >
+              <AyField :label="$t('sa12.depositAmount')" required>
+                <template #default="{ id: fid }">
+                  <input
+                    :id="fid"
+                    v-model.number="depositAmount"
+                    class="input"
+                    type="number"
+                    min="0"
+                    :max="totalAmount"
+                  />
+                </template>
+              </AyField>
+              <AyField :label="$t('sa12.depositDue')">
+                <template #default="{ id: fid }">
+                  <input :id="fid" v-model="depositDueAt" class="input" type="datetime-local" />
+                </template>
+              </AyField>
+            </div>
+            <p v-if="requireDeposit" class="text-muted text-[12px]">
+              {{ $t('sa12.remainingOnHandover', { amount: money(remainingOnHandover) }) }}
+            </p>
+          </div>
+
+          <AyField :label="$t('sa12.validUntil')">
+            <template #default="{ id: fid }">
+              <input :id="fid" v-model="validUntil" class="input" type="date">
+            </template>
+          </AyField>
+
+          <AyField :label="$t('sa12.noteToCustomer')">
+            <template #default="{ id: fid }">
+              <textarea :id="fid" v-model="note" class="input min-h-[70px]" />
+            </template>
+          </AyField>
+
+          <div class="border-t border-divider pt-3">
+            <AyMoneyTable
+              :subtotal="subtotal"
+              :discount-amount="discountAmount"
+              :tax-rate="taxRate"
+              :tax-amount="taxAmount"
+              :total-amount="totalAmount"
+            />
+          </div>
+
+          <label class="flex items-start gap-2.5 text-[13.5px]">
+            <input v-model="sendAfterSave" type="checkbox" class="mt-1 h-4 w-4 accent-[var(--color-accent)]">
+            <span>{{ $t('sa12.sendNow') }}</span>
+          </label>
+
+          <AyErrorNote :error="error" />
+
+          <AyButton block :loading="saving" @click="save">
+            {{ sendAfterSave ? $t('sa12.saveAndSend') : $t('sa12.saveDraft') }}
+          </AyButton>
         </div>
       </section>
 
@@ -465,92 +561,6 @@ useHead({ title: () => `${t('sa12.headTitle')} — AOYAMA Admin` });
           </p>
         </section>
 
-        <section class="card gap-2" style="background: #fff">
-          <h5>{{ $t('sa12.addPart') }}</h5>
-          <AyPartPicker :store-id="workOrder.storeId" @select="addPart" />
-        </section>
-
-        <section class="card flex flex-col gap-3" style="background: #fff">
-          <h5>{{ $t('sa12.summary') }}</h5>
-
-          <AyField :label="$t('money.discount')">
-            <template #default="{ id: fid }">
-              <input :id="fid" v-model.number="discountAmount" class="input" type="number" min="0">
-            </template>
-          </AyField>
-
-          <AyField :label="$t('sa12.taxPercent')">
-            <template #default="{ id: fid }">
-              <input :id="fid" v-model.number="taxRate" class="input" type="number" min="0" max="100">
-            </template>
-          </AyField>
-
-          <div class="ay-deposit">
-            <label class="flex cursor-pointer items-center gap-2.5 text-[13.5px] font-semibold">
-              <input v-model="requireDeposit" type="checkbox" />
-              {{ $t('sa12.requireDeposit') }}
-            </label>
-            <div
-              v-if="requireDeposit"
-              class="grid gap-2.5"
-              style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))"
-            >
-              <AyField :label="$t('sa12.depositAmount')" required>
-                <template #default="{ id: fid }">
-                  <input
-                    :id="fid"
-                    v-model.number="depositAmount"
-                    class="input"
-                    type="number"
-                    min="0"
-                    :max="totalAmount"
-                  />
-                </template>
-              </AyField>
-              <AyField :label="$t('sa12.depositDue')">
-                <template #default="{ id: fid }">
-                  <input :id="fid" v-model="depositDueAt" class="input" type="datetime-local" />
-                </template>
-              </AyField>
-            </div>
-            <p v-if="requireDeposit" class="text-muted text-[12px]">
-              {{ $t('sa12.remainingOnHandover', { amount: money(remainingOnHandover) }) }}
-            </p>
-          </div>
-
-          <AyField :label="$t('sa12.validUntil')">
-            <template #default="{ id: fid }">
-              <input :id="fid" v-model="validUntil" class="input" type="date">
-            </template>
-          </AyField>
-
-          <AyField :label="$t('sa12.noteToCustomer')">
-            <template #default="{ id: fid }">
-              <textarea :id="fid" v-model="note" class="input min-h-[70px]" />
-            </template>
-          </AyField>
-
-          <div class="border-t border-divider pt-3">
-            <AyMoneyTable
-              :subtotal="subtotal"
-              :discount-amount="discountAmount"
-              :tax-rate="taxRate"
-              :tax-amount="taxAmount"
-              :total-amount="totalAmount"
-            />
-          </div>
-
-          <label class="flex items-start gap-2.5 text-[13.5px]">
-            <input v-model="sendAfterSave" type="checkbox" class="mt-1 h-4 w-4 accent-[var(--color-accent)]">
-            <span>{{ $t('sa12.sendNow') }}</span>
-          </label>
-
-          <AyErrorNote :error="error" />
-
-          <AyButton block :loading="saving" @click="save">
-            {{ sendAfterSave ? $t('sa12.saveAndSend') : $t('sa12.saveDraft') }}
-          </AyButton>
-        </section>
       </div>
     </div>
   </div>

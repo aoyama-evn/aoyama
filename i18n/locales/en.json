@@ -620,7 +620,6 @@
     "kindLabor": "Labour",
     "kindOther": "Other",
     "kindPart": "Part",
-    "lines": "Quotation lines",
     "needLine": "A quotation needs at least one line",
     "needLineName": "A line still has no name",
     "noLines": "No lines yet",

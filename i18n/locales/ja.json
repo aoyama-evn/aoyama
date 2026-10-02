@@ -620,7 +620,6 @@
     "kindLabor": "技術料",
     "kindOther": "その他",
     "kindPart": "部品",
-    "lines": "見積明細",
     "needLine": "見積には1行以上必要です",
     "needLineName": "名前のない行があります",
     "noLines": "明細がまだありません",

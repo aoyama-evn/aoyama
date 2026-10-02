@@ -364,6 +364,26 @@
     flex-direction: column;
   }
 
+  /**
+   * SA-12 Lap bao gia — bieu mau chinh ben trai, cot phu tro ben phai.
+   *
+   * Bieu mau bao gia chua ca bang hang muc sau cot lan cac o tien nong, nen
+   * no can rong hon khung goi y AI ben canh. Duoi 1100px thi xep chong: bang
+   * sau cot ma nhet vao nua man thi chu bi bop nat.
+   */
+  .admin-two-col {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 14px;
+  }
+
+  @media (min-width: 1100px) {
+    .admin-two-col {
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    }
+  }
+
   /** Luoi o nhap — tu chia cot theo be rong con lai. */
   .admin-grid {
     display: grid;
