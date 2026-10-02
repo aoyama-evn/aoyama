@@ -1537,7 +1537,8 @@
     "bookNow": "今すぐ予約",
     "emptyHint": "オンライン予約は1分ほどで終わります。",
     "emptyTitle": "まだ予約はありません",
-    "title": "予約一覧"
+    "title": "予約一覧",
+    "quoteWaiting": "見積 {amount} を送信しました。ご返答をお待ちしています"
   },
   "sc22": {
     "cancel": "予約をキャンセル",

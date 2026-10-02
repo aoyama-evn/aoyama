@@ -284,7 +284,16 @@ export interface Booking {
   adminNote: string | null;
   services?: BookingServiceLine[];
   statusHistories?: BookingStatusHistory[];
+  /** Ban bao gia da gui va dang cho khach tra loi — SC-21, SC-26. */
+  pendingQuotation?: PendingQuotation | null;
   createdAt: string;
+}
+
+export interface PendingQuotation {
+  token: string;
+  code: string;
+  totalAmount: number;
+  validUntil: string | null;
 }
 
 export interface SlotAvailability {
@@ -410,6 +419,8 @@ export interface PublicProgress {
   /** SC-26 ve ca chang lich hen tren cung mot dong thoi gian. */
   bookingTimeline: { status: BookingStatus; at: string; note: string | null }[];
   hasQr: boolean;
+  /** Ban bao gia dang cho khach tra loi — nut "Xem bao gia" dan toi day. */
+  pendingQuotation?: PendingQuotation | null;
   vehicle: { maker: string; model: string; plateNumber: string } | null;
   hasWorkOrder: boolean;
   status?: WorkOrderStatus;

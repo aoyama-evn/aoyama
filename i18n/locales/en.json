@@ -1537,7 +1537,8 @@
     "bookNow": "Book now",
     "emptyHint": "Booking online takes about a minute.",
     "emptyTitle": "You have no bookings yet",
-    "title": "My bookings"
+    "title": "My bookings",
+    "quoteWaiting": "Quotation of {amount} sent — awaiting your reply"
   },
   "sc22": {
     "cancel": "Cancel booking",

@@ -26,7 +26,7 @@ const props = withDefaults(
  */
 const emit = defineEmits<{ (e: 'cancel', booking: Booking): void }>();
 
-const { i18n, slotRange } = useFormat();
+const { i18n, slotRange, money } = useFormat();
 
 /** BR-04, BR-05 — chi lich chua dien ra va chua tiep nhan moi doi hoac huy duoc. */
 const ACTIVE: string[] = ['PENDING', 'CONFIRMED'];
@@ -38,20 +38,40 @@ const closed = computed(() => CLOSED.includes(props.booking.status));
 const serviceNames = computed(() =>
   (props.booking.services ?? []).map((line) => line.serviceName).join(', '),
 );
+
+/**
+ * Cua hang da gui bao gia va dang cho khach tra loi.
+ *
+ * Lich hen khong co trang thai rieng cho viec nay — ca giai doan sua xe deu
+ * nam duoi RECEIVED "Da tiep nhan". Nhung day lai la luc duy nhat KHACH phai
+ * lam gi do, nen the phai noi ro va bam vao la mo thang ban bao gia, khong
+ * bat ho di qua man tien do roi tu mo.
+ */
+const awaitingQuote = computed(() => props.booking.pendingQuotation ?? null);
+
+const cardLink = computed(() =>
+  awaitingQuote.value
+    ? `/quotations/${awaitingQuote.value.token}`
+    : `/bookings/${props.booking.code}/progress`,
+);
 </script>
 
 <template>
   <div style="background: var(--color-surface); border-radius: 24px; overflow: hidden">
-    <NuxtLink
-      :to="`/bookings/${booking.code}/progress`"
-      class="flex w-full flex-col gap-[7px] p-3.5 text-left"
-    >
+    <NuxtLink :to="cardLink" class="flex w-full flex-col gap-[7px] p-3.5 text-left">
       <span class="flex items-center justify-between gap-2.5">
         <span v-if="kicker" class="card-kicker">{{ kicker }}</span>
         <span v-else class="font-heading text-[14px]">{{ booking.code }}</span>
-        <AyStatusTag :status="booking.status" />
+        <AyStatusTag :status="awaitingQuote ? 'QUOTED' : booking.status" />
       </span>
       <span class="text-[13.5px] font-semibold">{{ slotRange(booking) }}</span>
+      <span
+        v-if="awaitingQuote"
+        class="text-[12px] font-semibold"
+        style="color: var(--color-accent-800)"
+      >
+        {{ $t('sc21.quoteWaiting', { amount: money(awaitingQuote.totalAmount) }) }}
+      </span>
       <span class="text-muted text-[11.5px]">
         {{ i18n(booking.store?.name ?? null) }}
         <template v-if="serviceNames"> · {{ serviceNames }}</template>

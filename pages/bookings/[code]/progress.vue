@@ -145,9 +145,14 @@ useHead({ title: () => t('sc26.headTitle', { code }) });
         <span v-if="progress.totalAmount" class="text-muted text-[11.5px]">
           {{ $t('sc26.awaitingYou', { amount: money(progress.totalAmount) }) }}
         </span>
+        <!--
+          Dan thang toi ban bao gia. Truoc day nut nay tro ve man chi tiet
+          lich hen, khach bam vao chi thay mot cai ma QR chu khong phai bao
+          gia nao ca.
+        -->
         <NuxtLink
-          v-if="progress.status === 'QUOTED'"
-          :to="`/bookings/${code}`"
+          v-if="progress.pendingQuotation"
+          :to="`/quotations/${progress.pendingQuotation.token}`"
           class="btn btn-primary mt-2 text-[12px]"
           style="min-height: 34px"
         >

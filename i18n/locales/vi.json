@@ -1537,7 +1537,8 @@
     "bookNow": "Đặt lịch ngay",
     "emptyHint": "Đặt lịch trực tuyến chỉ mất khoảng một phút.",
     "emptyTitle": "Bạn chưa có lịch hẹn nào",
-    "title": "Lịch hẹn của tôi"
+    "title": "Lịch hẹn của tôi",
+    "quoteWaiting": "Cửa hàng đã gửi báo giá {amount} — chờ bạn phản hồi"
   },
   "sc22": {
     "cancel": "Hủy lịch",
