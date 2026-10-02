@@ -134,4 +134,20 @@ export class Booking extends BaseEntity {
 
   @OneToMany(() => BookingStatusHistory, (h) => h.booking)
   statusHistories!: BookingStatusHistory[];
+
+  /**
+   * Ban bao gia da gui va dang cho khach tra loi — KHONG luu trong CSDL,
+   * chi gan them luc tra ve cho khach (SC-21, SC-26).
+   *
+   * Lich hen khong co trang thai rieng cho viec "dang cho duyet bao gia":
+   * ca giai doan sua xe deu nam duoi mot trang thai RECEIVED. Nhung voi
+   * khach thi day la luc duy nhat HO phai lam gi do, nen danh sach phai
+   * noi ro va dan thang toi ban bao gia.
+   */
+  pendingQuotation?: {
+    token: string;
+    code: string;
+    totalAmount: number;
+    validUntil: string | null;
+  } | null;
 }

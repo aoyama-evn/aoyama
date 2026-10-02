@@ -271,6 +271,12 @@ export class WorkOrdersService {
       bookingStatus: booking.status,
       bookingTimeline,
       hasQr: Boolean(booking.qrToken),
+      /**
+       * Nut "Xem bao gia" o SC-26 can duong dan toi ban bao gia that. Truoc
+       * day no dan ve man chi tiet lich hen, va khach bam vao thi nhan duoc
+       * mot cai ma QR chu khong phai bao gia.
+       */
+      pendingQuotation: await this.bookings.findPendingQuotation(booking.id),
       vehicle: booking.vehicle
         ? {
             maker: booking.vehicle.maker,

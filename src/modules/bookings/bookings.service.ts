@@ -15,6 +15,8 @@ import {
   DEFAULT_LANGUAGE,
   NotificationChannel,
   NotificationEvent,
+  QuotationStatus,
+  WorkOrderStatus,
 } from 'src/common/enums';
 import {
   formatAppDateTime,
@@ -243,7 +245,72 @@ export class BookingsService {
       .skip(query.skip)
       .take(query.limit)
       .getManyAndCount();
+    await this.attachPendingQuotations(items);
     return new PageDto(items, total, query);
+  }
+
+  /**
+   * Gan ban bao gia dang cho khach tra loi vao tung lich hen.
+   *
+   * Doc thang bang quotations bang mot cau truy van chung cho ca trang thay
+   * vi goi QuotationsService: dich vu do di qua WorkOrdersService, ma
+   * WorkOrdersService lai dung chinh lop nay — vong phu thuoc.
+   */
+  private async attachPendingQuotations(bookings: Booking[]): Promise<void> {
+    const ids = bookings.map((b) => b.id);
+    if (ids.length === 0) return;
+
+    // DISTINCT ON: mot phieu co the da gui lai bao gia nhieu lan, chi lay ban moi nhat.
+    const rows: {
+      bookingId: string;
+      token: string;
+      code: string;
+      totalAmount: number;
+      validUntil: Date | null;
+    }[] = await this.dataSource.query(
+      `select distinct on (w.booking_id)
+         w.booking_id as "bookingId",
+         q.public_token as "token",
+         q.code as "code",
+         q.total_amount as "totalAmount",
+         q.valid_until as "validUntil"
+       from quotations q
+       join work_orders w on w.id = q.work_order_id
+       where w.booking_id = ANY($1)
+         and q.status = $2
+         and w.status = ANY($3)
+       order by w.booking_id, q.created_at desc`,
+      /**
+       * Phieu da bat tay vao sua thi khong con cho khach tra loi nua, du ban
+       * bao gia van nam o SENT vi khach dong y mieng tai quay. Khong chan lai
+       * thi khach thay "Cho duyet bao gia" tren chiec xe tho may dang sua do.
+       */
+      [
+        ids,
+        QuotationStatus.SENT,
+        [WorkOrderStatus.RECEIVED, WorkOrderStatus.DIAGNOSING, WorkOrderStatus.QUOTED],
+      ],
+    );
+
+    const byBooking = new Map(rows.map((r) => [r.bookingId, r]));
+    for (const booking of bookings) {
+      const found = byBooking.get(booking.id);
+      booking.pendingQuotation = found
+        ? {
+            token: found.token,
+            code: found.code,
+            totalAmount: Number(found.totalAmount),
+            validUntil: found.validUntil ? found.validUntil.toISOString() : null,
+          }
+        : null;
+    }
+  }
+
+  /** SC-26 — WorkOrdersService hoi rieng mot lich hen khi dung tien do. */
+  async findPendingQuotation(bookingId: string): Promise<Booking['pendingQuotation']> {
+    const holder = { id: bookingId } as Booking;
+    await this.attachPendingQuotations([holder]);
+    return holder.pendingQuotation ?? null;
   }
 
   /** SA-03 — danh sach lich hen phia quan tri. */
