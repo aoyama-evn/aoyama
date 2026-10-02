@@ -376,6 +376,10 @@ export interface WorkOrder {
   customerSymptom: string | null;
   diagnosisNote: string | null;
   diagnosisCause: string | null;
+  /** Nguoi viet chan doan — may chu tu ghi theo tai khoan dang nhap luc luu. */
+  diagnosedById: string | null;
+  diagnosedBy?: AdminUser | null;
+  diagnosedAt: string | null;
   assignedTechnicianId: string | null;
   assignedTechnician?: AdminUser | null;
   /** SA-10a — muc do kho do ky thuat vien danh gia. */

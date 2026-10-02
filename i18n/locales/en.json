@@ -553,7 +553,8 @@
     "summary1": "Customer · bike · store",
     "summary2": "Condition at intake",
     "symptom": "Symptom:",
-    "title": "Work order"
+    "title": "Work order",
+    "diagnosedBy": "Technician {name}"
   },
   "sa10b": {
     "backToBookings": "Back to the booking list",
@@ -593,7 +594,9 @@
     "saved": "Diagnosis and items saved",
     "stockIs": "stock {n}",
     "title": "Diagnosis and quotation",
-    "unassigned": "— Not assigned —"
+    "unassigned": "— Not assigned —",
+    "assigneeHint": "The technician who will do the repair, picked from staff accounts.",
+    "diagnosedByNote": "Diagnosed by: {name} — recorded automatically from your account when you save."
   },
   "sa12": {
     "addOther": "+ Other",

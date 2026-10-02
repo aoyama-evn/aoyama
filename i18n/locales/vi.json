@@ -553,7 +553,8 @@
     "summary1": "Khách · xe · cửa hàng",
     "summary2": "Hiện trạng khi tiếp nhận",
     "symptom": "Triệu chứng:",
-    "title": "Phiếu dịch vụ"
+    "title": "Phiếu dịch vụ",
+    "diagnosedBy": "Kỹ thuật viên {name}"
   },
   "sa10b": {
     "backToBookings": "Về danh sách lịch hẹn",
@@ -593,7 +594,9 @@
     "saved": "Đã lưu chẩn đoán và hạng mục",
     "stockIs": "tồn {n}",
     "title": "Chẩn đoán và báo giá",
-    "unassigned": "— Chưa phân công —"
+    "unassigned": "— Chưa phân công —",
+    "assigneeHint": "Người sẽ sửa xe, chọn từ tài khoản nhân viên.",
+    "diagnosedByNote": "Người chẩn đoán: {name} — hệ thống tự ghi theo tài khoản đăng nhập khi bấm lưu."
   },
   "sa12": {
     "addOther": "+ Khác",

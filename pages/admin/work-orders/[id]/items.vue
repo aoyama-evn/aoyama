@@ -83,6 +83,15 @@ const diagnosisCause = ref(workOrder.value.diagnosisCause ?? '');
 const difficulty = ref<WorkDifficulty>(workOrder.value.difficulty ?? WorkDifficulty.MEDIUM);
 const technicianId = ref(workOrder.value.assignedTechnicianId ?? '');
 
+/**
+ * Ten se duoc ky duoi chan doan. Phieu da co nguoi kham thi giu ten do cho
+ * den khi co nguoi viet lai; chua co thi la chinh nguoi dang ngoi truoc may.
+ */
+const auth = useAuthStore();
+const diagnosedByName = computed(
+  () => workOrder.value?.diagnosedBy?.fullName ?? auth.user?.name ?? '',
+);
+
 const DIFFICULTIES = computed(() => [
   { value: WorkDifficulty.EASY, label: t('difficulty.EASY') },
   { value: WorkDifficulty.MEDIUM, label: t('difficulty.MEDIUM') },
@@ -261,7 +270,7 @@ useHead({ title: () => `${t('sa11.headTitle')} — AOYAMA Admin` });
               </select>
             </template>
           </AyField>
-          <AyField :label="$t('sa11.assignee')">
+          <AyField :label="$t('sa11.assignee')" :hint="$t('sa11.assigneeHint')">
             <template #default="{ id: fid }">
               <select :id="fid" v-model="technicianId" class="input">
                 <option value="">{{ $t('sa11.unassigned') }}</option>
@@ -272,6 +281,14 @@ useHead({ title: () => `${t('sa11.headTitle')} — AOYAMA Admin` });
             </template>
           </AyField>
         </div>
+
+        <!--
+          Nguoi kham khong phai o nhap: may chu tu ghi theo tai khoan dang
+          nhap luc bam luu. Hien ra de nhan vien biet minh dang ky ten.
+        -->
+        <p class="text-muted text-[11.5px] leading-[1.45]">
+          {{ $t('sa11.diagnosedByNote', { name: diagnosedByName }) }}
+        </p>
       </section>
 
       <section class="ay-ai-card">

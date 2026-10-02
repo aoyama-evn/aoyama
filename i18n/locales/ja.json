@@ -553,7 +553,8 @@
     "summary1": "お客様・バイク・店舗",
     "summary2": "受付時の状態",
     "symptom": "症状：",
-    "title": "作業票"
+    "title": "作業票",
+    "diagnosedBy": "整備士 {name}"
   },
   "sa10b": {
     "backToBookings": "予約一覧へ戻る",
@@ -593,7 +594,9 @@
     "saved": "診断と作業項目を保存しました",
     "stockIs": "在庫 {n}",
     "title": "診断とお見積",
-    "unassigned": "— 未割当 —"
+    "unassigned": "— 未割当 —",
+    "assigneeHint": "実際に修理する担当者。スタッフアカウントから選択します。",
+    "diagnosedByNote": "診断者: {name} — 保存時にログインアカウントから自動で記録されます。"
   },
   "sa12": {
     "addOther": "+ その他",

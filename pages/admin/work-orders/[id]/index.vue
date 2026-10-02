@@ -229,6 +229,11 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
       >
         {{ $t('sa10.noDiagnosis') }}
       </p>
+      <!-- Ban thiet ke ky ten nguoi kham ngay duoi ket qua chan doan. -->
+      <p v-if="workOrder.diagnosedBy" class="text-muted text-[11.5px]">
+        {{ $t('sa10.diagnosedBy', { name: workOrder.diagnosedBy.fullName }) }}
+        <template v-if="workOrder.diagnosedAt"> · {{ dateTime(workOrder.diagnosedAt) }}</template>
+      </p>
     </section>
 
     <!-- Hang muc va phu tung -->
