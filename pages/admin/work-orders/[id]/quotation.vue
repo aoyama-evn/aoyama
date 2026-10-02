@@ -78,7 +78,15 @@ const lines = ref<Line[]>([
 ]);
 
 const discountAmount = ref(workOrder.value.discountAmount);
-const taxRate = ref(workOrder.value.taxRate);
+/**
+ * Bao gia niem yet gia CHUA bao gom thue (SA-12). Thue duoc cong vao o buoc
+ * thanh toan theo thue suat cua phieu, nen o day luon gui 0 — khong de may
+ * chu roi ve thue suat mac dinh cua he thong.
+ */
+const QUOTE_TAX_RATE = 0;
+
+/** O tim phu tung gap lai cho den khi nhan vien can den. */
+const partPickerOpen = ref(false);
 const validUntil = ref(defaultValidUntil());
 const note = ref('');
 /** SA-12 — bao gia co the yeu cau khach dat coc truoc khi bat tay vao viec. */
@@ -243,12 +251,7 @@ function addPart(part: Part): void {
 }
 
 const subtotal = computed(() => lines.value.reduce((s, l) => s + l.unitPrice * l.quantity, 0));
-const taxAmount = computed(() =>
-  Math.floor((Math.max(0, subtotal.value - discountAmount.value) * taxRate.value) / 100),
-);
-const totalAmount = computed(
-  () => Math.max(0, subtotal.value - discountAmount.value) + taxAmount.value,
-);
+const totalAmount = computed(() => Math.max(0, subtotal.value - discountAmount.value));
 
 async function save(): Promise<void> {
   if (lines.value.length === 0) {
@@ -269,7 +272,7 @@ async function save(): Promise<void> {
         // fromCatalog chi phuc vu giao dien; may chu bat loi truong la.
         items: lines.value.map(({ fromCatalog, ...rest }) => rest),
         discountAmount: discountAmount.value,
-        taxRate: taxRate.value,
+        taxRate: QUOTE_TAX_RATE,
         validUntil: validUntil.value || undefined,
         depositAmount: requireDeposit.value ? depositAmount.value : undefined,
         depositDueAt:
@@ -402,9 +405,27 @@ useHead({ title: () => `${t('sa12.headTitle')} — AOYAMA Admin` });
           </table>
         </div>
 
+        <!--
+          Them phu tung la viec thinh thoang moi lam, phan lon bao gia chi
+          gom hang muc cong. De o tim mo san thi no chiem cho giua bieu mau
+          va day phan tien xuong duoi tam nhin, nen gap lai cho den khi can.
+        -->
         <div class="flex flex-col gap-1.5">
-          <div class="card-kicker">{{ $t('sa12.addPart') }}</div>
-          <AyPartPicker :store-id="workOrder.storeId" @select="addPart" />
+          <button
+            type="button"
+            class="flex items-center gap-1.5 self-start text-[12.5px] font-semibold"
+            style="color: var(--color-accent)"
+            :aria-expanded="partPickerOpen"
+            @click="partPickerOpen = !partPickerOpen"
+          >
+            <span aria-hidden="true">{{ partPickerOpen ? '−' : '+' }}</span>
+            {{ $t('sa12.addPart') }}
+          </button>
+          <AyPartPicker
+            v-if="partPickerOpen"
+            :store-id="workOrder.storeId"
+            @select="addPart"
+          />
         </div>
 
         <div class="flex flex-col gap-3 border-t border-divider pt-3">
@@ -417,9 +438,9 @@ useHead({ title: () => `${t('sa12.headTitle')} — AOYAMA Admin` });
               </template>
             </AyField>
 
-            <AyField :label="$t('sa12.taxPercent')">
+            <AyField :label="$t('sa12.validUntil')">
               <template #default="{ id: fid }">
-                <input :id="fid" v-model.number="taxRate" class="input" type="number" min="0" max="100">
+                <input :id="fid" v-model="validUntil" class="input" type="date">
               </template>
             </AyField>
           </div>
@@ -457,26 +478,26 @@ useHead({ title: () => `${t('sa12.headTitle')} — AOYAMA Admin` });
             </p>
           </div>
 
-          <AyField :label="$t('sa12.validUntil')">
-            <template #default="{ id: fid }">
-              <input :id="fid" v-model="validUntil" class="input" type="date">
-            </template>
-          </AyField>
-
-          <AyField :label="$t('sa12.noteToCustomer')">
+          <!-- O ghi chu keo het be rong bieu mau thi mot cau ngan nam lot
+               thom giua mot dong dai, nen chan lai cho vua tam mat. -->
+          <AyField :label="$t('sa12.noteToCustomer')" class="max-w-[520px]">
             <template #default="{ id: fid }">
               <textarea :id="fid" v-model="note" class="input min-h-[70px]" />
             </template>
           </AyField>
 
           <div class="border-t border-divider pt-3">
+            <!--
+              Bao gia niem yet gia chua thue; thue duoc cong vao luc thanh
+              toan theo thue suat cua phieu. Khong hien dong thue o day de
+              khach khong tuong tong cong nay la so cuoi cung phai tra.
+            -->
             <AyMoneyTable
               :subtotal="subtotal"
               :discount-amount="discountAmount"
-              :tax-rate="taxRate"
-              :tax-amount="taxAmount"
               :total-amount="totalAmount"
             />
+            <p class="text-muted mt-1.5 text-[12px]">{{ $t('sa12.taxExcluded') }}</p>
           </div>
 
           <label class="flex items-start gap-2.5 text-[13.5px]">
