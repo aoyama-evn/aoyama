@@ -106,10 +106,14 @@ async function resend(): Promise<void> {
   }
 }
 
-/** Tu gui khi go du 6 chu so — bot mot lan cham cho nguoi dung. */
-watch(digitsTyped, (typed) => {
-  if (typed === 6 && !loading.value) verify();
-});
+/**
+ * Khong tu gui khi go du sau chu so.
+ *
+ * Truoc day go den so cuoi la man hinh tu dang nhap luon. Go nham mot so
+ * thi chua kip nhin lai da bao sai ma va o nhap bi xoa trang, phai go lai
+ * tu dau; may cham mot nhip la khach tuong minh bam vao cai gi khac. Nguoi
+ * dung tu bam "Xac nhan" khi ho thay ma da dung.
+ */
 
 useHead({ title: () => t('sc19.titleLogin') });
 </script>
