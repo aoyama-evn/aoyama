@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AiDiagnosis, ServiceItem, Vehicle } from '~/types/models';
+import type { AiDiagnosis, ServiceItem, Store, Vehicle } from '~/types/models';
 
 /**
  * SC-10 Chatbox AI chan doan (khach) va SC-10a (thanh vien).
@@ -25,7 +25,7 @@ const auth = useAuthStore();
 const booking = useBookingStore();
 const ui = useUiStore();
 const { t, locale } = useI18n();
-const { number } = useFormat();
+const { number, i18n, dayLabel, clock } = useFormat();
 
 const session = ref<AiDiagnosis | null>(null);
 const intents = ref<Intent[]>([]);
@@ -161,10 +161,20 @@ async function send(): Promise<void> {
   }
 }
 
-/** SC-11 — bam dat lich tu ket qua chan doan thi mang theo phien AI sang. */
+/**
+ * SC-11 — chon xong hang muc thi tro ly hoi not nhung thu con thieu ngay
+ * trong cuoc tro chuyen, thay vi da khach sang bieu mau dat lich.
+ *
+ * Ba thu con thieu: xe nao, cua hang nao, gio nao. Hoi xong ca ba thi
+ * nhay thang sang buoc 3 — khong con gi de chon o buoc 1 va buoc 2 nua.
+ */
+type BookStage = 'NONE' | 'VEHICLE' | 'STORE' | 'SLOT';
+const bookStage = ref<BookStage>('NONE');
+const pickedServices = ref<ServiceItem[]>([]);
+
 async function bookFromFinding(serviceCodes: string[]): Promise<void> {
   const services = await api.get<ServiceItem[]>('/services');
-  const matched = services.filter((s) => serviceCodes.includes(s.code));
+  pickedServices.value = services.filter((s) => serviceCodes.includes(s.code));
 
   booking.restore();
   // Gop het nhung gi khach da noi trong phien — truoc day chi lay cau dau tien,
@@ -178,11 +188,146 @@ async function bookFromFinding(serviceCodes: string[]): Promise<void> {
   booking.applyDiagnosis({
     diagnosisId: session.value?.id ?? '',
     description: saidByCustomer || undefined,
-    services: matched,
+    services: pickedServices.value,
     replaceServices: true,
   });
+
+  // Da biet xe tu dau phien (luong bao duong) thi khong hoi lai.
+  if (vehicle.value) {
+    booking.setVehicle(vehicle.value);
+    await goToStoreStage();
+  } else {
+    bookStage.value = 'VEHICLE';
+    await scrollToEnd();
+  }
+}
+
+/** Khach xac nhan xe o buoc nay roi moi sang chon cua hang. */
+async function confirmBookVehicle(): Promise<void> {
+  if (!vehicleReady.value) {
+    ui.warning(t('sc10.needVehicle'));
+    return;
+  }
   if (vehicle.value) booking.setVehicle(vehicle.value);
-  await navigateTo('/booking/step1');
+  else {
+    // O chat chi hoi hang va dong xe; bien so de buoc 3 hoi, dung bia ra.
+    booking.setVehicle({
+      plateNumber: '',
+      maker: manualVehicle.maker.trim(),
+      model: manualVehicle.model.trim(),
+    });
+  }
+  await goToStoreStage();
+}
+
+// ---- Cua hang gan nhat ----
+const stores = ref<Store[]>([]);
+const locating = ref(false);
+/** Khach tu choi chia se vi tri thi van chon duoc, chi la khong co khoang cach. */
+const locationDenied = ref(false);
+const storeDistances = ref<Record<string, number>>({});
+
+const sortedStores = computed(() => {
+  const list = [...stores.value];
+  const d = storeDistances.value;
+  if (Object.keys(d).length === 0) return list;
+  return list.sort((a, b) => (d[a.id] ?? Infinity) - (d[b.id] ?? Infinity));
+});
+
+async function goToStoreStage(): Promise<void> {
+  bookStage.value = 'STORE';
+  await scrollToEnd();
+
+  if (stores.value.length === 0) {
+    stores.value = await api.get<Store[]>('/stores').catch(() => []);
+  }
+
+  locating.value = true;
+  const here = await askBrowserLocation();
+  locating.value = false;
+
+  if (!here) {
+    locationDenied.value = true;
+    await scrollToEnd();
+    return;
+  }
+
+  const map: Record<string, number> = {};
+  for (const store of stores.value) {
+    if (store.latitude === null || store.longitude === null) continue;
+    map[store.id] = distanceKm(here, {
+      lat: Number(store.latitude),
+      lng: Number(store.longitude),
+    });
+  }
+  storeDistances.value = map;
+  await scrollToEnd();
+}
+
+// ---- Khung gio som nhat ----
+interface SoonSlot {
+  date: string;
+  startTime: string;
+  endTime: string;
+  remaining: number;
+}
+const soonSlots = ref<SoonSlot[]>([]);
+const loadingSlots = ref(false);
+const chosenStore = ref<Store | null>(null);
+
+/** Ba khung gio som nhat con cho, quet toi da hai tuan toi. */
+async function pickStore(store: Store): Promise<void> {
+  chosenStore.value = store;
+  booking.storeId = store.id;
+  booking.store = store;
+  bookStage.value = 'SLOT';
+  loadingSlots.value = true;
+  soonSlots.value = [];
+  await scrollToEnd();
+
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const days = await api.get<
+      { date: string; slots: { startTime: string; endTime: string; remaining: number; available: boolean }[] }[]
+    >('/bookings/availability', { storeId: store.id, from: today, days: 14 });
+
+    const found: SoonSlot[] = [];
+    for (const day of days ?? []) {
+      for (const slot of day.slots ?? []) {
+        if (!slot.available) continue;
+        found.push({
+          date: day.date,
+          startTime: slot.startTime,
+          endTime: slot.endTime,
+          remaining: slot.remaining,
+        });
+        if (found.length >= 3) break;
+      }
+      if (found.length >= 3) break;
+    }
+    soonSlots.value = found;
+  } catch {
+    soonSlots.value = [];
+  } finally {
+    loadingSlots.value = false;
+    await scrollToEnd();
+  }
+}
+
+/**
+ * Chon gio xong la du ca bon thu (hang muc, xe, cua hang, gio) nen di
+ * thang sang buoc 3. Quay lai buoc 1 thi khach phai bam qua hai man ma
+ * khong con gi de chon.
+ */
+async function pickSoonSlot(slot: SoonSlot): Promise<void> {
+  booking.slot = { date: slot.date, startTime: slot.startTime };
+  booking.persist();
+  await navigateTo('/booking/step3');
+}
+
+/** Khong khung gio nao vua y thi mo lich day du o buoc 2. */
+async function openFullCalendar(): Promise<void> {
+  await navigateTo('/booking/step2');
 }
 
 const findings = computed(() => session.value?.findings ?? []);
@@ -415,6 +560,100 @@ useHead({ title: () => t('sc10.assistant') });
         :vehicle-label="vehicleLabel || null"
         @book="bookFromFinding"
       />
+
+      <!--
+        Chon xong hang muc thi tro ly hoi not ba thu con thieu ngay tai day:
+        xe nao, cua hang nao, gio nao. Hoi xong la du de dat lich, khach
+        khong phai di lai tu dau o bieu mau.
+      -->
+      <section v-if="bookStage === 'VEHICLE'" class="card gap-2.5">
+        <p class="text-[13.5px] font-semibold">{{ $t('sc10.askVehicleTitle') }}</p>
+
+        <label
+          v-for="item in myVehicles ?? []"
+          :key="item.id"
+          class="radio gap-[11px] px-3.5 py-2.5"
+          style="border-radius: 18px; background: var(--color-neutral-100)"
+        >
+          <input type="radio" name="chatbike" :checked="vehicle?.id === item.id" @change="vehicle = item">
+          <span class="dot" />
+          <span class="min-w-0 flex-1">
+            <span class="block text-[13.5px]">{{ item.maker }} {{ item.model }}</span>
+            <span class="text-muted block truncate text-[11px]">{{ vehicleLine(item) }}</span>
+          </span>
+        </label>
+
+        <!-- Khach vang lai go tay; bien so de buoc nhap thong tin hoi sau. -->
+        <div v-if="!hasProfileVehicles" class="grid grid-cols-2 gap-2">
+          <input v-model="manualVehicle.maker" class="input" :placeholder="$t('sc10.makerPlaceholder')">
+          <input v-model="manualVehicle.model" class="input" :placeholder="$t('sc10.modelPlaceholder')">
+        </div>
+
+        <AyButton size="sm" class="self-start" @click="confirmBookVehicle">
+          {{ $t('sc10.continueBooking') }}
+        </AyButton>
+      </section>
+
+      <section v-else-if="bookStage === 'STORE'" class="card gap-2.5">
+        <p class="text-[13.5px] font-semibold">{{ $t('sc10.askStoreTitle') }}</p>
+        <p v-if="locating" class="text-muted text-[12px]">{{ $t('sc10.locating') }}</p>
+        <p v-else-if="locationDenied" class="text-muted text-[12px]">{{ $t('sc10.locationOff') }}</p>
+
+        <button
+          v-for="store in sortedStores"
+          :key="store.id"
+          type="button"
+          class="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left"
+          style="border-radius: 18px; background: var(--color-neutral-100)"
+          @click="pickStore(store)"
+        >
+          <span class="min-w-0 flex-1">
+            <span class="block text-[13.5px] font-semibold">{{ i18n(store.name) }}</span>
+            <span class="text-muted block truncate text-[11px]">{{ i18n(store.address) }}</span>
+          </span>
+          <span
+            v-if="storeDistances[store.id] !== undefined"
+            class="tag flex-none text-[11px]"
+            style="background: var(--color-accent-200)"
+          >
+            {{ $t('sc10.kmAway', { km: storeDistances[store.id].toFixed(1) }) }}
+          </span>
+        </button>
+      </section>
+
+      <section v-else-if="bookStage === 'SLOT'" class="card gap-2.5">
+        <p class="text-[13.5px] font-semibold">
+          {{ $t('sc10.askSlotTitle', { store: i18n(chosenStore?.name ?? null) }) }}
+        </p>
+        <p v-if="loadingSlots" class="text-muted text-[12px]">{{ $t('sc10.findingSlots') }}</p>
+        <p v-else-if="soonSlots.length === 0" class="text-muted text-[12px]">
+          {{ $t('sc10.noSlotSoon') }}
+        </p>
+
+        <button
+          v-for="(slot, index) in soonSlots"
+          :key="index"
+          type="button"
+          class="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left"
+          style="border-radius: 18px; background: var(--color-neutral-100)"
+          @click="pickSoonSlot(slot)"
+        >
+          <span class="min-w-0 flex-1">
+            <span class="block text-[13.5px] font-semibold">{{ dayLabel(slot.date) }}</span>
+            <span class="text-muted block text-[11px]">
+              {{ clock(slot.startTime) }} – {{ clock(slot.endTime) }}
+            </span>
+          </span>
+          <span class="text-muted flex-none text-[11px]">
+            {{ $t('sc10.slotsLeft', { n: slot.remaining }) }}
+          </span>
+        </button>
+
+        <!-- Khong gio nao vua y thi mo lich day du. -->
+        <AyButton variant="ghost" size="sm" class="self-start" @click="openFullCalendar">
+          {{ $t('sc10.pickAnotherTime') }}
+        </AyButton>
+      </section>
 
       <div v-else-if="analysisFailed" class="card gap-2">
         <p class="text-[14px] font-semibold">{{ $t('sc10.failTitle') }}</p>

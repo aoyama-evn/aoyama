@@ -1397,7 +1397,18 @@
     "videoSaved": "Video added",
     "voice": "Voice",
     "whichVehicle": "Which bike shall we look at?",
-    "yearPlaceholder": "2022"
+    "yearPlaceholder": "2022",
+    "askVehicleTitle": "Which bike are you bringing in?",
+    "continueBooking": "Continue",
+    "askStoreTitle": "Which shop would you like?",
+    "locating": "Finding the shop nearest to you…",
+    "locationOff": "Couldn't get your location — please pick a shop.",
+    "kmAway": "{km} km away",
+    "askSlotTitle": "Soonest openings at {store}:",
+    "findingSlots": "Looking for open slots…",
+    "noSlotSoon": "This shop is full for the next two weeks. Try the full calendar.",
+    "slotsLeft": "{n} left",
+    "pickAnotherTime": "Pick another time"
   },
   "sc12": {
     "addMore": "+ Add another service",

@@ -1397,7 +1397,18 @@
     "videoSaved": "Đã có video",
     "voice": "Giọng nói",
     "whichVehicle": "Bạn muốn kiểm tra xe nào ạ?",
-    "yearPlaceholder": "2022"
+    "yearPlaceholder": "2022",
+    "askVehicleTitle": "Bạn mang xe nào đến ạ?",
+    "continueBooking": "Tiếp tục",
+    "askStoreTitle": "Bạn muốn đến cửa hàng nào?",
+    "locating": "Đang tìm cửa hàng gần bạn nhất…",
+    "locationOff": "Chưa lấy được vị trí của bạn — bạn chọn cửa hàng giúp nhé.",
+    "kmAway": "cách {km} km",
+    "askSlotTitle": "Mấy khung giờ sớm nhất ở {store}:",
+    "findingSlots": "Đang tìm khung giờ còn trống…",
+    "noSlotSoon": "Hai tuần tới cửa hàng này đã kín. Bạn xem lịch đầy đủ nhé.",
+    "slotsLeft": "còn {n} chỗ",
+    "pickAnotherTime": "Chọn giờ khác"
   },
   "sc12": {
     "addMore": "+ Thêm hạng mục khác",

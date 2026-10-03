@@ -1397,7 +1397,18 @@
     "videoSaved": "動画あり",
     "voice": "音声",
     "whichVehicle": "どのバイクを見ましょうか？",
-    "yearPlaceholder": "2022"
+    "yearPlaceholder": "2022",
+    "askVehicleTitle": "どの車両をお持ちいただきますか？",
+    "continueBooking": "次へ",
+    "askStoreTitle": "どの店舗をご希望ですか？",
+    "locating": "お近くの店舗を探しています…",
+    "locationOff": "位置情報を取得できませんでした。店舗をお選びください。",
+    "kmAway": "約 {km} km",
+    "askSlotTitle": "{store} の直近の空き枠です:",
+    "findingSlots": "空き枠を探しています…",
+    "noSlotSoon": "今後2週間は満席です。カレンダーからお選びください。",
+    "slotsLeft": "残り {n} 枠",
+    "pickAnotherTime": "別の日時を選ぶ"
   },
   "sc12": {
     "addMore": "＋ サービスを追加",
