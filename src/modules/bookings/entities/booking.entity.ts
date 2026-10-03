@@ -1,6 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity } from 'src/common/entities/base.entity';
-import { BookingServiceType, BookingStatus } from 'src/common/enums';
+import { BookingServiceType, BookingStage, BookingStatus } from 'src/common/enums';
 import { Customer } from 'src/modules/customers/entities/customer.entity';
 import { Store } from 'src/modules/stores/entities/store.entity';
 import { Vehicle } from 'src/modules/vehicles/entities/vehicle.entity';
@@ -148,6 +148,17 @@ export class Booking extends BaseEntity {
    * khach thi day la luc duy nhat HO phai lam gi do, nen danh sach phai
    * noi ro va dan thang toi ban bao gia.
    */
+  /**
+   * Buoc thuc te cua lich hen, gop ca chang phieu dich vu — KHONG luu trong
+   * CSDL, tinh khi tra ve cho trang quan tri.
+   *
+   * `status` cua lich hen chi co sau gia tri, trong do RECEIVED om tron ca
+   * giai doan sua xe: nhin vao danh sach khong biet xe dang cho bao gia hay
+   * sap ban giao. Nhan vien can tam bay buoc nen tinh san o day, mot cho
+   * duy nhat, de moi man khong tu ghep moi kieu.
+   */
+  stage?: BookingStage;
+
   pendingQuotation?: {
     token: string;
     code: string;

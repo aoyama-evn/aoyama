@@ -38,3 +38,29 @@ export const BOOKING_OPEN_STATUSES = [
   BookingStatus.CONFIRMED,
   BookingStatus.RECEIVED,
 ];
+
+/**
+ * Buoc thuc te cua mot lich hen nhin tu trang quan tri — RD muc 5.1 va 5.2
+ * gop lai.
+ *
+ * BookingStatus chi co sau gia tri va RECEIVED om tron ca giai doan sua xe,
+ * nen nhin vao danh sach khong biet xe dang cho khach duyet bao gia hay
+ * sap ban giao. Tam buoc nay la thu nhan vien thuc su can doc.
+ *
+ * Chi dung de HIEN THI. May trang thai van la BookingStatus; khong co buoc
+ * nao o day duoc ghi xuong CSDL.
+ */
+export enum BookingStage {
+  PENDING = 'PENDING',
+  CONFIRMED = 'CONFIRMED',
+  RECEIVED = 'RECEIVED',
+  /** Da gui bao gia, dang cho khach tra loi. */
+  QUOTING = 'QUOTING',
+  /** Khach da dong y nhung tho chua dong vao hang muc nao. */
+  QUOTE_ACCEPTED = 'QUOTE_ACCEPTED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  DELIVERED = 'DELIVERED',
+  CANCELLED = 'CANCELLED',
+  NO_SHOW = 'NO_SHOW',
+}

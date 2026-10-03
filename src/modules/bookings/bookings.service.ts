@@ -11,6 +11,7 @@ import { PageDto } from 'src/common/dto';
 import {
   BOOKING_TRANSITIONS,
   BookingServiceType,
+  BookingStage,
   BookingStatus,
   DEFAULT_LANGUAGE,
   NotificationChannel,
@@ -231,6 +232,7 @@ export class BookingsService {
         message: 'Khong tim thay lich hen',
       });
     }
+    await this.attachStages([booking]);
     return booking;
   }
 
@@ -341,7 +343,52 @@ export class BookingsService {
     }
   }
 
-  /** SC-26 — WorkOrdersService hoi rieng mot lich hen khi dung tien do. */
+  /**
+   * Tinh buoc hien thi cho tung lich hen — mot cau truy van cho ca trang.
+   *
+   * Lich hen chua vao xuong thi buoc chinh la trang thai cua no. Vao xuong
+   * roi thi buoc nam o phieu dich vu va ban bao gia, nen phai hoi them —
+   * nhung hoi mot lan cho ca danh sach, khong phai moi dong mot lan.
+   */
+  private async attachStages(bookings: Booking[]): Promise<void> {
+    const ids = bookings.map((b) => b.id);
+    if (ids.length === 0) return;
+
+    const rows: {
+      bookingId: string;
+      woStatus: string | null;
+      quoteStatus: string | null;
+      started: boolean | null;
+    }[] = await this.dataSource.query(
+      `select b.id as "bookingId",
+              w.status as "woStatus",
+              q.status as "quoteStatus",
+              exists(
+                select 1 from work_order_items i
+                 where i.work_order_id = w.id and i.state <> 'PENDING'
+              ) as "started"
+         from bookings b
+         left join lateral (
+           select * from work_orders w2
+            where w2.booking_id = b.id
+            order by w2.created_at desc limit 1
+         ) w on true
+         left join lateral (
+           select * from quotations q2
+            where q2.work_order_id = w.id
+            order by q2.version desc limit 1
+         ) q on true
+        where b.id = ANY($1)`,
+      [ids],
+    );
+
+    const byBooking = new Map(rows.map((r) => [r.bookingId, r]));
+    for (const booking of bookings) {
+      booking.stage = resolveStage(booking.status, byBooking.get(booking.id));
+    }
+  }
+
+  /** SC-26 — WorkOrdersService hoi rieng mot lich hen khi dung tien do. */  /** SC-26 — WorkOrdersService hoi rieng mot lich hen khi dung tien do. */
   async findPendingQuotation(bookingId: string): Promise<Booking['pendingQuotation']> {
     const holder = { id: bookingId } as Booking;
     await this.attachPendingQuotations([holder]);
@@ -349,6 +396,7 @@ export class BookingsService {
   }
 
   /** SA-03 — danh sach lich hen phia quan tri. */
+  /** SA-03 — danh sach lich hen phia quan tri; kem buoc hien thi. */
   async search(query: BookingQueryDto): Promise<PageDto<Booking>> {
     const qb = this.baseQuery();
     this.applyFilters(qb, query);
@@ -363,6 +411,7 @@ export class BookingsService {
       .skip(query.skip)
       .take(query.limit)
       .getManyAndCount();
+    await this.attachStages(items);
     return new PageDto(items, total, query);
   }
 
@@ -833,5 +882,43 @@ function serviceTypeLabel(type: BookingServiceType): string {
       return 'Kiem tra';
     default:
       return 'Nhieu loai dich vu';
+  }
+}
+
+/**
+ * Lich hen dang o buoc nao, nhin tu trang quan tri.
+ *
+ * Huy va khong den la ket cuc rieng, khong di theo day chuyen. Chua vao
+ * xuong thi buoc chinh la trang thai cua lich. Vao roi thi doc tu phieu
+ * dich vu va ban bao gia.
+ */
+function resolveStage(
+  status: BookingStatus,
+  row?: { woStatus: string | null; quoteStatus: string | null; started: boolean | null },
+): BookingStage {
+  if (status === BookingStatus.CANCELLED) return BookingStage.CANCELLED;
+  if (status === BookingStatus.NO_SHOW) return BookingStage.NO_SHOW;
+  if (status === BookingStatus.PENDING) return BookingStage.PENDING;
+  if (status === BookingStatus.CONFIRMED) return BookingStage.CONFIRMED;
+
+  switch (row?.woStatus) {
+    case WorkOrderStatus.DELIVERED:
+      return BookingStage.DELIVERED;
+    case WorkOrderStatus.COMPLETED:
+      return BookingStage.COMPLETED;
+    case WorkOrderStatus.IN_PROGRESS:
+      /**
+       * Khach dong y bao gia la phieu nhay sang dang sua ngay (BR-33), nen
+       * neu chi nhin trang thai phieu thi khong bao gio thay buoc "da chot
+       * bao gia". Phan biet bang viec tho da dong vao hang muc nao chua.
+       */
+      return row.started ? BookingStage.IN_PROGRESS : BookingStage.QUOTE_ACCEPTED;
+    case WorkOrderStatus.QUOTED:
+      return row.quoteStatus === QuotationStatus.SENT
+        ? BookingStage.QUOTING
+        : BookingStage.RECEIVED;
+    default:
+      // RECEIVED, DIAGNOSING, phieu da huy, hoac chua co phieu nao.
+      return status === BookingStatus.DONE ? BookingStage.DELIVERED : BookingStage.RECEIVED;
   }
 }

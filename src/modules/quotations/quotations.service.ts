@@ -62,32 +62,70 @@ export class QuotationsService {
     const totals = computeTotals(dto.items, dto.discountAmount ?? 0, taxRate);
 
     return this.dataSource.transaction(async (manager) => {
-      if (latest && latest.status !== QuotationStatus.SUPERSEDED) {
-        latest.status = QuotationStatus.SUPERSEDED;
-        await manager.getRepository(Quotation).save(latest);
-      }
+      const repo = manager.getRepository(Quotation);
 
-      const version = (latest?.version ?? 0) + 1;
-      const quotation = manager.getRepository(Quotation).create({
-        code: `QT-${workOrder.code.replace('WO-', '')}-${String(version).padStart(2, '0')}`,
-        workOrderId,
-        customerId: workOrder.customerId,
-        version,
-        status: QuotationStatus.DRAFT,
-        publicToken: generatePublicToken(),
-        subtotal: totals.subtotal,
-        discountAmount: dto.discountAmount ?? 0,
-        taxRate,
-        taxAmount: totals.taxAmount,
-        totalAmount: totals.totalAmount,
-        validUntil: dto.validUntil ?? null,
-        depositAmount: dto.depositAmount ?? null,
-        depositDueAt: dto.depositDueAt ? new Date(dto.depositDueAt) : null,
-        note: dto.note ?? null,
-        aiSuggestion: dto.aiSuggestion ?? null,
-        createdById,
-      });
-      const saved = await manager.getRepository(Quotation).save(quotation);
+      /**
+       * Moi phieu dich vu chi co DUY NHAT mot ban bao gia.
+       *
+       * Khach yeu cau xem lai thi sua chinh ban do, khong de lai mot ban
+       * cu "da thay the" roi sinh ban moi. Quan trong nhat la giu nguyen
+       * publicToken: duong dan khach da nhan trong tin nhan van mo duoc va
+       * hien noi dung vua sua, khong bat ho doi tin nhan khac.
+       *
+       * `version` chay tiep nhu mot bo dem lan sua, de nhan vien biet ban
+       * nay da chinh may lan — nhung van chi co mot dong trong CSDL.
+       */
+      const saved = latest
+        ? await repo.save(
+            Object.assign(latest, {
+              version: latest.version + 1,
+              status: QuotationStatus.DRAFT,
+              subtotal: totals.subtotal,
+              discountAmount: dto.discountAmount ?? 0,
+              taxRate,
+              taxAmount: totals.taxAmount,
+              totalAmount: totals.totalAmount,
+              validUntil: dto.validUntil ?? null,
+              depositAmount: dto.depositAmount ?? null,
+              depositDueAt: dto.depositDueAt ? new Date(dto.depositDueAt) : null,
+              note: dto.note ?? null,
+              aiSuggestion: dto.aiSuggestion ?? null,
+              // Cau tra loi cu la tra loi cho noi dung cu — xoa di, khong
+              // de no treo tren ban da sua thanh thu khac.
+              sentAt: null,
+              respondedAt: null,
+              rejectReason: null,
+              customerComment: null,
+              revisionRequested: false,
+              respondedVia: null,
+              recordedById: null,
+            }),
+          )
+        : await repo.save(
+            repo.create({
+              // Mot phieu mot bao gia nen ma khong con duoi so ban.
+              code: `QT-${workOrder.code.replace('WO-', '')}`,
+              workOrderId,
+              customerId: workOrder.customerId,
+              version: 1,
+              status: QuotationStatus.DRAFT,
+              publicToken: generatePublicToken(),
+              subtotal: totals.subtotal,
+              discountAmount: dto.discountAmount ?? 0,
+              taxRate,
+              taxAmount: totals.taxAmount,
+              totalAmount: totals.totalAmount,
+              validUntil: dto.validUntil ?? null,
+              depositAmount: dto.depositAmount ?? null,
+              depositDueAt: dto.depositDueAt ? new Date(dto.depositDueAt) : null,
+              note: dto.note ?? null,
+              aiSuggestion: dto.aiSuggestion ?? null,
+              createdById,
+            }),
+          );
+
+      // Thay toan bo hang muc: man lap bao gia gui len trang thai cuoi cung.
+      await manager.getRepository(QuotationItem).delete({ quotationId: saved.id });
 
       await manager.getRepository(QuotationItem).save(
         dto.items.map((item, index) =>
