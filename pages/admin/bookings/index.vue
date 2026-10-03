@@ -67,6 +67,12 @@ const hasFilters = computed(() =>
   ),
 );
 
+/**
+ * Chip loc chay tren TRANG THAI that cua lich hen, con cot trang thai hien
+ * BUOC. Mot trang thai om nhieu buoc, nen chip phai dat ten theo nhom —
+ * goi la "Da tiep nhan" thi nguoi dung cho ra dung buoc do, ma ket qua
+ * lai gom ca dang bao gia, dang sua, da xong.
+ */
 const STATUS_KEYS = ['PENDING', 'CONFIRMED', 'RECEIVED', 'DONE', 'CANCELLED', 'NO_SHOW'];
 
 /** Dai "Dang loc" chi hien khi bo loc den tu duong dan, khong phai tu nguoi go. */
@@ -145,7 +151,7 @@ async function confirmSelected(): Promise<void> {
 
 const STATUS_OPTIONS = computed(() => [
   { value: '', label: t('common.all') },
-  ...STATUS_KEYS.map((value) => ({ value, label: t(`status.${value}`) })),
+  ...STATUS_KEYS.map((value) => ({ value, label: t(`bookingFilter.${value}`) })),
 ]);
 
 function reset(): void {
@@ -287,8 +293,13 @@ useHead({ title: () => `${t('sa03.title')} — AOYAMA Admin` });
       <template #cell-store="{ row }">
         {{ i18n(row.store?.name ?? null) }}
       </template>
+      <!--
+        Hien BUOC chu khong phai trang thai tho: "Da tiep nhan" om tron ca
+        giai doan sua xe, nhin vao danh sach khong biet xe dang cho khach
+        duyet bao gia hay sap ban giao.
+      -->
       <template #cell-status="{ row }">
-        <AyStatusTag :status="row.status" />
+        <AyStatusTag :status="(row.stage as string) ?? (row.status as string)" />
       </template>
       <!--
         Bam nut khong duoc mo chi tiet: @click.stop o the o, neu khong thi

@@ -132,3 +132,17 @@ export enum WorkItemState {
   IN_PROGRESS = 'IN_PROGRESS',
   DONE = 'DONE',
 }
+
+/** Buoc hien thi cua lich hen o trang quan tri — SA-03, gop ca chang phieu. */
+export enum BookingStage {
+  PENDING = 'PENDING',
+  CONFIRMED = 'CONFIRMED',
+  RECEIVED = 'RECEIVED',
+  QUOTING = 'QUOTING',
+  QUOTE_ACCEPTED = 'QUOTE_ACCEPTED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  DELIVERED = 'DELIVERED',
+  CANCELLED = 'CANCELLED',
+  NO_SHOW = 'NO_SHOW',
+}

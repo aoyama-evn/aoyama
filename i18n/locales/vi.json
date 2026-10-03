@@ -648,7 +648,7 @@
     "removeLine": "Xóa dòng",
     "requireDeposit": "Yêu cầu tiền cọc trước",
     "saveAndSend": "Lưu và gửi báo giá",
-    "saveDraft": "Lưu nháp",
+    "saveDraft": "Lưu tạm",
     "screenTitle": "Báo giá · {code}",
     "sendNow": "Gửi ngay cho khách sau khi lưu (SMS kèm đường dẫn xem báo giá)",
     "sent": "Đã lập và gửi báo giá",
@@ -1810,14 +1810,14 @@
   "status": {
     "ACCEPTED": "Đã đồng ý",
     "CANCELLED": "Đã hủy",
-    "COMPLETED": "Hoàn tất",
+    "COMPLETED": "Đã xong",
     "CONFIRMED": "Đã xác nhận",
     "DELIVERED": "Đã bàn giao",
     "DIAGNOSING": "Đang chẩn đoán",
     "DONE": "Hoàn tất",
     "DRAFT": "Nháp",
     "FAILED": "Gửi lỗi",
-    "IN_PROGRESS": "Đang thực hiện",
+    "IN_PROGRESS": "Đang tiến hành",
     "NO_SHOW": "Khách không đến",
     "PAID": "Đã thanh toán",
     "PARTIAL": "Thanh toán một phần",
@@ -1828,7 +1828,9 @@
     "REJECTED": "Đã từ chối",
     "SENT": "Đã gửi",
     "SUPERSEDED": "Đã thay thế",
-    "UNPAID": "Chưa thanh toán"
+    "UNPAID": "Chưa thanh toán",
+    "QUOTING": "Đang báo giá",
+    "QUOTE_ACCEPTED": "Đã chốt báo giá"
   },
   "stockType": {
     "ADJUST": "Điều chỉnh",
@@ -1940,5 +1942,13 @@
     "LINK": "khách tự xác nhận trên web",
     "COUNTER": "ghi tại quầy",
     "PHONE": "ghi qua điện thoại"
+  },
+  "bookingFilter": {
+    "PENDING": "Chờ xác nhận",
+    "CONFIRMED": "Đã xác nhận",
+    "RECEIVED": "Đang ở xưởng",
+    "DONE": "Đã bàn giao",
+    "CANCELLED": "Đã hủy",
+    "NO_SHOW": "Khách không đến"
   }
 }

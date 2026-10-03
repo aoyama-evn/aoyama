@@ -205,6 +205,8 @@ useHead({ title: () => `${t('sa05.headTitle', { code: booking.value?.code ?? '' 
           {{ clock(booking.slotStartTime) }}–{{ clock(booking.slotEndTime) }}
         </p>
         <p class="text-muted text-[12px]">{{ i18n(booking.store?.name ?? null) }}</p>
+        <!-- Buoc thuc te, gop ca chang phieu dich vu. -->
+        <AyStatusTag class="mt-1 self-start" :status="booking.stage ?? booking.status" />
       </div>
     </div>
 

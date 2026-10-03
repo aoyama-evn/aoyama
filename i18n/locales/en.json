@@ -1810,9 +1810,9 @@
   "status": {
     "ACCEPTED": "Accepted",
     "CANCELLED": "Cancelled",
-    "COMPLETED": "Completed",
+    "COMPLETED": "Work done",
     "CONFIRMED": "Confirmed",
-    "DELIVERED": "Delivered",
+    "DELIVERED": "Handed over",
     "DIAGNOSING": "Diagnosing",
     "DONE": "Completed",
     "DRAFT": "Draft",
@@ -1824,11 +1824,13 @@
     "PENDING": "Awaiting confirmation",
     "QUEUED": "Queued",
     "QUOTED": "Awaiting quote approval",
-    "RECEIVED": "Vehicle received",
+    "RECEIVED": "Checked in",
     "REJECTED": "Rejected",
     "SENT": "Sent",
     "SUPERSEDED": "Superseded",
-    "UNPAID": "Unpaid"
+    "UNPAID": "Unpaid",
+    "QUOTING": "Quotation sent",
+    "QUOTE_ACCEPTED": "Quotation accepted"
   },
   "stockType": {
     "ADJUST": "Adjustment",
@@ -1940,5 +1942,13 @@
     "LINK": "customer replied on the web",
     "COUNTER": "recorded at the counter",
     "PHONE": "recorded by phone"
+  },
+  "bookingFilter": {
+    "PENDING": "Awaiting confirmation",
+    "CONFIRMED": "Confirmed",
+    "RECEIVED": "In the shop",
+    "DONE": "Handed over",
+    "CANCELLED": "Cancelled",
+    "NO_SHOW": "No show"
   }
 }

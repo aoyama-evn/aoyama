@@ -648,7 +648,7 @@
     "removeLine": "行を削除",
     "requireDeposit": "前金をお願いする",
     "saveAndSend": "保存して送信",
-    "saveDraft": "下書きを保存",
+    "saveDraft": "一時保存",
     "screenTitle": "見積 · {code}",
     "sendNow": "保存後すぐお客様に送信する（見積のリンクをSMSで）",
     "sent": "お見積を作成し送信しました",
@@ -1810,7 +1810,7 @@
   "status": {
     "ACCEPTED": "承認済み",
     "CANCELLED": "キャンセル",
-    "COMPLETED": "完了",
+    "COMPLETED": "作業完了",
     "CONFIRMED": "確定",
     "DELIVERED": "引渡済み",
     "DIAGNOSING": "診断中",
@@ -1824,11 +1824,13 @@
     "PENDING": "確認待ち",
     "QUEUED": "送信待ち",
     "QUOTED": "見積承認待ち",
-    "RECEIVED": "受付済み",
+    "RECEIVED": "入庫済み",
     "REJECTED": "却下",
     "SENT": "送信済み",
     "SUPERSEDED": "差し替え済み",
-    "UNPAID": "未払い"
+    "UNPAID": "未払い",
+    "QUOTING": "見積提示中",
+    "QUOTE_ACCEPTED": "見積承認済み"
   },
   "stockType": {
     "ADJUST": "棚卸調整",
@@ -1940,5 +1942,13 @@
     "LINK": "お客様がWebで回答",
     "COUNTER": "店頭で記録",
     "PHONE": "電話で記録"
+  },
+  "bookingFilter": {
+    "PENDING": "承認待ち",
+    "CONFIRMED": "確定済み",
+    "RECEIVED": "入庫中",
+    "DONE": "引渡済み",
+    "CANCELLED": "キャンセル",
+    "NO_SHOW": "来店なし"
   }
 }

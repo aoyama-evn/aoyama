@@ -23,6 +23,12 @@ const intakePhotos = computed(() =>
   (progress.value?.photos ?? []).filter((photo) => photo.stage === 'INTAKE'),
 );
 
+/** Xe da vao giai doan sua chua? Truoc do danh sach hang muc chua co y nghia. */
+const workStarted = computed(() =>
+  ['IN_PROGRESS', 'COMPLETED', 'DELIVERED'].includes(progress.value?.status ?? '') &&
+  (progress.value?.items ?? []).length > 0,
+);
+
 const qrOpen = ref(false);
 const { saveQr } = useSaveQr();
 const { data: qr } = await useAsyncData(`progress-qr-${code}`, () =>
@@ -169,7 +175,12 @@ useHead({ title: () => t('sc26.headTitle', { code }) });
       </template>
 
       <template #after-IN_PROGRESS>
-        <ul v-if="(progress.items ?? []).length" class="mt-1.5 flex flex-col gap-1">
+        <!--
+          Chi ke hang muc khi xe that su da duoc dong vao. Hien som hon thi
+          ca danh sach deu "Cho lam" — khong noi them duoc gi, lai lam khach
+          tuong tho dang lam trong khi ho con chua duyet bao gia.
+        -->
+        <ul v-if="workStarted" class="mt-1.5 flex flex-col gap-1">
           <li
             v-for="(item, index) in progress.items ?? []"
             :key="index"

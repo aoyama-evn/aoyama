@@ -1,6 +1,7 @@
 import type {
   AdminRole,
   BookingServiceType,
+  BookingStage,
   BookingStatus,
   InventoryTxType,
   LanguageCode,
@@ -287,6 +288,8 @@ export interface Booking {
   statusHistories?: BookingStatusHistory[];
   /** Ban bao gia da gui va dang cho khach tra loi — SC-21, SC-26. */
   pendingQuotation?: PendingQuotation | null;
+  /** Buoc hien thi o trang quan tri, gop ca chang phieu dich vu — SA-03. */
+  stage?: BookingStage;
   createdAt: string;
 }
 

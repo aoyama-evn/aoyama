@@ -2,6 +2,7 @@
 import type {
   ApiError,
   Part,
+  Quotation,
   QuotationSuggestion,
   ServiceItem,
   WorkOrder,
@@ -53,29 +54,59 @@ if (!workOrder.value) {
   throw createError({ statusCode: 404, statusMessage: t('sa10.notFound') });
 }
 
-/** Khoi tao tu hang muc va phu tung da ghi o SA-11. */
-const lines = ref<Line[]>([
-  ...(workOrder.value.items ?? []).map<Line>((i) => ({
-    kind: 'LABOR',
-    name: i.name,
-    description: i.description ?? undefined,
-    unitPrice: i.unitPrice,
-    quantity: i.quantity,
-    isOptional: false,
-    suggestedByAi: i.suggestedByAi,
-    // Giu lai moi noi ve danh muc dich vu, neu khong bao gia chi con ten chu.
-    serviceId: i.serviceId,
-  })),
-  ...(workOrder.value.parts ?? []).map<Line>((p) => ({
-    kind: 'PART',
-    name: p.partName,
-    unitPrice: p.unitPrice,
-    quantity: p.quantity,
-    isOptional: false,
-    suggestedByAi: p.suggestedByAi,
-    partId: p.partId,
-  })),
-]);
+/**
+ * Ban bao gia dang co cua phieu nay — moi phieu chi co duy nhat mot ban.
+ *
+ * Khach yeu cau xem lai thi man nay phai mo ra dung nhung gi da gui di de
+ * nhan vien sua, chu khong phai mot to trang bat ho go lai tu dau.
+ */
+const { data: existing } = await useAsyncData(`wo-quote-existing-${id}`, () =>
+  api
+    .get<Quotation[]>(`/admin/work-orders/${id}/quotations`)
+    .then((list) => (Array.isArray(list) ? (list[0] ?? null) : null))
+    .catch(() => null),
+);
+
+/**
+ * Da co bao gia thi nap lai chinh no; chua co thi dung hang muc va phu
+ * tung da ghi o buoc chan doan lam diem khoi dau.
+ */
+const lines = ref<Line[]>(
+  existing.value
+    ? (existing.value.items ?? []).map<Line>((i) => ({
+        kind: (i.kind as Line['kind']) ?? 'LABOR',
+        name: i.name,
+        description: i.description ?? undefined,
+        unitPrice: i.unitPrice,
+        quantity: i.quantity,
+        isOptional: false,
+        suggestedByAi: i.suggestedByAi,
+        serviceId: i.serviceId,
+        partId: i.partId,
+      }))
+    : [
+        ...(workOrder.value.items ?? []).map<Line>((i) => ({
+          kind: 'LABOR',
+          name: i.name,
+          description: i.description ?? undefined,
+          unitPrice: i.unitPrice,
+          quantity: i.quantity,
+          isOptional: false,
+          suggestedByAi: i.suggestedByAi,
+          // Giu lai moi noi ve danh muc dich vu, neu khong bao gia chi con ten chu.
+          serviceId: i.serviceId,
+        })),
+        ...(workOrder.value.parts ?? []).map<Line>((p) => ({
+          kind: 'PART',
+          name: p.partName,
+          unitPrice: p.unitPrice,
+          quantity: p.quantity,
+          isOptional: false,
+          suggestedByAi: p.suggestedByAi,
+          partId: p.partId,
+        })),
+      ],
+);
 
 const discountAmount = ref(workOrder.value.discountAmount);
 /**
@@ -93,8 +124,12 @@ const note = ref('');
 const requireDeposit = ref(false);
 const depositAmount = ref(0);
 const depositDueAt = ref('');
-const saving = ref(false);
-const sendAfterSave = ref(true);
+/**
+ * Dang luu nao dang chay — de hai nut biet cai nao dang quay.
+ * Truoc day la mot o tick "gui ngay" roi mot nut doi chu theo, nhan vien
+ * phai doc lai nhan nut moi biet bam vao se gui hay khong.
+ */
+const savingMode = ref<'DRAFT' | 'SEND' | null>(null);
 const error = ref<ApiError | null>(null);
 
 /** Bao gia mac dinh con hieu luc 7 ngay. */
@@ -253,7 +288,7 @@ function addPart(part: Part): void {
 const subtotal = computed(() => lines.value.reduce((s, l) => s + l.unitPrice * l.quantity, 0));
 const totalAmount = computed(() => Math.max(0, subtotal.value - discountAmount.value));
 
-async function save(): Promise<void> {
+async function save(send: boolean): Promise<void> {
   if (lines.value.length === 0) {
     ui.warning(t('sa12.needLine'));
     return;
@@ -263,7 +298,7 @@ async function save(): Promise<void> {
     return;
   }
 
-  saving.value = true;
+  savingMode.value = send ? 'SEND' : 'DRAFT';
   error.value = null;
   try {
     const created = await api.post<{ id: string; code: string }>(
@@ -282,22 +317,22 @@ async function save(): Promise<void> {
       },
     );
 
-    if (sendAfterSave.value) {
+    if (send) {
       await api.put(`/admin/quotations/${created.id}/send`);
       ui.success(t('sa12.sent'), t('sa12.sentSub', { code: created.code }));
-    } else {
-      ui.success(t('sa12.draftSaved'), created.code);
+      await navigateTo(`/admin/work-orders/${id}/quote-confirm?quote=${created.id}`);
+      return;
     }
-    // Sang buoc chot bao gia; con la ban nhap thi ve man chi tiet phieu.
-    await navigateTo(
-      sendAfterSave.value
-        ? `/admin/work-orders/${id}/quote-confirm?quote=${created.id}`
-        : `/admin/work-orders/${id}`,
-    );
+
+    /**
+     * Luu tam thi o lai chinh man nay. Nhan vien bam luu tam la vi con dang
+     * soan do — day ho sang man khac roi bat quay lai la vo ich.
+     */
+    ui.success(t('sa12.draftSaved'), created.code);
   } catch (err) {
     error.value = normalizeError(err);
   } finally {
-    saving.value = false;
+    savingMode.value = null;
   }
 }
 
@@ -500,15 +535,28 @@ useHead({ title: () => `${t('sa12.headTitle')} — AOYAMA Admin` });
             <p class="text-muted mt-1.5 text-[12px]">{{ $t('sa12.taxExcluded') }}</p>
           </div>
 
-          <label class="flex items-start gap-2.5 text-[13.5px]">
-            <input v-model="sendAfterSave" type="checkbox" class="mt-1 h-4 w-4 accent-[var(--color-accent)]">
-            <span>{{ $t('sa12.sendNow') }}</span>
-          </label>
-
           <AyErrorNote :error="error" />
 
-          <AyButton block :loading="saving" @click="save">
-            {{ sendAfterSave ? $t('sa12.saveAndSend') : $t('sa12.saveDraft') }}
+          <!--
+            Hai nut thay cho o tick "gui ngay" cu: nhan vien nhin la biet
+            bam vao se gui hay chi luu lai, khong phai doc nhan nut roi suy.
+          -->
+          <AyButton
+            block
+            variant="secondary"
+            :loading="savingMode === 'DRAFT'"
+            :disabled="savingMode !== null"
+            @click="save(false)"
+          >
+            {{ $t('sa12.saveDraft') }}
+          </AyButton>
+          <AyButton
+            block
+            :loading="savingMode === 'SEND'"
+            :disabled="savingMode !== null"
+            @click="save(true)"
+          >
+            {{ $t('sa12.saveAndSend') }}
           </AyButton>
         </div>
       </section>
