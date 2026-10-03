@@ -354,17 +354,17 @@ export class QuotationsService {
       });
     }
 
-    // BR-33 — khach dong y thi phieu chuyen sang dang thuc hien.
-    if (dto.accept) {
-      const workOrder = await this.workOrders.findById(quotation.workOrderId);
-      if (workOrder.status === WorkOrderStatus.QUOTED) {
-        await this.workOrders.changeStatus(
-          workOrder.id,
-          WorkOrderStatus.IN_PROGRESS,
-          actorId ? { type: 'ADMIN', id: actorId } : { type: 'CUSTOMER', id: quotation.customerId },
-        );
-      }
-    }
+    /**
+     * Khach dong y KHONG tu dong bat dau sua.
+     *
+     * Truoc day phieu nhay thang sang "dang thuc hien" ngay luc khach bam
+     * dong y. Nhung dong y la viec cua khach, con bat tay vao sua la viec
+     * cua xuong: tho con phai xep viec, lay phu tung. Hai thu do roi lam
+     * mot thi buoc "da chot bao gia" khong bao gio xuat hien, va phieu
+     * hien "dang sua" trong khi chua ai dong vao xe.
+     *
+     * Nhan vien bam "Tien hanh" o SA-12c khi that su bat dau.
+     */
 
     return this.findById(quotation.id);
   }

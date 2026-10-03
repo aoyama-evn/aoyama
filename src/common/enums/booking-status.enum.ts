@@ -54,9 +54,11 @@ export enum BookingStage {
   PENDING = 'PENDING',
   CONFIRMED = 'CONFIRMED',
   RECEIVED = 'RECEIVED',
+  /** Ky thuat vien da ghi chan doan, chua gui bao gia. */
+  DIAGNOSED = 'DIAGNOSED',
   /** Da gui bao gia, dang cho khach tra loi. */
   QUOTING = 'QUOTING',
-  /** Khach da dong y nhung tho chua dong vao hang muc nao. */
+  /** Khach da dong y; xuong chua bam "Tien hanh". */
   QUOTE_ACCEPTED = 'QUOTE_ACCEPTED',
   IN_PROGRESS = 'IN_PROGRESS',
   COMPLETED = 'COMPLETED',

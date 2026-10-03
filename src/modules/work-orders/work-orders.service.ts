@@ -257,6 +257,20 @@ export class WorkOrdersService {
    * Ban thiet ke ve ca chang lich hen lan chang phieu dich vu chung mot cot,
    * nen tra ve ca hai phan cung the xe va so km luc tiep nhan.
    */
+  /** Gio khach bam dong y bao gia — null khi chua chot. */
+  private async quoteAcceptedAt(workOrderId?: string): Promise<string | null> {
+    if (!workOrderId) return null;
+    const [row] = await this.dataSource.query<{ respondedAt: Date | null }[]>(
+      `select responded_at as "respondedAt"
+         from quotations
+        where work_order_id = $1 and status = 'ACCEPTED'
+        order by responded_at desc nulls last
+        limit 1`,
+      [workOrderId],
+    );
+    return row?.respondedAt ? row.respondedAt.toISOString() : null;
+  }
+
   async getPublicProgress(bookingCode: string) {
     const booking = await this.bookings.findByCode(bookingCode);
     const workOrder = await this.findByBooking(booking.id);
@@ -278,6 +292,12 @@ export class WorkOrdersService {
        * mot cai ma QR chu khong phai bao gia.
        */
       pendingQuotation: await this.bookings.findPendingQuotation(booking.id),
+      /**
+       * Luc khach chot bao gia khong nam trong lich su trang thai phieu —
+       * no la viec cua ban bao gia. Nhung tren duong thoi gian cua khach
+       * day la mot moc rieng, nen tra ve de SC-26 danh dau duoc.
+       */
+      quoteAcceptedAt: await this.quoteAcceptedAt(workOrder?.id),
       vehicle: booking.vehicle
         ? {
             maker: booking.vehicle.maker,

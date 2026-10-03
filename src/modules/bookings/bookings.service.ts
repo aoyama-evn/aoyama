@@ -907,18 +907,21 @@ function resolveStage(
     case WorkOrderStatus.COMPLETED:
       return BookingStage.COMPLETED;
     case WorkOrderStatus.IN_PROGRESS:
-      /**
-       * Khach dong y bao gia la phieu nhay sang dang sua ngay (BR-33), nen
-       * neu chi nhin trang thai phieu thi khong bao gio thay buoc "da chot
-       * bao gia". Phan biet bang viec tho da dong vao hang muc nao chua.
-       */
-      return row.started ? BookingStage.IN_PROGRESS : BookingStage.QUOTE_ACCEPTED;
+      return BookingStage.IN_PROGRESS;
     case WorkOrderStatus.QUOTED:
+      /**
+       * Phieu o QUOTED om hai buoc khac nhau: dang cho khach tra loi, va
+       * khach da chot nhung xuong chua bam "Tien hanh". Phan biet bang
+       * trang thai cua chinh ban bao gia.
+       */
+      if (row.quoteStatus === QuotationStatus.ACCEPTED) return BookingStage.QUOTE_ACCEPTED;
       return row.quoteStatus === QuotationStatus.SENT
         ? BookingStage.QUOTING
-        : BookingStage.RECEIVED;
+        : BookingStage.DIAGNOSED;
+    case WorkOrderStatus.DIAGNOSING:
+      return BookingStage.DIAGNOSED;
     default:
-      // RECEIVED, DIAGNOSING, phieu da huy, hoac chua co phieu nao.
+      // RECEIVED, phieu da huy, hoac chua co phieu nao.
       return status === BookingStatus.DONE ? BookingStage.DELIVERED : BookingStage.RECEIVED;
   }
 }
