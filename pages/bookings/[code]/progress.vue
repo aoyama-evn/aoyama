@@ -18,6 +18,11 @@ const { data: progress, refresh } = await useAsyncData(`progress-${code}`, () =>
   api.get<PublicProgress>(`/bookings/${code}/progress`),
 );
 
+/** Anh chup luc tiep nhan — cac giai doan sau co anh rieng, khong tron vao. */
+const intakePhotos = computed(() =>
+  (progress.value?.photos ?? []).filter((photo) => photo.stage === 'INTAKE'),
+);
+
 const qrOpen = ref(false);
 const { saveQr } = useSaveQr();
 const { data: qr } = await useAsyncData(`progress-qr-${code}`, () =>
@@ -139,6 +144,47 @@ useHead({ title: () => t('sc26.headTitle', { code }) });
           </svg>
           {{ $t('sc26.showQr') }}
         </button>
+      </template>
+
+      <!--
+        Da qua buoc nao thi ke ro buoc do, chu khong chi danh dau mot cham
+        xanh. Khach khong o xuong nen day la tat ca nhung gi ho biet.
+      -->
+      <template #after-RECEIVED>
+        <div class="mt-1.5 flex flex-col gap-0.5 text-[11.5px]">
+          <span v-if="progress.intakeOdometer" class="text-muted">
+            {{ $t('sc26.intake', { km: number(progress.intakeOdometer) }) }}
+            <template v-if="fuelLabel"> · {{ fuelLabel }}</template>
+          </span>
+          <span v-if="progress.intakeAccessories" class="text-muted">
+            {{ $t('sc26.accessories', { list: progress.intakeAccessories }) }}
+          </span>
+          <span v-if="progress.customerSymptom" class="text-muted">
+            {{ $t('sc26.symptom', { text: progress.customerSymptom }) }}
+          </span>
+          <span v-if="intakePhotos.length" class="text-muted">
+            {{ $t('sc26.photoCount', { n: intakePhotos.length }) }}
+          </span>
+        </div>
+      </template>
+
+      <template #after-IN_PROGRESS>
+        <ul v-if="(progress.items ?? []).length" class="mt-1.5 flex flex-col gap-1">
+          <li
+            v-for="(item, index) in progress.items ?? []"
+            :key="index"
+            class="flex items-start gap-1.5 text-[12px]"
+          >
+            <!-- Dau hieu bang hinh, khong chi bang mau: NFR-UX-09. -->
+            <span class="flex-none" aria-hidden="true">
+              {{ item.state === 'DONE' ? '✓' : item.state === 'IN_PROGRESS' ? '▸' : '·' }}
+            </span>
+            <span :class="item.state === 'DONE' ? 'text-muted' : ''">
+              {{ item.name }}
+              <span class="text-muted">— {{ $t(`workItem.${item.state}`) }}</span>
+            </span>
+          </li>
+        </ul>
       </template>
 
       <template #after-QUOTED>

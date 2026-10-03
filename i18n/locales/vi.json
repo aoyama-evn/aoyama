@@ -571,7 +571,9 @@
     "summary2": "Hiện trạng khi tiếp nhận",
     "symptom": "Triệu chứng:",
     "title": "Phiếu dịch vụ",
-    "diagnosedBy": "Kỹ thuật viên {name}"
+    "diagnosedBy": "Kỹ thuật viên {name}",
+    "colItemState": "Tiến độ",
+    "itemStateFor": "Tiến độ hạng mục {name}"
   },
   "sa10b": {
     "backToBookings": "Về danh sách lịch hẹn",
@@ -1617,7 +1619,10 @@
     "showQr": "Xem mã QR",
     "title": "Theo dõi tiến độ",
     "viewQuote": "Xem báo giá →",
-    "yourVehicle": "Xe của bạn"
+    "yourVehicle": "Xe của bạn",
+    "accessories": "Đồ gửi kèm: {list}",
+    "symptom": "Bạn mô tả: {text}",
+    "photoCount": "{n} ảnh hiện trạng khi tiếp nhận"
   },
   "sc27": {
     "accept": "Đồng ý báo giá",
@@ -1893,5 +1898,10 @@
     "4": "Thứ năm",
     "5": "Thứ sáu",
     "6": "Thứ bảy"
+  },
+  "workItem": {
+    "PENDING": "Chờ làm",
+    "IN_PROGRESS": "Đang làm",
+    "DONE": "Đã xong"
   }
 }

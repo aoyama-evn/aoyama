@@ -20,6 +20,27 @@ const { i18n, money, dateTime, number } = useFormat();
 
 const id = route.params.id as string;
 
+/**
+ * Tien do tung hang muc — tho tick ngay tai day.
+ *
+ * Phan tram tien do cua ca phieu do may chu tinh lai theo so hang muc da
+ * xong, nen khong ai phai nho cap nhat con so do bang tay nua.
+ */
+const ITEM_STATES = ['PENDING', 'IN_PROGRESS', 'DONE'] as const;
+const savingItem = ref<string | null>(null);
+
+async function setItemState(itemId: string, state: string): Promise<void> {
+  savingItem.value = itemId;
+  try {
+    await api.put(`/admin/work-orders/${id}/items/${itemId}/state`, { state });
+    await refresh();
+  } catch (error) {
+    ui.error(normalizeError(error).message);
+  } finally {
+    savingItem.value = null;
+  }
+}
+
 const { data: workOrder, refresh } = await useAsyncData(`wo-${id}`, () =>
   api.get<WorkOrder>(`/admin/work-orders/${id}`),
 );
@@ -245,6 +266,7 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
             <tr>
               <th>{{ $t('sa10.colItem') }}</th>
               <th>{{ $t('sa10.colTime') }}</th>
+              <th class="w-32">{{ $t('sa10.colItemState') }}</th>
               <th class="text-right">{{ $t('sa10.colUnit') }}</th>
             </tr>
           </thead>
@@ -257,6 +279,24 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
               </td>
               <td class="whitespace-nowrap">
                 {{ item.laborMinutes ? $t('common.minutes', { n: item.laborMinutes }) : '—' }}
+              </td>
+              <!--
+                Tho tick o day la khach thay ngay o man theo doi tien do, va
+                phan tram tien do cua phieu tu tinh lai. Truoc day co is_done
+                nam trong CSDL nhung khong man nao dat duoc.
+              -->
+              <td>
+                <select
+                  class="input h-8 min-h-0 py-0 text-[12px]"
+                  :value="item.state"
+                  :disabled="savingItem === item.id"
+                  :aria-label="$t('sa10.itemStateFor', { name: item.name })"
+                  @change="setItemState(item.id, ($event.target as HTMLSelectElement).value)"
+                >
+                  <option v-for="s in ITEM_STATES" :key="s" :value="s">
+                    {{ $t(`workItem.${s}`) }}
+                  </option>
+                </select>
               </td>
               <td class="text-right">{{ money(item.unitPrice * item.quantity) }}</td>
             </tr>

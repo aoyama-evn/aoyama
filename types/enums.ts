@@ -125,3 +125,10 @@ export const WorkDifficulty = {
   HARD: 'HARD',
 } as const;
 export type WorkDifficulty = (typeof WorkDifficulty)[keyof typeof WorkDifficulty];
+
+/** Tien do tung hang muc cong viec — SA-10, SC-26. */
+export enum WorkItemState {
+  PENDING = 'PENDING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  DONE = 'DONE',
+}

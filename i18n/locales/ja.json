@@ -571,7 +571,9 @@
     "summary2": "受付時の状態",
     "symptom": "症状：",
     "title": "作業票",
-    "diagnosedBy": "整備士 {name}"
+    "diagnosedBy": "整備士 {name}",
+    "colItemState": "進捗",
+    "itemStateFor": "{name} の進捗"
   },
   "sa10b": {
     "backToBookings": "予約一覧へ戻る",
@@ -1617,7 +1619,10 @@
     "showQr": "QRコードを見る",
     "title": "進捗を見る",
     "viewQuote": "見積を見る →",
-    "yourVehicle": "お客様のバイク"
+    "yourVehicle": "お客様のバイク",
+    "accessories": "お預かり品: {list}",
+    "symptom": "お客様のご申告: {text}",
+    "photoCount": "入庫時の写真 {n} 枚"
   },
   "sc27": {
     "accept": "見積に同意する",
@@ -1893,5 +1898,10 @@
     "4": "木曜日",
     "5": "金曜日",
     "6": "土曜日"
+  },
+  "workItem": {
+    "PENDING": "未着手",
+    "IN_PROGRESS": "作業中",
+    "DONE": "完了"
   }
 }

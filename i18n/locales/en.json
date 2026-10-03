@@ -571,7 +571,9 @@
     "summary2": "Condition at intake",
     "symptom": "Symptom:",
     "title": "Work order",
-    "diagnosedBy": "Technician {name}"
+    "diagnosedBy": "Technician {name}",
+    "colItemState": "Progress",
+    "itemStateFor": "Progress for {name}"
   },
   "sa10b": {
     "backToBookings": "Back to the booking list",
@@ -1617,7 +1619,10 @@
     "showQr": "Show QR code",
     "title": "Service progress",
     "viewQuote": "View the quote →",
-    "yourVehicle": "Your bike"
+    "yourVehicle": "Your bike",
+    "accessories": "Items left with us: {list}",
+    "symptom": "You described: {text}",
+    "photoCount": "{n} photo(s) taken at intake"
   },
   "sc27": {
     "accept": "Accept the quotation",
@@ -1893,5 +1898,10 @@
     "4": "Thursday",
     "5": "Friday",
     "6": "Saturday"
+  },
+  "workItem": {
+    "PENDING": "Not started",
+    "IN_PROGRESS": "In progress",
+    "DONE": "Done"
   }
 }

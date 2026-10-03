@@ -7,7 +7,7 @@ import type {
   ServiceItem,
   WorkOrder,
 } from '~/types/models';
-import { WorkDifficulty } from '~/types/enums';
+import { WorkDifficulty, WorkItemState } from '~/types/enums';
 
 /**
  * SA-10a Chan doan va bao gia (SM-2026-001 goi la SA-11) —
@@ -27,7 +27,8 @@ interface ItemRow {
   quantity: number;
   laborMinutes?: number | null;
   suggestedByAi?: boolean;
-  isDone?: boolean;
+  /** Tien do hang muc — man nay khong sua, chi giu de khong ghi de. */
+  state?: WorkItemState;
 }
 
 interface PartRow {
@@ -106,7 +107,7 @@ const items = ref<ItemRow[]>(
     quantity: i.quantity,
     laborMinutes: i.laborMinutes,
     suggestedByAi: i.suggestedByAi,
-    isDone: i.isDone,
+    state: i.state,
   })),
 );
 const parts = ref<PartRow[]>(

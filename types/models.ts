@@ -12,6 +12,7 @@ import type {
   ServiceType,
   UserRole,
   VehicleFuelType,
+  WorkItemState,
   WorkDifficulty,
   WorkOrderStatus,
 } from './enums';
@@ -343,7 +344,8 @@ export interface WorkOrderItem {
   quantity: number;
   laborMinutes: number | null;
   suggestedByAi: boolean;
-  isDone: boolean;
+  /** Cho / Dang lam / Xong — SC-26 hien cho khach theo doi. */
+  state: WorkItemState;
   sortOrder: number;
 }
 
@@ -440,6 +442,11 @@ export interface PublicProgress {
   /** Muc nhien lieu theo phan tu binh: 0..4. */
   intakeFuelLevel?: number | null;
   totalAmount?: number;
+  /** Hien sau khi xe da duoc tiep nhan. */
+  intakeAccessories?: string | null;
+  customerSymptom?: string | null;
+  /** Tung hang muc cong viec kem tien do — chi ten, khong kem gia. */
+  items?: { name: string; state: WorkItemState }[];
   progressPercent?: number;
   progressNote?: string | null;
   estimatedCompletionAt?: string | null;
