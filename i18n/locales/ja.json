@@ -1658,7 +1658,8 @@
     "rejectLead": "理由をお知らせいただくと対応が早くなります。未入力でも送信できます。",
     "rejectPlaceholder": "例：想定より高い、項目を減らしたい…",
     "askRevision": "見積の見直しを依頼",
-    "revisionSent": "見直し依頼を送信しました"
+    "revisionSent": "見直し依頼を送信しました",
+    "taxExcluded": "表示価格は税抜です。消費税はお支払い時に加算されます。"
   },
   "sc28": {
     "accept": "同意する",

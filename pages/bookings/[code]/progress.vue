@@ -188,8 +188,17 @@ useHead({ title: () => t('sc26.headTitle', { code }) });
       </template>
 
       <template #after-QUOTED>
-        <span v-if="progress.totalAmount" class="text-muted text-[11.5px]">
-          {{ $t('sc26.awaitingYou', { amount: money(progress.totalAmount) }) }}
+        <!--
+          Lay tong cua chinh ban bao gia, khong phai tong cua phieu dich vu.
+          Hai con so nay khac nhau: bao gia niem yet gia chua thue, con phieu
+          da cong 10% thue vao. Khach dang duoc hoi co dong y BAN BAO GIA
+          khong, nen phai thay dung con so trong ban do.
+        -->
+        <span
+          v-if="progress.pendingQuotation?.totalAmount"
+          class="text-muted text-[11.5px]"
+        >
+          {{ $t('sc26.awaitingYou', { amount: money(progress.pendingQuotation.totalAmount) }) }}
         </span>
         <!--
           Dan thang toi ban bao gia. Truoc day nut nay tro ve man chi tiet

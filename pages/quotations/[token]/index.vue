@@ -106,7 +106,12 @@ useHead({ title: () => t('sc27.title', { code: quotation.value?.code ?? '' }) })
       <div v-if="quotation.discountAmount" class="flex justify-between" style="color: var(--color-success)">
         <span>{{ $t('money.discount') }}</span><span>− {{ money(quotation.discountAmount) }}</span>
       </div>
-      <div class="flex justify-between">
+      <!--
+        Bao gia niem yet gia chua thue nen khong co dong thue. Nhung ban cu
+        lap truoc khi doi cach tinh thi van con thue that — giau dong do di
+        se lam cac con so khong cong lai ra tong, nen chi an khi bang khong.
+      -->
+      <div v-if="quotation.taxAmount > 0" class="flex justify-between">
         <span class="text-muted">{{ $t('money.taxRate', { rate: quotation.taxRate }) }}</span><span>{{ money(quotation.taxAmount) }}</span>
       </div>
       <div
@@ -116,6 +121,9 @@ useHead({ title: () => t('sc27.title', { code: quotation.value?.code ?? '' }) })
         <strong>{{ $t('money.total') }}</strong>
         <span class="font-heading text-[22px]">{{ money(quotation.totalAmount) }}</span>
       </div>
+      <p v-if="!quotation.taxAmount" class="text-muted mt-0.5 text-[11.5px] leading-[1.45]">
+        {{ $t('sc27.taxExcluded') }}
+      </p>
     </div>
 
     <p

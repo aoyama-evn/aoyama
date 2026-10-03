@@ -1658,7 +1658,8 @@
     "rejectLead": "Cho cửa hàng biết lý do để được hỗ trợ nhanh hơn. Bỏ trống cũng được.",
     "rejectPlaceholder": "VD: giá cao hơn dự kiến, muốn bỏ bớt hạng mục…",
     "askRevision": "Yêu cầu xem lại báo giá",
-    "revisionSent": "Đã gửi yêu cầu xem lại"
+    "revisionSent": "Đã gửi yêu cầu xem lại",
+    "taxExcluded": "Giá chưa bao gồm thuế. Thuế sẽ được cộng khi thanh toán."
   },
   "sc28": {
     "accept": "Đồng ý",
