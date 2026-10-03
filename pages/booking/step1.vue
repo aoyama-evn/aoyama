@@ -18,15 +18,53 @@ const { i18n, money, number } = useFormat();
 
 const analysing = ref(false);
 
-const { data: myVehicles } = await useAsyncData(
-  'book-vehicles',
-  () => (auth.isCustomer ? api.get<Vehicle[]>('/account/vehicles') : Promise.resolve([])),
-  { watch: [() => auth.isCustomer] },
-);
+/**
+ * Danh sach xe trong ho so, nap o phia trinh duyet.
+ *
+ * Truoc day dung useAsyncData: lan dung trang dau tien chay tren may chu,
+ * luc do chua co the dang nhap nen tra ve rong, va ket qua rong do duoc
+ * giu lai khi trang song day. Thanh ra khach da dang nhap van thay muc
+ * "Chon xe cua ban" trong khong. Nap trong onMounted nhu buoc 3 van lam.
+ */
+const myVehicles = ref<Vehicle[]>([]);
 
-onMounted(() => {
+async function loadMyVehicles(): Promise<void> {
+  if (!auth.isCustomer) {
+    myVehicles.value = [];
+    return;
+  }
+  myVehicles.value = await api.get<Vehicle[]>('/account/vehicles').catch(() => []);
+}
+
+/**
+ * Chon san chiec xe dau tien trong ho so.
+ *
+ * Buoc 3 tu lay chiec dau neu khach chua chon, nen khong chon san o day
+ * thi khach di qua buoc 1 ma khong dong gi, roi den buoc 3 lai thay mot
+ * chiec xe minh chua he chon. Hai man phai noi cung mot thu.
+ *
+ * Phai chay SAU booking.restore(): ham do nap lai ban nhap tu phien truoc
+ * va ghi de ca o xe, nen chon truoc do thi bi xoa mat.
+ */
+function preselectVehicle(): void {
+  const list = myVehicles.value;
+  if (!booking.vehicle.vehicleId && list.length > 0) pickVehicle(list[0]);
+}
+
+onMounted(async () => {
   booking.restore();
+  await loadMyVehicles();
+  preselectVehicle();
 });
+
+// Dang nhap ngay tren man nay thi nap lai danh sach xe.
+watch(
+  () => auth.isCustomer,
+  async () => {
+    await loadMyVehicles();
+    preselectVehicle();
+  },
+);
 
 /** Luong AI khi khach den tu SC-10 hoac tu bam nut phan tich o day. */
 const aiFlow = computed(() => Boolean(booking.aiDiagnosisId) || booking.symptomPhotoUrls.length > 0);
@@ -65,7 +103,7 @@ function pickVehicle(item: Vehicle): void {
 const vehicleDialogOpen = ref(false);
 
 function onVehicleSaved(saved: Vehicle): void {
-  myVehicles.value = [...(myVehicles.value ?? []), saved];
+  myVehicles.value = [...myVehicles.value, saved];
   pickVehicle(saved);
   vehicleDialogOpen.value = false;
 }
@@ -146,7 +184,7 @@ useHead({ title: () => `${t('sc01.bookCta')} — 1` });
     <section v-if="auth.isCustomer" class="flex flex-col gap-2.5">
       <h5>{{ $t('sc12.pickVehicle') }}</h5>
       <label
-        v-for="item in myVehicles ?? []"
+        v-for="item in myVehicles"
         :key="item.id"
         class="radio gap-[11px] px-3.5 py-3"
         style="border-radius: 20px"

@@ -1457,7 +1457,9 @@
     "resend": "Resend code",
     "sendCode": "Send code",
     "vehicleTitle": "Vehicle details",
-    "verifyLogin": "Verify & log in"
+    "verifyLogin": "Verify & log in",
+    "changeVehicle": "Change",
+    "noVehicleYet": "No vehicle on your profile yet. Add one to continue."
   },
   "sc15": {
     "cancel": "Cancel booking",

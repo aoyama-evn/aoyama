@@ -1457,7 +1457,9 @@
     "resend": "Gửi lại mã",
     "sendCode": "Gửi mã",
     "vehicleTitle": "Thông tin xe · Vehicle",
-    "verifyLogin": "Xác thực & đăng nhập"
+    "verifyLogin": "Xác thực & đăng nhập",
+    "changeVehicle": "Đổi xe",
+    "noVehicleYet": "Hồ sơ của bạn chưa có xe nào. Thêm xe để tiếp tục."
   },
   "sc15": {
     "cancel": "Hủy đặt lịch",

@@ -1457,7 +1457,9 @@
     "resend": "コードを再送",
     "sendCode": "コードを送信",
     "vehicleTitle": "バイク情報 · Vehicle",
-    "verifyLogin": "認証してログイン"
+    "verifyLogin": "認証してログイン",
+    "changeVehicle": "変更",
+    "noVehicleYet": "登録された車両がありません。車両を追加してください。"
   },
   "sc15": {
     "cancel": "予約をやめる",

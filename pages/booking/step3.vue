@@ -100,6 +100,11 @@ async function verifyOtp(): Promise<void> {
   }
 }
 
+/** Xe khach da chon o buoc 1 — buoc nay chi nhac lai cho ho xac nhan. */
+const chosenVehicle = computed(
+  () => myVehicles.value.find((v) => v.id === booking.vehicle.vehicleId) ?? null,
+);
+
 function pickVehicle(vehicle: Vehicle): void {
   booking.setVehicle(vehicle);
 }
@@ -373,48 +378,45 @@ useHead({ title: () => `${t('sc01.bookCta')} — 3` });
         </div>
       </div>
 
-      <label
-        v-for="item in myVehicles"
-        :key="item.id"
-        class="radio gap-[11px] px-3.5 py-3"
-        style="border-radius: 20px"
-        :style="
-          booking.vehicle.vehicleId === item.id
-            ? 'background: var(--color-surface)'
-            : 'background: var(--color-neutral-100)'
-        "
+      <!--
+        Chi nhac lai xe da chon o buoc 1, khong cho chon lai.
+        Truoc day buoc nay bay nguyen danh sach xe mot lan nua, khach vua
+        chon xong o buoc 1 lai thay y het nhu vay va khong hieu minh da
+        chon sai cho nao. Muon doi thi quay ve buoc 1 — mot duong duy nhat.
+      -->
+      <div
+        v-if="chosenVehicle"
+        class="flex items-center gap-2.5 px-3.5 py-3"
+        style="background: var(--color-neutral-100); border-radius: 20px"
       >
-        <input
-          type="radio"
-          name="mybike"
-          :checked="booking.vehicle.vehicleId === item.id"
-          @change="pickVehicle(item)"
+        <div class="min-w-0 flex-1 leading-[1.35]">
+          <p class="text-muted text-[11px]">{{ $t('sc14.vehicleTitle') }}</p>
+          <p class="text-[14px] font-semibold">
+            {{ chosenVehicle.maker }} {{ chosenVehicle.model }}
+          </p>
+          <p class="text-muted truncate text-[11.5px]">{{ vehicleLine(chosenVehicle) }}</p>
+        </div>
+        <NuxtLink to="/booking/step1" class="btn btn-ghost flex-none text-[12.5px]">
+          {{ $t('sc14.changeVehicle') }}
+        </NuxtLink>
+      </div>
+
+      <!-- Thanh vien chua co chiec xe nao thi van phai them duoc tai day. -->
+      <template v-else>
+        <p class="text-muted text-[12.5px]">{{ $t('sc14.noVehicleYet') }}</p>
+        <button
+          type="button"
+          class="btn btn-secondary self-start text-[12.5px]"
+          @click="vehicleDialogOpen = true"
+        >
+          {{ $t('sc12.addVehicle') }}
+        </button>
+        <AyVehicleDialog
+          :open="vehicleDialogOpen"
+          @saved="onVehicleSaved"
+          @close="vehicleDialogOpen = false"
         />
-        <span class="dot" />
-        <span class="min-w-0 flex-1">
-          <span
-            class="block text-[14px]"
-            :class="booking.vehicle.vehicleId === item.id ? 'font-semibold' : ''"
-          >
-            {{ item.maker }} {{ item.model }}
-          </span>
-          <span class="text-muted block truncate text-[11.5px]">{{ vehicleLine(item) }}</span>
-        </span>
-      </label>
-
-      <button
-        type="button"
-        class="btn btn-secondary self-start text-[12.5px]"
-        @click="vehicleDialogOpen = true"
-      >
-        {{ $t('sc12.addVehicle') }}
-      </button>
-
-      <AyVehicleDialog
-        :open="vehicleDialogOpen"
-        @saved="onVehicleSaved"
-        @close="vehicleDialogOpen = false"
-      />
+      </template>
 
       <AyField for="odo" :label="$t('sc14.odometer')" :hint="$t('sc14.odometerHint')">
         <input
