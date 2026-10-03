@@ -86,6 +86,27 @@ export class Quotation extends BaseEntity {
   @Column({ name: 'reject_reason', type: 'text', nullable: true })
   rejectReason!: string | null;
 
+  /**
+   * Khach bam "Yeu cau xem lai" chu khong phai "Tu choi" (SC-27).
+   *
+   * Ca hai deu dua ban bao gia ve REJECTED, nhung viec cua hang phai lam
+   * thi nguoc nhau: tu choi la khach thoi khong sua, con xem lai la khach
+   * doi mot ban bao gia khac. Khong tach ra thi nhan vien doc rejectReason
+   * roi tu doan.
+   */
+  @Column({ name: 'revision_requested', default: false })
+  revisionRequested!: boolean;
+
+  /**
+   * Ma lich hen — KHONG luu trong CSDL, chi gan khi tra ve qua duong dan
+   * cong khai de man SC-27 co duong quay ve theo doi tien do.
+   *
+   * Tra ve dung mot chuoi ma thay vi nap ca quan he booking: duong dan nay
+   * khong can dang nhap, ma ban ghi lich hen con chua so dien thoai, email
+   * va ghi chu noi bo cua cua hang.
+   */
+  bookingCode?: string | null;
+
   /** Hang muc khach chon rieng khi dong y mot phan. */
   @Column({ name: 'customer_comment', type: 'text', nullable: true })
   customerComment!: string | null;

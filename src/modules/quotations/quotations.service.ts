@@ -143,6 +143,16 @@ export class QuotationsService {
         message: 'Bao gia chua duoc gui',
       });
     }
+
+    // Chi lay ma lich hen cho nut quay lai, khong keo theo ca ban ghi.
+    const [row] = await this.dataSource.query<{ code: string }[]>(
+      `select b.code from bookings b
+         join work_orders w on w.booking_id = b.id
+        where w.id = $1`,
+      [quotation.workOrderId],
+    );
+    quotation.bookingCode = row?.code ?? null;
+
     return quotation;
   }
 
@@ -248,6 +258,9 @@ export class QuotationsService {
       } else {
         quotation.status = QuotationStatus.REJECTED;
         quotation.rejectReason = dto.reason ?? null;
+        // Tu choi han va xin bao gia lai deu ve REJECTED, nhung viec cua
+        // hang phai lam thi nguoc nhau — giu lai de nhan vien khong phai doan.
+        quotation.revisionRequested = dto.requestRevision ?? false;
       }
 
       quotation.respondedAt = new Date();

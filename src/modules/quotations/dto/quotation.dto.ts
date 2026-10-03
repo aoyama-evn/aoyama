@@ -89,6 +89,13 @@ export class RespondQuotationDto {
 
   @IsOptional() @IsString() reason?: string;
   @IsOptional() @IsString() comment?: string;
+
+  @ApiPropertyOptional({
+    description: 'Khach muon mot ban bao gia khac chu khong phai thoi han — SC-27',
+  })
+  @IsOptional()
+  @IsBoolean()
+  requestRevision?: boolean;
 }
 
 export class QuotationQueryDto extends PaginationQueryDto {
