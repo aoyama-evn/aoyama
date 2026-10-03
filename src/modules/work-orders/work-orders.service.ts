@@ -184,7 +184,14 @@ export class WorkOrdersService {
   async findByBooking(bookingId: string): Promise<WorkOrder | null> {
     return this.repo.findOne({
       where: { bookingId },
-      relations: { items: true, parts: true, photos: true, statusHistories: true },
+      // diagnosedBy: SC-26 ke ten ky thuat vien da kham xe duoi moc chan doan.
+      relations: {
+        items: true,
+        parts: true,
+        photos: true,
+        statusHistories: true,
+        diagnosedBy: true,
+      },
     });
   }
 
@@ -324,6 +331,17 @@ export class WorkOrdersService {
        */
       intakeAccessories: workOrder.intakeAccessories,
       customerSymptom: workOrder.customerSymptom,
+      /**
+       * Ket qua chan doan va nguoi da kham xe.
+       *
+       * Chi tra ve TEN ky thuat vien, khong phai ca ban ghi tai khoan:
+       * day la duong dan cong khai, khach khong can biet ten dang nhap
+       * hay so dien thoai noi bo cua nhan vien.
+       */
+      diagnosedByName: workOrder.diagnosedBy?.fullName ?? null,
+      diagnosedAt: workOrder.diagnosedAt,
+      diagnosisNote: workOrder.diagnosisNote,
+      diagnosisCause: workOrder.diagnosisCause,
       // Chi ten va tien do — gia nam o ban bao gia, khong nhac lai o day.
       items: (workOrder.items ?? [])
         .slice()
