@@ -689,7 +689,9 @@
     "send": "Gửi cho khách",
     "sent": "Đã gửi báo giá cho khách",
     "sentAt": "Ngày gửi",
-    "title": "Báo giá"
+    "title": "Báo giá",
+    "customerWants": "Khách mong muốn",
+    "wantsRevision": "Xem lại báo giá"
   },
   "sa14": {
     "amount": "Số tiền thực thu",
@@ -1624,7 +1626,13 @@
     "storeNote": "Ghi chú của cửa hàng: “{note}”",
     "title": "Báo giá {code}",
     "validUntil": "Hiệu lực đến {date}.",
-    "version": "phiên bản {n}"
+    "version": "phiên bản {n}",
+    "backToProgress": "Theo dõi tiến độ",
+    "rejectTitle": "Chưa đồng ý báo giá này?",
+    "rejectLead": "Cho cửa hàng biết lý do để được hỗ trợ nhanh hơn. Bỏ trống cũng được.",
+    "rejectPlaceholder": "VD: giá cao hơn dự kiến, muốn bỏ bớt hạng mục…",
+    "askRevision": "Yêu cầu xem lại báo giá",
+    "revisionSent": "Đã gửi yêu cầu xem lại"
   },
   "sc28": {
     "accept": "Đồng ý",

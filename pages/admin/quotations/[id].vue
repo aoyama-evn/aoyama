@@ -120,6 +120,14 @@ useHead({ title: () => `${t('sa13.detailTitle', { code: quotation.value?.code ??
         <div class="flex justify-between">
           <span class="text-muted">{{ $t('sa12.validUntil') }}</span><span>{{ date(quotation.validUntil) || '—' }}</span>
         </div>
+        <!--
+          Tu choi han va xin bao gia lai deu ve "Da tu choi", nhung viec phai
+          lam thi nguoc nhau: mot ben la thoi, mot ben la lap lai ban khac.
+        -->
+        <div v-if="quotation.revisionRequested" class="flex justify-between">
+          <span class="text-muted">{{ $t('sa13.customerWants') }}</span>
+          <strong style="color: var(--color-accent-800)">{{ $t('sa13.wantsRevision') }}</strong>
+        </div>
         <div v-if="quotation.rejectReason">
           <span class="text-muted">{{ $t('sa13.rejectReason') }}</span>
           <p>{{ quotation.rejectReason }}</p>

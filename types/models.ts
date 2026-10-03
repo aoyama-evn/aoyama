@@ -476,7 +476,11 @@ export interface Quotation {
   sentAt: string | null;
   respondedAt: string | null;
   rejectReason: string | null;
+  /** Khach bam "Yeu cau xem lai" chu khong phai "Tu choi" — SC-27. */
+  revisionRequested?: boolean;
   customerComment: string | null;
+  /** Chi co o duong dan cong khai, de SC-27 co nut quay ve tien do. */
+  bookingCode?: string | null;
   items: QuotationItem[];
   createdAt: string;
 }

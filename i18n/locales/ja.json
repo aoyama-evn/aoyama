@@ -689,7 +689,9 @@
     "send": "お客様へ送信",
     "sent": "お見積をお客様へ送信しました",
     "sentAt": "送信日時",
-    "title": "お見積"
+    "title": "お見積",
+    "customerWants": "お客様のご希望",
+    "wantsRevision": "見積の見直し"
   },
   "sa14": {
     "amount": "お預かり金額",
@@ -1624,7 +1626,13 @@
     "storeNote": "店舗からのメモ：「{note}」",
     "title": "見積 {code}",
     "validUntil": "有効期限 {date}。",
-    "version": "第{n}版"
+    "version": "第{n}版",
+    "backToProgress": "進捗を確認",
+    "rejectTitle": "この見積にご同意いただけませんか？",
+    "rejectLead": "理由をお知らせいただくと対応が早くなります。未入力でも送信できます。",
+    "rejectPlaceholder": "例：想定より高い、項目を減らしたい…",
+    "askRevision": "見積の見直しを依頼",
+    "revisionSent": "見直し依頼を送信しました"
   },
   "sc28": {
     "accept": "同意する",

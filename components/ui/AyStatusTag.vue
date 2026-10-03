@@ -54,7 +54,8 @@ const toneClass = computed(() => TONE_CLASS[TONES[props.status] ?? 'neutral']);
 </script>
 
 <template>
-  <span class="tag" :class="toneClass">
+  <!-- whitespace-nowrap: nhan trang thai chi vai chu, vo lam hai dong thi xau. -->
+  <span class="tag whitespace-nowrap" :class="toneClass">
     <span
       class="h-1.5 w-1.5 rounded-full bg-current opacity-70"
       aria-hidden="true"

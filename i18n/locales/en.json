@@ -689,7 +689,9 @@
     "send": "Send to the customer",
     "sent": "Quotation sent to the customer",
     "sentAt": "Sent at",
-    "title": "Quotations"
+    "title": "Quotations",
+    "customerWants": "Customer wants",
+    "wantsRevision": "A revised quotation"
   },
   "sa14": {
     "amount": "Amount received",
@@ -1624,7 +1626,13 @@
     "storeNote": "Note from the store: “{note}”",
     "title": "Quotation {code}",
     "validUntil": "Valid until {date}.",
-    "version": "version {n}"
+    "version": "version {n}",
+    "backToProgress": "Track progress",
+    "rejectTitle": "Not happy with this quotation?",
+    "rejectLead": "Telling the shop why helps them respond faster. You can leave it blank.",
+    "rejectPlaceholder": "e.g. higher than expected, want to drop some items…",
+    "askRevision": "Ask for a revised quotation",
+    "revisionSent": "Revision request sent"
   },
   "sc28": {
     "accept": "Accept",

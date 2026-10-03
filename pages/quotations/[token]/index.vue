@@ -8,7 +8,7 @@ const { t } = useI18n();
 const { money, date } = useFormat();
 
 const token = route.params.token as string;
-const { data: quotation } = await useAsyncData(`quotation-${token}`, () =>
+const { data: quotation, refresh } = await useAsyncData(`quotation-${token}`, () =>
   api.get<Quotation>(`/quotations/${token}`),
 );
 if (!quotation.value) {
@@ -23,6 +23,13 @@ const laborTotal = computed(() =>
 );
 const partsTotal = computed(() => parts.value.reduce((s, i) => s + i.unitPrice * i.quantity, 0));
 
+const rejectOpen = ref(false);
+
+async function onResponded(): Promise<void> {
+  rejectOpen.value = false;
+  await refresh();
+}
+
 const canRespond = computed(() => quotation.value?.status === 'SENT');
 const expired = computed(() =>
   Boolean(
@@ -35,14 +42,28 @@ useHead({ title: () => t('sc27.title', { code: quotation.value?.code ?? '' }) })
 
 <template>
   <div v-if="quotation" class="flex flex-col gap-3.5 pb-4">
-    <div class="flex items-center justify-between gap-2">
-      <div>
+    <!--
+      Nut quay lai dua ve dung cho khach vua di ra: man theo doi tien do.
+      Khong co ma lich hen (bao gia mo tu duong dan trong tin nhan) thi ve
+      danh sach lich hen cua khach.
+    -->
+    <NuxtLink
+      :to="quotation.bookingCode ? `/bookings/${quotation.bookingCode}/progress` : '/account/bookings'"
+      class="btn btn-ghost self-start text-[13px]"
+      style="min-height: 38px; padding-inline: 10px; margin: 0"
+    >
+      ← {{ $t('sc27.backToProgress') }}
+    </NuxtLink>
+
+    <div class="flex items-start justify-between gap-2">
+      <div class="min-w-0">
         <div class="text-[11px] text-muted">{{ $t('sc27.kicker') }}</div>
         <div class="font-heading text-[18px]">
           {{ quotation.code }} · {{ $t('sc27.version', { n: quotation.version }) }}
         </div>
       </div>
-      <AyStatusTag :status="quotation.status" />
+      <!-- flex-none: nhan bi bop lai thi chu "Da gui" vo lam hai dong. -->
+      <AyStatusTag :status="quotation.status" class="flex-none" />
     </div>
 
     <div class="flex flex-col gap-2">
@@ -114,13 +135,14 @@ useHead({ title: () => t('sc27.title', { code: quotation.value?.code ?? '' }) })
       <NuxtLink :to="`/quotations/${token}/respond?accept=1`" class="btn btn-primary btn-cta">
         {{ $t('sc27.accept') }}
       </NuxtLink>
-      <NuxtLink
-        :to="`/quotations/${token}/respond`"
+      <button
+        type="button"
         class="btn btn-secondary btn-block"
         style="min-height: 44px"
+        @click="rejectOpen = true"
       >
         {{ $t('sc27.reject') }}
-      </NuxtLink>
+      </button>
     </template>
 
     <div
@@ -145,5 +167,16 @@ useHead({ title: () => t('sc27.title', { code: quotation.value?.code ?? '' }) })
         {{ ' ' }}{{ $t('sc27.rejectedWhy', { reason: quotation.rejectReason }) }}
       </template>
     </div>
+
+    <!--
+      Dat cuoi cung: xen vao giua chuoi v-if/v-else-if o tren se lam dut
+      mach va Vue bao "v-else-if khong co v-if lien ke".
+    -->
+    <AyQuoteRejectDialog
+      :open="rejectOpen"
+      :token="token"
+      @done="onResponded"
+      @close="rejectOpen = false"
+    />
   </div>
 </template>
