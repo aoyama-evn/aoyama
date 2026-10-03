@@ -9,6 +9,7 @@ import {
   ServiceType,
   WORK_ORDER_TRANSITIONS,
   WorkOrderStatus,
+  WorkItemState,
 } from 'src/common/enums';
 import { applyTax, formatAppDateTime, sumLines, yen } from 'src/common/utils';
 import { Actor, BookingsService } from 'src/modules/bookings/bookings.service';
@@ -296,6 +297,18 @@ export class WorkOrdersService {
       intakeOdometer: workOrder.intakeOdometer,
       intakeFuelLevel: workOrder.intakeFuelLevel,
       totalAmount: workOrder.totalAmount,
+      /**
+       * Khach theo doi den dau thi thay chi tiet den do: da tiep nhan thi
+       * biet xe vao xuong trong tinh trang nao, dang sua thi biet tho dang
+       * lam hang muc nao va con lai nhung gi.
+       */
+      intakeAccessories: workOrder.intakeAccessories,
+      customerSymptom: workOrder.customerSymptom,
+      // Chi ten va tien do — gia nam o ban bao gia, khong nhac lai o day.
+      items: (workOrder.items ?? [])
+        .slice()
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map((i) => ({ name: i.name, state: i.state })),
       progressPercent: workOrder.progressPercent,
       progressNote: workOrder.progressNote,
       estimatedCompletionAt: workOrder.estimatedCompletionAt,
@@ -344,7 +357,7 @@ export class WorkOrdersService {
               quantity: item.quantity,
               laborMinutes: item.laborMinutes ?? null,
               suggestedByAi: item.suggestedByAi ?? false,
-              isDone: item.isDone ?? false,
+              state: item.state ?? WorkItemState.PENDING,
               sortOrder: item.sortOrder ?? index,
             })),
           );
@@ -407,6 +420,37 @@ export class WorkOrdersService {
 
     await this.recalculateAmounts(id);
     return this.findById(id);
+  }
+
+  /**
+   * SA-10 — tho danh dau mot hang muc dang lam hay da xong.
+   *
+   * Tien do phan tram cua ca phieu tu tinh lai theo so hang muc da xong,
+   * de khach o SC-26 thay thanh tien do nhuc nhich that chu khong phai mot
+   * con so nhan vien phai nho cap nhat bang tay.
+   */
+  async updateItemState(
+    workOrderId: string,
+    itemId: string,
+    state: WorkItemState,
+  ): Promise<WorkOrder> {
+    const repo = this.dataSource.getRepository(WorkOrderItem);
+    const item = await repo.findOne({ where: { id: itemId, workOrderId } });
+    if (!item) {
+      throw new NotFoundException({
+        code: 'WORK_ORDER_ITEM_NOT_FOUND',
+        message: 'Khong tim thay hang muc trong phieu nay',
+      });
+    }
+
+    await repo.update(itemId, { state });
+
+    const all = await repo.find({ where: { workOrderId } });
+    const done = all.filter((x) => x.state === WorkItemState.DONE).length;
+    const percent = all.length === 0 ? 0 : Math.round((done / all.length) * 100);
+    await this.repo.update(workOrderId, { progressPercent: percent });
+
+    return this.findById(workOrderId);
   }
 
   /** BR-38 — tinh lai tong tien tu hang muc va phu tung hien co. */

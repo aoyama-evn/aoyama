@@ -37,6 +37,19 @@ export enum PaymentMethod {
   OTHER = 'OTHER',
 }
 
+/**
+ * Tien do tung hang muc cong viec — SC-26 hien cho khach theo doi.
+ *
+ * Truoc day chi co co isDone (xong / chua xong), ma "chua xong" thi khach
+ * khong biet tho da bat tay vao lam chua. Ba muc nay dung nhu bang trang
+ * thai trong ban dac ta: Cho / Dang lam / Xong.
+ */
+export enum WorkItemState {
+  PENDING = 'PENDING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  DONE = 'DONE',
+}
+
 /** Muc do kho cua phieu — SA-10a cho ky thuat vien chon. */
 export enum WorkDifficulty {
   EASY = 'EASY',

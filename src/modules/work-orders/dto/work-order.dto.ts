@@ -15,7 +15,12 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { PaginationQueryDto } from 'src/common/dto';
-import { PaymentStatus, WorkDifficulty, WorkOrderStatus } from 'src/common/enums';
+import {
+  PaymentStatus,
+  WorkDifficulty,
+  WorkItemState,
+  WorkOrderStatus,
+} from 'src/common/enums';
 
 /** SA-08 — tiep nhan xe. BR-18 doi hoi so km va anh hien trang. */
 export class IntakeDto {
@@ -69,7 +74,7 @@ export class WorkOrderItemDto {
   @IsInt() @Min(1) quantity!: number;
   @IsOptional() @IsInt() @Min(0) laborMinutes?: number;
   @IsOptional() @IsBoolean() suggestedByAi?: boolean;
-  @IsOptional() @IsBoolean() isDone?: boolean;
+  @IsOptional() @IsEnum(WorkItemState) state?: WorkItemState;
   @IsOptional() @IsInt() sortOrder?: number;
 }
 
@@ -155,6 +160,11 @@ export class WorkOrderQueryDto extends PaginationQueryDto {
   @IsOptional()
   @IsIn(['IN_SHOP', 'AWAITING_PAYMENT', 'AWAITING_QUOTE'])
   bucket?: 'IN_SHOP' | 'AWAITING_PAYMENT' | 'AWAITING_QUOTE';
+}
+
+/** SA-10 — tho danh dau tung hang muc dang lam hay da xong. */
+export class UpdateItemStateDto {
+  @IsEnum(WorkItemState) state!: WorkItemState;
 }
 
 export class UpdateAmountsDto {

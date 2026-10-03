@@ -1,4 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { WorkItemState } from 'src/common/enums';
 import { BaseEntity } from 'src/common/entities/base.entity';
 import { Service } from 'src/modules/catalog/entities/service.entity';
 import { WorkOrder } from './work-order.entity';
@@ -42,8 +43,12 @@ export class WorkOrderItem extends BaseEntity {
   @Column({ name: 'suggested_by_ai', default: false })
   suggestedByAi!: boolean;
 
-  @Column({ name: 'is_done', default: false })
-  isDone!: boolean;
+  /**
+   * Thay cho co is_done cu. Hai trang thai khong du: khach nhin "chua xong"
+   * thi khong biet xe minh da duoc dong vao chua.
+   */
+  @Column({ type: 'enum', enum: WorkItemState, default: WorkItemState.PENDING })
+  state!: WorkItemState;
 
   @Column({ name: 'sort_order', type: 'int', default: 0 })
   sortOrder!: number;

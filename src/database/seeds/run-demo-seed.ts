@@ -6,6 +6,7 @@ import {
   QuotationStatus,
   ServiceType,
   WorkDifficulty,
+  WorkItemState,
   WorkOrderStatus,
 } from 'src/common/enums';
 import { formatBookingCode, generatePublicToken } from 'src/common/utils';
@@ -672,7 +673,7 @@ async function seedWorkOrders(
         quantity: 1,
         laborMinutes: service.durationMinutes,
         suggestedByAi: index === 1,
-        isDone: delivered,
+        state: delivered ? WorkItemState.DONE : WorkItemState.PENDING,
         sortOrder: index,
       })),
     );

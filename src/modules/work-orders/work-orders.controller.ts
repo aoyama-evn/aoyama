@@ -20,6 +20,7 @@ import {
   ChangeWorkOrderStatusDto,
   IntakeDto,
   UpdateAmountsDto,
+  UpdateItemStateDto,
   UpdateDiagnosisDto,
   UpdateProgressDto,
   WorkOrderQueryDto,
@@ -130,6 +131,16 @@ export class AdminWorkOrdersController {
   @ApiOperation({ summary: 'SA-10 — cap nhat tien do hien cho khach o SC-26' })
   updateProgress(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateProgressDto) {
     return this.service.updateProgress(id, dto);
+  }
+
+  @Put(':id/items/:itemId/state')
+  @ApiOperation({ summary: 'SA-10 — danh dau hang muc dang lam hay da xong' })
+  updateItemState(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('itemId', ParseUUIDPipe) itemId: string,
+    @Body() dto: UpdateItemStateDto,
+  ) {
+    return this.service.updateItemState(id, itemId, dto.state);
   }
 
   @Put(':id/status')
