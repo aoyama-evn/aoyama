@@ -137,10 +137,10 @@ export class AiService {
       ...session.messages,
       {
         role: 'assistant',
-        text:
-          session.findings.length > 0
-            ? 'Duoi day la cac kha nang phu hop nhat voi mo ta cua ban.'
-            : 'Chua du thong tin de chan doan. Ban co the mo ta them hoac dat lich de ky thuat vien kiem tra truc tiep.',
+        text: assistantLine(
+          session.findings.length > 0 ? 'FOUND' : 'UNSURE',
+          session.language,
+        ),
         at: new Date().toISOString(),
       },
     ];
@@ -336,4 +336,31 @@ export class AiService {
     }
     return expired.length;
   }
+}
+
+
+/**
+ * Cau tro ly noi truoc khi liet ke ket qua.
+ *
+ * Truoc day viet cung mot chuoi tieng Viet khong dau, nen khach Nhat mo
+ * chatbox ra doc duoc mot dong "Duoi day la cac kha nang..." giua giao dien
+ * tieng Nhat. Ba thu tieng de ngay day vi chi la hai cau — khong dang mot
+ * mau thong bao rieng trong CSDL.
+ */
+const ASSISTANT_LINES: Record<'FOUND' | 'UNSURE', Record<string, string>> = {
+  FOUND: {
+    ja: 'ご説明にもっとも近い可能性は次のとおりです。',
+    en: 'Here are the possibilities that best match what you described.',
+    vi: 'Dưới đây là các khả năng phù hợp nhất với mô tả của bạn.',
+  },
+  UNSURE: {
+    ja: '診断に必要な情報が足りません。もう少し詳しくご入力いただくか、ご予約のうえ整備士が直接確認いたします。',
+    en: 'Not enough to go on yet. Tell me a bit more, or book a visit and a technician will take a look.',
+    vi: 'Chưa đủ thông tin để chẩn đoán. Bạn mô tả thêm giúp mình, hoặc đặt lịch để kỹ thuật viên kiểm tra trực tiếp.',
+  },
+};
+
+function assistantLine(kind: 'FOUND' | 'UNSURE', language: string): string {
+  const table = ASSISTANT_LINES[kind];
+  return table[language] ?? table[DEFAULT_LANGUAGE] ?? table.ja;
 }
