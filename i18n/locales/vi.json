@@ -1655,7 +1655,10 @@
     "yourVehicle": "Xe của bạn",
     "accessories": "Đồ gửi kèm: {list}",
     "symptom": "Bạn mô tả: {text}",
-    "photoCount": "{n} ảnh hiện trạng khi tiếp nhận"
+    "photoCount": "{n} ảnh hiện trạng khi tiếp nhận",
+    "finding": "Ghi nhận: {text}",
+    "cause": "Nguyên nhân: {text}",
+    "diagnosedBy": "Kỹ thuật viên {name} đã kiểm tra"
   },
   "sc27": {
     "accept": "Đồng ý báo giá",

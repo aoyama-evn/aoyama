@@ -1655,7 +1655,10 @@
     "yourVehicle": "お客様のバイク",
     "accessories": "お預かり品: {list}",
     "symptom": "お客様のご申告: {text}",
-    "photoCount": "入庫時の写真 {n} 枚"
+    "photoCount": "入庫時の写真 {n} 枚",
+    "finding": "確認内容: {text}",
+    "cause": "原因: {text}",
+    "diagnosedBy": "整備士 {name} が点検しました"
   },
   "sc27": {
     "accept": "見積に同意する",

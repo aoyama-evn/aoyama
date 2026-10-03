@@ -450,6 +450,11 @@ export interface PublicProgress {
   /** Hien sau khi xe da duoc tiep nhan. */
   intakeAccessories?: string | null;
   customerSymptom?: string | null;
+  /** Ket qua chan doan va ten ky thuat vien da kham xe. */
+  diagnosedByName?: string | null;
+  diagnosedAt?: string | null;
+  diagnosisNote?: string | null;
+  diagnosisCause?: string | null;
   /** Tung hang muc cong viec kem tien do — chi ten, khong kem gia. */
   items?: { name: string; state: WorkItemState }[];
   progressPercent?: number;

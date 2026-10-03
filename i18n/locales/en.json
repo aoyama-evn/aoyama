@@ -1655,7 +1655,10 @@
     "yourVehicle": "Your bike",
     "accessories": "Items left with us: {list}",
     "symptom": "You described: {text}",
-    "photoCount": "{n} photo(s) taken at intake"
+    "photoCount": "{n} photo(s) taken at intake",
+    "finding": "Found: {text}",
+    "cause": "Cause: {text}",
+    "diagnosedBy": "Checked by technician {name}"
   },
   "sc27": {
     "accept": "Accept the quotation",

@@ -188,6 +188,24 @@ useHead({ title: () => t('sc26.headTitle', { code }) });
         </div>
       </template>
 
+      <!--
+        Khach khong o xuong nen moc "da chan doan" ma trong khong thi ho
+        van khong biet tho tim ra gi. Ke ket luan va ten nguoi da kham xe.
+      -->
+      <template #after-DIAGNOSING>
+        <div class="mt-1.5 flex flex-col gap-0.5 text-[11.5px]">
+          <span v-if="progress.diagnosisNote" class="text-muted">
+            {{ $t('sc26.finding', { text: progress.diagnosisNote }) }}
+          </span>
+          <span v-if="progress.diagnosisCause" class="text-muted">
+            {{ $t('sc26.cause', { text: progress.diagnosisCause }) }}
+          </span>
+          <span v-if="progress.diagnosedByName" class="text-muted">
+            {{ $t('sc26.diagnosedBy', { name: progress.diagnosedByName }) }}
+          </span>
+        </div>
+      </template>
+
       <template #after-IN_PROGRESS>
         <!--
           Chi ke hang muc khi xe that su da duoc dong vao. Hien som hon thi
