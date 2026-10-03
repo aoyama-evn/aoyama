@@ -15,8 +15,12 @@ import { BookingStatusHistory } from './booking-status-history.entity';
 @Index(['storeId', 'scheduledAt'])
 @Index(['status', 'scheduledAt'])
 export class Booking extends BaseEntity {
+  /**
+   * Dang B-YYYYMMDDHHMMXXX (17 ky tu). De 24 de con cho neu sau nay doi
+   * tien to hoac them so thu tu, khong phai sua lai cot.
+   */
   @Index({ unique: true })
-  @Column({ length: 16 })
+  @Column({ length: 24 })
   code!: string;
 
   @Column({ name: 'customer_id', type: 'uuid' })

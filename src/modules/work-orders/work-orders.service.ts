@@ -636,7 +636,11 @@ export class WorkOrdersService {
         this.logger.warn(`Khong dong duoc lich hen cua phieu ${workOrder.code}`);
       }
     }
-    await this.notifyCustomer(workOrder, NotificationEvent.VEHICLE_DELIVERED);
+    /**
+     * Khong gui SMS luc ban giao: khach dang dung ngay tai quay nhan xe, mot
+     * tin nhan bao "xe da ban giao" khong them thong tin gi. Moc nay van
+     * duoc ghi vao tien trinh de khach tra cuu lai sau.
+     */
   }
 
   /**
@@ -670,6 +674,10 @@ export class WorkOrdersService {
     try {
       const customer = await this.customers.findById(workOrder.customerId);
       if (!customer.notifySms) return;
+
+      const bookingCode = workOrder.bookingId
+        ? ((await this.bookings.findById(workOrder.bookingId)).code ?? '')
+        : '';
       await this.notifications.send({
         event,
         channel: NotificationChannel.SMS,
@@ -678,10 +686,19 @@ export class WorkOrdersService {
         customerId: customer.id,
         variables: {
           customerName: customer.name,
+          bookingCode,
+          vehicle: workOrder.vehicle
+            ? [workOrder.vehicle.maker, workOrder.vehicle.model, workOrder.vehicle.plateNumber]
+                .filter(Boolean)
+                .join(' ')
+            : '—',
           workOrderCode: workOrder.code,
           totalAmount: workOrder.totalAmount.toLocaleString('ja-JP'),
           completedAt: formatAppDateTime(workOrder.completedAt ?? new Date()),
         },
+        // Phieu khong gan lich hen (khach vang lai den thang) thi khong co
+        // trang tien do cong khai de dan toi.
+        linkPath: bookingCode ? `/bookings/${bookingCode}/progress` : undefined,
         relatedType: 'WorkOrder',
         relatedId: workOrder.id,
       });

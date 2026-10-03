@@ -8,7 +8,7 @@ import {
   WorkDifficulty,
   WorkOrderStatus,
 } from 'src/common/enums';
-import { generateBookingCode, generatePublicToken } from 'src/common/utils';
+import { formatBookingCode, generatePublicToken } from 'src/common/utils';
 import { AdminUser } from 'src/modules/admin-users/entities/admin-user.entity';
 import { AiDiagnosis } from 'src/modules/ai/entities/ai-diagnosis.entity';
 import { Booking } from 'src/modules/bookings/entities/booking.entity';
@@ -381,6 +381,8 @@ async function seedBookings(
   const historyRepo = ds.getRepository(BookingStatusHistory);
 
   const bookings: Booking[] = [];
+  /** So thu tu lich hen theo tung khach — dung de dung ma B-YYYYMMDDHHMMXXX. */
+  const seqByCustomer = new Map<string, number>();
 
   for (const plan of bookingPlans()) {
     const customer = ctx.customers[plan.customerIndex];
@@ -405,9 +407,16 @@ async function seedBookings(
           : BookingServiceType.MAINTENANCE;
 
     const confirmed = plan.status !== BookingStatus.PENDING;
+
+    // Lich duoc "gui" ba ngay truoc gio hen — ma mang dung moc do.
+    const submittedAt = new Date(scheduledAt.getTime() - 3 * 86_400_000);
+    const seq = seqByCustomer.get(customer.id) ?? 0;
+    seqByCustomer.set(customer.id, seq + 1);
+    const bookingCode = formatBookingCode(submittedAt, seq);
+
     const booking = await bookingRepo.save(
       bookingRepo.create({
-        code: generateBookingCode(),
+        code: bookingCode,
         customerId: customer.id,
         vehicleId: vehicle?.id ?? null,
         storeId: store.id,
@@ -438,7 +447,7 @@ async function seedBookings(
             ? new Date(scheduledAt.getTime() - 26 * 3_600_000)
             : null,
         cancelReason: plan.status === BookingStatus.CANCELLED ? 'Khách bận đột xuất' : null,
-        createdAt: new Date(scheduledAt.getTime() - 3 * 86_400_000),
+        createdAt: submittedAt,
       }),
     );
 

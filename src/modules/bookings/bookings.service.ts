@@ -20,7 +20,7 @@ import {
 } from 'src/common/enums';
 import {
   formatAppDateTime,
-  generateBookingCode,
+  formatBookingCode,
   hoursBetween,
   normalizePhone,
   zonedDateTimeToUtc,
@@ -28,6 +28,7 @@ import {
 import { pickI18n } from 'src/common/types';
 import { CatalogService } from 'src/modules/catalog/catalog.service';
 import { CustomersService } from 'src/modules/customers/customers.service';
+import { AdminNotificationsService } from 'src/modules/notifications/admin-notifications.service';
 import { NotificationsService } from 'src/modules/notifications/notifications.service';
 import { StoresService } from 'src/modules/stores/stores.service';
 import { SettingsService, SETTING_KEYS } from 'src/modules/system/settings.service';
@@ -66,6 +67,7 @@ export class BookingsService {
     private readonly stores: StoresService,
     private readonly catalog: CatalogService,
     private readonly notifications: NotificationsService,
+    private readonly adminFeed: AdminNotificationsService,
     private readonly settings: SettingsService,
     private readonly qr: QrService,
   ) {}
@@ -107,9 +109,28 @@ export class BookingsService {
     const vehicleId = await this.resolveVehicle(dto, customer.id);
     const serviceLines = await this.buildServiceLines(dto.serviceIds, dto.storeId, vehicleId);
 
+    const submittedAt = new Date();
+
     const booking = await this.dataSource.transaction(async (manager) => {
-      const entity = manager.getRepository(Booking).create({
-        code: generateBookingCode(),
+      /**
+       * So thu tu la "lich thu may cua khach nay", nen dem ca lich da huy —
+       * khong thi huy mot lich la ma cua lich tiep theo trung voi ma cu.
+       *
+       * Dem trong cung giao dich voi luc ghi, va neu van dung ma (hai thiet
+       * bi cung bam gui trong mot phut) thi nhich so thu tu len cho den khi
+       * trong. Vong lap co chan tren de khong bao gio quay mai.
+       */
+      const bookingRepo = manager.getRepository(Booking);
+      const taken = await bookingRepo.count({ where: { customerId: customer.id } });
+
+      let code = formatBookingCode(submittedAt, taken);
+      for (let bump = 1; bump <= 50; bump += 1) {
+        if ((await bookingRepo.count({ where: { code } })) === 0) break;
+        code = formatBookingCode(submittedAt, taken + bump);
+      }
+
+      const entity = bookingRepo.create({
+        code,
         customerId: customer.id,
         vehicleId,
         storeId: dto.storeId,
@@ -159,9 +180,23 @@ export class BookingsService {
     // den khi cua hang xac nhan.
     await this.qr.issueToken(booking);
 
-    // FR-BOOK-10 — SMS xac nhan da nhan yeu cau, kem ma lich hen.
-    await this.notify(booking, NotificationEvent.BOOKING_CREATED, {
-      storeName: pickI18n(store.name, customer.language),
+    /**
+     * Dat lich thanh cong la viec cua CUA HANG, khong phai cua khach.
+     *
+     * Khach vua bam xong va dang nhin thang vao man "dat lich thanh cong",
+     * nhan them mot tin nhan ke lai dieu ho vua lam la thua. Nguoi can biet
+     * la nhan vien: co lich moi cho xac nhan.
+     */
+    await this.adminFeed.push({
+      event: NotificationEvent.BOOKING_CREATED,
+      title: `Lich hen moi ${booking.code}`,
+      // Ngon ngu cua hang, khong phai cua khach: day la tin noi bo.
+      body: `${booking.contactName} · ${formatAppDateTime(booking.scheduledAt)} · ${pickI18n(
+        store.name,
+        DEFAULT_LANGUAGE,
+      )}`,
+      link: `/admin/bookings/${booking.id}`,
+      storeId: booking.storeId,
     });
 
     return this.findById(booking.id);
@@ -732,13 +767,25 @@ export class BookingsService {
   ): Promise<void> {
     try {
       const customer = booking.customer ?? (await this.customers.findById(booking.customerId));
+      /**
+       * Khach vang lai co the dat lich ma chua khai xe. De trong thi tin
+       * nhan con lai mot dong "Xe" cut ngun, nen dien dau gach.
+       */
+      const vehicle = booking.vehicle
+        ? [booking.vehicle.maker, booking.vehicle.model, booking.vehicle.plateNumber]
+            .filter(Boolean)
+            .join(' ')
+        : '—';
       const variables = {
         bookingCode: booking.code,
         customerName: booking.contactName,
+        vehicle,
         scheduledAt: formatAppDateTime(booking.scheduledAt),
         serviceType: serviceTypeLabel(booking.serviceType),
         ...extra,
       };
+      // Moi tin nhan deu dan khach ve mot cho xem duoc day du tinh hinh.
+      const linkPath = `/bookings/${booking.code}/progress`;
 
       if (customer.notifySms) {
         await this.notifications.send({
@@ -748,6 +795,7 @@ export class BookingsService {
           recipient: booking.contactPhone,
           customerId: customer.id,
           variables,
+          linkPath,
           relatedType: 'Booking',
           relatedId: booking.id,
         });
@@ -760,6 +808,7 @@ export class BookingsService {
           recipient: booking.contactEmail,
           customerId: customer.id,
           variables,
+          linkPath,
           relatedType: 'Booking',
           relatedId: booking.id,
         });

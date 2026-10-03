@@ -11,6 +11,7 @@ import {
 } from 'src/common/enums';
 import { applyTax, generatePublicToken, sumLines, yen } from 'src/common/utils';
 import { CustomersService } from 'src/modules/customers/customers.service';
+import { AdminNotificationsService } from 'src/modules/notifications/admin-notifications.service';
 import { NotificationsService } from 'src/modules/notifications/notifications.service';
 import { SettingsService, SETTING_KEYS } from 'src/modules/system/settings.service';
 import { WorkOrdersService } from 'src/modules/work-orders/work-orders.service';
@@ -29,6 +30,7 @@ export class QuotationsService {
     private readonly workOrders: WorkOrdersService,
     private readonly customers: CustomersService,
     private readonly notifications: NotificationsService,
+    private readonly adminFeed: AdminNotificationsService,
     private readonly settings: SettingsService,
   ) {}
 
@@ -268,6 +270,20 @@ export class QuotationsService {
       await manager.getRepository(Quotation).save(quotation);
     });
 
+    /**
+     * Khach chot bao gia la tin hieu nhan vien cho: bat tay vao sua duoc roi.
+     * Bao qua web, khong gui SMS — khach da biet chinh ho vua bam dong y.
+     */
+    if (dto.accept) {
+      await this.adminFeed.push({
+        event: NotificationEvent.QUOTATION_ACCEPTED,
+        title: `Khach da chot bao gia ${quotation.code}`,
+        body: `Tong ${quotation.totalAmount.toLocaleString('en-US')} JPY — co the bat dau sua xe.`,
+        link: `/admin/work-orders/${quotation.workOrderId}`,
+        storeId: quotation.workOrder?.storeId ?? null,
+      });
+    }
+
     // BR-33 — khach dong y thi phieu chuyen sang dang thuc hien.
     if (dto.accept) {
       const workOrder = await this.workOrders.findById(quotation.workOrderId);
@@ -319,6 +335,15 @@ export class QuotationsService {
   private async notifyCustomer(quotation: Quotation): Promise<void> {
     try {
       const customer = await this.customers.findById(quotation.customerId);
+      if (!quotation.bookingCode) {
+        const [row] = await this.dataSource.query<{ code: string }[]>(
+          `select b.code from bookings b
+             join work_orders w on w.booking_id = b.id
+            where w.id = $1`,
+          [quotation.workOrderId],
+        );
+        quotation.bookingCode = row?.code ?? null;
+      }
       if (!customer.notifySms) return;
       await this.notifications.send({
         event: NotificationEvent.QUOTATION_SENT,
@@ -328,10 +353,14 @@ export class QuotationsService {
         customerId: customer.id,
         variables: {
           customerName: customer.name,
+          bookingCode: quotation.bookingCode ?? '',
+          vehicle: vehicleLabel(quotation),
           quotationCode: quotation.code,
           totalAmount: quotation.totalAmount.toLocaleString('ja-JP'),
           quotationToken: quotation.publicToken,
         },
+        // Dan thang vao ban bao gia, khong bat khach tu mo tien do roi tim.
+        linkPath: `/quotations/${quotation.publicToken}`,
         relatedType: 'Quotation',
         relatedId: quotation.id,
       });
@@ -339,6 +368,13 @@ export class QuotationsService {
       this.logger.error(`Khong gui duoc thong bao bao gia ${quotation.code}`);
     }
   }
+}
+
+/** "Honda Lead 29T1.122.12" — khach doc la biet tin nhan noi ve xe nao. */
+function vehicleLabel(quotation: Quotation): string {
+  const v = quotation.workOrder?.vehicle;
+  if (!v) return '—';
+  return [v.maker, v.model, v.plateNumber].filter(Boolean).join(' ');
 }
 
 function computeTotals(

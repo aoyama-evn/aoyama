@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PageDto, PaginationQueryDto } from 'src/common/dto';
@@ -22,6 +23,13 @@ export interface SendNotificationInput {
   recipient: string;
   customerId?: string | null;
   variables: Record<string, string | number>;
+  /**
+   * Duong dan trong site khach, vi du "/bookings/B-.../progress".
+   *
+   * Chi mot noi biet dia chi site that: cho goi truyen duong dan tuong doi,
+   * o day ghep voi WEB_URL thanh bien {{link}}. Doi ten mien thi sua mot cho.
+   */
+  linkPath?: string;
   relatedType?: string;
   relatedId?: string;
 }
@@ -42,6 +50,7 @@ export class NotificationsService {
     private readonly logRepo: Repository<NotificationLog>,
     @Inject(SMS_PROVIDER) private readonly sms: SmsProvider,
     @Inject(MAIL_PROVIDER) private readonly mail: MailProvider,
+    private readonly config: ConfigService,
   ) {}
 
   /**
@@ -57,8 +66,14 @@ export class NotificationsService {
       return null;
     }
 
-    const body = render(template.body, input.variables);
-    const subject = template.subject ? render(template.subject, input.variables) : null;
+    const variables = { ...input.variables };
+    if (input.linkPath) {
+      const base = (this.config.get<string>('app.webUrl') ?? '').replace(/\/+$/, '');
+      variables.link = `${base}${input.linkPath}`;
+    }
+
+    const body = render(template.body, variables);
+    const subject = template.subject ? render(template.subject, variables) : null;
 
     const log = this.logRepo.create({
       customerId: input.customerId ?? null,

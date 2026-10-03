@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AdminNotificationsService } from './admin-notifications.service';
+import { AdminNotification } from './entities/admin-notification.entity';
 import { NotificationLog } from './entities/notification-log.entity';
 import { NotificationTemplate } from './entities/notification-template.entity';
 import { NotificationsController } from './notifications.controller';
@@ -10,10 +12,11 @@ import { ConsoleSmsProvider, HttpSmsProvider, SMS_PROVIDER } from './providers/s
 
 /** M-14 — Thong bao SMS va email. */
 @Module({
-  imports: [TypeOrmModule.forFeature([NotificationTemplate, NotificationLog])],
+  imports: [TypeOrmModule.forFeature([NotificationTemplate, NotificationLog, AdminNotification])],
   controllers: [NotificationsController],
   providers: [
     NotificationsService,
+    AdminNotificationsService,
     ConsoleSmsProvider,
     HttpSmsProvider,
     ConsoleMailProvider,
@@ -32,6 +35,6 @@ import { ConsoleSmsProvider, HttpSmsProvider, SMS_PROVIDER } from './providers/s
       useFactory: (consoleDriver: ConsoleMailProvider) => consoleDriver,
     },
   ],
-  exports: [NotificationsService],
+  exports: [NotificationsService, AdminNotificationsService],
 })
 export class NotificationsModule {}
