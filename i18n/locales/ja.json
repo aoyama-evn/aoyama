@@ -140,7 +140,9 @@
     "IN_PROGRESS": "作業中",
     "PENDING": "確認待ち",
     "QUOTED": "見積中",
-    "RECEIVED": "受付済み"
+    "RECEIVED": "受付済み",
+    "DIAGNOSING": "診断完了",
+    "QUOTE_ACCEPTED": "見積承認済み"
   },
   "fuel": {
     "0": "ほぼ空",
@@ -511,10 +513,10 @@
   "sa10": {
     "act": {
       "CANCELLED": "伝票を取り消す",
-      "COMPLETED": "作業を完了 →",
-      "DELIVERED": "車両を引き渡す →",
-      "DIAGNOSING": "診断を開始",
-      "IN_PROGRESS": "作業を開始"
+      "COMPLETED": "作業完了 →",
+      "DELIVERED": "引渡し →",
+      "DIAGNOSING": "診断を記録",
+      "IN_PROGRESS": "作業を開始 →"
     },
     "ask": {
       "CANCELLED": "伝票を取り消します。在庫から引き落とし済みの部品は戻します。",
@@ -675,7 +677,7 @@
     "notSent": "未送信",
     "quoteCode": "見積番号",
     "sentAt": "送信日時",
-    "startRepair": "確定して作業開始",
+    "startRepair": "作業を開始 →",
     "started": "作業を開始しました",
     "title": "見積の確定",
     "total": "合計",
@@ -1830,7 +1832,8 @@
     "SUPERSEDED": "差し替え済み",
     "UNPAID": "未払い",
     "QUOTING": "見積提示中",
-    "QUOTE_ACCEPTED": "見積承認済み"
+    "QUOTE_ACCEPTED": "見積承認済み",
+    "DIAGNOSED": "診断完了"
   },
   "stockType": {
     "ADJUST": "棚卸調整",

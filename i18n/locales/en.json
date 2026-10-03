@@ -140,7 +140,9 @@
     "IN_PROGRESS": "In progress",
     "PENDING": "Awaiting confirmation",
     "QUOTED": "Quoting",
-    "RECEIVED": "Vehicle received"
+    "RECEIVED": "Vehicle received",
+    "DIAGNOSING": "Diagnosed",
+    "QUOTE_ACCEPTED": "Quotation accepted"
   },
   "fuel": {
     "0": "Empty",
@@ -511,10 +513,10 @@
   "sa10": {
     "act": {
       "CANCELLED": "Cancel the work order",
-      "COMPLETED": "Finish the work →",
-      "DELIVERED": "Deliver the bike →",
-      "DIAGNOSING": "Start diagnosis",
-      "IN_PROGRESS": "Start work"
+      "COMPLETED": "Mark done →",
+      "DELIVERED": "Hand over →",
+      "DIAGNOSING": "Record diagnosis",
+      "IN_PROGRESS": "Start work →"
     },
     "ask": {
       "CANCELLED": "The work order is cancelled. Any parts already deducted are returned to stock.",
@@ -675,7 +677,7 @@
     "notSent": "Not sent yet",
     "quoteCode": "Quote number",
     "sentAt": "Sent at",
-    "startRepair": "Confirm and start the repair",
+    "startRepair": "Start work →",
     "started": "The repair has started",
     "title": "Confirm the quote",
     "total": "Total",
@@ -1830,7 +1832,8 @@
     "SUPERSEDED": "Superseded",
     "UNPAID": "Unpaid",
     "QUOTING": "Quotation sent",
-    "QUOTE_ACCEPTED": "Quotation accepted"
+    "QUOTE_ACCEPTED": "Quotation accepted",
+    "DIAGNOSED": "Diagnosed"
   },
   "stockType": {
     "ADJUST": "Adjustment",

@@ -54,11 +54,20 @@ onBeforeUnmount(() => {
 });
 
 /** Bay moc cua ban thiet ke, theo dung thu tu. */
+/**
+ * Chin moc khach nhin thay, dung bang voi cac buoc o trang quan tri —
+ * hai site phai noi cung mot thu, khong moi ben mot cach goi.
+ *
+ * DIAGNOSING hien thanh "Da chan doan" va QUOTE_ACCEPTED thanh "Da chot
+ * bao gia": ca hai la moc da qua, khong phai viec dang lam.
+ */
 const FLOW = [
   { key: 'PENDING', kind: 'booking' as const },
   { key: 'CONFIRMED', kind: 'booking' as const },
   { key: 'RECEIVED', kind: 'work' as const },
+  { key: 'DIAGNOSING', kind: 'work' as const },
   { key: 'QUOTED', kind: 'work' as const },
+  { key: 'QUOTE_ACCEPTED', kind: 'work' as const },
   { key: 'IN_PROGRESS', kind: 'work' as const },
   { key: 'COMPLETED', kind: 'work' as const },
   { key: 'DELIVERED', kind: 'work' as const },
@@ -78,6 +87,11 @@ const steps = computed<ProgressStep[]>(() => {
   }
   for (const entry of data.timeline ?? []) {
     stamps.set(entry.status, { at: entry.at, note: entry.note });
+  }
+  // Luc chot bao gia khong nam trong lich su trang thai phieu — no la
+  // viec cua ban bao gia, may chu tra ve rieng.
+  if (data.quoteAcceptedAt) {
+    stamps.set('QUOTE_ACCEPTED', { at: data.quoteAcceptedAt, note: null });
   }
 
   // Moc hien tai la moc cuoi cung co dau thoi gian.

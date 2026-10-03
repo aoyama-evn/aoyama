@@ -21,6 +21,7 @@ const TONES: Record<string, Tone> = {
   CANCELLED: 'neutral',
   NO_SHOW: 'danger',
   DIAGNOSING: 'info',
+  DIAGNOSED: 'info',
   QUOTED: 'warning',
   QUOTING: 'warning',
   QUOTE_ACCEPTED: 'info',

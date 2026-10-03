@@ -140,7 +140,9 @@
     "IN_PROGRESS": "Đang tiến hành",
     "PENDING": "Chờ xác nhận",
     "QUOTED": "Đang báo giá",
-    "RECEIVED": "Đã tiếp nhận"
+    "RECEIVED": "Đã tiếp nhận",
+    "DIAGNOSING": "Đã chẩn đoán",
+    "QUOTE_ACCEPTED": "Đã chốt báo giá"
   },
   "fuel": {
     "0": "Cạn",
@@ -511,10 +513,10 @@
   "sa10": {
     "act": {
       "CANCELLED": "Hủy phiếu",
-      "COMPLETED": "Hoàn tất sửa chữa →",
-      "DELIVERED": "Bàn giao xe →",
-      "DIAGNOSING": "Bắt đầu chẩn đoán",
-      "IN_PROGRESS": "Bắt đầu thực hiện"
+      "COMPLETED": "Hoàn thành →",
+      "DELIVERED": "Đã bàn giao →",
+      "DIAGNOSING": "Đã chẩn đoán",
+      "IN_PROGRESS": "Tiến hành →"
     },
     "ask": {
       "CANCELLED": "Phiếu bị hủy. Nếu đã trừ kho, phụ tùng sẽ được hoàn lại.",
@@ -675,7 +677,7 @@
     "notSent": "Chưa gửi",
     "quoteCode": "Mã báo giá",
     "sentAt": "Gửi lúc",
-    "startRepair": "Chốt báo giá & bắt đầu sửa",
+    "startRepair": "Tiến hành →",
     "started": "Đã bắt đầu sửa",
     "title": "Chốt báo giá",
     "total": "Tổng cộng",
@@ -1830,7 +1832,8 @@
     "SUPERSEDED": "Đã thay thế",
     "UNPAID": "Chưa thanh toán",
     "QUOTING": "Đang báo giá",
-    "QUOTE_ACCEPTED": "Đã chốt báo giá"
+    "QUOTE_ACCEPTED": "Đã chốt báo giá",
+    "DIAGNOSED": "Đã chẩn đoán"
   },
   "stockType": {
     "ADJUST": "Điều chỉnh",

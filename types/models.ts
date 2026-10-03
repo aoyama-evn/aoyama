@@ -438,6 +438,8 @@ export interface PublicProgress {
   hasQr: boolean;
   /** Ban bao gia dang cho khach tra loi — nut "Xem bao gia" dan toi day. */
   pendingQuotation?: PendingQuotation | null;
+  /** Luc khach bam dong y bao gia — moc rieng tren duong thoi gian SC-26. */
+  quoteAcceptedAt?: string | null;
   vehicle: { maker: string; model: string; plateNumber: string } | null;
   hasWorkOrder: boolean;
   status?: WorkOrderStatus;
