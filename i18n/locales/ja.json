@@ -679,7 +679,14 @@
     "started": "作業を開始しました",
     "title": "見積の確定",
     "total": "合計",
-    "version": "第 {n} 版"
+    "version": "第 {n} 版",
+    "replyTitle": "お客様の回答",
+    "waitingReply": "未回答",
+    "noReplyYet": "送信済み。お客様の確認待ちです。",
+    "makeRevision": "見積を作り直す",
+    "leadRevision": "お客様は別の見積をご希望です。修正して新しい版をお送りください。",
+    "leadRejected": "お客様はこの見積を断られました。交渉の余地があれば新しい版を、なければ予約を取り消してください。",
+    "leadAccepted": "お客様が承認しました。確定すると作業中に移ります。"
   },
   "sa13": {
     "colCode": "見積番号",

@@ -27,14 +27,44 @@ const { data, refresh } = await useAsyncData(`quote-confirm-${id}-${quoteId ?? '
     api.get<Quotation[]>(`/admin/work-orders/${id}/quotations`).catch(() => [] as Quotation[]),
   ]);
   const list = Array.isArray(quotations) ? quotations : [];
-  const quotation = quoteId
-    ? (list.find((q) => q.id === quoteId) ?? list[0] ?? null)
-    : (list[0] ?? null);
-  return { workOrder, quotation };
+  /**
+   * Ban duoc tro toi, tru khi no da bi thay the.
+   *
+   * SA-12 dan sang day kem ma ban vua gui nen binh thuong do la ban moi
+   * nhat. Nhung neu nhan vien mo lai mot duong dan cu, ho se thay the dau
+   * man ghi "Ban 1 — da tu choi" trong khi hang nut lai moi chot ban 4.
+   * Luc do dua thang ho den ban dang co hieu luc.
+   */
+  const asked = quoteId ? (list.find((q) => q.id === quoteId) ?? null) : null;
+  const quotation =
+    asked && asked.status !== 'SUPERSEDED' ? asked : (list[0] ?? asked ?? null);
+  return { workOrder, quotation, quotations: list };
 });
 
 const workOrder = computed(() => data.value?.workOrder ?? null);
 const quotation = computed(() => data.value?.quotation ?? null);
+
+/**
+ * Dong thoi gian phan hoi cua khach — ban thiet ke ve han phan nay.
+ *
+ * Nhan vien mo man nay de quyet dinh lam gi tiep, ma quyet dinh do phu
+ * thuoc vao viec khach da noi gi: dong y, tu choi han, hay xin bao gia
+ * khac. Truoc day man chi hien mot cai nhan trang thai, nhan vien phai
+ * sang man chi tiet bao gia moi doc duoc ly do.
+ *
+ * Xep tu cu den moi de doc nhu mot cau chuyen: gui ban 1 -> khach xin
+ * sua -> gui ban 2 -> khach dong y.
+ */
+const history = computed(() =>
+  [...(data.value?.quotations ?? [])]
+    .filter((q) => q.status !== 'DRAFT')
+    .sort((a, b) => a.version - b.version),
+);
+
+/** Ban moi nhat quyet dinh buoc tiep theo, khong phai ban dang mo. */
+const latest = computed(() => history.value[history.value.length - 1] ?? null);
+const latestStatus = computed(() => latest.value?.status ?? null);
+const wantsRevision = computed(() => Boolean(latest.value?.revisionRequested));
 
 setScreenTitle(() => t('sa12c.title'));
 
@@ -118,8 +148,57 @@ useHead({ title: () => `${t('sa12c.title')} — AOYAMA Admin` });
         </div>
       </section>
 
+      <!--
+        Phan hoi cua khach — thu quyet dinh nhan vien lam gi tiep. Truoc day
+        man nay chi co mot cai nhan trang thai, muon biet khach noi gi phai
+        sang man chi tiet bao gia doc.
+      -->
+      <section class="card gap-2.5" style="background: #fff">
+        <h5>{{ $t('sa12c.replyTitle') }}</h5>
+
+        <div
+          v-for="row in history"
+          :key="row.id"
+          class="flex flex-col gap-1 pl-3"
+          style="border-left: 2px solid var(--color-divider)"
+        >
+          <div class="flex flex-wrap items-baseline gap-2">
+            <span class="text-[13px] font-semibold">
+              {{ $t('sa12c.version', { n: row.version }) }}
+            </span>
+            <AyStatusTag :status="row.status" />
+            <span v-if="row.revisionRequested" class="tag tag-accent text-[11px]">
+              {{ $t('sa13.wantsRevision') }}
+            </span>
+            <span class="text-muted text-[11.5px]">
+              {{ row.respondedAt ? dateTime(row.respondedAt) : $t('sa12c.waitingReply') }}
+            </span>
+            <span class="text-muted ml-auto text-[11.5px]">{{ money(row.totalAmount) }}</span>
+          </div>
+
+          <p v-if="row.rejectReason" class="text-[12.5px]">
+            <span class="text-muted">{{ $t('sa13.rejectReason') }}:</span>
+            “{{ row.rejectReason }}”
+          </p>
+          <p v-if="row.customerComment" class="text-[12.5px]">
+            <span class="text-muted">{{ $t('sa13.customerComment') }}:</span>
+            “{{ row.customerComment }}”
+          </p>
+          <p
+            v-if="row.status === 'SENT' && !row.respondedAt"
+            class="text-muted text-[12px]"
+          >
+            {{ $t('sa12c.noReplyYet') }}
+          </p>
+        </div>
+      </section>
+
+      <!-- Cau nhac doi theo viec khach da tra loi gi. -->
       <p class="text-[12.5px] leading-[1.55]" style="color: var(--color-neutral-700)">
-        {{ $t('sa12c.lead') }}
+        <template v-if="wantsRevision">{{ $t('sa12c.leadRevision') }}</template>
+        <template v-else-if="latestStatus === 'REJECTED'">{{ $t('sa12c.leadRejected') }}</template>
+        <template v-else-if="latestStatus === 'ACCEPTED'">{{ $t('sa12c.leadAccepted') }}</template>
+        <template v-else>{{ $t('sa12c.lead') }}</template>
       </p>
 
       <AyErrorNote :error="error" />
@@ -134,14 +213,22 @@ useHead({ title: () => `${t('sa12c.title')} — AOYAMA Admin` });
         </NuxtLink>
         <NuxtLink
           :to="`/admin/work-orders/${id}/quotation`"
-          class="btn btn-secondary text-[13px]"
+          class="btn text-[13px]"
+          :class="latestStatus === 'REJECTED' ? 'btn-primary' : 'btn-secondary'"
           style="min-height: 48px; padding-inline: 20px"
         >
-          {{ $t('sa12c.editQuote') }}
+          {{ wantsRevision ? $t('sa12c.makeRevision') : $t('sa12c.editQuote') }}
         </NuxtLink>
+        <!--
+          Khach da tu choi thi khong moi nhan vien "chot bao gia" nua —
+          viec can lam la lap ban moi hoac dong lich. Van giu duong chot
+          lai duoi dang nut phu: khach doi y qua dien thoai la chuyen
+          thuong gap, khong nen bat nhan vien di vong.
+        -->
         <button
           type="button"
-          class="btn btn-primary text-[15px]"
+          class="btn text-[15px]"
+          :class="latestStatus === 'REJECTED' ? 'btn-secondary' : 'btn-primary'"
           style="min-height: 48px; padding-inline: 26px"
           :disabled="busy"
           @click="confirmOpen = true"

@@ -679,7 +679,14 @@
     "started": "Đã bắt đầu sửa",
     "title": "Chốt báo giá",
     "total": "Tổng cộng",
-    "version": "Bản {n}"
+    "version": "Bản {n}",
+    "replyTitle": "Phản hồi của khách",
+    "waitingReply": "chưa phản hồi",
+    "noReplyYet": "Đã gửi, đang chờ khách xem.",
+    "makeRevision": "Lập báo giá mới",
+    "leadRevision": "Khách muốn một bản báo giá khác. Sửa lại rồi gửi bản mới cho khách.",
+    "leadRejected": "Khách đã từ chối báo giá này. Lập bản mới nếu còn thương lượng được, hoặc hủy lịch hẹn.",
+    "leadAccepted": "Khách đã đồng ý. Chốt báo giá để chuyển phiếu sang đang sửa."
   },
   "sa13": {
     "colCode": "Mã báo giá",

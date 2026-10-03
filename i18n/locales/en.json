@@ -679,7 +679,14 @@
     "started": "The repair has started",
     "title": "Confirm the quote",
     "total": "Total",
-    "version": "Version {n}"
+    "version": "Version {n}",
+    "replyTitle": "Customer's reply",
+    "waitingReply": "no reply yet",
+    "noReplyYet": "Sent — waiting for the customer to look.",
+    "makeRevision": "Draft a new quotation",
+    "leadRevision": "The customer wants a different quotation. Revise it and send a new version.",
+    "leadRejected": "The customer turned this quotation down. Draft a new one if there is room to negotiate, or cancel the booking.",
+    "leadAccepted": "The customer accepted. Confirm to move the work order into repair."
   },
   "sa13": {
     "colCode": "Quotation",
