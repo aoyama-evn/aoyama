@@ -686,7 +686,18 @@
     "makeRevision": "Lập báo giá mới",
     "leadRevision": "Khách muốn một bản báo giá khác. Sửa lại rồi gửi bản mới cho khách.",
     "leadRejected": "Khách đã từ chối báo giá này. Lập bản mới nếu còn thương lượng được, hoặc hủy lịch hẹn.",
-    "leadAccepted": "Khách đã đồng ý. Chốt báo giá để chuyển phiếu sang đang sửa."
+    "leadAccepted": "Khách đã đồng ý. Chốt báo giá để chuyển phiếu sang đang sửa.",
+    "recordTitle": "Ghi nhận thay khách",
+    "recordLead": "Khi khách phản hồi tại quầy hoặc qua điện thoại.",
+    "replyChannel": "Kênh phản hồi",
+    "atCounter": "Tại quầy",
+    "byPhone": "Qua điện thoại",
+    "replyNote": "Lý do / nội dung phản hồi",
+    "replyNotePlaceholder": "VD: khách muốn bỏ hạng mục thay dầu…",
+    "recordReject": "Từ chối báo giá",
+    "recordAccept": "Đồng ý báo giá",
+    "recordedAccept": "Đã ghi nhận khách đồng ý",
+    "recordedReject": "Đã ghi nhận khách từ chối"
   },
   "sa13": {
     "colCode": "Mã báo giá",
@@ -1924,5 +1935,10 @@
     "PENDING": "Chờ làm",
     "IN_PROGRESS": "Đang làm",
     "DONE": "Đã xong"
+  },
+  "replyVia": {
+    "LINK": "khách tự xác nhận trên web",
+    "COUNTER": "ghi tại quầy",
+    "PHONE": "ghi qua điện thoại"
   }
 }

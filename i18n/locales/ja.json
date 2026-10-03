@@ -686,7 +686,18 @@
     "makeRevision": "見積を作り直す",
     "leadRevision": "お客様は別の見積をご希望です。修正して新しい版をお送りください。",
     "leadRejected": "お客様はこの見積を断られました。交渉の余地があれば新しい版を、なければ予約を取り消してください。",
-    "leadAccepted": "お客様が承認しました。確定すると作業中に移ります。"
+    "leadAccepted": "お客様が承認しました。確定すると作業中に移ります。",
+    "recordTitle": "お客様に代わって記録",
+    "recordLead": "店頭またはお電話でご回答いただいた場合。",
+    "replyChannel": "回答の経路",
+    "atCounter": "店頭",
+    "byPhone": "電話",
+    "replyNote": "理由・回答内容",
+    "replyNotePlaceholder": "例: オイル交換を外したいとのご希望…",
+    "recordReject": "見積を断られた",
+    "recordAccept": "見積を承認された",
+    "recordedAccept": "承認を記録しました",
+    "recordedReject": "辞退を記録しました"
   },
   "sa13": {
     "colCode": "見積番号",
@@ -1924,5 +1935,10 @@
     "PENDING": "未着手",
     "IN_PROGRESS": "作業中",
     "DONE": "完了"
+  },
+  "replyVia": {
+    "LINK": "お客様がWebで回答",
+    "COUNTER": "店頭で記録",
+    "PHONE": "電話で記録"
   }
 }

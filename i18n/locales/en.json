@@ -686,7 +686,18 @@
     "makeRevision": "Draft a new quotation",
     "leadRevision": "The customer wants a different quotation. Revise it and send a new version.",
     "leadRejected": "The customer turned this quotation down. Draft a new one if there is room to negotiate, or cancel the booking.",
-    "leadAccepted": "The customer accepted. Confirm to move the work order into repair."
+    "leadAccepted": "The customer accepted. Confirm to move the work order into repair.",
+    "recordTitle": "Record on the customer's behalf",
+    "recordLead": "When the customer replies at the counter or over the phone.",
+    "replyChannel": "Reply channel",
+    "atCounter": "At the counter",
+    "byPhone": "By phone",
+    "replyNote": "Reason / what they said",
+    "replyNotePlaceholder": "e.g. they want to drop the oil change…",
+    "recordReject": "They declined",
+    "recordAccept": "They accepted",
+    "recordedAccept": "Recorded: customer accepted",
+    "recordedReject": "Recorded: customer declined"
   },
   "sa13": {
     "colCode": "Quotation",
@@ -1924,5 +1935,10 @@
     "PENDING": "Not started",
     "IN_PROGRESS": "In progress",
     "DONE": "Done"
+  },
+  "replyVia": {
+    "LINK": "customer replied on the web",
+    "COUNTER": "recorded at the counter",
+    "PHONE": "recorded by phone"
   }
 }

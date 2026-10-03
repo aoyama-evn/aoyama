@@ -72,6 +72,41 @@ const busy = ref(false);
 const error = ref<ApiError | null>(null);
 const confirmOpen = ref(false);
 
+/**
+ * SA-12c "Ghi nhan thay khach" — khach tra loi tai quay hoac qua dien thoai.
+ *
+ * Khong phai khach nao cung bam duong dan trong tin nhan; nhieu nguoi goi
+ * thang den cua hang. Truoc day nhan vien khong co cach nao ghi lai, ban
+ * bao gia nam mai o "da gui" trong khi viec thuc te da chay tiep.
+ */
+const replyChannel = ref<'COUNTER' | 'PHONE'>('PHONE');
+const replyNote = ref('');
+const recording = ref<'ACCEPT' | 'REJECT' | null>(null);
+
+/** Chi ghi ho duoc khi ban moi nhat con dang cho khach tra loi. */
+const canRecord = computed(() => latestStatus.value === 'SENT');
+
+async function recordReply(accept: boolean): Promise<void> {
+  if (!latest.value || recording.value) return;
+  recording.value = accept ? 'ACCEPT' : 'REJECT';
+  error.value = null;
+  try {
+    await api.put(`/admin/quotations/${latest.value.id}/record-reply`, {
+      accept,
+      channel: replyChannel.value,
+      reason: accept ? undefined : replyNote.value.trim() || undefined,
+      comment: accept ? replyNote.value.trim() || undefined : undefined,
+    });
+    ui.success(accept ? t('sa12c.recordedAccept') : t('sa12c.recordedReject'));
+    replyNote.value = '';
+    await refresh();
+  } catch (caught) {
+    error.value = normalizeError(caught);
+  } finally {
+    recording.value = null;
+  }
+}
+
 /** Chot bao gia = phieu bat dau duoc sua. */
 async function startRepair(): Promise<void> {
   confirmOpen.value = false;
@@ -172,6 +207,9 @@ useHead({ title: () => `${t('sa12c.title')} — AOYAMA Admin` });
             </span>
             <span class="text-muted text-[11.5px]">
               {{ row.respondedAt ? dateTime(row.respondedAt) : $t('sa12c.waitingReply') }}
+              <template v-if="row.respondedVia">
+                · {{ $t(`replyVia.${row.respondedVia}`) }}
+              </template>
             </span>
             <span class="text-muted ml-auto text-[11.5px]">{{ money(row.totalAmount) }}</span>
           </div>
@@ -190,6 +228,67 @@ useHead({ title: () => `${t('sa12c.title')} — AOYAMA Admin` });
           >
             {{ $t('sa12c.noReplyYet') }}
           </p>
+        </div>
+      </section>
+
+      <!--
+        Ghi ho cau tra loi. Chi hien khi ban moi nhat con dang cho: da co
+        tra loi roi thi ghi them chi lam nhieu nguon su that.
+      -->
+      <section v-if="canRecord" class="card gap-2.5" style="background: #fff">
+        <div>
+          <h5>{{ $t('sa12c.recordTitle') }}</h5>
+          <p class="text-muted text-[12px]">{{ $t('sa12c.recordLead') }}</p>
+        </div>
+
+        <AyField :label="$t('sa12c.replyChannel')">
+          <template #default>
+            <div class="flex flex-wrap gap-4 pt-1">
+              <label class="radio gap-2">
+                <input v-model="replyChannel" type="radio" value="COUNTER">
+                <span class="dot" />
+                {{ $t('sa12c.atCounter') }}
+              </label>
+              <label class="radio gap-2">
+                <input v-model="replyChannel" type="radio" value="PHONE">
+                <span class="dot" />
+                {{ $t('sa12c.byPhone') }}
+              </label>
+            </div>
+          </template>
+        </AyField>
+
+        <AyField :label="$t('sa12c.replyNote')" class="max-w-[520px]">
+          <template #default="{ id: fid }">
+            <textarea
+              :id="fid"
+              v-model="replyNote"
+              class="input min-h-[64px]"
+              maxlength="400"
+              :placeholder="$t('sa12c.replyNotePlaceholder')"
+            />
+          </template>
+        </AyField>
+
+        <div class="flex flex-wrap gap-2.5">
+          <button
+            type="button"
+            class="btn btn-secondary text-[13px]"
+            style="min-height: 44px; padding-inline: 16px"
+            :disabled="recording !== null"
+            @click="recordReply(false)"
+          >
+            {{ recording === 'REJECT' ? $t('common.saving') : $t('sa12c.recordReject') }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary text-[13px]"
+            style="min-height: 44px; padding-inline: 16px; border-color: var(--color-accent-2-500); color: var(--color-accent-2-800)"
+            :disabled="recording !== null"
+            @click="recordReply(true)"
+          >
+            {{ recording === 'ACCEPT' ? $t('common.saving') : $t('sa12c.recordAccept') }}
+          </button>
         </div>
       </section>
 

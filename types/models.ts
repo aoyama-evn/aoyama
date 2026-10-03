@@ -497,6 +497,8 @@ export interface Quotation {
   rejectReason: string | null;
   /** Khach bam "Yeu cau xem lai" chu khong phai "Tu choi" — SC-27. */
   revisionRequested?: boolean;
+  /** Khach tu bam tren site, hay nhan vien ghi ho tai quay / qua dien thoai. */
+  respondedVia?: 'LINK' | 'COUNTER' | 'PHONE' | null;
   customerComment: string | null;
   /** Chi co o duong dan cong khai, de SC-27 co nut quay ve tien do. */
   bookingCode?: string | null;
