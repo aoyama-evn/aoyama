@@ -17,7 +17,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { PaginationQueryDto } from 'src/common/dto';
-import { QuotationStatus } from 'src/common/enums';
+import { QuotationReplyChannel, QuotationStatus } from 'src/common/enums';
 
 export class QuotationItemDto {
   @ApiPropertyOptional({ enum: ['LABOR', 'PART', 'OTHER'], default: 'LABOR' })
@@ -96,6 +96,13 @@ export class RespondQuotationDto {
   @IsOptional()
   @IsBoolean()
   requestRevision?: boolean;
+}
+
+/** SA-12c — nhan vien ghi ho cau tra loi cua khach. */
+export class RecordReplyDto extends RespondQuotationDto {
+  @ApiProperty({ enum: [QuotationReplyChannel.COUNTER, QuotationReplyChannel.PHONE] })
+  @IsIn([QuotationReplyChannel.COUNTER, QuotationReplyChannel.PHONE])
+  channel!: QuotationReplyChannel;
 }
 
 export class QuotationQueryDto extends PaginationQueryDto {

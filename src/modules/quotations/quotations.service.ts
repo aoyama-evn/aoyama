@@ -8,6 +8,7 @@ import {
   QUOTATION_TRANSITIONS,
   QuotationStatus,
   WorkOrderStatus,
+  QuotationReplyChannel,
 } from 'src/common/enums';
 import { applyTax, generatePublicToken, sumLines, yen } from 'src/common/utils';
 import { CustomersService } from 'src/modules/customers/customers.service';
@@ -221,6 +222,35 @@ export class QuotationsService {
    */
   async respond(token: string, dto: RespondQuotationDto): Promise<Quotation> {
     const quotation = await this.findByPublicToken(token);
+    return this.applyReply(quotation, dto, QuotationReplyChannel.LINK, null);
+  }
+
+  /**
+   * SA-12c — nhan vien ghi ho cau tra loi khi khach noi tai quay hoac qua
+   * dien thoai.
+   *
+   * Khong phai khach nao cung bam duong dan trong tin nhan: nhieu nguoi goi
+   * thang den cua hang. Truoc day nhan vien khong co cach nao ghi lai, ban
+   * bao gia nam mai o trang thai "da gui" trong khi viec thuc te da chay
+   * tiep. Ghi lai kenh va nguoi ghi de sau con doi chieu duoc — day la cau
+   * tra loi do nhan vien thuat lai, khong phai khach tu bam.
+   */
+  async recordReply(
+    id: string,
+    dto: RespondQuotationDto,
+    channel: QuotationReplyChannel,
+    actorId: string | null,
+  ): Promise<Quotation> {
+    const quotation = await this.findById(id);
+    return this.applyReply(quotation, dto, channel, actorId);
+  }
+
+  private async applyReply(
+    quotation: Quotation,
+    dto: RespondQuotationDto,
+    channel: QuotationReplyChannel,
+    actorId: string | null,
+  ): Promise<Quotation> {
 
     if (quotation.status !== QuotationStatus.SENT) {
       throw new BadRequestException({
@@ -267,6 +297,8 @@ export class QuotationsService {
 
       quotation.respondedAt = new Date();
       quotation.customerComment = dto.comment ?? null;
+      quotation.respondedVia = channel;
+      quotation.recordedById = actorId;
       await manager.getRepository(Quotation).save(quotation);
     });
 
@@ -274,7 +306,7 @@ export class QuotationsService {
      * Khach chot bao gia la tin hieu nhan vien cho: bat tay vao sua duoc roi.
      * Bao qua web, khong gui SMS — khach da biet chinh ho vua bam dong y.
      */
-    if (dto.accept) {
+    if (dto.accept && channel === QuotationReplyChannel.LINK) {
       await this.adminFeed.push({
         event: NotificationEvent.QUOTATION_ACCEPTED,
         title: `Khach da chot bao gia ${quotation.code}`,
@@ -288,10 +320,11 @@ export class QuotationsService {
     if (dto.accept) {
       const workOrder = await this.workOrders.findById(quotation.workOrderId);
       if (workOrder.status === WorkOrderStatus.QUOTED) {
-        await this.workOrders.changeStatus(workOrder.id, WorkOrderStatus.IN_PROGRESS, {
-          type: 'CUSTOMER',
-          id: quotation.customerId,
-        });
+        await this.workOrders.changeStatus(
+          workOrder.id,
+          WorkOrderStatus.IN_PROGRESS,
+          actorId ? { type: 'ADMIN', id: actorId } : { type: 'CUSTOMER', id: quotation.customerId },
+        );
       }
     }
 

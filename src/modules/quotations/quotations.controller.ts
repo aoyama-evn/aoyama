@@ -14,7 +14,12 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthUser, CurrentUser, Public } from 'src/common/decorators';
 import { AdminGuard, RolesGuard } from 'src/common/guards';
 import { AuditService } from 'src/modules/system/audit.service';
-import { CreateQuotationDto, QuotationQueryDto, RespondQuotationDto } from './dto/quotation.dto';
+import {
+  CreateQuotationDto,
+  QuotationQueryDto,
+  RecordReplyDto,
+  RespondQuotationDto,
+} from './dto/quotation.dto';
 import { QuotationsService } from './quotations.service';
 
 /** SC-27, SC-28 — khach xem va phan hoi bao gia qua duong dan kho doan. */
@@ -81,6 +86,25 @@ export class AdminQuotationsController {
       action: 'CREATE',
       entity: 'Quotation',
       entityId: quotation.id,
+    });
+    return quotation;
+  }
+
+  @Put('quotations/:id/record-reply')
+  @ApiOperation({ summary: 'SA-12c — ghi ho cau tra loi cua khach tai quay / qua dien thoai' })
+  async recordReply(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: RecordReplyDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    const quotation = await this.service.recordReply(id, dto, dto.channel, user.sub);
+    await this.audit.record({
+      actorId: user.sub,
+      actorName: user.name,
+      actorType: 'ADMIN',
+      action: dto.accept ? 'RECORD_ACCEPT' : 'RECORD_REJECT',
+      entity: 'Quotation',
+      entityId: id,
     });
     return quotation;
   }

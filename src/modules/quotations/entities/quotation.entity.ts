@@ -1,6 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity } from 'src/common/entities/base.entity';
-import { QuotationStatus } from 'src/common/enums';
+import { QuotationReplyChannel, QuotationStatus } from 'src/common/enums';
 import { Customer } from 'src/modules/customers/entities/customer.entity';
 import { WorkOrder } from 'src/modules/work-orders/entities/work-order.entity';
 import { QuotationItem } from './quotation-item.entity';
@@ -96,6 +96,22 @@ export class Quotation extends BaseEntity {
    */
   @Column({ name: 'revision_requested', default: false })
   revisionRequested!: boolean;
+
+  /** Khach tu bam tren site, hay nhan vien ghi ho tai quay / qua dien thoai. */
+  @Column({
+    name: 'responded_via',
+    type: 'enum',
+    enum: QuotationReplyChannel,
+    nullable: true,
+  })
+  respondedVia!: QuotationReplyChannel | null;
+
+  /**
+   * Nhan vien da ghi ho cau tra loi. De trong nghia la chinh khach bam.
+   * Co nguoi chiu trach nhiem thi sau nay con doi chieu duoc.
+   */
+  @Column({ name: 'recorded_by_id', type: 'uuid', nullable: true })
+  recordedById!: string | null;
 
   /**
    * Ma lich hen — KHONG luu trong CSDL, chi gan khi tra ve qua duong dan
