@@ -37,6 +37,14 @@
       "unread": "{n} thông báo mới",
       "logoutAsk": "Đăng xuất khỏi hệ thống quản trị?",
       "logoutAskBody": "Bạn sẽ cần đăng nhập lại bằng tên đăng nhập và mật khẩu."
+    },
+    "notif": {
+      "title": "Thông báo",
+      "lead": "Việc cần nhân viên xử lý. Chỉ hiển thị trên web, không gửi SMS.",
+      "markAll": "Đánh dấu đã đọc hết",
+      "smsLogs": "Nhật ký gửi SMS",
+      "emptyTitle": "Chưa có thông báo nào",
+      "emptyHint": "Lịch hẹn mới và báo giá khách vừa chốt sẽ hiện ở đây."
     }
   },
   "ai": {

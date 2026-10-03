@@ -289,6 +289,18 @@ export interface Booking {
   createdAt: string;
 }
 
+/** CP-05 — thong bao hien trong trang quan tri (khong gui SMS). */
+export interface AdminNotification {
+  id: string;
+  event: string;
+  title: string;
+  body: string;
+  link: string | null;
+  storeId: string | null;
+  read: boolean;
+  createdAt: string;
+}
+
 export interface PendingQuotation {
   token: string;
   code: string;

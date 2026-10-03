@@ -32,7 +32,13 @@ const initials = computed(() => {
     .join('');
 });
 
-/** So thong bao chua doc — hien tren chuong. */
+/**
+ * So viec nhan vien chua xem — hien tren chuong.
+ *
+ * Truoc day con so nay la "so tin nhan gui that bai", tuc mot canh bao ky
+ * thuat lan vao cho danh cho cong viec hang ngay. Tin gui loi van xem o
+ * trang nhat ky gui tin.
+ */
 const { data: unread } = await useAsyncData('admin-unread', () =>
   api.get<{ count: number }>('/admin/notifications/unread-count').catch(() => ({ count: 0 })),
 );
@@ -79,7 +85,7 @@ async function logout(): Promise<void> {
 
     <div class="ml-auto flex items-center gap-2.5">
       <NuxtLink
-        to="/admin/notifications/logs"
+        to="/admin/notifications"
         class="relative inline-flex items-center"
         style="color: var(--color-neutral-700)"
         :title="$t('adm.top.unread', { n: unread?.count ?? 0 })"

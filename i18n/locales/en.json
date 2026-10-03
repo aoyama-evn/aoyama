@@ -37,6 +37,14 @@
       "unread": "{n} new notifications",
       "logoutAsk": "Sign out of the admin site?",
       "logoutAskBody": "You will need to sign in again with your username and password."
+    },
+    "notif": {
+      "title": "Notifications",
+      "lead": "Work that needs a person. Shown on the web only — no SMS is sent.",
+      "markAll": "Mark all as read",
+      "smsLogs": "SMS send log",
+      "emptyTitle": "No notifications yet",
+      "emptyHint": "New bookings and quotations your customers accept will appear here."
     }
   },
   "ai": {
