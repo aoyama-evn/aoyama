@@ -7,6 +7,11 @@ import { generatePublicToken, hoursBetween } from 'src/common/utils';
 import { Booking } from './entities/booking.entity';
 
 /** Bo moi ky tu khong phai chu hoac so de so khop bien so khong phu thuoc cach go. */
+/** Chi giu chu so — de so khop khong phu thuoc cach go hay ma vung. */
+function squashPhone(phone: string): string {
+  return (phone ?? '').replace(/[^0-9]/g, '');
+}
+
 function squashPlate(plate: string): string {
   return (plate ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '');
 }
@@ -111,45 +116,109 @@ export class QrService {
    * go moi noi mot kieu (29T1-122.12, 29T1.122.12, 29t1 12212) va may doc anh
    * cung tra ve khong thong nhat.
    */
-  async validateByPlate(plate: string): Promise<QrScanResult> {
-    const needle = squashPlate(plate);
-    if (needle.length < 4) {
+  /**
+   * SA-07 — mot o tim duy nhat: go bien so HAY so dien thoai deu duoc.
+   *
+   * Le tan khong nen phai chon truoc minh dang go cai gi. Nhin vao chuoi
+   * la doan duoc: toan chu so thi gan nhu chac chan la so dien thoai, con
+   * lai thi la bien so. Doan sai cung khong sao — thu not kieu kia truoc
+   * khi bao khong tim thay.
+   */
+  async validateBySearch(term: string): Promise<QrScanResult> {
+    const raw = (term ?? '').trim();
+    const digitsOnly = squashPhone(raw);
+    const looksLikePhone = digitsOnly.length >= 6 && digitsOnly.length === raw.replace(/[\s\-+().]/g, '').length;
+
+    if (raw.length < 4) {
       throw new BadRequestException({
-        code: 'PLATE_TOO_SHORT',
-        message: 'Bien so qua ngan de tra cuu',
+        code: 'SEARCH_TOO_SHORT',
+        message: 'Can it nhat 4 ky tu de tra cuu',
       });
     }
 
-    const booking = await this.repo
+    const order = looksLikePhone
+      ? [() => this.findByPhone(raw), () => this.findByPlate(raw)]
+      : [() => this.findByPlate(raw), () => this.findByPhone(raw)];
+
+    for (const find of order) {
+      const booking = await find();
+      if (!booking) continue;
+      if (!booking.qrToken) {
+        return { valid: false, reason: 'NOT_FOUND', message: 'Lich hen nay chua co ma QR', booking };
+      }
+      return this.validate(booking.qrToken);
+    }
+
+    return {
+      valid: false,
+      reason: 'NOT_FOUND',
+      message: 'Khong tim thay lich hen nao cho bien so hay so dien thoai nay',
+    };
+  }
+
+  /** Mot xe hay mot khach co the co nhieu lich — xem ghi chu o scopeToBooking. */
+  private async findByPhone(phone: string): Promise<Booking | null> {
+    const needle = squashPhone(phone);
+    if (needle.length < 6) return null;
+
+    /**
+     * Go du so thi phai khop chinh xac.
+     *
+     * So khop theo duoi rat tien khi le tan chi nho may so cuoi, nhung
+     * "+84969376966" va "+81969376966" la hai nguoi khac nhau ma chung
+     * nhau chin so cuoi. Nen: co dau cong hoac go tu 10 so tro len thi
+     * doi khop tron; ngan hon moi cho khop duoi.
+     */
+    const exactOnly = phone.trim().startsWith('+') || needle.length >= 10;
+    const match = exactOnly
+      ? `(regexp_replace(b.contact_phone, '[^0-9]', '', 'g') = :needle
+          OR regexp_replace(c.phone, '[^0-9]', '', 'g') = :needle)`
+      : `(regexp_replace(b.contact_phone, '[^0-9]', '', 'g') LIKE :tail
+          OR regexp_replace(c.phone, '[^0-9]', '', 'g') LIKE :tail)`;
+
+    return this.scopeToBooking()
+      .where(match, { needle, tail: `%${needle}` })
+      .andWhere('b.status != :cancelled', { cancelled: BookingStatus.CANCELLED })
+      .getOne();
+  }
+
+  private async findByPlate(plate: string): Promise<Booking | null> {
+    const needle = squashPlate(plate);
+    if (needle.length < 4) return null;
+    return this.scopeToBooking()
+      .where("regexp_replace(upper(v.plate_number), '[^A-Z0-9]', '', 'g') = :needle", { needle })
+      .andWhere('b.status != :cancelled', { cancelled: BookingStatus.CANCELLED })
+      .getOne();
+  }
+
+  /**
+   * Khung truy van dung chung cho hai cach tim.
+   *
+   * Mot xe hay mot khach co the co nhieu lich hen. Le tan dang can cai
+   * khach toi hom nay, nen uu tien lich con cho xu ly truoc, roi moi den
+   * lich gan nhat.
+   */
+  private scopeToBooking() {
+    return this.repo
       .createQueryBuilder('b')
       .leftJoinAndSelect('b.customer', 'c')
       .leftJoinAndSelect('b.vehicle', 'v')
       .leftJoinAndSelect('b.store', 's')
       .leftJoinAndSelect('b.services', 'bs')
-      .where("regexp_replace(upper(v.plate_number), '[^A-Z0-9]', '', 'g') = :needle", { needle })
-      .andWhere('b.status != :cancelled', { cancelled: BookingStatus.CANCELLED })
-      // Mot chiec xe co the co nhieu lich. Le tan dang can cai khach toi hom
-      // nay, nen uu tien lich con cho xu ly truoc, roi moi den lich gan nhat.
+      /**
+       * Le tan dang doi mot khach den nhan xe, nen lich DA XAC NHAN phai
+       * len truoc: do la cai co the tiep nhan ngay. Lich con cho xac nhan
+       * xep sau, lich da xong xep cuoi.
+       */
       .addSelect(
-        `CASE WHEN b.status IN ('${BookingStatus.CONFIRMED}', '${BookingStatus.PENDING}')
-              THEN 0 ELSE 1 END`,
+        `CASE b.status
+           WHEN '${BookingStatus.CONFIRMED}' THEN 0
+           WHEN '${BookingStatus.PENDING}' THEN 1
+           ELSE 2 END`,
         'uu_tien',
       )
       .orderBy('uu_tien', 'ASC')
-      .addOrderBy('b.scheduledAt', 'ASC')
-      .getOne();
-
-    if (!booking) {
-      return {
-        valid: false,
-        reason: 'NOT_FOUND',
-        message: 'Khong tim thay lich hen nao cho bien so nay',
-      };
-    }
-    if (!booking.qrToken) {
-      return { valid: false, reason: 'NOT_FOUND', message: 'Lich hen nay chua co ma QR', booking };
-    }
-    return this.validate(booking.qrToken);
+      .addOrderBy('b.scheduledAt', 'ASC');
   }
 
   /** Dung khi le tan nhap tay ma lich hen thay vi quet — FR-QR-08. */
