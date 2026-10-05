@@ -189,12 +189,25 @@ export class BookingQueryDto extends PaginationQueryDto {
 
   @IsOptional() @Matches(DATE_PATTERN) to?: string;
 
-  /** SC-01a va SC-21 — chi lay lich hen con o phia truoc. */
+  /** SC-21 — chi lay lich hen con o phia truoc. */
   @ApiPropertyOptional({ description: 'Chi lay lich hen chua dien ra' })
   @IsOptional()
   @Transform(({ value }) => value === true || value === 'true')
   @IsBoolean()
   upcoming?: boolean;
+
+  /**
+   * SC-01a — lich hen con dang dang do, ke ca da qua gio hen.
+   *
+   * Khac `upcoming` o cho xe dang nam trong xuong van tinh: gio hen da
+   * troi qua nhung viec chua xong, va day moi la lich khach quan tam nhat
+   * khi mo trang chu. Chi bo nhung lich da ban giao, da huy hoac khong den.
+   */
+  @ApiPropertyOptional({ description: 'Chi lay lich hen chua dong' })
+  @IsOptional()
+  @Transform(({ value }) => value === true || value === 'true')
+  @IsBoolean()
+  active?: boolean;
 }
 
 export class CalendarQueryDto {

@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 import { PageDto } from 'src/common/dto';
 import {
+  BOOKING_OPEN_STATUSES,
   BOOKING_TRANSITIONS,
   BookingServiceType,
   BookingStage,
@@ -761,6 +762,11 @@ export class BookingsService {
         'b.status IN (:...openStatuses)',
         { openStatuses: [BookingStatus.PENDING, BookingStatus.CONFIRMED] },
       );
+    }
+    if (query.active) {
+      qb.andWhere('b.status IN (:...activeStatuses)', {
+        activeStatuses: BOOKING_OPEN_STATUSES,
+      });
     }
   }
 
