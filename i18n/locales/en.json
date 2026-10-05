@@ -1531,7 +1531,8 @@
     "privacyLink": "privacy policy",
     "submit": "Sign up & get OTP",
     "termsLink": "terms of use",
-    "title": "Sign up"
+    "title": "Sign up",
+    "countryCode": "Country code"
   },
   "sc18": {
     "lookupCta": "Look up a booking →",

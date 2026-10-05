@@ -1531,7 +1531,8 @@
     "privacyLink": "chính sách dữ liệu",
     "submit": "Đăng ký & nhận mã OTP",
     "termsLink": "điều khoản sử dụng",
-    "title": "Đăng ký"
+    "title": "Đăng ký",
+    "countryCode": "Mã quốc gia"
   },
   "sc18": {
     "lookupCta": "Tra cứu lịch hẹn →",
