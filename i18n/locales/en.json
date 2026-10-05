@@ -439,14 +439,6 @@
     "manual": "Enter the code by hand",
     "manualHint": "Use this when the QR code will not scan.",
     "openBooking": "Open the booking",
-    "plateDemo": "Demo only. No plate-reading AI is connected, so this is the plate of a booking waiting to be received.",
-    "plateHint": "When the customer cannot open their QR code, find the booking by plate number.",
-    "plateNotRead": "No plate number could be read from the photo",
-    "plateRead": "Plate number read",
-    "plateReading": "Reading…",
-    "plateShoot": "Photograph the plate",
-    "plateTitle": "Look up by plate",
-    "plateTypeIn": "Please type it in instead.",
     "reason": {
       "ALREADY_RECEIVED": "This bike is already received. Open the work order to see progress.",
       "CANCELLED": "This booking was cancelled. Ask the customer if they want to rebook.",
@@ -463,7 +455,9 @@
     "valid": "Valid",
     "validToast": "Valid code",
     "validToastSub": "You can receive the bike.",
-    "when": "Appointment"
+    "when": "Appointment",
+    "searchTitle": "Look up by plate or phone",
+    "searchHint": "If the customer can't open their QR code, find the booking by plate number or phone."
   },
   "sa08": {
     "accessories": "Accessories left with the bike",

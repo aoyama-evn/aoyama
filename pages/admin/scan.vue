@@ -20,14 +20,13 @@ const checking = ref(false);
 const manualCode = ref('');
 
 /**
- * Tra theo bien so — duong vao thu ba canh quet ma QR va nhap ma lich hen.
- * May chu so khop long nen go kieu nao cung duoc: 29T1-122.12, 29T1.122.12
- * hay 29t1 12212 deu ra cung mot xe.
+ * Mot o tim duy nhat — go bien so HAY so dien thoai deu duoc.
+ *
+ * Le tan khong nen phai chon truoc minh dang go cai gi: may chu nhin
+ * chuoi la doan, doan sai thi thu not kieu kia. So khop long nen
+ * "29t1 12212" hay "090-1234-5678" deu ra dung nguoi.
  */
-const plate = ref('');
-const readingPlate = ref(false);
-/** Bien so vua doc ra tu anh la so lieu dung thu, chua phai ket qua AI that. */
-const plateIsDemo = ref(false);
+const term = ref('');
 
 /** Goi y xu ly cho tung ly do tu choi; ly do la khoa dung chung ba thu tieng. */
 function reasonHint(reason: string): string {
@@ -64,7 +63,7 @@ function remember(entry: RecentScan): void {
   }
 }
 
-async function check(payload: { token?: string; code?: string; plate?: string }): Promise<void> {
+async function check(payload: { token?: string; code?: string; search?: string }): Promise<void> {
   checking.value = true;
   result.value = null;
   try {
@@ -88,49 +87,8 @@ function submitManual(): void {
   if (manualCode.value.trim()) check({ code: manualCode.value.trim().toUpperCase() });
 }
 
-function submitPlate(): void {
-  if (plate.value.trim()) check({ plate: plate.value.trim() });
-}
-
-function readAsDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-/**
- * AI-05 — chup bien so roi de may doc ho. Nguoi van phai nhin lai truoc khi
- * bam tra cuu, giong nguyen tac o man nhan dang phu tung (BR-43).
- */
-async function readPlateFromImage(event: Event): Promise<void> {
-  const input = event.target as HTMLInputElement;
-  const file = input.files?.[0];
-  if (!file) return;
-
-  readingPlate.value = true;
-  plateIsDemo.value = false;
-  try {
-    const read = await api.post<{ plateNumber?: string; confidence?: number; isDemo: boolean }>(
-      '/admin/ai/plate-recognition',
-      { imageUrls: [await readAsDataUrl(file)] },
-    );
-    if (!read.plateNumber) {
-      ui.warning(t('sa07.plateNotRead'), t('sa07.plateTypeIn'));
-      return;
-    }
-    plate.value = read.plateNumber;
-    plateIsDemo.value = read.isDemo;
-    if (read.isDemo) ui.info(t('sa07.plateRead'), t('sa07.plateDemo'));
-    else ui.success(t('sa07.plateRead'));
-  } catch (error) {
-    ui.error(normalizeError(error).message);
-  } finally {
-    readingPlate.value = false;
-    input.value = '';
-  }
+function submitSearch(): void {
+  if (term.value.trim()) check({ search: term.value.trim() });
 }
 
 useHead({ title: () => `${t('sa07.title')} — AOYAMA Admin` });
@@ -176,53 +134,29 @@ useHead({ title: () => `${t('sa07.title')} — AOYAMA Admin` });
         </section>
 
         <section class="card gap-2.5" style="background: #fff">
-          <h5>{{ $t('sa07.plateTitle') }}</h5>
-          <p class="text-muted text-[12.5px]">{{ $t('sa07.plateHint') }}</p>
+          <h5>{{ $t('sa07.searchTitle') }}</h5>
+          <p class="text-muted text-[12.5px]">{{ $t('sa07.searchHint') }}</p>
 
           <div class="flex flex-wrap gap-2.5">
             <input
-              v-model="plate"
-              class="input min-w-[150px] flex-1"
-              placeholder="29T1-122.12"
+              v-model="term"
+              class="input min-w-[180px] flex-1"
+              type="search"
+              placeholder="29T1-122.12 / 090-1234-5678"
               autocomplete="off"
-              :aria-label="$t('sa07.plateTitle')"
-              @keyup.enter="submitPlate"
+              :aria-label="$t('sa07.searchTitle')"
+              @keyup.enter="submitSearch"
             />
             <button
               type="button"
               class="btn btn-primary flex-none"
               style="min-height: 46px; padding-inline: 20px"
-              :disabled="!plate.trim() || checking"
-              @click="submitPlate"
+              :disabled="!term.trim() || checking"
+              @click="submitSearch"
             >
               {{ $t('sa07.lookup') }}
             </button>
           </div>
-
-          <!-- AI-05: chup bien so cho may doc ho, nguoi xac nhan lai -->
-          <label class="btn btn-secondary cursor-pointer self-start gap-1.5 text-[12.5px]">
-            <svg
-              width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
-            >
-              <rect x="3" y="6" width="18" height="13" rx="3" />
-              <circle cx="12" cy="12.5" r="3.4" />
-            </svg>
-            {{ readingPlate ? $t('sa07.plateReading') : $t('sa07.plateShoot') }}
-            <input
-              type="file" class="sr-only" accept="image/*" capture="environment"
-              :disabled="readingPlate"
-              @change="readPlateFromImage"
-            >
-          </label>
-
-          <p
-            v-if="plateIsDemo"
-            class="text-[11.5px] leading-[1.45]"
-            style="color: var(--color-accent-2-800)"
-          >
-            {{ $t('sa07.plateDemo') }}
-          </p>
         </section>
 
         <section

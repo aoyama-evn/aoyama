@@ -439,14 +439,6 @@
     "manual": "Nhập mã thủ công",
     "manualHint": "Dùng khi không quét được mã QR.",
     "openBooking": "Mở chi tiết lịch hẹn",
-    "plateDemo": "Đây là bản demo. Chưa nối AI đọc biển số nên hệ thống lấy tạm biển của một lịch hẹn đang chờ tiếp nhận.",
-    "plateHint": "Khách không mở được mã QR thì tìm lịch hẹn bằng biển số xe.",
-    "plateNotRead": "Không đọc được biển số từ ảnh",
-    "plateRead": "Đã đọc được biển số",
-    "plateReading": "Đang đọc…",
-    "plateShoot": "Chụp biển số",
-    "plateTitle": "Tra theo biển số",
-    "plateTypeIn": "Bạn gõ tay giúp nhé.",
     "reason": {
       "ALREADY_RECEIVED": "Xe đã được tiếp nhận trước đó. Mở phiếu dịch vụ để xem tiến độ.",
       "CANCELLED": "Lịch hẹn này đã bị hủy. Hỏi khách có muốn đặt lại không.",
@@ -463,7 +455,9 @@
     "valid": "Hợp lệ",
     "validToast": "Mã hợp lệ",
     "validToastSub": "Có thể tiếp nhận xe.",
-    "when": "Thời gian hẹn"
+    "when": "Thời gian hẹn",
+    "searchTitle": "Tra theo biển số hoặc số điện thoại",
+    "searchHint": "Khách không mở được mã QR thì tìm lịch hẹn bằng biển số xe hoặc số điện thoại."
   },
   "sa08": {
     "accessories": "Phụ kiện đi kèm",
