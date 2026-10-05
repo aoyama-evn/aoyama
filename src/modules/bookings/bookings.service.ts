@@ -356,11 +356,13 @@ export class BookingsService {
 
     const rows: {
       bookingId: string;
+      workOrderId: string | null;
       woStatus: string | null;
       quoteStatus: string | null;
       started: boolean | null;
     }[] = await this.dataSource.query(
       `select b.id as "bookingId",
+              w.id as "workOrderId",
               w.status as "woStatus",
               q.status as "quoteStatus",
               exists(
@@ -384,7 +386,9 @@ export class BookingsService {
 
     const byBooking = new Map(rows.map((r) => [r.bookingId, r]));
     for (const booking of bookings) {
-      booking.stage = resolveStage(booking.status, byBooking.get(booking.id));
+      const row = byBooking.get(booking.id);
+      booking.stage = resolveStage(booking.status, row);
+      booking.workOrderId = row?.workOrderId ?? null;
     }
   }
 

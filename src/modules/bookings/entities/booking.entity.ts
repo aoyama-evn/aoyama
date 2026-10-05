@@ -159,6 +159,13 @@ export class Booking extends BaseEntity {
    */
   stage?: BookingStage;
 
+  /**
+   * Phieu dich vu dang mo cua lich hen — KHONG luu trong CSDL, gan kem
+   * `stage` de danh sach quan tri bam thang vao viec can lam ma khong
+   * phai goi them mot vong nua cho tung dong.
+   */
+  workOrderId?: string | null;
+
   pendingQuotation?: {
     token: string;
     code: string;
