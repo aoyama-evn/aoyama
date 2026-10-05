@@ -25,6 +25,12 @@ const memberItems = computed<Item[]>(() => [
   { to: '/services', label: t('nav.services'), icon: 'services' },
   { to: '/account/vehicles', label: t('nav.myVehicles'), icon: 'vehicles' },
   { to: '/account/bookings', label: t('nav.myBookings'), icon: 'bookings' },
+  /**
+   * Thanh vien cung can tra cuu: lich dat truoc khi lap tai khoan, hoac
+   * lich nguoi nha dat ho bang so khac, deu khong nam trong "Lich hen cua
+   * toi" ma chi tim duoc bang ma hoac so dien thoai.
+   */
+  { to: '/booking/lookup', label: t('nav.lookup'), icon: 'lookup' },
   { to: '/account/profile', label: t('nav.myProfile'), icon: 'profile' },
 ]);
 

@@ -1298,12 +1298,11 @@
   "sc01": {
     "askAi": "Xe đang gặp vấn đề? Hỏi trợ lý AI",
     "bookCta": "Đặt lịch ngay · Book now",
-    "haveCode": "Đã có mã lịch hẹn?",
-    "haveCodeLead": "Tra cứu bằng mã lịch hẹn và số điện thoại — không cần đăng nhập.",
+    "haveCodeLead": "Nhập mã lịch hẹn hoặc số điện thoại — không cần đăng nhập.",
     "heroAlt": "Xe máy tại AOYAMA",
     "kicker": "Bảo dưỡng & sửa chữa xe máy",
     "lead": "Aoyama Motorcycle xử lý mọi dịch vụ từ bảo dưỡng đến kiểm tra, sửa chữa vỏ, sơn, phụ tùng các dòng xe máy. Hãy để mọi thứ liên quan đến xe của bạn cho chúng tôi!",
-    "lookupCta": "Tra cứu lịch hẹn →",
+    "lookupCta": "Tra cứu lịch hẹn",
     "servicesTitle": "Dịch vụ · Services",
     "title": "Hỗ trợ toàn diện cho cuộc sống xe máy của bạn",
     "upcomingKicker": "Lịch hẹn sắp tới"

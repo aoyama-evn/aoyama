@@ -1298,12 +1298,11 @@
   "sc01": {
     "askAi": "Bike trouble? Ask the AI assistant",
     "bookCta": "Book now",
-    "haveCode": "Already have a booking code?",
-    "haveCodeLead": "Look it up with your booking code and phone number — no account needed.",
+    "haveCodeLead": "Enter a booking code or phone number — no sign-in needed.",
     "heroAlt": "A motorcycle at AOYAMA",
     "kicker": "Motorcycle service & repair",
     "lead": "Aoyama Motorcycle handles everything from servicing and inspection to bodywork, paint and parts. Leave anything about your bike to us.",
-    "lookupCta": "Look up a booking →",
+    "lookupCta": "Look up a booking",
     "servicesTitle": "Services",
     "title": "Full support for your motorcycle life",
     "upcomingKicker": "Next booking"
