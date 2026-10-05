@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Quotation } from '~/types/models';
+import type { ApiError, Quotation } from '~/types/models';
 
 /** SC-27 Xem bao gia — FR-QUO-07, NFR-SE-08 (duong dan kho doan). */
 const route = useRoute();
@@ -23,11 +23,40 @@ const laborTotal = computed(() =>
 );
 const partsTotal = computed(() => parts.value.reduce((s, i) => s + i.unitPrice * i.quantity, 0));
 
+const ui = useUiStore();
+
 const rejectOpen = ref(false);
+const acceptOpen = ref(false);
+const accepting = ref(false);
+const error = ref<ApiError | null>(null);
 
 async function onResponded(): Promise<void> {
   rejectOpen.value = false;
   await refresh();
+}
+
+/**
+ * Dong y ngay tai day thay vi di qua mot man phan hoi rieng.
+ *
+ * Man do co cho khach bo bot hang muc tuy chon, nhung bieu mau lap bao gia
+ * ben quan tri khong danh dau hang muc nao la tuy chon ca — nen thuc te
+ * khach chi phai bam qua mot man trung gian khong co gi de chon. Mot cau
+ * hoi Co/Khong la du.
+ */
+async function acceptQuotation(): Promise<void> {
+  accepting.value = true;
+  error.value = null;
+  try {
+    await api.post(`/quotations/${token}/respond`, { accept: true });
+    acceptOpen.value = false;
+    ui.success(t('sc28.sentAccept'), t('sc28.sentSub'));
+    await refresh();
+  } catch (caught) {
+    error.value = normalizeError(caught);
+    acceptOpen.value = false;
+  } finally {
+    accepting.value = false;
+  }
 }
 
 const canRespond = computed(() => quotation.value?.status === 'SENT');
@@ -139,10 +168,12 @@ useHead({ title: () => t('sc27.title', { code: quotation.value?.code ?? '' }) })
       </template>
     </p>
 
+    <AyErrorNote :error="error" />
+
     <template v-if="canRespond && !expired">
-      <NuxtLink :to="`/quotations/${token}/respond?accept=1`" class="btn btn-primary btn-cta">
+      <button type="button" class="btn btn-primary btn-cta" @click="acceptOpen = true">
         {{ $t('sc27.accept') }}
-      </NuxtLink>
+      </button>
       <button
         type="button"
         class="btn btn-secondary btn-block"
@@ -180,6 +211,17 @@ useHead({ title: () => t('sc27.title', { code: quotation.value?.code ?? '' }) })
       Dat cuoi cung: xen vao giua chuoi v-if/v-else-if o tren se lam dut
       mach va Vue bao "v-else-if khong co v-if lien ke".
     -->
+    <AyConfirmDialog
+      :open="acceptOpen"
+      :title="$t('sc27.confirmAccept')"
+      :message="$t('sc27.confirmAcceptBody', { amount: money(quotation.totalAmount) })"
+      :confirm-label="$t('common.yes')"
+      :cancel-label="$t('common.no')"
+      :loading="accepting"
+      @confirm="acceptQuotation"
+      @cancel="acceptOpen = false"
+    />
+
     <AyQuoteRejectDialog
       :open="rejectOpen"
       :token="token"
