@@ -15,7 +15,14 @@ const { data } = await useAsyncData('home-services', () =>
   api.get<ServiceItem[]>('/services/featured'),
 );
 
-/** Lich hen sap toi chi co y nghia voi thanh vien, nen goi rieng. */
+/**
+ * Lich hen sap toi chi co y nghia voi thanh vien, nen goi rieng.
+ *
+ * Chi goi tu phia trinh duyet. Phien dang nhap nam trong localStorage nen
+ * may chu dung trang khong biet khach la ai: no tra ve null, roi ban null
+ * do di kem trang va duoc dung lai khi trang song day — thanh vien tai lai
+ * trang chu se khong bao gio thay lich cua minh.
+ */
 const { data: upcomingData } = await useAsyncData(
   'home-upcoming',
   async () => {
@@ -27,7 +34,7 @@ const { data: upcomingData } = await useAsyncData(
     });
     return { booking: page.items[0] ?? null };
   },
-  { watch: [() => auth.isCustomer] },
+  { server: false, lazy: true, watch: [() => auth.isCustomer] },
 );
 
 const upcoming = computed(() => upcomingData.value?.booking ?? null);
@@ -89,14 +96,32 @@ function priceLabel(service: ServiceItem): string {
     </div>
 
     <!--
-      SC-01 — tra cuu lich hen bang ma hoac so dien thoai.
-      Truoc day the nay nam cuoi trang, duoi ca danh sach dich vu, va chi
-      hien cho khach chua dang nhap. Nguoi vua nhan tin nhan xac nhan mo
-      trang len la de tim lich cua minh — ho khong phai cuon qua het moi
-      thu moi thay. Thanh vien cung giu lai: lich dat truoc khi lap tai
-      khoan, hay lich nguoi nha dat ho, khong nam trong "Lich hen cua toi".
+      Mot cho ngay duoi hai nut lon, hai ban tuy nguoi dang xem.
+      Truoc day ca hai deu nam cuoi trang, duoi danh sach nam dich vu:
+      nguoi vua nhan tin nhan xac nhan mo trang len la de xem lich cua
+      minh, ho khong phai cuon qua het moi thu moi thay.
     -->
+
+    <!-- SC-01a — thanh vien: lich hen gan den nhat -->
+    <AyBookingCard
+      v-if="auth.isCustomer && upcoming"
+      :booking="upcoming"
+      :kicker="$t('sc01.upcomingKicker')"
+    >
+      <template #actions>
+        <NuxtLink
+          to="/account/bookings"
+          class="btn btn-ghost px-1 text-[12.5px]"
+          style="color: var(--color-accent-700)"
+        >
+          {{ $t('nav.myBookings') }} →
+        </NuxtLink>
+      </template>
+    </AyBookingCard>
+
+    <!-- SC-01 — khach chua dang nhap: tra cuu bang ma hoac so dien thoai -->
     <NuxtLink
+      v-else-if="!auth.isCustomer"
       to="/booking/lookup"
       class="card flex-row items-center gap-3"
       style="color: inherit; text-decoration: none"
@@ -139,22 +164,5 @@ function priceLabel(service: ServiceItem): string {
         <span class="whitespace-nowrap font-heading text-[13.5px]">{{ priceLabel(service) }}</span>
       </NuxtLink>
     </section>
-
-    <!-- SC-01a: lich hen sap toi cua thanh vien -->
-    <AyBookingCard
-      v-if="auth.isCustomer && upcoming"
-      :booking="upcoming"
-      :kicker="$t('sc01.upcomingKicker')"
-    >
-      <template #actions>
-        <NuxtLink
-          to="/account/bookings"
-          class="btn btn-ghost px-1 text-[12.5px]"
-          style="color: var(--color-accent-700)"
-        >
-          {{ $t('nav.myBookings') }} →
-        </NuxtLink>
-      </template>
-    </AyBookingCard>
   </div>
 </template>
