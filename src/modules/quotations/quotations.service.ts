@@ -325,6 +325,31 @@ export class QuotationsService {
         quotation.taxAmount = totals.taxAmount;
         quotation.totalAmount = totals.totalAmount;
         quotation.status = QuotationStatus.ACCEPTED;
+
+        /**
+         * Phieu dich vu phai noi dung thu khach vua dong y tra tien.
+         *
+         * Hang muc cua phieu sinh ra o buoc chan doan va truoc day khong ai
+         * dung lai. Bao gia bi tra lai, nhan vien bo bot mot hang muc roi
+         * gui ban moi, khach chot — tho mo man "Dang tien hanh" van thay
+         * hang muc da bo, va tong tien phieu lech han bao gia.
+         */
+        await this.workOrders.applyAcceptedQuotation(
+          quotation.workOrderId,
+          accepted.map((i) => ({
+            kind: i.kind,
+            serviceId: i.serviceId,
+            partId: i.partId,
+            name: i.name,
+            description: i.description,
+            unitPrice: i.unitPrice,
+            quantity: i.quantity,
+            suggestedByAi: i.suggestedByAi,
+            sortOrder: i.sortOrder,
+          })),
+          quotation.discountAmount,
+          manager,
+        );
       } else {
         quotation.status = QuotationStatus.REJECTED;
         quotation.rejectReason = dto.reason ?? null;
@@ -339,6 +364,11 @@ export class QuotationsService {
       quotation.recordedById = actorId;
       await manager.getRepository(Quotation).save(quotation);
     });
+
+    // Ngoai giao dich: tinh lai tien cua phieu tu danh sach vua dung lai.
+    if (dto.accept) {
+      await this.workOrders.recalculateAmounts(quotation.workOrderId);
+    }
 
     /**
      * Khach chot bao gia la tin hieu nhan vien cho: bat tay vao sua duoc roi.

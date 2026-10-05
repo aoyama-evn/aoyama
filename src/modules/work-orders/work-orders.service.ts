@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, In, Repository } from 'typeorm';
 import { PageDto } from 'src/common/dto';
 import {
   NotificationChannel,
@@ -15,6 +15,7 @@ import { applyTax, formatAppDateTime, sumLines, yen } from 'src/common/utils';
 import { Actor, BookingsService } from 'src/modules/bookings/bookings.service';
 import { CustomersService } from 'src/modules/customers/customers.service';
 import { NotificationsService } from 'src/modules/notifications/notifications.service';
+import { Part } from 'src/modules/parts/entities/part.entity';
 import { InventoryService } from 'src/modules/parts/inventory.service';
 import { SettingsService, SETTING_KEYS } from 'src/modules/system/settings.service';
 import { VehiclesService } from 'src/modules/vehicles/vehicles.service';
@@ -489,6 +490,121 @@ export class WorkOrdersService {
     await this.repo.update(workOrderId, { progressPercent: percent });
 
     return this.findById(workOrderId);
+  }
+
+  /**
+   * Dung lai hang muc cua phieu theo ban bao gia khach vua chot — FR-QUO-09.
+   *
+   * Hang muc cua phieu sinh ra o buoc chan doan. Neu khach tra lai bao gia,
+   * nhan vien bo bot mot hang muc roi gui lai, va khach chot ban moi — thi
+   * cho tiec la phieu van giu nguyen danh sach cu. Tho mo man "Dang tien
+   * hanh" se thay ca hang muc khach da khong dong y tra tien, va tong tien
+   * cua phieu lech han so voi bao gia.
+   *
+   * Nen luc khach chot, danh sach cua phieu duoc dung lai tu dung nhung
+   * dong khach dong y. Dong nao con lai thi giu thoi gian cong va tien do
+   * dang co — nhan vien da bam "dang lam" roi khong phai bam lai.
+   */
+  async applyAcceptedQuotation(
+    workOrderId: string,
+    lines: {
+      kind: string;
+      serviceId: string | null;
+      partId: string | null;
+      name: string;
+      description: string | null;
+      unitPrice: number;
+      quantity: number;
+      suggestedByAi: boolean;
+      sortOrder: number;
+    }[],
+    discountAmount: number,
+    manager: EntityManager,
+  ): Promise<void> {
+    const itemRepo = manager.getRepository(WorkOrderItem);
+    const partRepo = manager.getRepository(WorkOrderPart);
+
+    const labour = lines.filter((l) => l.kind !== 'PART');
+    const parts = lines.filter((l) => l.kind === 'PART');
+
+    // ---- hang muc cong ----
+    const oldItems = await itemRepo.find({ where: { workOrderId } });
+    const itemKey = (serviceId: string | null, name: string): string =>
+      `${serviceId ?? ''}|${name.trim().toLowerCase()}`;
+    const beforeItems = new Map(oldItems.map((i) => [itemKey(i.serviceId, i.name), i]));
+
+    await itemRepo.delete({ workOrderId });
+    if (labour.length > 0) {
+      await itemRepo.insert(
+        labour.map((line, index) => {
+          /**
+           * Bao gia khong mang thoi gian cong — do la so ky thuat vien uoc
+           * luong o buoc chan doan. Dong nao van con thi lay lai so cu, mat
+           * di thi man "Dang tien hanh" khong con biet moi viec lam bao lau.
+           */
+          const prev = beforeItems.get(itemKey(line.serviceId, line.name));
+          return {
+            workOrderId,
+            serviceId: line.serviceId,
+            name: line.name,
+            description: line.description ?? prev?.description ?? null,
+            unitPrice: line.unitPrice,
+            quantity: line.quantity,
+            laborMinutes: prev?.laborMinutes ?? null,
+            suggestedByAi: line.suggestedByAi,
+            state: prev?.state ?? WorkItemState.PENDING,
+            sortOrder: line.sortOrder ?? index,
+          };
+        }),
+      );
+    }
+
+    // ---- phu tung ----
+    const oldParts = await partRepo.find({ where: { workOrderId } });
+    const partKey = (partId: string | null, name: string): string =>
+      partId ?? `ten:${name.trim().toLowerCase()}`;
+    const beforeParts = new Map(oldParts.map((p) => [partKey(p.partId, p.partName), p]));
+
+    // Ma phu tung khong nam trong dong bao gia; tra ve danh muc de lay.
+    const partIds = parts.map((l) => l.partId).filter((x): x is string => Boolean(x));
+    const codes = new Map<string, string>();
+    if (partIds.length > 0) {
+      const rows = await manager.getRepository(Part).find({
+        where: { id: In(partIds) },
+        select: { id: true, code: true },
+      });
+      for (const row of rows) codes.set(row.id, row.code);
+    }
+
+    await partRepo.delete({ workOrderId });
+    if (parts.length > 0) {
+      await partRepo.insert(
+        parts.map((line) => {
+          const prev = beforeParts.get(partKey(line.partId, line.name));
+          return {
+            workOrderId,
+            partId: line.partId,
+            partName: line.name,
+            partCode: (line.partId ? codes.get(line.partId) : null) ?? prev?.partCode ?? null,
+            unitPrice: line.unitPrice,
+            quantity: line.quantity,
+            suggestedByAi: line.suggestedByAi,
+          };
+        }),
+      );
+    }
+
+    /**
+     * Phan tram tien do tinh theo so hang muc da xong tren tong so. Danh
+     * sach vua doi nen mau so doi theo; khong tinh lai thi thanh tien do o
+     * man khach (SC-26) bao mot con so cua danh sach khong con ton tai.
+     */
+    const remaining = await itemRepo.find({ where: { workOrderId } });
+    const done = remaining.filter((i) => i.state === WorkItemState.DONE).length;
+    const progressPercent = remaining.length === 0 ? 0 : Math.round((done / remaining.length) * 100);
+
+    // Giam gia da thoa thuan tren bao gia cung phai theo sang phieu.
+    await manager.getRepository(WorkOrder).update(workOrderId, { discountAmount, progressPercent });
   }
 
   /** BR-38 — tinh lai tong tien tu hang muc va phu tung hien co. */
