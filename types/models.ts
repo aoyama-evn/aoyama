@@ -438,8 +438,13 @@ export interface PublicProgress {
   /** SC-26 ve ca chang lich hen tren cung mot dong thoi gian. */
   bookingTimeline: { status: BookingStatus; at: string; note: string | null }[];
   hasQr: boolean;
-  /** Ban bao gia dang cho khach tra loi — nut "Xem bao gia" dan toi day. */
+  /** Ban bao gia dang cho khach tra loi — dung cho dong "dang cho ban". */
   pendingQuotation?: PendingQuotation | null;
+  /**
+   * Ban bao gia moi nhat, ke ca khi da chot. Nut "Xem bao gia" dan toi day
+   * nen chot xong roi khach van mo lai xem duoc.
+   */
+  quotation?: { token: string; code: string; totalAmount: number; status: QuotationStatus } | null;
   /** Luc khach bam dong y bao gia — moc rieng tren duong thoi gian SC-26. */
   quoteAcceptedAt?: string | null;
   vehicle: { maker: string; model: string; plateNumber: string } | null;

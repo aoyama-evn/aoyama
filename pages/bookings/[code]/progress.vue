@@ -247,11 +247,17 @@ useHead({ title: () => t('sc26.headTitle', { code }) });
           Dan thang toi ban bao gia. Truoc day nut nay tro ve man chi tiet
           lich hen, khach bam vao chi thay mot cai ma QR chu khong phai bao
           gia nao ca.
+
+          Dung `quotation` chu khong phai `pendingQuotation`: chot xong roi
+          khach van muon mo lai xem minh da dong y nhung gi va het bao nhieu.
+          Man bao gia tu an cac nut dong y, tu choi, xem lai khi ban do
+          khong con cho tra loi, nen o day khong phai chan them.
         -->
         <NuxtLink
-          v-if="progress.pendingQuotation"
-          :to="`/quotations/${progress.pendingQuotation.token}`"
-          class="btn btn-primary mt-2 text-[12px]"
+          v-if="progress.quotation"
+          :to="`/quotations/${progress.quotation.token}`"
+          class="mt-2 text-[12px]"
+          :class="progress.pendingQuotation ? 'btn btn-primary' : 'btn btn-secondary'"
           style="min-height: 34px"
         >
           {{ $t('sc26.viewQuote') }}
