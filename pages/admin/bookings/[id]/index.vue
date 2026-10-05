@@ -163,14 +163,50 @@ async function markCompleted(): Promise<void> {
   }
 }
 
-async function setItemState(itemId: string, state: string): Promise<void> {
-  if (!openOrder.value) return;
-  savingItem.value = itemId;
+/**
+ * Doi tien do mot hang muc phai hoi lai — giong o man ho so dich vu.
+ *
+ * Khach thay thay doi nay ngay tren man theo doi tien do, va phan tram
+ * tien do cua ca xe tinh theo no. Mot cu bam nham vao o chon — rat de xay
+ * ra khi cuon bang chuot — la khach nhan duoc tin bao cho viec chua ai
+ * dong vao.
+ */
+const pendingItem = ref<{
+  id: string;
+  name: string;
+  state: string;
+  previous: string;
+  el: HTMLSelectElement;
+} | null>(null);
+
+function askItemState(item: { id: string; name: string; state: string }, event: Event): void {
+  const el = event.target as HTMLSelectElement;
+  pendingItem.value = { id: item.id, name: item.name, state: el.value, previous: item.state, el };
+}
+
+/**
+ * O chon da nhay sang gia tri moi ngay luc bam. Bo thi phai tra lai bang
+ * tay: Vue khong ve lai o do vi item.state trong du lieu dau co doi.
+ */
+function dropItemState(): void {
+  const pending = pendingItem.value;
+  if (pending) pending.el.value = pending.previous;
+  pendingItem.value = null;
+}
+
+async function setItemState(): Promise<void> {
+  const pending = pendingItem.value;
+  if (!openOrder.value || !pending) return;
+  savingItem.value = pending.id;
   try {
-    await api.put(`/admin/work-orders/${openOrder.value.id}/items/${itemId}/state`, { state });
+    await api.put(`/admin/work-orders/${openOrder.value.id}/items/${pending.id}/state`, {
+      state: pending.state,
+    });
+    pendingItem.value = null;
     await refreshOrder();
   } catch (error) {
     ui.error(normalizeError(error).message);
+    dropItemState();
   } finally {
     savingItem.value = null;
   }
@@ -271,25 +307,7 @@ useHead({ title: () => `${t('sa05.headTitle', { code: booking.value?.code ?? '' 
       ngay tai day. Khach cung thay thay doi nay o man theo doi tien do.
     -->
     <section v-if="atWork && (openOrder?.items ?? []).length" class="card gap-2.5" style="background: #fff">
-      <div class="flex items-baseline justify-between gap-2.5">
-        <h5>{{ $t('sa10.items') }}</h5>
-        <!--
-          Tho tick xong hang muc cuoi cung thi viec ke tiep la bao da xong,
-          chu khong phai mo them mot man nua de tim nut do. Phieu da xong
-          roi thi khong con gi de bam, de lai duong sang phieu dich vu.
-        -->
-        <AyButton
-          v-if="openOrder!.status === 'IN_PROGRESS'"
-          size="sm"
-          :loading="completing"
-          @click="confirmDone = true"
-        >
-          {{ $t('sa05.markDone') }}
-        </AyButton>
-        <NuxtLink v-else :to="`/admin/work-orders/${openOrder!.id}`" class="btn btn-ghost text-[12.5px]">
-          {{ $t('sa05.openOrder') }}
-        </NuxtLink>
-      </div>
+      <h5>{{ $t('sa10.items') }}</h5>
 
       <div
         v-for="item in openOrder!.items"
@@ -306,7 +324,7 @@ useHead({ title: () => `${t('sa05.headTitle', { code: booking.value?.code ?? '' 
           :value="item.state"
           :disabled="savingItem === item.id"
           :aria-label="$t('sa10.itemStateFor', { name: item.name })"
-          @change="setItemState(item.id, ($event.target as HTMLSelectElement).value)"
+          @change="askItemState(item, $event)"
         >
           <option v-for="st in ITEM_STATES" :key="st" :value="st">
             {{ $t(`workItem.${st}`) }}
@@ -556,6 +574,17 @@ useHead({ title: () => `${t('sa05.headTitle', { code: booking.value?.code ?? '' 
           {{ $t('sa05.goDiagnosis') }}
         </NuxtLink>
       </template>
+      <!--
+        Tho tick xong hang muc cuoi cung thi viec ke tiep la bao da xong,
+        chu khong phai mo them mot man nua de di tim nut do.
+      -->
+      <AyButton
+        v-else-if="openOrder && openOrder.status === 'IN_PROGRESS'"
+        :loading="completing"
+        @click="confirmDone = true"
+      >
+        {{ $t('sa05.markDone') }}
+      </AyButton>
       <NuxtLink
         v-else-if="openOrder"
         :to="`/admin/work-orders/${openOrder.id}`"
@@ -601,6 +630,24 @@ useHead({ title: () => `${t('sa05.headTitle', { code: booking.value?.code ?? '' 
         </template>
       </AyField>
     </AyConfirmDialog>
+
+    <AyConfirmDialog
+      :open="pendingItem !== null"
+      :title="$t('sa10.askItemState')"
+      :message="
+        pendingItem
+          ? $t('sa10.askItemStateBody', {
+            name: pendingItem.name,
+            state: $t(`workItem.${pendingItem.state}`),
+          })
+          : ''
+      "
+      :confirm-label="$t('common.yes')"
+      :cancel-label="$t('common.no')"
+      :loading="savingItem !== null"
+      @confirm="setItemState"
+      @cancel="dropItemState"
+    />
 
     <!-- Khong co duong lui tu "Da xong" ve "Dang tien hanh" — NFR-UX-08. -->
     <AyConfirmDialog

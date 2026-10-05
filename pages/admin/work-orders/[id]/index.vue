@@ -15,7 +15,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
-const { t } = useI18n();
+const { t, te } = useI18n();
 const { i18n, money, dateTime, number } = useFormat();
 
 const id = route.params.id as string;
@@ -29,13 +29,48 @@ const id = route.params.id as string;
 const ITEM_STATES = ['PENDING', 'IN_PROGRESS', 'DONE'] as const;
 const savingItem = ref<string | null>(null);
 
-async function setItemState(itemId: string, state: string): Promise<void> {
-  savingItem.value = itemId;
+/**
+ * Doi tien do mot hang muc phai hoi lai.
+ *
+ * Khach thay thay doi nay ngay tren man theo doi tien do, va phan tram
+ * tien do cua ca phieu tinh theo no. Mot cu bam nham vao o chon — rat de
+ * xay ra khi cuon bang chuot — la khach nhan duoc tin "xe da xong" cho
+ * viec chua ai dong vao.
+ */
+const pendingItem = ref<{
+  id: string;
+  name: string;
+  state: string;
+  previous: string;
+  el: HTMLSelectElement;
+} | null>(null);
+
+function askItemState(item: { id: string; name: string; state: string }, event: Event): void {
+  const el = event.target as HTMLSelectElement;
+  pendingItem.value = { id: item.id, name: item.name, state: el.value, previous: item.state, el };
+}
+
+/**
+ * O chon da nhay sang gia tri moi ngay luc bam. Bo thi phai tra lai bang
+ * tay: Vue khong ve lai o do vi item.state trong du lieu dau co doi.
+ */
+function dropItemState(): void {
+  const pending = pendingItem.value;
+  if (pending) pending.el.value = pending.previous;
+  pendingItem.value = null;
+}
+
+async function setItemState(): Promise<void> {
+  const pending = pendingItem.value;
+  if (!pending) return;
+  savingItem.value = pending.id;
   try {
-    await api.put(`/admin/work-orders/${id}/items/${itemId}/state`, { state });
+    await api.put(`/admin/work-orders/${id}/items/${pending.id}/state`, { state: pending.state });
+    pendingItem.value = null;
     await refresh();
   } catch (error) {
     ui.error(normalizeError(error).message);
+    dropItemState();
   } finally {
     savingItem.value = null;
   }
@@ -48,7 +83,12 @@ if (!workOrder.value) {
   throw createError({ statusCode: 404, statusMessage: t('sa10.notFound') });
 }
 
-setScreenTitle(() => t('sa10.title'));
+/**
+ * Tieu de man la buoc phieu dang dung — "Dang tien hanh", "Da xong"...
+ * Dong thanh "Phieu dich vu" thi cai dong chu to nhat tren man khong noi
+ * duoc gi ma nhan vien chua biet.
+ */
+setScreenTitle(() => flowLabel(workOrder.value?.status ?? ''));
 
 const { data: quotations } = await useAsyncData(`wo-quotes-${id}`, () =>
   api.get<Quotation[]>(`/admin/work-orders/${id}/quotations`),
@@ -60,15 +100,6 @@ const { data: payments } = await useAsyncData(`wo-payments-${id}`, () =>
 const busy = ref(false);
 const statusTarget = ref<WorkOrderStatus | null>(null);
 const statusNote = ref('');
-const progress = reactive({ progressPercent: 0, progressNote: '', estimatedCompletionAt: '' });
-
-watchEffect(() => {
-  if (!workOrder.value) return;
-  progress.progressPercent = workOrder.value.progressPercent;
-  progress.progressNote = workOrder.value.progressNote ?? '';
-  progress.estimatedCompletionAt = workOrder.value.estimatedCompletionAt?.slice(0, 16) ?? '';
-});
-
 /** RD muc 5.2 — chi hien nhung buoc chuyen hop le tu trang thai hien tai. */
 const TRANSITIONS: Record<string, WorkOrderStatus[]> = {
   RECEIVED: [WorkOrderStatus.DIAGNOSING, WorkOrderStatus.CANCELLED],
@@ -93,7 +124,15 @@ function flowLabel(status: string): string {
   return t(`sa10.flow.${status}`);
 }
 
-const nextStatuses = computed(() => TRANSITIONS[workOrder.value?.status ?? ''] ?? []);
+/**
+ * Bo huy phieu khoi hang nut: do la viec hiem va khong lui lai duoc, de
+ * lan vao canh nut di tiep thi chi cho nguoi dang lam nhanh bam nham.
+ */
+const nextStatuses = computed(() =>
+  (TRANSITIONS[workOrder.value?.status ?? ''] ?? []).filter(
+    (status) => status !== WorkOrderStatus.CANCELLED,
+  ),
+);
 
 const confirmMessage = computed(() => {
   switch (statusTarget.value) {
@@ -101,8 +140,6 @@ const confirmMessage = computed(() => {
       return t('sa10.ask.COMPLETED');
     case WorkOrderStatus.DELIVERED:
       return t('sa10.ask.DELIVERED');
-    case WorkOrderStatus.CANCELLED:
-      return t('sa10.ask.CANCELLED');
     default:
       return undefined;
   }
@@ -139,49 +176,56 @@ async function changeStatus(): Promise<void> {
   }
 }
 
-async function saveProgress(): Promise<void> {
-  try {
-    await api.put(`/admin/work-orders/${id}/progress`, {
-      progressPercent: progress.progressPercent,
-      progressNote: progress.progressNote || undefined,
-      estimatedCompletionAt: progress.estimatedCompletionAt || undefined,
-    });
-    ui.success(t('sa10.progressSaved'), t('sa10.progressSavedSub'));
-    await refresh();
-  } catch (error) {
-    ui.error(normalizeError(error).message);
-  }
-}
-
 const remaining = computed(() =>
   workOrder.value ? workOrder.value.totalAmount - workOrder.value.paidAmount : 0,
 );
 
 const deposit = computed(() => (payments.value ?? []).filter((p) => !p.isVoided)[0] ?? null);
 
-const timelineEntries = computed(() =>
-  (workOrder.value?.statusHistories ?? []).map((h) => ({
-    id: h.id,
-    createdAt: h.createdAt,
-    actorType: 'ADMIN',
-    action: `${h.fromStatus ? flowLabel(h.fromStatus) : t('sa10.opened')} → ${flowLabel(h.toStatus)}`,
-    detail: h.note,
-  })),
-);
+/**
+ * Nhat ky ve ca chang di cua xe, khong chi doan tu luc mo ho so.
+ *
+ * Truoc day day chi la lich su trang thai cua ho so dich vu, nen dong dau
+ * tien la "Mo ho so → Da tiep nhan" — nhan vien khong thay khach dat lich
+ * luc nao, ai xac nhan va bao gio. Ba nguon gop lai thanh mot duong:
+ *
+ *   lich hen   -> Cho xac nhan, Da xac nhan
+ *   ho so      -> Da tiep nhan, Da chan doan, Dang bao gia, Dang tien
+ *                 hanh, Da xong, Da ban giao
+ *   bao gia    -> Da chot bao gia (khong nam trong lich su nao ca)
+ *
+ * Moi buoc chi hien mot lan: lich hen va ho so cung ghi moc "Da tiep
+ * nhan" o cung mot thoi diem, lay cai som hon.
+ */
+const timelineEntries = computed(() => {
+  const stamps = new Map<string, { at: string; note: string | null }>();
 
-/** CP-19 — moc tien do cua phieu, bo buoc bao gia khi phieu khong can bao gia. */
-const progressSteps = computed<ProgressStep[]>(() => {
-  const order = WORK_ORDER_FLOW.filter(
-    (status) => status !== 'QUOTED' || (quotations.value ?? []).length > 0,
-  );
-  const current = order.indexOf(workOrder.value?.status ?? 'RECEIVED');
-  return order.map((status, index) => ({
-    key: status,
-    label: flowLabel(status),
-    state: index < current ? 'done' : index === current ? 'current' : 'todo',
-  }));
+  const add = (key: string, at: string, note: string | null): void => {
+    const seen = stamps.get(key);
+    if (!seen || at < seen.at) stamps.set(key, { at, note: note ?? seen?.note ?? null });
+  };
+
+  for (const h of workOrder.value?.booking?.statusHistories ?? []) {
+    add(h.toStatus, h.createdAt, h.note ?? null);
+  }
+  for (const h of workOrder.value?.statusHistories ?? []) {
+    add(h.toStatus, h.createdAt, h.note ?? null);
+  }
+  const accepted = (quotations.value ?? []).find((q) => q.status === 'ACCEPTED' && q.respondedAt);
+  if (accepted?.respondedAt) add('QUOTE_ACCEPTED', accepted.respondedAt, null);
+
+  return [...stamps.entries()]
+    .sort((a, b) => a[1].at.localeCompare(b[1].at))
+    .map(([key, stamp]) => ({
+      id: key,
+      createdAt: stamp.at,
+      actorType: 'ADMIN',
+      action: te(`flow.${key}`) ? t(`flow.${key}`) : key,
+      detail: stamp.note,
+    }));
 });
 
+/** CP-19 — moc tien do cua phieu, bo buoc bao gia khi phieu khong can bao gia. */
 useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '' })} — AOYAMA Admin` });
 </script>
 
@@ -224,8 +268,6 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
       </div>
 
     </div>
-
-    <AyProgressSteps :steps="progressSteps" />
 
     <!-- Chan doan -->
     <section class="card gap-2.5" style="background: #fff">
@@ -291,7 +333,7 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
                   :value="item.state"
                   :disabled="savingItem === item.id"
                   :aria-label="$t('sa10.itemStateFor', { name: item.name })"
-                  @change="setItemState(item.id, ($event.target as HTMLSelectElement).value)"
+                  @change="askItemState(item, $event)"
                 >
                   <option v-for="s in ITEM_STATES" :key="s" :value="s">
                     {{ $t(`workItem.${s}`) }}
@@ -401,44 +443,6 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
       </section>
     </div>
 
-    <!-- Tien do hien cho khach -->
-    <section class="card gap-3" style="background: #fff">
-      <h5>{{ $t('sa10.customerProgress') }}</h5>
-      <div class="grid gap-3 sm:grid-cols-2">
-        <AyField :label="$t('sa10.percentDone', { n: progress.progressPercent })">
-          <template #default="{ id: fid }">
-            <input
-              :id="fid"
-              v-model.number="progress.progressPercent"
-              class="w-full"
-              type="range"
-              min="0"
-              max="100"
-              step="5"
-            />
-          </template>
-        </AyField>
-        <AyField :label="$t('sa10.eta')">
-          <template #default="{ id: fid }">
-            <input
-              :id="fid"
-              v-model="progress.estimatedCompletionAt"
-              class="input"
-              type="datetime-local"
-            />
-          </template>
-        </AyField>
-        <AyField :label="$t('sa10.progressNote')" class="sm:col-span-2" :hint="$t('sa10.progressNoteHint')">
-          <template #default="{ id: fid }">
-            <textarea :id="fid" v-model="progress.progressNote" class="input min-h-[70px]" />
-          </template>
-        </AyField>
-      </div>
-      <button type="button" class="btn btn-secondary self-start text-[12.5px]" @click="saveProgress">
-        {{ $t('sa10.saveProgress') }}
-      </button>
-    </section>
-
     <section class="card gap-2" style="background: #fff">
       <h5>{{ $t('sa10.log') }}</h5>
       <AyChangeLog :entries="timelineEntries" />
@@ -449,26 +453,35 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
       class="flex flex-wrap items-center justify-end gap-2.5 pt-[15px]"
       style="border-top: 1px solid var(--color-divider)"
     >
-      <NuxtLink
-        v-if="remaining > 0"
-        :to="`/admin/work-orders/${id}/payment`"
-        class="btn btn-secondary text-[13px]"
-        style="min-height: 48px; padding-inline: 20px"
-      >
-        {{ $t('sa10.recordPayment') }}
-      </NuxtLink>
       <button
         v-for="status in nextStatuses"
         :key="status"
         type="button"
-        class="btn"
-        :class="status === 'CANCELLED' ? 'btn-ghost text-[13px]' : 'btn-primary text-[15px]'"
+        class="btn btn-primary text-[15px]"
         style="min-height: 48px; padding-inline: 26px"
         @click="statusTarget = status"
       >
         {{ actionLabel(status) }}
       </button>
     </div>
+
+    <AyConfirmDialog
+      :open="pendingItem !== null"
+      :title="$t('sa10.askItemState')"
+      :message="
+        pendingItem
+          ? $t('sa10.askItemStateBody', {
+            name: pendingItem.name,
+            state: $t(`workItem.${pendingItem.state}`),
+          })
+          : ''
+      "
+      :confirm-label="$t('common.yes')"
+      :cancel-label="$t('common.no')"
+      :loading="savingItem !== null"
+      @confirm="setItemState"
+      @cancel="dropItemState"
+    />
 
     <AyConfirmDialog
       :open="statusTarget !== null"
