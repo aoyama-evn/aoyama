@@ -171,9 +171,17 @@ function reset(): void {
  * gia — do la noi doc duoc khach da tra loi gi va bam tiep. Dua ho ve
  * man chi tiet lich hen roi bat tu tim duong sang la thua mot chang.
  */
+const STAGE_DESTINATION: Record<string, (workOrderId: string) => string> = {
+  // Da kham xong, viec ke tiep la lap bao gia.
+  DIAGNOSED: (wo) => `/admin/work-orders/${wo}/quotation`,
+  // Da gui bao gia, viec ke tiep la doc tra loi cua khach va chot.
+  QUOTING: (wo) => `/admin/work-orders/${wo}/quote-confirm`,
+};
+
 function openBooking(row: Booking): void {
-  if (row.stage === 'QUOTING' && row.workOrderId) {
-    void navigateTo(`/admin/work-orders/${row.workOrderId}/quote-confirm`);
+  const to = row.stage ? STAGE_DESTINATION[row.stage] : undefined;
+  if (to && row.workOrderId) {
+    void navigateTo(to(row.workOrderId));
     return;
   }
   void navigateTo(`/admin/bookings/${row.id}`);
