@@ -47,8 +47,8 @@ class PartBodyDto {
   @IsOptional() @IsBoolean() isActive?: boolean;
 }
 
+/** Ma phu tung do he thong sinh sau khi luu, nen khong doi o day — SA-26. */
 class CreatePartDto extends PartBodyDto {
-  @IsString() @IsNotEmpty() declare code: string;
   @IsObject() declare name: I18nText;
 }
 

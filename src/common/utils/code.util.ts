@@ -40,3 +40,22 @@ export function generateNumericOtp(length: number): string {
   }
   return otp;
 }
+
+/**
+ * Ma phu tung — dang `P-<NHOM><SO>`, vi du `P-ELE-0007`.
+ *
+ * Truoc day nhan vien phai tu dat ma, va ho dat moi nguoi mot kieu
+ * ("P-OIL-10W30", "BAT-01"), nen tim theo ma thanh vo nghia. Gio he thong
+ * sinh sau khi luu: ba chu dau cua nhom cho nguoi nhin la biet loai gi,
+ * bon chu so chay rieng trong tung nhom.
+ *
+ * Nhom rong thi dung GEN — phu tung le chua xep nhom van phai co ma.
+ */
+export function partCodePrefix(category?: string | null): string {
+  const letters = (category ?? '').toUpperCase().replace(/[^A-Z]/g, '');
+  return `P-${letters.slice(0, 3) || 'GEN'}`;
+}
+
+export function formatPartCode(category: string | null | undefined, sequence: number): string {
+  return `${partCodePrefix(category)}-${String(sequence).padStart(4, '0')}`;
+}
