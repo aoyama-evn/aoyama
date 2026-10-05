@@ -290,6 +290,8 @@ export interface Booking {
   pendingQuotation?: PendingQuotation | null;
   /** Buoc hien thi o trang quan tri, gop ca chang phieu dich vu — SA-03. */
   stage?: BookingStage;
+  /** Phieu dich vu dang mo — de danh sach bam thang vao viec can lam. */
+  workOrderId?: string | null;
   createdAt: string;
 }
 

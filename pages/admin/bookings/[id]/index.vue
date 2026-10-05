@@ -47,21 +47,24 @@ const { data: history } = await useAsyncData(`admin-booking-history-${id}`, () =
  * Phieu dich vu mo tu lich hen nay, neu co — chi dung de biet co nen hien nut
  * "Mo phieu dich vu" hay khong. Man nay khong trinh bay gi ve phieu nua.
  */
-const { data: openOrder } = await useAsyncData(`admin-booking-order-${id}`, async () => {
-  try {
-    const page = await api.get<{ items: WorkOrder[] }>('/admin/work-orders', {
-      bookingId: id,
-      limit: 1,
-    });
-    const found = page.items[0];
-    if (!found) return null;
-    // Nap ban day du: danh sach phieu khong kem anh, ma man nay can anh hien
-    // trang luc tiep nhan.
-    return await api.get<WorkOrder>(`/admin/work-orders/${found.id}`);
-  } catch {
-    return null;
-  }
-});
+const { data: openOrder, refresh: refreshOrder } = await useAsyncData(
+  `admin-booking-order-${id}`,
+  async () => {
+    try {
+      const page = await api.get<{ items: WorkOrder[] }>('/admin/work-orders', {
+        bookingId: id,
+        limit: 1,
+      });
+      const found = page.items[0];
+      if (!found) return null;
+      // Nap ban day du: danh sach phieu khong kem anh, ma man nay can anh
+      // hien trang luc tiep nhan.
+      return await api.get<WorkOrder>(`/admin/work-orders/${found.id}`);
+    } catch {
+      return null;
+    }
+  },
+);
 
 const busy = ref(false);
 const confirmAction = ref<'CONFIRM' | 'CANCEL' | 'NO_SHOW' | null>(null);
@@ -119,6 +122,32 @@ const canIntake = computed(() => booking.value?.status === 'CONFIRMED');
  */
 const EARLY_STAGES = ['RECEIVED', 'DIAGNOSING', 'QUOTED'];
 const atEarlyStage = computed(() => EARLY_STAGES.includes(openOrder.value?.status ?? ''));
+
+/**
+ * Xe dang duoc sua thi man nay la cho nhan vien theo doi tung hang muc.
+ *
+ * Bam vao mot lich o trang thai "dang tien hanh" la de xem viec chay den
+ * dau, nen liet ke ngay tai day va cho tick luon — khong bat ho mo them
+ * man phieu dich vu chi de doi mot o.
+ */
+const WORKING_STAGES = ['IN_PROGRESS', 'COMPLETED'];
+const atWork = computed(() => WORKING_STAGES.includes(openOrder.value?.status ?? ''));
+
+const ITEM_STATES = ['PENDING', 'IN_PROGRESS', 'DONE'] as const;
+const savingItem = ref<string | null>(null);
+
+async function setItemState(itemId: string, state: string): Promise<void> {
+  if (!openOrder.value) return;
+  savingItem.value = itemId;
+  try {
+    await api.put(`/admin/work-orders/${openOrder.value.id}/items/${itemId}/state`, { state });
+    await refreshOrder();
+  } catch (error) {
+    ui.error(normalizeError(error).message);
+  } finally {
+    savingItem.value = null;
+  }
+}
 
 /** Anh chup luc tiep nhan — cac giai doan sau co anh rieng, khong tron vao day. */
 const intakePhotos = computed(() =>
@@ -209,6 +238,42 @@ useHead({ title: () => `${t('sa05.headTitle', { code: booking.value?.code ?? '' 
         <AyStatusTag class="mt-1 self-start" :status="booking.stage ?? booking.status" />
       </div>
     </div>
+
+    <!--
+      Xe dang duoc sua: liet ke tung hang muc kem tien do, va cho tick
+      ngay tai day. Khach cung thay thay doi nay o man theo doi tien do.
+    -->
+    <section v-if="atWork && (openOrder?.items ?? []).length" class="card gap-2.5" style="background: #fff">
+      <div class="flex items-baseline justify-between gap-2.5">
+        <h5>{{ $t('sa10.items') }}</h5>
+        <NuxtLink :to="`/admin/work-orders/${openOrder!.id}`" class="btn btn-ghost text-[12.5px]">
+          {{ $t('sa05.openOrder') }}
+        </NuxtLink>
+      </div>
+
+      <div
+        v-for="item in openOrder!.items"
+        :key="item.id"
+        class="flex flex-wrap items-center gap-2.5"
+      >
+        <span class="min-w-0 flex-1 text-[13.5px]">
+          {{ item.name }}
+          <template v-if="item.quantity > 1"> × {{ item.quantity }}</template>
+        </span>
+        <select
+          class="input h-8 min-h-0 flex-none py-0 text-[12px]"
+          style="width: 140px"
+          :value="item.state"
+          :disabled="savingItem === item.id"
+          :aria-label="$t('sa10.itemStateFor', { name: item.name })"
+          @change="setItemState(item.id, ($event.target as HTMLSelectElement).value)"
+        >
+          <option v-for="st in ITEM_STATES" :key="st" :value="st">
+            {{ $t(`workItem.${st}`) }}
+          </option>
+        </select>
+      </div>
+    </section>
 
     <!-- Hien trang ghi nhan luc tiep nhan xe -->
     <section v-if="hasIntakeInfo" class="card gap-2.5" style="background: #fff">

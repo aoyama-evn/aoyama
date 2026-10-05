@@ -164,6 +164,21 @@ function reset(): void {
   page.value = 1;
 }
 
+/**
+ * Bam vao mot dong thi den thang viec dang cho o do.
+ *
+ * Lich dang cho khach duyet bao gia thi viec can lam nam o man chot bao
+ * gia — do la noi doc duoc khach da tra loi gi va bam tiep. Dua ho ve
+ * man chi tiet lich hen roi bat tu tim duong sang la thua mot chang.
+ */
+function openBooking(row: Booking): void {
+  if (row.stage === 'QUOTING' && row.workOrderId) {
+    void navigateTo(`/admin/work-orders/${row.workOrderId}/quote-confirm`);
+    return;
+  }
+  void navigateTo(`/admin/bookings/${row.id}`);
+}
+
 const COLUMNS = computed(() => [
   { key: 'code', label: t('sa03.colCode'), width: '130px' },
   { key: 'scheduledAt', label: t('sa03.colWhen'), sortable: true, width: '170px' },
@@ -275,7 +290,7 @@ useHead({ title: () => `${t('sa03.title')} — AOYAMA Admin` });
       @update:page="page = $event"
       @update:sort="sortOrder = $event.sortOrder"
       @update:selected="selectedIds = $event"
-      @row-click="navigateTo(`/admin/bookings/${$event.id}`)"
+      @row-click="openBooking($event as Booking)"
     >
       <template #cell-code="{ row }">
         <span class="font-mono text-[12.5px]">{{ row.code }}</span>
