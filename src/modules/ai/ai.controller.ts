@@ -126,8 +126,8 @@ export class AdminAiController {
 
   @Post('part-recognition')
   @ApiOperation({ summary: 'SA-27 — nhan dang phu tung tu anh, dien san bieu mau (AI-04)' })
-  recognizePart(@Body() dto: RecognizePartDto) {
-    return this.service.recognizePart(dto.imageUrls);
+  recognizePart(@Body() dto: RecognizePartDto, @Query() query: SuggestQuotationQueryDto) {
+    return this.service.recognizePart(dto.imageUrls, query.lang);
   }
 
   @Post('plate-recognition')

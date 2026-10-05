@@ -214,9 +214,50 @@ export class AiService {
   /** FR-PRT-04..07 — dien san bieu mau phu tung; Admin kiem tra roi moi luu (BR-43). */
   async recognizePart(
     imageUrls: string[],
-  ): Promise<PartRecognitionResult & { isFallback: boolean }> {
+    language: Language = DEFAULT_LANGUAGE,
+  ): Promise<PartRecognitionResult & { isFallback: boolean; isDemo: boolean }> {
     const result = await this.provider.recognizePart(imageUrls);
-    return { ...result, isFallback: Object.keys(result).length === 0 };
+    if (Object.keys(result).length > 0) {
+      return {
+        ...result,
+        confidence: asPercent(result.confidence),
+        isFallback: false,
+        isDemo: false,
+      };
+    }
+
+    /**
+     * Chua cam AI_API_KEY thi khong co mo hinh nhin anh nao ca, va man hinh
+     * se mai bao "khong nhan ra" — khong trinh dien duoc y tuong.
+     *
+     * Che do trinh dien lay mot phu tung CO THAT trong kho de dien vao bieu
+     * mau: nhan vien thay dung cach lam viec (anh -> cac o tu dien -> nguoi
+     * kiem lai -> luu) ma khong co so lieu nao bia ra. Co isDemo de man hinh
+     * noi thang day la du lieu mau.
+     *
+     * Ban chay that khong bao gio di vao nhanh nay.
+     */
+    if (process.env.NODE_ENV === 'production') {
+      return { isFallback: true, isDemo: false };
+    }
+
+    const sample = await this.parts.search(
+      Object.assign(new PaginationQueryDto(), { page: 1, limit: 1, isActive: true }),
+    );
+    const part = sample.items[0];
+    if (!part) return { isFallback: true, isDemo: false };
+
+    return {
+      name: pickI18n(part.name, language),
+      maker: part.maker ?? undefined,
+      makerPartNo: part.makerPartNo ?? undefined,
+      category: part.category ?? undefined,
+      specification: part.specification ?? undefined,
+      compatibleVehicles: part.compatibleVehicles ?? [],
+      confidence: 50,
+      isFallback: false,
+      isDemo: true,
+    };
   }
 
   // ---------------- AI-05 — Doc bien so tu anh (SA-07) ----------------
@@ -363,4 +404,15 @@ const ASSISTANT_LINES: Record<'FOUND' | 'UNSURE', Record<string, string>> = {
 function assistantLine(kind: 'FOUND' | 'UNSURE', language: string): string {
   const table = ASSISTANT_LINES[kind];
   return table[language] ?? table[DEFAULT_LANGUAGE] ?? table.ja;
+}
+
+/**
+ * Do tin cay ve thang phan tram.
+ *
+ * Giao dien hien "· 72%", nhung mo hinh ngon ngu khi tra 0.72 khi tra 72
+ * tuy cach dat cau hoi. Khong quy ve mot thang thi 0.72 hien thanh 1%.
+ */
+function asPercent(value?: number): number | undefined {
+  if (value === undefined || value === null) return undefined;
+  return value <= 1 ? Math.round(value * 100) : Math.round(value);
 }
