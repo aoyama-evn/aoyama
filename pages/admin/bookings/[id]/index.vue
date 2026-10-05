@@ -136,6 +136,33 @@ const atWork = computed(() => WORKING_STAGES.includes(openOrder.value?.status ??
 const ITEM_STATES = ['PENDING', 'IN_PROGRESS', 'DONE'] as const;
 const savingItem = ref<string | null>(null);
 
+const confirmDone = ref(false);
+const completing = ref(false);
+
+/**
+ * Bao phieu da xong ngay tai day, roi di tiep sang buoc thu tien.
+ *
+ * Giong het nut o man phieu dich vu (SA-10) — cung goi mot API, cung dua
+ * sang man thanh toan. Khac moi cho nhan vien dang dung man nay thi khong
+ * phai mo them man kia chi de bam mot nut.
+ */
+async function markCompleted(): Promise<void> {
+  if (!openOrder.value) return;
+  completing.value = true;
+  try {
+    await api.put(`/admin/work-orders/${openOrder.value.id}/status`, {
+      status: 'COMPLETED',
+    });
+    ui.success(t('sa10.statusSaved'));
+    await navigateTo(`/admin/work-orders/${openOrder.value.id}/payment`);
+  } catch (error) {
+    ui.error(normalizeError(error).message);
+  } finally {
+    completing.value = false;
+    confirmDone.value = false;
+  }
+}
+
 async function setItemState(itemId: string, state: string): Promise<void> {
   if (!openOrder.value) return;
   savingItem.value = itemId;
@@ -246,7 +273,20 @@ useHead({ title: () => `${t('sa05.headTitle', { code: booking.value?.code ?? '' 
     <section v-if="atWork && (openOrder?.items ?? []).length" class="card gap-2.5" style="background: #fff">
       <div class="flex items-baseline justify-between gap-2.5">
         <h5>{{ $t('sa10.items') }}</h5>
-        <NuxtLink :to="`/admin/work-orders/${openOrder!.id}`" class="btn btn-ghost text-[12.5px]">
+        <!--
+          Tho tick xong hang muc cuoi cung thi viec ke tiep la bao da xong,
+          chu khong phai mo them mot man nua de tim nut do. Phieu da xong
+          roi thi khong con gi de bam, de lai duong sang phieu dich vu.
+        -->
+        <AyButton
+          v-if="openOrder!.status === 'IN_PROGRESS'"
+          size="sm"
+          :loading="completing"
+          @click="confirmDone = true"
+        >
+          {{ $t('sa05.markDone') }}
+        </AyButton>
+        <NuxtLink v-else :to="`/admin/work-orders/${openOrder!.id}`" class="btn btn-ghost text-[12.5px]">
           {{ $t('sa05.openOrder') }}
         </NuxtLink>
       </div>
@@ -561,6 +601,16 @@ useHead({ title: () => `${t('sa05.headTitle', { code: booking.value?.code ?? '' 
         </template>
       </AyField>
     </AyConfirmDialog>
+
+    <!-- Khong co duong lui tu "Da xong" ve "Dang tien hanh" — NFR-UX-08. -->
+    <AyConfirmDialog
+      :open="confirmDone"
+      :title="$t('sa05.askDone')"
+      :message="$t('sa10.ask.COMPLETED')"
+      :loading="completing"
+      @confirm="markCompleted"
+      @cancel="confirmDone = false"
+    />
   </div>
 </template>
 
