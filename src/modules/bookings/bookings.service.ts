@@ -460,6 +460,41 @@ export class BookingsService {
     return holder.pendingQuotation ?? null;
   }
 
+  /**
+   * Ban bao gia moi nhat cua lich hen, bat ke da tra loi hay chua.
+   *
+   * Khac findPendingQuotation o cho khong loc theo trang thai. Chot xong
+   * roi khach van muon mo lai xem minh da dong y nhung gi va het bao nhieu
+   * — man SC-27 tu an cac nut dong y, tu choi, xem lai khi ban bao gia
+   * khong con cho tra loi.
+   */
+  async findLatestQuotation(bookingId: string): Promise<{
+    token: string;
+    code: string;
+    totalAmount: number;
+    status: string;
+  } | null> {
+    const rows: {
+      token: string;
+      code: string;
+      totalAmount: string;
+      status: string;
+    }[] = await this.dataSource.query(
+      `select q.public_token as "token",
+              q.code as "code",
+              q.total_amount as "totalAmount",
+              q.status as "status"
+         from quotations q
+         join work_orders w on w.id = q.work_order_id
+        where w.booking_id = $1
+        order by q.created_at desc
+        limit 1`,
+      [bookingId],
+    );
+    const found = rows[0];
+    return found ? { ...found, totalAmount: Number(found.totalAmount) } : null;
+  }
+
   /** SA-03 — danh sach lich hen phia quan tri. */
   /** SA-03 — danh sach lich hen phia quan tri; kem buoc hien thi. */
   async search(query: BookingQueryDto): Promise<PageDto<Booking>> {

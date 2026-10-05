@@ -301,6 +301,12 @@ export class WorkOrdersService {
        */
       pendingQuotation: await this.bookings.findPendingQuotation(booking.id),
       /**
+       * Ban bao gia moi nhat, ke ca khi da chot. Chot xong roi khach van
+       * muon mo lai xem minh da dong y nhung gi — nut "Xem bao gia" phai
+       * con do, chi cac nut tra loi la bien mat.
+       */
+      quotation: await this.bookings.findLatestQuotation(booking.id),
+      /**
        * Luc khach chot bao gia khong nam trong lich su trang thai phieu —
        * no la viec cua ban bao gia. Nhung tren duong thoi gian cua khach
        * day la mot moc rieng, nen tra ve de SC-26 danh dau duoc.
