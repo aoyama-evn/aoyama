@@ -140,15 +140,12 @@ useHead({ title: () => t('sc20.title') });
     </AyField>
 
     <AyField for="phone" :label="$t('sc20.phoneLabel')" required>
-      <input
-        id="phone"
-        v-model="phone"
-        class="input"
-        type="tel"
-        inputmode="tel"
-        autocomplete="tel"
-        placeholder="090-1234-5678"
-      />
+      <!--
+        May chu so khop CHINH XAC voi so da chuan hoa, mac dinh hieu la so
+        Nhat. Khach Viet go "0969..." theo thoi quen trong nuoc se khong
+        bao gio khop voi "+84969..." da luu, nen phai chon ma quoc gia.
+      -->
+      <AyPhoneField id="phone" v-model="phone" />
     </AyField>
 
     <AyErrorNote :error="error" />

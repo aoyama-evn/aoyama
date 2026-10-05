@@ -161,19 +161,15 @@ useHead({ title: () => `${t('sc01.bookCta')} — 3` });
 
       <div class="field">
         <label for="phone">{{ $t('sc14.phone') }} *</label>
-        <div class="mt-[5px] flex gap-2">
-          <input
+        <div class="mt-[5px] flex flex-col gap-2">
+          <AyPhoneField
             id="phone"
             v-model="booking.contactPhone"
-            class="input min-w-0 flex-1"
-            type="tel"
-            inputmode="tel"
-            autocomplete="tel"
-            placeholder="090-1234-5678"
+            :invalid="Boolean(errors.contactPhone)"
           />
           <button
             type="button"
-            class="btn btn-secondary flex-none whitespace-nowrap text-[12.5px]"
+            class="btn btn-secondary self-start whitespace-nowrap text-[12.5px]"
             style="min-height: 44px"
             :disabled="otpBusy"
             @click="requestOtp"
@@ -327,13 +323,10 @@ useHead({ title: () => `${t('sc01.bookCta')} — 3` });
       </AyField>
 
       <AyField for="phone" :label="$t('sc14.phone')" required :error="errors.contactPhone">
-        <input
+        <AyPhoneField
           id="phone"
           v-model="booking.contactPhone"
-          class="input"
-          type="tel"
-          inputmode="tel"
-          autocomplete="tel"
+          :invalid="Boolean(errors.contactPhone)"
         />
       </AyField>
 
