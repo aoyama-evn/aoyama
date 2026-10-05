@@ -97,6 +97,17 @@ export function normalizeError(error: unknown): ApiError {
   const data = (error as { data?: ApiError }).data;
   if (data?.code) return data;
 
+  /**
+   * Lop goi API da chuan hoa truoc khi nem ra, nhung gan nhu man hinh nao
+   * cung goi lai ham nay trong khoi catch. Khong nhan ra ban da chuan hoa
+   * thi no roi xuong nhanh cuoi va bien moi loi thanh UNKNOWN_ERROR — nguoi
+   * dung thay "Ma loi: UNKNOWN_ERROR" thay vi ma that de bao ho tro.
+   */
+  const already = error as Partial<ApiError>;
+  if (typeof already?.code === 'string' && typeof already?.statusCode === 'number') {
+    return already as ApiError;
+  }
+
   const statusCode =
     (error as { statusCode?: number }).statusCode ?? (error as { status?: number }).status ?? 0;
 

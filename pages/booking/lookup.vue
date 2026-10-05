@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ApiError, Booking } from '~/types/models';
+import type { ApiError } from '~/types/models';
 
 /**
  * SC-20 Tra cuu lich hen cho khach chua dang nhap — FR-BOOK-15.
@@ -11,26 +11,45 @@ const api = useApi();
 const route = useRoute();
 const ui = useUiStore();
 
-const code = ref((route.query.code as string) ?? '');
-const phone = ref('');
+const term = ref((route.query.code as string) ?? '');
 const loading = ref(false);
 const decoding = ref(false);
 const error = ref<ApiError | null>(null);
 
+/**
+ * Mot o duy nhat cho ca ma lich hen lan so dien thoai, giong o tra cuu cua
+ * le tan: khach khong phai doan xem o nao danh cho cai minh dang cam trong
+ * tay. May chu thu ma truoc, khong ra thi coi la so dien thoai.
+ */
 async function lookup(): Promise<void> {
+  const value = term.value.trim();
+  if (!value) return;
+
   error.value = null;
   loading.value = true;
   try {
-    const booking = await api.post<Booking>('/bookings/lookup', {
-      code: code.value.trim().toUpperCase(),
-      phone: phone.value.trim(),
-    });
+    const booking = await api.post<{ code: string }>('/bookings/lookup', { term: value });
     await navigateTo(`/bookings/${booking.code}/progress`);
   } catch (caught) {
-    error.value = normalizeError(caught);
+    error.value = localise(normalizeError(caught));
   } finally {
     loading.value = false;
   }
+}
+
+/**
+ * May chu tra loi bang tieng Viet khong dau. Man nay phuc vu ca khach Nhat
+ * lan khach doc tieng Anh, nen hai truong hop hay gap nhat phai noi dung
+ * thu tieng ho dang xem.
+ */
+function localise(failure: ApiError): ApiError {
+  const messages: Record<string, string> = {
+    BOOKING_NOT_FOUND: t('sc20.notFound'),
+    LOOKUP_TOO_SHORT: t('sc20.tooShort'),
+    QR_NOT_FOUND: t('sc20.qrExpired'),
+  };
+  const message = messages[failure.code];
+  return message ? { ...failure, message } : failure;
 }
 
 /**
@@ -39,7 +58,7 @@ async function lookup(): Promise<void> {
  * Anh QR he thong sinh ra chua token cua lich hen chu khong phai ma lich hen,
  * nen doc xong phai hoi may chu xem token do la lich nao roi dua thang khach
  * sang man theo doi tien do. Khach cung co the tai len mot anh chua thang ma
- * lich hen; truong hop do chi dien vao o ma, van doi so dien thoai nhu cu.
+ * lich hen; truong hop do dien vao o tim kiem roi tra cuu luon.
  */
 async function decodeQrImage(event: Event): Promise<void> {
   const input = event.target as HTMLInputElement;
@@ -65,10 +84,12 @@ async function decodeQrImage(event: Event): Promise<void> {
       return;
     }
 
-    const asCode = raw.match(/AY-[0-9A-Z]{6,12}/i)?.[0];
+    // Ma cu la "AY-xxxxxxxx", ma moi la "B-<ngay gio><so thu tu>" — nhan ca hai.
+    const asCode = raw.match(/(?:AY|B)-[0-9A-Z]{6,20}/i)?.[0];
     if (asCode) {
-      code.value = asCode.toUpperCase();
+      term.value = asCode.toUpperCase();
       ui.success(t('sc20.qrOk'), t('sc20.qrOkSub'));
+      await lookup();
       return;
     }
 
@@ -76,7 +97,7 @@ async function decodeQrImage(event: Event): Promise<void> {
     ui.success(t('sc20.qrOk'), found.code);
     await navigateTo(`/bookings/${found.code}/progress`);
   } catch (caught) {
-    error.value = normalizeError(caught);
+    error.value = localise(normalizeError(caught));
   } finally {
     decoding.value = false;
     // Xoa de chon lai dung tep do van kich hoat duoc su kien change.
@@ -129,23 +150,15 @@ useHead({ title: () => t('sc20.title') });
       <span class="h-px flex-1" style="background: var(--color-divider)" />
     </div>
 
-    <AyField for="code" :label="$t('sc20.codeLabel')" required>
+    <AyField for="term" :label="$t('sc20.termLabel')" :hint="$t('sc20.termHint')" required>
       <input
-        id="code"
-        v-model="code"
+        id="term"
+        v-model="term"
         class="input"
-        placeholder="B-20261008-0421"
+        type="search"
+        placeholder="B-202610081226001 / 0969 376 966"
         autocomplete="off"
       />
-    </AyField>
-
-    <AyField for="phone" :label="$t('sc20.phoneLabel')" required>
-      <!--
-        May chu so khop CHINH XAC voi so da chuan hoa, mac dinh hieu la so
-        Nhat. Khach Viet go "0969..." theo thoi quen trong nuoc se khong
-        bao gio khop voi "+84969..." da luu, nen phai chon ma quoc gia.
-      -->
-      <AyPhoneField id="phone" v-model="phone" />
     </AyField>
 
     <AyErrorNote :error="error" />
@@ -154,7 +167,7 @@ useHead({ title: () => t('sc20.title') });
       type="submit"
       class="btn btn-primary btn-block"
       style="min-height: 48px; font-size: 15px; margin: 0"
-      :disabled="loading || !code.trim() || !phone.trim()"
+      :disabled="loading || !term.trim()"
     >
       {{ loading ? $t('sc20.looking') : $t('sc20.submit') }}
     </button>
