@@ -956,7 +956,6 @@
     "added": "Part added",
     "aiPrefill": "The AI assistant filled this in from the image. Please check it before saving.",
     "code": "Part code",
-    "codeAuto": "Generated automatically on save",
     "compatible": "Compatible bikes",
     "costPrice": "Cost price (JPY)",
     "editTitle": "Edit part",

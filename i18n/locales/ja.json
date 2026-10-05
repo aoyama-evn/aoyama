@@ -956,7 +956,6 @@
     "added": "部品を追加しました",
     "aiPrefill": "以下はAIアシスタントが画像から入力した内容です。保存前にご確認ください。",
     "code": "品番",
-    "codeAuto": "保存時に自動採番されます",
     "compatible": "適合車種",
     "costPrice": "仕入価格（JPY）",
     "editTitle": "部品の編集",

@@ -150,13 +150,15 @@ useHead({ title: () => (isNew ? t('sa26.addTitle') : t('sa26.editTitle')) });
     </p>
 
     <section class="card admin-grid" style="background: #fff">
-      <!-- Ma do he thong sinh khi luu, khong cho sua: xem formatPartCode ben may chu. -->
-      <AyField :label="$t('sa26.code')">
+      <!--
+        Ma do he thong sinh khi luu — xem formatPartCode ben may chu.
+        Luc them moi thi chua co gi de hien, ma mot o khoa san bo trong chi
+        lam nguoi nhap dung lai tu hoi minh co phai dien khong. An han di,
+        sang man sua moi hien ra.
+      -->
+      <AyField v-if="!isNew" :label="$t('sa26.code')">
         <template #default="{ id: fid }">
-          <input
-            :id="fid" class="input font-mono" type="text" readonly disabled
-            :value="form.code" :placeholder="$t('sa26.codeAuto')"
-          >
+          <input :id="fid" class="input font-mono" type="text" readonly disabled :value="form.code">
         </template>
       </AyField>
 
