@@ -152,13 +152,15 @@ export class ConfirmManyDto {
   ids!: string[];
 }
 
+/**
+ * SC-20 — mot o duy nhat cho ca ma lich hen lan so dien thoai, giong o tra
+ * cuu cua le tan: khach khong phai doan xem minh dang go kieu nao.
+ */
 export class LookupBookingDto {
-  @ApiProperty({ example: 'AY-7KD2QH4M' })
+  @ApiProperty({ example: 'B-202610081226001', description: 'Ma lich hen hoac so dien thoai' })
   @IsString()
   @IsNotEmpty()
-  code!: string;
-
-  @IsString() @IsNotEmpty() phone!: string;
+  term!: string;
 }
 
 /**

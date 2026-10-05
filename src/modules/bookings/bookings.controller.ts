@@ -60,9 +60,9 @@ export class PublicBookingsController {
 
   @Public()
   @Post('lookup')
-  @ApiOperation({ summary: 'SC-20 — Guest tra cuu lich hen bang ma va so dien thoai' })
+  @ApiOperation({ summary: 'SC-20 — Guest tra cuu lich hen bang ma lich hen hoac so dien thoai' })
   lookup(@Body() dto: LookupBookingDto) {
-    return this.service.lookupForGuest(dto.code, dto.phone);
+    return this.service.lookupForGuest(dto.term);
   }
 
   @Public()

@@ -259,18 +259,78 @@ export class BookingsService {
   }
 
   /**
-   * SC-20 — Guest tra cuu bang ma lich hen kem so dien thoai.
-   * Doi hoi ca hai de mot nguoi biet ma van khong xem duoc lich cua nguoi khac.
+   * SC-20 — Guest tra cuu bang MOT o duy nhat: ma lich hen hoac so dien thoai.
+   *
+   * Giong o tiep nhan cua le tan: khach khong phai chon kieu tra cuu, go gi
+   * he thong thu nay. Ma lich hen la dinh danh duy nhat nen thu truoc; khong
+   * ra thi coi la so dien thoai.
    */
-  async lookupForGuest(code: string, rawPhone: string): Promise<Booking> {
-    const booking = await this.findByCode(code);
-    if (booking.contactPhone !== normalizePhone(rawPhone)) {
-      throw new NotFoundException({
-        code: 'BOOKING_NOT_FOUND',
-        message: 'Khong tim thay lich hen khop voi ma va so dien thoai',
+  async lookupForGuest(term: string): Promise<{ code: string }> {
+    const raw = (term ?? '').trim();
+    if (raw.length < 6) {
+      throw new BadRequestException({
+        code: 'LOOKUP_TOO_SHORT',
+        message: 'Can it nhat 6 ky tu de tra cuu',
       });
     }
-    return booking;
+
+    const booking = (await this.lookupByCode(raw)) ?? (await this.lookupByPhone(raw));
+    if (!booking) {
+      throw new NotFoundException({
+        code: 'BOOKING_NOT_FOUND',
+        message: 'Khong tim thay lich hen khop voi ma lich hen hoac so dien thoai vua nhap',
+      });
+    }
+
+    /**
+     * Chi tra ve ma lich hen.
+     *
+     * Day la duong cong khai: go dung mot so dien thoai la co ket qua. Tra
+     * ve ca thuc the thi kem theo qrToken — thu le tan quet de tiep nhan xe
+     * — cung ten, email va ghi chu noi bo. Man hinh goi den day chi can ma
+     * de dieu huong sang trang tien do, nen dua dung chung do.
+     */
+    return { code: booking.code };
+  }
+
+  private async lookupByCode(term: string): Promise<Booking | null> {
+    return this.repo.findOne({ where: { code: term.toUpperCase() } });
+  }
+
+  /**
+   * Tim theo so dien thoai khi khach khong con nho ma lich hen.
+   *
+   * So da luu o dang E.164 ("+84969376966"), con khach go theo thoi quen
+   * trong nuoc ("0969376966"). Bo dau cong, dau cach va so 0 dung dau roi
+   * khop phan duoi thi ca hai cach go deu ra. Doi it nhat 8 chu so de mot
+   * chuoi ngan khong quet trung lich cua nguoi la.
+   *
+   * Khach co the co nhieu lich; tra ve cai dang mo va gan nhat, vi do la
+   * cai ho vao day de xem.
+   */
+  private async lookupByPhone(term: string): Promise<Booking | null> {
+    const needle = term.replace(/\D/g, '').replace(/^0+/, '');
+    if (needle.length < 8) return null;
+
+    return this.repo
+      .createQueryBuilder('b')
+      .leftJoin('b.customer', 'c')
+      .where(
+        `(regexp_replace(b.contact_phone, '[^0-9]', '', 'g') LIKE :tail
+          OR regexp_replace(c.phone, '[^0-9]', '', 'g') LIKE :tail)`,
+        { tail: `%${needle}` },
+      )
+      .andWhere('b.status != :cancelled', { cancelled: BookingStatus.CANCELLED })
+      .addSelect(
+        `CASE b.status
+           WHEN '${BookingStatus.CONFIRMED}' THEN 0
+           WHEN '${BookingStatus.PENDING}' THEN 1
+           ELSE 2 END`,
+        'uu_tien',
+      )
+      .orderBy('uu_tien', 'ASC')
+      .addOrderBy('b.scheduledAt', 'DESC')
+      .getOne();
   }
 
   /** SC-21 — lich hen cua khach dang dang nhap. */
