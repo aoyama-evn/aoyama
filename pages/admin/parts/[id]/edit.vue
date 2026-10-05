@@ -5,7 +5,7 @@ import type { ApiError, I18nText, Part } from '~/types/models';
 definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const route = useRoute();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const api = useApi();
 const ui = useUiStore();
 
@@ -13,10 +13,29 @@ const id = route.params.id as string;
 const isNew = id === 'new';
 
 const form = reactive({
-  code: '', name: {} as I18nText, maker: '', makerPartNo: '', category: '',
+  code: '', maker: '', makerPartNo: '', category: '',
   specification: '', unit: 'pcs', costPrice: 0, sellPrice: 0,
   createdSource: 'MANUAL', isActive: true,
 });
+
+/**
+ * Ten phu tung chi go MOT lan, bang thu tieng nhan vien dang dung.
+ *
+ * Truoc day la ba tab JA / EN / VI. Nguoi nhap kho khong biet tieng Nhat
+ * lan tieng Anh nen gan nhu lan nao cung chi dien mot tab, va khach xem
+ * bang hai thu tieng kia thay o trong. Gio may chu dich not khi luu.
+ */
+const nameText = ref('');
+/** Ten o thu tieng khac, de nguoi sua con doi chieu duoc khi o nay trong. */
+const nameOther = ref('');
+
+function readName(value: I18nText | null | undefined): void {
+  const name = value ?? {};
+  nameText.value = name[locale.value as keyof I18nText] ?? '';
+  nameOther.value = nameText.value
+    ? ''
+    : (['ja', 'en', 'vi'] as const).map((lang) => name[lang]).find(Boolean) ?? '';
+}
 const compatible = ref<string[]>([]);
 const compatibleInput = ref('');
 const images = ref<string[]>([]);
@@ -26,9 +45,9 @@ const error = ref<ApiError | null>(null);
 if (!isNew) {
   const { data } = await useAsyncData(`admin-part-${id}`, () => api.get<Part>(`/admin/parts/${id}`));
   if (data.value) {
+    readName(data.value.name);
     Object.assign(form, {
       code: data.value.code,
-      name: data.value.name ?? {},
       maker: data.value.maker ?? '',
       makerPartNo: data.value.makerPartNo ?? '',
       category: data.value.category ?? '',
@@ -46,8 +65,9 @@ if (!isNew) {
   /** AI-04 — du lieu do AI nhan dang chuyen sang, Admin van phai kiem tra (BR-43). */
   try {
     const prefill = JSON.parse(String(route.query.prefill));
+    // SA-27 goi AI kem ngon ngu dang dung, nen ten tra ve da dung thu tieng nay.
+    nameText.value = prefill.name ?? '';
     Object.assign(form, {
-      name: prefill.name ? { ja: prefill.name } : {},
       maker: prefill.maker ?? '',
       makerPartNo: prefill.makerPartNo ?? '',
       category: prefill.category ?? '',
@@ -73,15 +93,21 @@ const margin = computed(() =>
 );
 
 async function save(): Promise<void> {
-  if (!form.code.trim() || !(form.name.ja || form.name.en || form.name.vi)) {
+  if (!nameText.value.trim()) {
     ui.warning(t('sa26.needFields'));
     return;
   }
   saving.value = true;
   error.value = null;
   try {
+    const { code, ...rest } = form;
     const body = {
-      ...form,
+      ...rest,
+      /**
+       * Gui dung mot o. May chu dien not hai thu tieng con lai; gui ca ba
+       * thi no hieu la nguoi dung da tu dich va giu nguyen.
+       */
+      name: { [locale.value]: nameText.value.trim() } as I18nText,
       maker: form.maker || undefined,
       makerPartNo: form.makerPartNo || undefined,
       category: form.category || undefined,
@@ -124,9 +150,13 @@ useHead({ title: () => (isNew ? t('sa26.addTitle') : t('sa26.editTitle')) });
     </p>
 
     <section class="card admin-grid" style="background: #fff">
-      <AyField :label="$t('sa26.code')" required>
+      <!-- Ma do he thong sinh khi luu, khong cho sua: xem formatPartCode ben may chu. -->
+      <AyField :label="$t('sa26.code')">
         <template #default="{ id: fid }">
-          <input :id="fid" v-model="form.code" class="input font-mono" type="text" placeholder="P-OIL-10W30">
+          <input
+            :id="fid" class="input font-mono" type="text" readonly disabled
+            :value="form.code" :placeholder="$t('sa26.codeAuto')"
+          >
         </template>
       </AyField>
 
@@ -136,7 +166,16 @@ useHead({ title: () => (isNew ? t('sa26.addTitle') : t('sa26.editTitle')) });
         </template>
       </AyField>
 
-      <div class="ay-col-full"><AyI18nInput v-model="form.name" :label="$t('sa26.nameLabel')" required /></div>
+      <AyField
+        class="ay-col-full"
+        :label="$t('sa26.nameLabel')"
+        required
+        :hint="nameOther ? $t('sa26.nameOther', { text: nameOther }) : $t('sa26.nameAutoTranslate')"
+      >
+        <template #default="{ id: fid }">
+          <input :id="fid" v-model="nameText" class="input" type="text" :placeholder="nameOther">
+        </template>
+      </AyField>
 
       <AyField :label="$t('sa26.maker')">
         <template #default="{ id: fid }">
