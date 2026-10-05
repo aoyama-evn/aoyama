@@ -45,6 +45,13 @@
       "smsLogs": "Nhật ký gửi SMS",
       "emptyTitle": "Chưa có thông báo nào",
       "emptyHint": "Lịch hẹn mới và báo giá khách vừa chốt sẽ hiện ở đây."
+    },
+    "cat": {
+      "nav": "Danh mục dữ liệu nền",
+      "services": "Dịch vụ",
+      "pricing": "Bảng giá",
+      "parts": "Phụ tùng",
+      "inventory": "Kho"
     }
   },
   "ai": {

@@ -90,6 +90,7 @@ useHead({ title: () => `${t('sa24.headTitle')} — AOYAMA Admin` });
 
 <template>
   <div class="flex flex-col gap-4">
+    <AdminCatalogTabs />
     <AyPageHeader
       code="SA-24" :title="$t('sa24.title')"
       :description="$t('sa24.lead')"

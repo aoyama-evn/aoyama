@@ -45,6 +45,13 @@
       "smsLogs": "SMS 送信ログ",
       "emptyTitle": "通知はありません",
       "emptyHint": "新規予約とお客様が承認した見積がここに表示されます。"
+    },
+    "cat": {
+      "nav": "マスタデータ",
+      "services": "サービス",
+      "pricing": "料金表",
+      "parts": "部品",
+      "inventory": "在庫"
     }
   },
   "ai": {

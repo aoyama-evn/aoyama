@@ -45,6 +45,13 @@
       "smsLogs": "SMS send log",
       "emptyTitle": "No notifications yet",
       "emptyHint": "New bookings and quotations your customers accept will appear here."
+    },
+    "cat": {
+      "nav": "Master data",
+      "services": "Services",
+      "pricing": "Price list",
+      "parts": "Parts",
+      "inventory": "Stock"
     }
   },
   "ai": {

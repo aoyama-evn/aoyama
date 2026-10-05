@@ -56,6 +56,7 @@ useHead({ title: () => `${t('sa22.title')} — AOYAMA Admin` });
 
 <template>
   <div class="flex flex-col gap-4">
+    <AdminCatalogTabs />
     <AyPageHeader code="SA-22" :title="$t('sa22.catalog')">
       <template #actions>
         <AyButton to="/admin/pricing" variant="secondary" size="sm">{{ $t('sa22.priceCta') }}</AyButton>
