@@ -17,7 +17,6 @@ setScreenTitle(() => t('sa07.title'));
 
 const result = ref<QrScanResult | null>(null);
 const checking = ref(false);
-const manualCode = ref('');
 
 /**
  * Mot o tim duy nhat — go bien so HAY so dien thoai deu duoc.
@@ -63,14 +62,14 @@ function remember(entry: RecentScan): void {
   }
 }
 
-async function check(payload: { token?: string; code?: string; search?: string }): Promise<void> {
+async function check(payload: { token?: string; search?: string }): Promise<void> {
   checking.value = true;
   result.value = null;
   try {
     const scanned = await api.post<QrScanResult>('/admin/scan', payload);
     result.value = scanned;
     remember({
-      code: scanned.booking?.code ?? payload.code ?? '—',
+      code: scanned.booking?.code ?? '—',
       name: scanned.booking?.contactName ?? '—',
       valid: scanned.valid,
       bookingId: scanned.booking?.id ?? null,
@@ -81,10 +80,6 @@ async function check(payload: { token?: string; code?: string; search?: string }
   } finally {
     checking.value = false;
   }
-}
-
-function submitManual(): void {
-  if (manualCode.value.trim()) check({ code: manualCode.value.trim().toUpperCase() });
 }
 
 function submitSearch(): void {
@@ -110,41 +105,17 @@ useHead({ title: () => `${t('sa07.title')} — AOYAMA Admin` });
 
       <div class="flex flex-col gap-3.5">
         <section class="card gap-2.5" style="background: #fff">
-          <h5>{{ $t('sa07.manual') }}</h5>
-          <p class="text-muted text-[12.5px]">{{ $t('sa07.manualHint') }}</p>
-          <div class="flex flex-wrap gap-2.5">
-            <input
-              v-model="manualCode"
-              class="input min-w-[180px] flex-1"
-              placeholder="B-YYYYMMDD-nnnn"
-              autocomplete="off"
-              :aria-label="$t('sc20.codeLabel')"
-              @keyup.enter="submitManual"
-            />
-            <button
-              type="button"
-              class="btn btn-primary flex-none"
-              style="min-height: 46px; padding-inline: 20px"
-              :disabled="!manualCode.trim() || checking"
-              @click="submitManual"
-            >
-              {{ $t('sa07.lookup') }}
-            </button>
-          </div>
-        </section>
-
-        <section class="card gap-2.5" style="background: #fff">
-          <h5>{{ $t('sa07.searchTitle') }}</h5>
-          <p class="text-muted text-[12.5px]">{{ $t('sa07.searchHint') }}</p>
+          <h5>{{ $t('sa07.findTitle') }}</h5>
+          <p class="text-muted text-[12.5px]">{{ $t('sa07.findHint') }}</p>
 
           <div class="flex flex-wrap gap-2.5">
             <input
               v-model="term"
               class="input min-w-[180px] flex-1"
               type="search"
-              placeholder="29T1-122.12 / 090-1234-5678"
+              placeholder="B-202610031418000 / 090-1234-5678"
               autocomplete="off"
-              :aria-label="$t('sa07.searchTitle')"
+              :aria-label="$t('sa07.findTitle')"
               @keyup.enter="submitSearch"
             />
             <button

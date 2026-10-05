@@ -436,8 +436,6 @@
     "colResult": "結果",
     "invalid": "無効",
     "lookup": "照会する",
-    "manual": "番号を手で入力",
-    "manualHint": "QRコードが読み取れないときに使います。",
     "openBooking": "予約の詳細を開く",
     "reason": {
       "ALREADY_RECEIVED": "この車両は受付済みです。整備伝票で進捗をご確認ください。",
@@ -456,8 +454,8 @@
     "validToast": "有効なコードです",
     "validToastSub": "車両を受け付けられます。",
     "when": "予約日時",
-    "searchTitle": "ナンバーまたは電話番号で検索",
-    "searchHint": "QRコードを提示できない場合は、ナンバーまたは電話番号で予約を検索します。"
+    "findTitle": "予約番号または電話番号で検索",
+    "findHint": "QRコードを読み取れない場合に。予約番号・電話番号・ナンバーのいずれかを入力してください。"
   },
   "sa08": {
     "accessories": "付属品",

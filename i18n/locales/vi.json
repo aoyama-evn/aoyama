@@ -436,8 +436,6 @@
     "colResult": "Kết quả",
     "invalid": "Không hợp lệ",
     "lookup": "Tra cứu",
-    "manual": "Nhập mã thủ công",
-    "manualHint": "Dùng khi không quét được mã QR.",
     "openBooking": "Mở chi tiết lịch hẹn",
     "reason": {
       "ALREADY_RECEIVED": "Xe đã được tiếp nhận trước đó. Mở phiếu dịch vụ để xem tiến độ.",
@@ -456,8 +454,8 @@
     "validToast": "Mã hợp lệ",
     "validToastSub": "Có thể tiếp nhận xe.",
     "when": "Thời gian hẹn",
-    "searchTitle": "Tra theo biển số hoặc số điện thoại",
-    "searchHint": "Khách không mở được mã QR thì tìm lịch hẹn bằng biển số xe hoặc số điện thoại."
+    "findTitle": "Tìm theo mã lịch hẹn hoặc số điện thoại",
+    "findHint": "Dùng khi không quét được mã QR. Nhập mã lịch hẹn, số điện thoại hoặc biển số xe."
   },
   "sa08": {
     "accessories": "Phụ kiện đi kèm",

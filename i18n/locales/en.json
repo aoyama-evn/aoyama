@@ -436,8 +436,6 @@
     "colResult": "Result",
     "invalid": "Not valid",
     "lookup": "Look up",
-    "manual": "Enter the code by hand",
-    "manualHint": "Use this when the QR code will not scan.",
     "openBooking": "Open the booking",
     "reason": {
       "ALREADY_RECEIVED": "This bike is already received. Open the work order to see progress.",
@@ -456,8 +454,8 @@
     "validToast": "Valid code",
     "validToastSub": "You can receive the bike.",
     "when": "Appointment",
-    "searchTitle": "Look up by plate or phone",
-    "searchHint": "If the customer can't open their QR code, find the booking by plate number or phone."
+    "findTitle": "Find by booking code or phone",
+    "findHint": "For when the QR code won't scan. Enter a booking code, phone number or plate."
   },
   "sa08": {
     "accessories": "Accessories left with the bike",
