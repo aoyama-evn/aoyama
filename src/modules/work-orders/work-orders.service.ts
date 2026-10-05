@@ -161,7 +161,12 @@ export class WorkOrdersService {
         customer: true,
         vehicle: true,
         store: true,
-        booking: true,
+        /**
+         * Nhat ky o SA-10 ve ca chang di cua xe, tu luc khach dat lich chu
+         * khong phai tu luc mo ho so. Chang dau nam trong lich su trang
+         * thai cua lich hen, khong phai cua ho so nay.
+         */
+        booking: { statusHistories: true },
         // SA-10 hien ten ky thuat vien phu trach ngay tren the tom tat.
         assignedTechnician: true,
         // Dong ky ten duoi ket qua chan doan.
@@ -171,7 +176,11 @@ export class WorkOrdersService {
         photos: true,
         statusHistories: true,
       },
-      order: { items: { sortOrder: 'ASC' }, statusHistories: { createdAt: 'ASC' } },
+      order: {
+        items: { sortOrder: 'ASC' },
+        statusHistories: { createdAt: 'ASC' },
+        booking: { statusHistories: { createdAt: 'ASC' } },
+      },
     });
     if (!workOrder) {
       throw new NotFoundException({
