@@ -127,7 +127,8 @@ export class QrService {
   async validateBySearch(term: string): Promise<QrScanResult> {
     const raw = (term ?? '').trim();
     const digitsOnly = squashPhone(raw);
-    const looksLikePhone = digitsOnly.length >= 6 && digitsOnly.length === raw.replace(/[\s\-+().]/g, '').length;
+    const looksLikePhone =
+      digitsOnly.length >= 6 && digitsOnly.length === raw.replace(/[\s\-+().]/g, '').length;
 
     if (raw.length < 4) {
       throw new BadRequestException({
@@ -136,9 +137,16 @@ export class QrService {
       });
     }
 
+    /**
+     * Thu theo thu tu chac chan nhat truoc.
+     *
+     * Ma lich hen la dinh danh duy nhat nen thu dau; toan chu so thi gan
+     * nhu chac la so dien thoai; con lai doan la bien so. Thu het ca ba
+     * truoc khi bao khong tim thay — le tan khong phai chon kieu tra cuu.
+     */
     const order = looksLikePhone
-      ? [() => this.findByPhone(raw), () => this.findByPlate(raw)]
-      : [() => this.findByPlate(raw), () => this.findByPhone(raw)];
+      ? [() => this.findByCode(raw), () => this.findByPhone(raw), () => this.findByPlate(raw)]
+      : [() => this.findByCode(raw), () => this.findByPlate(raw), () => this.findByPhone(raw)];
 
     for (const find of order) {
       const booking = await find();
@@ -152,8 +160,12 @@ export class QrService {
     return {
       valid: false,
       reason: 'NOT_FOUND',
-      message: 'Khong tim thay lich hen nao cho bien so hay so dien thoai nay',
+      message: 'Khong tim thay lich hen nao khop voi noi dung vua nhap',
     };
+  }
+
+  private async findByCode(code: string): Promise<Booking | null> {
+    return this.scopeToBooking().where('upper(b.code) = :code', { code: code.toUpperCase() }).getOne();
   }
 
   /** Mot xe hay mot khach co the co nhieu lich — xem ghi chu o scopeToBooking. */
