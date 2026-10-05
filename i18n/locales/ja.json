@@ -1298,6 +1298,7 @@
   "sc01": {
     "askAi": "バイクの不調？AIアシスタントに相談",
     "bookCta": "今すぐ予約 · Book now",
+    "currentKicker": "対応中のご予約",
     "haveCodeLead": "予約番号または電話番号で検索できます。ログイン不要です。",
     "heroAlt": "アオヤマのバイク",
     "kicker": "バイクの整備・修理",

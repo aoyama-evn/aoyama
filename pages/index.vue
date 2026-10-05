@@ -27,8 +27,14 @@ const { data: upcomingData } = await useAsyncData(
   'home-upcoming',
   async () => {
     if (!auth.isCustomer) return { booking: null as Booking | null };
+    /**
+     * `active` chu khong phai `upcoming`: xe dang nam trong xuong thi gio
+     * hen da troi qua, nhung do moi la lich khach muon thay khi mo trang
+     * chu. Sap xep tang dan nen lich dang do len truoc, chua co thi den
+     * lich gan nhat phia truoc.
+     */
     const page = await api.get<Page<Booking>>('/account/bookings', {
-      upcoming: true,
+      active: true,
       limit: 1,
       sortOrder: 'ASC',
     });
@@ -38,6 +44,11 @@ const { data: upcomingData } = await useAsyncData(
 );
 
 const upcoming = computed(() => upcomingData.value?.booking ?? null);
+
+/** Gio hen con o phia truoc hay xe dang trong xuong — hai nhan khac nhau. */
+const isUpcoming = computed(
+  () => Boolean(upcoming.value && new Date(upcoming.value.scheduledAt) > new Date()),
+);
 
 useHead({ title: 'AOYAMA Service' });
 
@@ -106,7 +117,7 @@ function priceLabel(service: ServiceItem): string {
     <AyBookingCard
       v-if="auth.isCustomer && upcoming"
       :booking="upcoming"
-      :kicker="$t('sc01.upcomingKicker')"
+      :kicker="isUpcoming ? $t('sc01.upcomingKicker') : $t('sc01.currentKicker')"
     >
       <template #actions>
         <NuxtLink
