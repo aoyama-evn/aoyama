@@ -4,7 +4,7 @@ import type { PartRecognition } from '~/types/models';
 /** SA-27 Nhap lieu phu tung bang AI — FR-PRT-04..07, AI-04, BR-43. */
 definePageMeta({ layout: 'admin', middleware: 'admin' });
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const api = useApi();
 const ui = useUiStore();
 
@@ -20,11 +20,14 @@ async function analyze(): Promise<void> {
   analyzing.value = true;
   result.value = null;
   try {
-    result.value = await api.post<PartRecognition>('/admin/ai/part-recognition', {
-      imageUrls: images.value,
-    });
+    result.value = await api.post<PartRecognition>(
+      `/admin/ai/part-recognition?lang=${locale.value}`,
+      { imageUrls: images.value },
+    );
     if (result.value.isFallback) {
       ui.info(t('sa27.noMatch'), t('sa27.noMatchSub'));
+    } else if (result.value.isDemo) {
+      ui.info(t('sa27.demoTitle'), t('sa27.demoSub'));
     }
   } catch (error) {
     ui.error(normalizeError(error).message, t('sa27.errorSub'));
@@ -98,6 +101,18 @@ useHead({ title: () => `${t('sa27.title')} — AOYAMA Admin` });
 
       <p class="rounded-xl bg-warning-bg px-3 py-2 text-[12.5px] text-warning">
         {{ $t('sa27.disclaimer') }}
+      </p>
+
+      <!--
+        Noi that ket qua nay den tu dau. Khong de nhan vien tuong may da
+        doc duoc anh trong khi thuc ra day la du lieu mau.
+      -->
+      <p
+        v-if="result.isDemo"
+        class="rounded-xl px-3 py-2 text-[12px] leading-[1.5]"
+        style="background: var(--color-accent-2-100); color: var(--color-accent-2-800)"
+      >
+        {{ $t('sa27.demoNote') }}
       </p>
 
       <div class="admin-actions">

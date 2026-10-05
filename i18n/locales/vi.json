@@ -988,7 +988,10 @@
     "recognise": "Nhận dạng bằng AI",
     "result": "Kết quả nhận dạng",
     "reviewSave": "Kiểm tra & tạo phụ tùng →",
-    "title": "Nhập phụ tùng bằng AI"
+    "title": "Nhập phụ tùng bằng AI",
+    "demoTitle": "Đây là dữ liệu mẫu",
+    "demoSub": "Chưa nối AI đọc ảnh nên hệ thống lấy tạm một phụ tùng có trong kho.",
+    "demoNote": "Chưa cắm AI_API_KEY nên hệ thống lấy tạm một phụ tùng có thật trong kho để minh họa cách làm việc: chụp ảnh → các ô tự điền → nhân viên kiểm lại → lưu. Cắm khóa vào là đọc ảnh thật, không phải sửa code."
   },
   "sa28": {
     "askMin": "Ngưỡng cảnh báo tồn kho",

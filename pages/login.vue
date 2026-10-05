@@ -54,15 +54,7 @@ useHead({ title: () => t('sc18.title') });
     <h3>{{ $t('sc18.title') }}</h3>
 
     <AyField for="phone" :label="$t('sc14.phone')" required :error="error ?? undefined">
-      <input
-        id="phone"
-        v-model="phone"
-        class="input"
-        type="tel"
-        inputmode="tel"
-        autocomplete="tel"
-        placeholder="090-1234-5678"
-      />
+      <AyPhoneField id="phone" v-model="phone" :invalid="Boolean(error)" />
     </AyField>
 
     <button

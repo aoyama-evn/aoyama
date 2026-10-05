@@ -632,6 +632,8 @@ export interface PartRecognition {
   compatibleVehicles?: string[];
   confidence?: number;
   isFallback: boolean;
+  /** True khi ket qua la du lieu mau, chua noi mo hinh AI that. */
+  isDemo?: boolean;
 }
 
 export interface TechAnswer {

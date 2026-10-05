@@ -988,7 +988,10 @@
     "recognise": "Recognise with AI",
     "result": "Recognition result",
     "reviewSave": "Review & create the part →",
-    "title": "Import a part with AI"
+    "title": "Import a part with AI",
+    "demoTitle": "This is sample data",
+    "demoSub": "Image recognition isn't connected, so a part from your stock is shown instead.",
+    "demoNote": "AI_API_KEY isn't set, so a real part from your stock is shown to demonstrate the workflow: photo → fields filled → staff check → save. Set the key and it reads the photo for real, with no code change."
   },
   "sa28": {
     "askMin": "Low-stock threshold",
