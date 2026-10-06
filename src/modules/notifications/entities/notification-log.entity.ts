@@ -40,6 +40,16 @@ export class NotificationLog extends BaseEntity {
   @Column({ name: 'sent_at', type: 'timestamptz', nullable: true })
   sentAt!: Date | null;
 
+  /**
+   * Luc khach mo hop thong bao trong ung dung — SC-33.
+   *
+   * Tin nhan van gui qua SMS nhu cu; day chi la ban sao hien trong ung
+   * dung cho khach co tai khoan. Khach vang lai khong co cho de xem nen
+   * voi ho SMS van la duong duy nhat.
+   */
+  @Column({ name: 'read_at', type: 'timestamptz', nullable: true })
+  readAt!: Date | null;
+
   @Column({ name: 'error_message', type: 'text', nullable: true })
   errorMessage!: string | null;
 

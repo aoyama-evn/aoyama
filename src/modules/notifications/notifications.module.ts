@@ -5,7 +5,7 @@ import { AdminNotificationsService } from './admin-notifications.service';
 import { AdminNotification } from './entities/admin-notification.entity';
 import { NotificationLog } from './entities/notification-log.entity';
 import { NotificationTemplate } from './entities/notification-template.entity';
-import { NotificationsController } from './notifications.controller';
+import { MyNotificationsController, NotificationsController } from './notifications.controller';
 import { NotificationsService } from './notifications.service';
 import { ConsoleMailProvider, MAIL_PROVIDER } from './providers/mail.provider';
 import { ConsoleSmsProvider, HttpSmsProvider, SMS_PROVIDER } from './providers/sms.provider';
@@ -13,7 +13,7 @@ import { ConsoleSmsProvider, HttpSmsProvider, SMS_PROVIDER } from './providers/s
 /** M-14 — Thong bao SMS va email. */
 @Module({
   imports: [TypeOrmModule.forFeature([NotificationTemplate, NotificationLog, AdminNotification])],
-  controllers: [NotificationsController],
+  controllers: [NotificationsController, MyNotificationsController],
   providers: [
     NotificationsService,
     AdminNotificationsService,

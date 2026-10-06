@@ -121,3 +121,34 @@ export class NotificationsController {
     return this.service.retry(id);
   }
 }
+
+/**
+ * SC-33 — hop thong bao cua khach co tai khoan.
+ *
+ * Tin nhan van gui qua SMS nhu cu; day la ban sao doc duoc ngay trong ung
+ * dung, de khach khong phai lui tim trong tin nhan dien thoai. Khach vang
+ * lai khong co tai khoan nen voi ho SMS van la duong duy nhat.
+ */
+@ApiTags('notifications')
+@ApiBearerAuth()
+@Controller('account/notifications')
+export class MyNotificationsController {
+  constructor(private readonly service: NotificationsService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'SC-33 — thong bao cua toi' })
+  list(@CurrentUser() user: AuthUser) {
+    return this.service.listForCustomer(user.sub);
+  }
+
+  @Get('unread-count')
+  unreadCount(@CurrentUser() user: AuthUser) {
+    return this.service.countUnreadForCustomer(user.sub);
+  }
+
+  @Put('read-all')
+  @ApiOperation({ summary: 'SC-33 — danh dau da doc het' })
+  readAll(@CurrentUser() user: AuthUser) {
+    return this.service.markAllReadForCustomer(user.sub);
+  }
+}

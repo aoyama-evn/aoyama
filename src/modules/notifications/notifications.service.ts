@@ -199,6 +199,43 @@ export class NotificationsService {
       .getManyAndCount();
     return new PageDto(items, total, query);
   }
+
+  // ---------------- Hop thong bao cua khach (SC-33) ----------------
+
+  /**
+   * Nhung gi khach thay trong ung dung.
+   *
+   * Bo OTP: ma dang nhap het han sau vai phut, de lai trong hop thong bao
+   * vua vo nghia vua la mot ban sao cua ma bi mat nam cho ai mo may khach
+   * cung doc duoc.
+   */
+  private customerFeed(customerId: string) {
+    return this.logRepo
+      .createQueryBuilder('log')
+      .where('log.customer_id = :customerId', { customerId })
+      .andWhere('log.event != :otp', { otp: NotificationEvent.OTP });
+  }
+
+  async listForCustomer(customerId: string, limit = 30): Promise<NotificationLog[]> {
+    return this.customerFeed(customerId).orderBy('log.createdAt', 'DESC').take(limit).getMany();
+  }
+
+  async countUnreadForCustomer(customerId: string): Promise<{ count: number }> {
+    const count = await this.customerFeed(customerId).andWhere('log.read_at IS NULL').getCount();
+    return { count };
+  }
+
+  async markAllReadForCustomer(customerId: string): Promise<{ count: number }> {
+    const result = await this.logRepo
+      .createQueryBuilder()
+      .update(NotificationLog)
+      .set({ readAt: new Date() })
+      .where('customer_id = :customerId', { customerId })
+      .andWhere('read_at IS NULL')
+      .andWhere('event != :otp', { otp: NotificationEvent.OTP })
+      .execute();
+    return { count: result.affected ?? 0 };
+  }
 }
 
 /** Thay bien dang {{ten}} trong mau. Bien thieu duoc thay bang chuoi rong. */
