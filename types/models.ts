@@ -640,6 +640,8 @@ export interface PartRecognition {
   isFallback: boolean;
   /** True khi ket qua la du lieu mau, chua noi mo hinh AI that. */
   isDemo?: boolean;
+  /** Anh vua dung de nhan dang — dong luon vao bieu mau cho khoi tai lai. */
+  imageUrls?: string[];
 }
 
 export interface TechAnswer {

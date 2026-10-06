@@ -62,7 +62,6 @@ useHead({ title: () => `${t('sa25.title')} — AOYAMA Admin` });
     <AdminCatalogTabs />
     <AyPageHeader code="SA-25" :title="$t('sa25.catalog')">
       <template #actions>
-        <AyButton to="/admin/parts/ai-import" variant="secondary" size="sm">{{ $t('sa25.aiImport') }}</AyButton>
         <AyButton to="/admin/inventory" variant="secondary" size="sm">{{ $t('sa25.stockCta') }}</AyButton>
         <AyButton to="/admin/parts/new/edit" size="sm">{{ $t('sa25.addCta') }}</AyButton>
       </template>

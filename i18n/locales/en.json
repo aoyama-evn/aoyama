@@ -904,7 +904,6 @@
   },
   "sa25": {
     "addCta": "Add a part",
-    "aiImport": "Import with AI",
     "askRetire": "Retire this part",
     "askRetireBody": "It can no longer be chosen for new work orders. Existing orders and quotations are unchanged.",
     "catalog": "Parts catalog",
@@ -948,25 +947,23 @@
     "unit": "Unit"
   },
   "sa27": {
-    "again": "Recognise again",
+    "applied": "Filled into the form",
+    "applyToForm": "Fill the form",
     "colName": "Name",
+    "demoNote": "AI_API_KEY isn't set, so a real part from your stock is shown to demonstrate the workflow: photo → fields filled → staff check → save. Set the key and it reads the photo for real, with no code change.",
+    "demoSub": "Image recognition isn't connected, so a part from your stock is shown instead.",
+    "demoTitle": "This is sample data",
     "disclaimer": "This is an AI suggestion. Check it against the actual box and add the cost and sell prices before saving.",
     "errorSub": "Please enter the part manually.",
     "failLead": "The image may be blurry, or the code may not be visible on the box. Retake a photo showing the maker part number, or enter it by hand.",
-    "failTitle": "Could not recognise the part",
     "lead": "Photograph the part or its box and the assistant reads the details into the form. Always check before saving.",
-    "manualCta": "Enter manually",
     "needPhoto": "Please upload at least one photo of the part or its box",
     "noMatch": "The AI assistant could not recognise it",
     "noMatchSub": "You can still enter it manually as usual.",
     "photoLabel": "Photo of the part or its box",
     "recognise": "Recognise with AI",
     "result": "Recognition result",
-    "reviewSave": "Review & create the part →",
-    "title": "Import a part with AI",
-    "demoTitle": "This is sample data",
-    "demoSub": "Image recognition isn't connected, so a part from your stock is shown instead.",
-    "demoNote": "AI_API_KEY isn't set, so a real part from your stock is shown to demonstrate the workflow: photo → fields filled → staff check → save. Set the key and it reads the photo for real, with no code change."
+    "title": "Import a part with AI"
   },
   "sa28": {
     "askMin": "Low-stock threshold",

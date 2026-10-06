@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ApiError, I18nText, Part } from '~/types/models';
+import type { ApiError, I18nText, Part, PartRecognition } from '~/types/models';
 
 /** SA-26 Them hoac sua phu tung — FR-PRT-01..03. */
 definePageMeta({ layout: 'admin', middleware: 'admin' });
@@ -61,23 +61,28 @@ if (!isNew) {
     compatible.value = data.value.compatibleVehicles ?? [];
     images.value = data.value.imageUrls ?? [];
   }
-} else if (route.query.prefill) {
-  /** AI-04 — du lieu do AI nhan dang chuyen sang, Admin van phai kiem tra (BR-43). */
-  try {
-    const prefill = JSON.parse(String(route.query.prefill));
-    // SA-27 goi AI kem ngon ngu dang dung, nen ten tra ve da dung thu tieng nay.
-    nameText.value = prefill.name ?? '';
-    Object.assign(form, {
-      maker: prefill.maker ?? '',
-      makerPartNo: prefill.makerPartNo ?? '',
-      category: prefill.category ?? '',
-      specification: prefill.specification ?? '',
-      createdSource: 'AI_IMAGE',
-    });
-    compatible.value = prefill.compatibleVehicles ?? [];
-  } catch {
-    // Du lieu dien san hong thi bo qua, nguoi dung nhap tay.
+}
+
+/**
+ * AI-04, BR-43 — ket qua AI khong tu luu.
+ *
+ * Nguoi nhap bam "dien vao bieu mau" o the ben canh, doc lai, sua cho
+ * nao sai roi moi bam luu. Chi dien nhung o AI that su doc duoc, de
+ * khong xoa trang cai ho da go tay.
+ */
+function applyAi(found: PartRecognition): void {
+  if (found.name) nameText.value = found.name;
+  if (found.maker) form.maker = found.maker;
+  if (found.makerPartNo) form.makerPartNo = found.makerPartNo;
+  if (found.category) form.category = found.category;
+  if (found.specification) form.specification = found.specification;
+  for (const vehicle of found.compatibleVehicles ?? []) {
+    if (!compatible.value.includes(vehicle)) compatible.value = [...compatible.value, vehicle];
   }
+  for (const url of found.imageUrls ?? []) {
+    if (!images.value.includes(url)) images.value = [...images.value, url];
+  }
+  form.createdSource = 'AI_IMAGE';
 }
 
 function addCompatible(): void {
@@ -131,7 +136,7 @@ useHead({ title: () => (isNew ? t('sa26.addTitle') : t('sa26.editTitle')) });
 </script>
 
 <template>
-  <div class="admin-form">
+  <div class="admin-form admin-form-wide">
     <AyPageHeader
       code="SA-26"
       :title="isNew ? $t('sa26.addTitle') : $t('sa26.editTitle')"
@@ -149,6 +154,8 @@ useHead({ title: () => (isNew ? t('sa26.addTitle') : t('sa26.editTitle')) });
       {{ $t('sa26.aiPrefill') }}
     </p>
 
+    <div class="grid items-start gap-[14px] lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div class="flex min-w-0 flex-col gap-[14px]">
     <section class="card admin-grid" style="background: #fff">
       <!--
         Ma do he thong sinh khi luu — xem formatPartCode ben may chu.
@@ -242,6 +249,15 @@ useHead({ title: () => (isNew ? t('sa26.addTitle') : t('sa26.editTitle')) });
     <section class="card" style="background: #fff">
       <AyImageUpload v-model="images" :label="$t('sa26.photos')" :max="4" />
     </section>
+      </div>
+
+      <!--
+        Nhan dang bang AI nam ngay canh bieu mau. Truoc day la mot man
+        rieng: nhan vien tai anh o do roi he thong nem ho sang day kem du
+        lieu dien san qua duong dan — di mot vong chi de dien may o.
+      -->
+      <AdminPartAiPanel @apply="applyAi" />
+    </div>
 
     <AyErrorNote :error="error" />
 

@@ -904,7 +904,6 @@
   },
   "sa25": {
     "addCta": "Thêm phụ tùng",
-    "aiImport": "Nhập bằng AI",
     "askRetire": "Ngừng dùng phụ tùng",
     "askRetireBody": "Phụ tùng không còn hiện khi chọn cho phiếu mới. Phiếu và báo giá cũ vẫn giữ nguyên.",
     "catalog": "Danh mục phụ tùng",
@@ -948,25 +947,23 @@
     "unit": "Đơn vị"
   },
   "sa27": {
-    "again": "Nhận dạng lại",
+    "applied": "Đã điền vào biểu mẫu",
+    "applyToForm": "Điền vào biểu mẫu",
     "colName": "Tên",
+    "demoNote": "Chưa cắm AI_API_KEY nên hệ thống lấy tạm một phụ tùng có thật trong kho để minh họa cách làm việc: chụp ảnh → các ô tự điền → nhân viên kiểm lại → lưu. Cắm khóa vào là đọc ảnh thật, không phải sửa code.",
+    "demoSub": "Chưa nối AI đọc ảnh nên hệ thống lấy tạm một phụ tùng có trong kho.",
+    "demoTitle": "Đây là dữ liệu mẫu",
     "disclaimer": "Đây là gợi ý của AI. Hãy đối chiếu với hộp vỏ thật rồi bổ sung giá nhập, giá bán trước khi lưu.",
     "errorSub": "Hãy nhập phụ tùng thủ công.",
     "failLead": "Ảnh có thể bị mờ hoặc thiếu mã trên hộp. Bạn có thể chụp lại rõ phần mã hãng, hoặc nhập thủ công.",
-    "failTitle": "Chưa nhận dạng được phụ tùng",
     "lead": "Chụp ảnh phụ tùng hoặc hộp vỏ, trợ lý sẽ đọc thông tin và điền sẵn biểu mẫu. Bạn luôn kiểm tra trước khi lưu.",
-    "manualCta": "Nhập thủ công",
     "needPhoto": "Hãy tải lên ít nhất một ảnh phụ tùng hoặc hộp vỏ",
     "noMatch": "Trợ lý AI chưa nhận dạng được",
     "noMatchSub": "Bạn vẫn có thể nhập thủ công như bình thường.",
     "photoLabel": "Ảnh phụ tùng hoặc hộp vỏ",
     "recognise": "Nhận dạng bằng AI",
     "result": "Kết quả nhận dạng",
-    "reviewSave": "Kiểm tra & tạo phụ tùng →",
-    "title": "Nhập phụ tùng bằng AI",
-    "demoTitle": "Đây là dữ liệu mẫu",
-    "demoSub": "Chưa nối AI đọc ảnh nên hệ thống lấy tạm một phụ tùng có trong kho.",
-    "demoNote": "Chưa cắm AI_API_KEY nên hệ thống lấy tạm một phụ tùng có thật trong kho để minh họa cách làm việc: chụp ảnh → các ô tự điền → nhân viên kiểm lại → lưu. Cắm khóa vào là đọc ảnh thật, không phải sửa code."
+    "title": "Nhập phụ tùng bằng AI"
   },
   "sa28": {
     "askMin": "Ngưỡng cảnh báo tồn kho",
