@@ -540,7 +540,7 @@
     "etaSaved": "Đã lưu thời gian dự kiến",
     "finding": "Ghi nhận:",
     "fuelIs": "nhiên liệu {level}",
-    "goPayment": "Thu tiền →",
+    "goPayment": "Chờ bàn giao →",
     "grandTotal": "TỔNG",
     "headTitle": "{code}",
     "itemStateFor": "Tiến độ hạng mục {name}",
@@ -1799,7 +1799,7 @@
   "status": {
     "ACCEPTED": "Đã đồng ý",
     "CANCELLED": "Đã hủy",
-    "COMPLETED": "Đã xong",
+    "COMPLETED": "Chờ thanh toán",
     "CONFIRMED": "Đã xác nhận",
     "DELIVERED": "Đã bàn giao",
     "DIAGNOSING": "Đang chẩn đoán",

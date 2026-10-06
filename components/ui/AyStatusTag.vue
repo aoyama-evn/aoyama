@@ -26,7 +26,7 @@ const TONES: Record<string, Tone> = {
   QUOTING: 'warning',
   QUOTE_ACCEPTED: 'info',
   IN_PROGRESS: 'accent',
-  COMPLETED: 'success',
+  COMPLETED: 'warning',
   DELIVERED: 'success',
   DRAFT: 'neutral',
   SENT: 'info',

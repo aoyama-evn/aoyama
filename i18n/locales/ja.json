@@ -540,7 +540,7 @@
     "etaSaved": "完了予定時刻を保存しました",
     "finding": "所見：",
     "fuelIs": "燃料 {level}",
-    "goPayment": "お会計へ →",
+    "goPayment": "引渡し待ちへ →",
     "grandTotal": "合計",
     "headTitle": "{code}",
     "itemStateFor": "{name} の進捗",
@@ -1799,7 +1799,7 @@
   "status": {
     "ACCEPTED": "承認済み",
     "CANCELLED": "キャンセル",
-    "COMPLETED": "作業完了",
+    "COMPLETED": "お支払い待ち",
     "CONFIRMED": "確定",
     "DELIVERED": "引渡済み",
     "DIAGNOSING": "診断中",

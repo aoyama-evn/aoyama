@@ -540,7 +540,7 @@
     "etaSaved": "Estimated completion saved",
     "finding": "Findings:",
     "fuelIs": "fuel {level}",
-    "goPayment": "Take payment →",
+    "goPayment": "Awaiting handover →",
     "grandTotal": "TOTAL",
     "headTitle": "{code}",
     "itemStateFor": "Progress for {name}",
@@ -1799,7 +1799,7 @@
   "status": {
     "ACCEPTED": "Accepted",
     "CANCELLED": "Cancelled",
-    "COMPLETED": "Work done",
+    "COMPLETED": "Awaiting payment",
     "CONFIRMED": "Confirmed",
     "DELIVERED": "Handed over",
     "DIAGNOSING": "Diagnosing",
