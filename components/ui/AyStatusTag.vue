@@ -7,6 +7,13 @@
 const props = defineProps<{
   status: string;
   kind?: 'booking' | 'workOrder' | 'quotation' | 'payment' | 'notification';
+  /**
+   * Chu de hien, khi noi goi can mot cach goi khac.
+   *
+   * Man khach goi cac buoc theo bo chu rieng (flow.*) — "Cho ban giao"
+   * thay vi "Cho thanh toan" chang han. Mau sac van lay theo `status`.
+   */
+  label?: string;
 }>();
 
 type Tone = 'neutral' | 'info' | 'success' | 'warning' | 'danger' | 'accent';
@@ -50,9 +57,10 @@ const TONE_CLASS: Record<Tone, string> = {
 };
 
 /** Chu hien ra lay tu tep ngon ngu; trang thai la khoa dung chung ba thu tieng. */
-const label = computed(() =>
-  te(`status.${props.status}`) ? t(`status.${props.status}`) : props.status,
-);
+const label = computed(() => {
+  if (props.label) return props.label;
+  return te(`status.${props.status}`) ? t(`status.${props.status}`) : props.status;
+});
 const toneClass = computed(() => TONE_CLASS[TONES[props.status] ?? 'neutral']);
 </script>
 

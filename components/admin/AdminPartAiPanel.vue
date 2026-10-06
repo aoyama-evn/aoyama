@@ -19,38 +19,42 @@ const ui = useUiStore();
 const { t, locale } = useI18n();
 
 const images = ref<string[]>([]);
-const result = ref<PartRecognition | null>(null);
 const analyzing = ref(false);
 
+/**
+ * Nhan dang xong la dien thang vao bieu mau.
+ *
+ * Truoc day ket qua nam trong mot khung rieng, nguoi nhap doc roi bam
+ * them mot nut "dien vao bieu mau" nua. Khung do chep lai dung nhung gi
+ * sap hien o bieu mau ngay ben canh, nen chi la mot buoc thua.
+ *
+ * BR-43 van giu: AI khong tu luu. Du lieu mot vao o la nguoi doc lai,
+ * sua cho nao sai, roi moi bam Luu.
+ */
 async function analyze(): Promise<void> {
   if (images.value.length === 0) {
     ui.warning(t('sa27.needPhoto'));
     return;
   }
   analyzing.value = true;
-  result.value = null;
   try {
-    result.value = await api.post<PartRecognition>(
+    const found = await api.post<PartRecognition>(
       `/admin/ai/part-recognition?lang=${locale.value}`,
       { imageUrls: images.value },
     );
-    if (result.value.isFallback) {
+    if (found.isFallback) {
       ui.info(t('sa27.noMatch'), t('sa27.noMatchSub'));
-    } else if (result.value.isDemo) {
-      ui.info(t('sa27.demoTitle'), t('sa27.demoSub'));
+      return;
     }
+    emit('apply', { ...found, imageUrls: images.value });
+    // Noi that ket qua den tu dau, khong de nguoi nhap tuong may vua doc anh.
+    if (found.isDemo) ui.info(t('sa27.demoTitle'), t('sa27.demoSub'));
+    else ui.success(t('sa27.applied'), t('sa27.disclaimer'));
   } catch (error) {
     ui.error(normalizeError(error).message, t('sa27.errorSub'));
   } finally {
     analyzing.value = false;
   }
-}
-
-/** Dong anh vua nhan dang vao bieu mau luon, de nguoi nhap khoi tai lai. */
-function apply(): void {
-  if (!result.value) return;
-  emit('apply', { ...result.value, imageUrls: images.value });
-  ui.success(t('sa27.applied'));
 }
 </script>
 
@@ -66,55 +70,5 @@ function apply(): void {
     <AyButton size="sm" :loading="analyzing" :disabled="images.length === 0" @click="analyze">
       {{ $t('sa27.recognise') }}
     </AyButton>
-
-    <template v-if="result && !result.isFallback">
-      <div class="flex items-center gap-2">
-        <h5 class="text-[14px]">{{ $t('sa27.result') }}</h5>
-        <AyAiBadge :confidence="result.confidence ?? null" />
-      </div>
-
-      <dl class="flex flex-col gap-1.5 text-[13px]">
-        <div><dt class="text-muted text-[11.5px]">{{ $t('sa27.colName') }}</dt><dd>{{ result.name ?? '—' }}</dd></div>
-        <div><dt class="text-muted text-[11.5px]">{{ $t('sa25.colMaker') }}</dt><dd>{{ result.maker ?? '—' }}</dd></div>
-        <div>
-          <dt class="text-muted text-[11.5px]">{{ $t('sa26.makerPartNo') }}</dt>
-          <dd class="font-mono">{{ result.makerPartNo ?? '—' }}</dd>
-        </div>
-        <div><dt class="text-muted text-[11.5px]">{{ $t('sa25.colCategory') }}</dt><dd>{{ result.category ?? '—' }}</dd></div>
-        <div><dt class="text-muted text-[11.5px]">{{ $t('sa26.spec') }}</dt><dd>{{ result.specification ?? '—' }}</dd></div>
-        <div v-if="result.compatibleVehicles?.length">
-          <dt class="text-muted text-[11.5px]">{{ $t('sa26.compatible') }}</dt>
-          <dd>
-            <ul class="mt-1 flex flex-wrap gap-1.5">
-              <li v-for="v in result.compatibleVehicles" :key="v" class="tag bg-neutral-200 text-neutral-700">
-                {{ v }}
-              </li>
-            </ul>
-          </dd>
-        </div>
-      </dl>
-
-      <p class="rounded-xl bg-warning-bg px-3 py-2 text-[12px] leading-[1.5] text-warning">
-        {{ $t('sa27.disclaimer') }}
-      </p>
-
-      <!--
-        Noi that ket qua nay den tu dau. Khong de nhan vien tuong may da
-        doc duoc anh trong khi thuc ra day la du lieu mau.
-      -->
-      <p
-        v-if="result.isDemo"
-        class="rounded-xl px-3 py-2 text-[11.5px] leading-[1.5]"
-        style="background: var(--color-accent-2-100); color: var(--color-accent-2-800)"
-      >
-        {{ $t('sa27.demoNote') }}
-      </p>
-
-      <AyButton size="sm" @click="apply">{{ $t('sa27.applyToForm') }}</AyButton>
-    </template>
-
-    <p v-else-if="result?.isFallback" class="text-muted text-[12.5px] leading-[1.5]">
-      {{ $t('sa27.failLead') }}
-    </p>
   </section>
 </template>

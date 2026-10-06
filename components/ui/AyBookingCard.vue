@@ -51,6 +51,40 @@ const serviceNames = computed(() =>
  * se xay ra. Duong sang ban bao gia nam o nut rieng duoi chan the.
  */
 const awaitingQuote = computed(() => props.booking.pendingQuotation ?? null);
+
+/**
+ * Nhan tren the phai doc giong het dong thoi gian o man theo doi tien do.
+ *
+ * Truoc day the lay thang `booking.status`, ma ca giai doan sua xe deu
+ * nam duoi RECEIVED — nen mot chiec xe sap duoc giao van ghi "Da tiep
+ * nhan" trong khi man tien do da di den "Cho ban giao".
+ *
+ * Buoc va moc tren dong thoi gian dat ten khac nhau o hai cho, nen phai
+ * bac cau: DIAGNOSED la moc "da chan doan", QUOTING la moc "dang bao
+ * gia". Huy va khong den khong co moc nao, de nguyen nhan cu.
+ */
+const STAGE_FLOW: Record<string, string> = {
+  PENDING: 'PENDING',
+  CONFIRMED: 'CONFIRMED',
+  RECEIVED: 'RECEIVED',
+  DIAGNOSED: 'DIAGNOSING',
+  QUOTING: 'QUOTED',
+  QUOTE_ACCEPTED: 'QUOTE_ACCEPTED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  DELIVERED: 'DELIVERED',
+};
+
+const { t, te } = useI18n();
+
+const tagStatus = computed(
+  () => props.booking.stage ?? (awaitingQuote.value ? 'QUOTED' : props.booking.status),
+);
+
+const tagLabel = computed(() => {
+  const key = STAGE_FLOW[tagStatus.value as string];
+  return key && te(`flow.${key}`) ? t(`flow.${key}`) : undefined;
+});
 </script>
 
 <template>
@@ -62,7 +96,7 @@ const awaitingQuote = computed(() => props.booking.pendingQuotation ?? null);
       <span class="flex items-center justify-between gap-2.5">
         <span v-if="kicker" class="card-kicker">{{ kicker }}</span>
         <span v-else class="font-heading text-[14px]">{{ booking.code }}</span>
-        <AyStatusTag :status="awaitingQuote ? 'QUOTED' : booking.status" />
+        <AyStatusTag :status="tagStatus as string" :label="tagLabel" />
       </span>
       <span class="text-[13.5px] font-semibold">{{ slotRange(booking) }}</span>
       <span
