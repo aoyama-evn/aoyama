@@ -111,8 +111,15 @@ export class UpdateDiagnosisDto {
 }
 
 /** SA-10 — cap nhat tien do hien cho khach o SC-26. */
+/**
+ * Cap nhat tien do — goi duoc tung phan.
+ *
+ * Truoc day bat buoc co progressPercent va hai truong kia khong gui thi bi
+ * xoa trang. Man SA-10 gio chi sua gio du kien xong, gui mot minh truong do
+ * ma lai lam mat ghi chu tien do thi nguoi dung khong hieu vi sao.
+ */
 export class UpdateProgressDto {
-  @IsInt() @Min(0) @Max(100) progressPercent!: number;
+  @IsOptional() @IsInt() @Min(0) @Max(100) progressPercent?: number;
 
   @IsOptional() @IsString() progressNote?: string;
   @IsOptional() @IsString() estimatedCompletionAt?: string;

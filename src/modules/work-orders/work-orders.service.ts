@@ -669,13 +669,18 @@ export class WorkOrdersService {
 
   // ---------------- Tien do va anh ----------------
 
+  /** Chi ghi de nhung truong that su duoc gui len — xem UpdateProgressDto. */
   async updateProgress(id: string, dto: UpdateProgressDto): Promise<WorkOrder> {
     await this.findById(id);
-    await this.repo.update(id, {
-      progressPercent: dto.progressPercent,
-      progressNote: dto.progressNote ?? null,
-      estimatedCompletionAt: dto.estimatedCompletionAt ? new Date(dto.estimatedCompletionAt) : null,
-    });
+    const patch: Partial<WorkOrder> = {};
+    if (dto.progressPercent !== undefined) patch.progressPercent = dto.progressPercent;
+    if (dto.progressNote !== undefined) patch.progressNote = dto.progressNote || null;
+    if (dto.estimatedCompletionAt !== undefined) {
+      patch.estimatedCompletionAt = dto.estimatedCompletionAt
+        ? new Date(dto.estimatedCompletionAt)
+        : null;
+    }
+    if (Object.keys(patch).length > 0) await this.repo.update(id, patch);
     return this.findById(id);
   }
 
