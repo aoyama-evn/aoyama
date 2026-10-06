@@ -344,6 +344,12 @@ export class BookingsService {
       .take(query.limit)
       .getManyAndCount();
     await this.attachPendingQuotations(items);
+    /**
+     * Khach cung can buoc thuc te chu khong chi trang thai lich hen: ca
+     * giai doan sua xe deu nam duoi RECEIVED, nen danh sach "Lich hen cua
+     * toi" ghi "Da tiep nhan" cho mot chiec xe sap duoc giao.
+     */
+    await this.attachStages(items);
     return new PageDto(items, total, query);
   }
 
