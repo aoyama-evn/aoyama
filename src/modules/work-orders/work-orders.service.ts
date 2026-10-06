@@ -385,10 +385,19 @@ export class WorkOrdersService {
    */
   async updateDiagnosis(id: string, dto: UpdateDiagnosisDto, actor: Actor): Promise<WorkOrder> {
     const workOrder = await this.findById(id);
-    if ([WorkOrderStatus.DELIVERED, WorkOrderStatus.CANCELLED].includes(workOrder.status)) {
+    /**
+     * Them COMPLETED vao day: qua buoc "Da xong" la kho da tru, lich su xe
+     * da ghi va khach da nhan tin. Sua lai chan doan luc nay chi lam so
+     * sach noi mot dang con viec thuc te mot dang.
+     */
+    if (
+      [WorkOrderStatus.COMPLETED, WorkOrderStatus.DELIVERED, WorkOrderStatus.CANCELLED].includes(
+        workOrder.status,
+      )
+    ) {
       throw new BadRequestException({
         code: 'WORK_ORDER_CLOSED',
-        message: 'Phieu da dong, khong sua duoc',
+        message: 'Cong viec da xong, khong sua duoc nua',
       });
     }
 

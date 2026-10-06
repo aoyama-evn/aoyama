@@ -21,6 +21,13 @@ import { Quotation } from './entities/quotation.entity';
 import { QuotationItem } from './entities/quotation-item.entity';
 
 /** M-07 — Bao gia. SA-12, SA-13, SC-27, SC-28. */
+/** Cac buoc da dong: khong con sua chan doan hay lap bao gia duoc nua. */
+const CLOSED_WORK_ORDER_STATUSES: WorkOrderStatus[] = [
+  WorkOrderStatus.COMPLETED,
+  WorkOrderStatus.DELIVERED,
+  WorkOrderStatus.CANCELLED,
+];
+
 @Injectable()
 export class QuotationsService {
   private readonly logger = new Logger(QuotationsService.name);
@@ -45,6 +52,20 @@ export class QuotationsService {
     createdById: string,
   ): Promise<Quotation> {
     const workOrder = await this.workOrders.findById(workOrderId);
+
+    /**
+     * Sua xong roi thi khong lap bao gia nua.
+     *
+     * Qua buoc "Da xong" la kho da tru, lich su xe da ghi va khach da nhan
+     * tin. Mot ban bao gia moi luc nay chi lam so sach noi mot dang con
+     * viec thuc te mot dang.
+     */
+    if (CLOSED_WORK_ORDER_STATUSES.includes(workOrder.status)) {
+      throw new BadRequestException({
+        code: 'WORK_ORDER_CLOSED',
+        message: 'Cong viec da xong, khong lap bao gia moi duoc',
+      });
+    }
 
     const latest = await this.repo.findOne({
       where: { workOrderId },
