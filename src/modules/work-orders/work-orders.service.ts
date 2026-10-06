@@ -33,6 +33,23 @@ import { WorkOrderPart } from './entities/work-order-part.entity';
 import { WorkOrderPhoto } from './entities/work-order-photo.entity';
 import { WorkOrderStatusHistory } from './entities/work-order-status-history.entity';
 
+/**
+ * Gio du kien xong suy ra tu chinh cong viec: luc bat tay vao lam cong
+ * voi tong thoi gian cac hang muc.
+ *
+ * Nhan vien van sua tay duoc — gia tri da luu luon thang. Day chi la con
+ * so mac dinh de khong ai phai tu cong nham.
+ */
+function deriveEta(workOrder: WorkOrder): Date | null {
+  if (!workOrder.startedAt) return null;
+  const minutes = (workOrder.items ?? []).reduce(
+    (sum, item) => sum + (item.laborMinutes ?? 0) * (item.quantity || 1),
+    0,
+  );
+  if (minutes <= 0) return null;
+  return new Date(workOrder.startedAt.getTime() + minutes * 60_000);
+}
+
 /** M-06 — Phieu dich vu. SA-08..SA-11, SC-26, SC-32. */
 @Injectable()
 export class WorkOrdersService {
@@ -188,11 +205,17 @@ export class WorkOrdersService {
         message: 'Khong tim thay phieu dich vu',
       });
     }
+    /**
+     * Chua ai dat gio du kien thi dien con so suy ra tu cong viec. Tinh o
+     * day de man quan tri va man theo doi cua khach cung mot cach tinh,
+     * khong phai moi ben cong mot kieu.
+     */
+    workOrder.estimatedCompletionAt = workOrder.estimatedCompletionAt ?? deriveEta(workOrder);
     return workOrder;
   }
 
   async findByBooking(bookingId: string): Promise<WorkOrder | null> {
-    return this.repo.findOne({
+    const workOrder = await this.repo.findOne({
       where: { bookingId },
       // diagnosedBy: SC-26 ke ten ky thuat vien da kham xe duoi moc chan doan.
       relations: {
@@ -203,6 +226,11 @@ export class WorkOrdersService {
         diagnosedBy: true,
       },
     });
+    // Nhu findById: khach o SC-26 thay dung gio ma nhan vien thay.
+    if (workOrder) {
+      workOrder.estimatedCompletionAt = workOrder.estimatedCompletionAt ?? deriveEta(workOrder);
+    }
+    return workOrder;
   }
 
   /** SA-09 — danh sach phieu dich vu. */
