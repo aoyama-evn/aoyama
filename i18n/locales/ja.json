@@ -1791,7 +1791,7 @@
   "status": {
     "ACCEPTED": "承認済み",
     "CANCELLED": "キャンセル",
-    "COMPLETED": "お支払い待ち",
+    "COMPLETED": "引渡し待ち",
     "CONFIRMED": "確定",
     "DELIVERED": "引渡済み",
     "DIAGNOSING": "診断中",

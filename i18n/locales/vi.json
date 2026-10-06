@@ -1791,7 +1791,7 @@
   "status": {
     "ACCEPTED": "Đã đồng ý",
     "CANCELLED": "Đã hủy",
-    "COMPLETED": "Chờ thanh toán",
+    "COMPLETED": "Chờ bàn giao",
     "CONFIRMED": "Đã xác nhận",
     "DELIVERED": "Đã bàn giao",
     "DIAGNOSING": "Đang chẩn đoán",

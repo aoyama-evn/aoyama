@@ -1791,7 +1791,7 @@
   "status": {
     "ACCEPTED": "Accepted",
     "CANCELLED": "Cancelled",
-    "COMPLETED": "Awaiting payment",
+    "COMPLETED": "Awaiting handover",
     "CONFIRMED": "Confirmed",
     "DELIVERED": "Handed over",
     "DIAGNOSING": "Diagnosing",
