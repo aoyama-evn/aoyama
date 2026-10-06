@@ -128,6 +128,21 @@ function flowLabel(status: string): string {
  * Bo huy phieu khoi hang nut: do la viec hiem va khong lui lai duoc, de
  * lan vao canh nut di tiep thi chi cho nguoi dang lam nhanh bam nham.
  */
+/**
+ * Sua xong roi thi khong con sua chan doan hay lap bao gia moi duoc.
+ *
+ * Qua buoc "Da xong" la xe da lam xong, kho da tru, lich su xe da ghi va
+ * khach da nhan tin. Sua chan doan hay ra mot ban bao gia moi luc nay chi
+ * lam so sach noi mot dang con viec thuc te mot dang. May chu cung chan,
+ * day chi la cat duong di cho ro.
+ */
+const CLOSED_STAGES: string[] = [
+  WorkOrderStatus.COMPLETED,
+  WorkOrderStatus.DELIVERED,
+  WorkOrderStatus.CANCELLED,
+];
+const editable = computed(() => !CLOSED_STAGES.includes(workOrder.value?.status ?? ''));
+
 const nextStatuses = computed(() =>
   (TRANSITIONS[workOrder.value?.status ?? ''] ?? []).filter(
     (status) => status !== WorkOrderStatus.CANCELLED,
@@ -273,7 +288,11 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
     <section class="card gap-2.5" style="background: #fff">
       <div class="flex items-baseline justify-between gap-2.5">
         <h5>{{ $t('sa10.diagnosis') }}</h5>
-        <NuxtLink :to="`/admin/work-orders/${id}/items`" class="btn btn-ghost text-[12.5px]">
+        <NuxtLink
+          v-if="editable"
+          :to="`/admin/work-orders/${id}/items`"
+          class="btn btn-ghost text-[12.5px]"
+        >
           {{ $t('sa10.editItems') }}
         </NuxtLink>
       </div>
@@ -416,6 +435,7 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
         <div class="flex items-baseline justify-between">
           <h5>{{ $t('sa10.quotes') }}</h5>
           <NuxtLink
+            v-if="editable"
             :to="`/admin/work-orders/${id}/quotation`"
             class="btn btn-ghost text-[12.5px]"
           >
