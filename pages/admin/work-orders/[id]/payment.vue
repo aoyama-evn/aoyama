@@ -66,7 +66,7 @@ async function recordAndHandover(): Promise<void> {
   }
 }
 
-setScreenTitle(() => t('sa14.screenTitle', { code: workOrder.value?.code ?? '' }));
+setScreenTitle(() => t('sa14.screenTitle'));
 
 useHead({ title: () => `${t('sa14.headTitle')} — AOYAMA Admin` });
 </script>
@@ -145,6 +145,14 @@ useHead({ title: () => `${t('sa14.headTitle')} — AOYAMA Admin` });
     </p>
 
     <div class="flex flex-wrap items-center justify-end gap-2.5">
+      <!-- Ve man cong viec: cho le tan vua di ra, de doi chieu lai truoc khi thu. -->
+      <NuxtLink
+        :to="`/admin/work-orders/${id}`"
+        class="btn btn-secondary mr-auto text-[13px]"
+        style="min-height: 48px; padding-inline: 20px"
+      >
+        {{ $t('common.back') }}
+      </NuxtLink>
       <button
         type="button"
         class="btn btn-primary text-[15px]"
