@@ -83,7 +83,10 @@ if (!workOrder.value) {
   throw createError({ statusCode: 404, statusMessage: t('sa10.notFound') });
 }
 
-/** Day la man tho lam viec, nen goi dung ten buoc do. */
+/**
+ * Man nay la cho tho doi chieu lai cong viec roi bao da xong, nen tieu de
+ * goi dung viec do chu khong phai ten mot trang thai.
+ */
 setScreenTitle(() => t('sa10.screenTitle'));
 
 const { data: quotations } = await useAsyncData(`wo-quotes-${id}`, () =>
