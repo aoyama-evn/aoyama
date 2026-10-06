@@ -463,7 +463,8 @@ export interface PublicProgress {
   diagnosisNote?: string | null;
   diagnosisCause?: string | null;
   /** Tung hang muc cong viec kem tien do — chi ten, khong kem gia. */
-  items?: { name: string; state: WorkItemState }[];
+  /** Chi ten viec; tien do tung hang muc la so tay noi bo, khong gui ra day. */
+  items?: { name: string }[];
   progressPercent?: number;
   progressNote?: string | null;
   estimatedCompletionAt?: string | null;

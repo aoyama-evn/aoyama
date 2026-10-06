@@ -218,14 +218,14 @@ useHead({ title: () => t('sc26.headTitle', { code }) });
             :key="index"
             class="flex items-start gap-1.5 text-[12px]"
           >
-            <!-- Dau hieu bang hinh, khong chi bang mau: NFR-UX-09. -->
-            <span class="flex-none" aria-hidden="true">
-              {{ item.state === 'DONE' ? '✓' : item.state === 'IN_PROGRESS' ? '▸' : '·' }}
-            </span>
-            <span :class="item.state === 'DONE' ? 'text-muted' : ''">
-              {{ item.name }}
-              <span class="text-muted">— {{ $t(`workItem.${item.state}`) }}</span>
-            </span>
+            <span class="flex-none" aria-hidden="true">·</span>
+            <!--
+              Chi ke ten viec, khong ke tien do tung dong. O chon ben
+              quan tri la so tay cua tho: ho sua toi sua lui trong luc
+              lam, day thang ra day thi khach thay xe "da xong" roi lai
+              "cho lam".
+            -->
+            <span>{{ item.name }}</span>
           </li>
         </ul>
       </template>

@@ -19,6 +19,28 @@ const { i18n, money, dateTime, number } = useFormat();
 
 const id = route.params.id as string;
 
+/**
+ * Tien do tung hang muc — so tay cua tho.
+ *
+ * Doi thang, khong hoi lai: tho sua toi sua lui trong luc lam, hoi mot
+ * cau moi lan thi thanh phien. Va con so nay khong day sang man khach
+ * (xem getPublicProgress ben may chu), nen bam nham cung khong ai thay.
+ */
+const ITEM_STATES = ['PENDING', 'IN_PROGRESS', 'DONE'] as const;
+const savingItem = ref<string | null>(null);
+
+async function setItemState(itemId: string, state: string): Promise<void> {
+  savingItem.value = itemId;
+  try {
+    await api.put(`/admin/work-orders/${id}/items/${itemId}/state`, { state });
+    await refresh();
+  } catch (error) {
+    ui.error(normalizeError(error).message);
+  } finally {
+    savingItem.value = null;
+  }
+}
+
 const { data: workOrder, refresh } = await useAsyncData(`wo-${id}`, () =>
   api.get<WorkOrder>(`/admin/work-orders/${id}`),
 );
@@ -317,6 +339,7 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
             <tr>
               <th>{{ $t('sa10.colItem') }}</th>
               <th>{{ $t('sa10.colTime') }}</th>
+              <th class="w-32">{{ $t('sa10.colItemState') }}</th>
               <th class="text-right">{{ $t('sa10.colUnit') }}</th>
             </tr>
           </thead>
@@ -329,6 +352,19 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
               </td>
               <td class="whitespace-nowrap">
                 {{ item.laborMinutes ? $t('common.minutes', { n: item.laborMinutes }) : '—' }}
+              </td>
+              <td>
+                <select
+                  class="input h-8 min-h-0 py-0 text-[12px]"
+                  :value="item.state"
+                  :disabled="savingItem === item.id"
+                  :aria-label="$t('sa10.itemStateFor', { name: item.name })"
+                  @change="setItemState(item.id, ($event.target as HTMLSelectElement).value)"
+                >
+                  <option v-for="st in ITEM_STATES" :key="st" :value="st">
+                    {{ $t(`workItem.${st}`) }}
+                  </option>
+                </select>
               </td>
               <td class="text-right">{{ money(item.unitPrice * item.quantity) }}</td>
             </tr>
@@ -444,6 +480,23 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
       class="flex flex-wrap items-center justify-end gap-2.5 pt-[15px]"
       style="border-top: 1px solid var(--color-divider)"
     >
+      <!--
+        Bao da xong khi con dang lam. Da bao roi thi cho nay khong de
+        trong: noi ro bao gio da xong va chi sang viec ke tiep la thu
+        tien, de nguoi mo man khong phai doan vi sao khong co nut nao.
+      -->
+      <template v-if="workOrder.status === 'COMPLETED'">
+        <span class="text-muted mr-auto text-[12.5px]">
+          {{ $t('sa10.doneAt', { at: dateTime(workOrder.completedAt ?? '') }) }}
+        </span>
+        <NuxtLink
+          :to="`/admin/work-orders/${id}/payment`"
+          class="btn btn-primary text-[15px]"
+          style="min-height: 48px; padding-inline: 26px"
+        >
+          {{ $t('sa10.goPayment') }}
+        </NuxtLink>
+      </template>
       <button
         v-for="status in nextStatuses"
         :key="status"
