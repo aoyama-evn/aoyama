@@ -67,45 +67,68 @@ const { data: existing } = await useAsyncData(`wo-quote-existing-${id}`, () =>
     .catch(() => null),
 );
 
+/** Hai dong chi mot thu khi cung tro ve mot dich vu, hoac cung ten. */
+function sameLine(a: Partial<Line>, b: Partial<Line>): boolean {
+  if (a.kind !== b.kind) return false;
+  if (a.kind === 'PART' && a.partId && b.partId) return a.partId === b.partId;
+  if (a.serviceId && b.serviceId) return a.serviceId === b.serviceId;
+  return (a.name ?? '').trim().toLowerCase() === (b.name ?? '').trim().toLowerCase();
+}
+
+/** Hang muc va phu tung dang ghi o buoc chan doan. */
+function fromDiagnosis(): Line[] {
+  return [
+    ...(workOrder.value?.items ?? []).map<Line>((i) => ({
+      kind: 'LABOR',
+      name: i.name,
+      description: i.description ?? undefined,
+      unitPrice: i.unitPrice,
+      quantity: i.quantity,
+      isOptional: false,
+      suggestedByAi: i.suggestedByAi,
+      // Giu lai moi noi ve danh muc dich vu, neu khong bao gia chi con ten chu.
+      serviceId: i.serviceId,
+    })),
+    ...(workOrder.value?.parts ?? []).map<Line>((p) => ({
+      kind: 'PART',
+      name: p.partName,
+      unitPrice: p.unitPrice,
+      quantity: p.quantity,
+      isOptional: false,
+      suggestedByAi: p.suggestedByAi,
+      partId: p.partId,
+    })),
+  ];
+}
+
 /**
- * Da co bao gia thi nap lai chinh no; chua co thi dung hang muc va phu
- * tung da ghi o buoc chan doan lam diem khoi dau.
+ * Ban bao gia cu lam goc, noi them hang muc chan doan chua co trong do.
+ *
+ * Nhan vien co the vua quay ra man chan doan them mot hang muc moi. Truoc
+ * day hang muc do khong bao gio sang den day: he co mot ban bao gia la
+ * man chi nhin ban do va bo qua han danh sach hang muc.
+ *
+ * Noi them chu khong ghi de — gia da sua, dong da them tay deu con nguyen,
+ * va dong moi chi nam cho nhan vien xem lai roi bam luu.
  */
 const lines = ref<Line[]>(
   existing.value
-    ? (existing.value.items ?? []).map<Line>((i) => ({
-        kind: (i.kind as Line['kind']) ?? 'LABOR',
-        name: i.name,
-        description: i.description ?? undefined,
-        unitPrice: i.unitPrice,
-        quantity: i.quantity,
-        isOptional: false,
-        suggestedByAi: i.suggestedByAi,
-        serviceId: i.serviceId,
-        partId: i.partId,
-      }))
-    : [
-        ...(workOrder.value.items ?? []).map<Line>((i) => ({
-          kind: 'LABOR',
+    ? (() => {
+        const kept = (existing.value.items ?? []).map<Line>((i) => ({
+          kind: (i.kind as Line['kind']) ?? 'LABOR',
           name: i.name,
           description: i.description ?? undefined,
           unitPrice: i.unitPrice,
           quantity: i.quantity,
           isOptional: false,
           suggestedByAi: i.suggestedByAi,
-          // Giu lai moi noi ve danh muc dich vu, neu khong bao gia chi con ten chu.
           serviceId: i.serviceId,
-        })),
-        ...(workOrder.value.parts ?? []).map<Line>((p) => ({
-          kind: 'PART',
-          name: p.partName,
-          unitPrice: p.unitPrice,
-          quantity: p.quantity,
-          isOptional: false,
-          suggestedByAi: p.suggestedByAi,
-          partId: p.partId,
-        })),
-      ],
+          partId: i.partId,
+        }));
+        const added = fromDiagnosis().filter((d) => !kept.some((k) => sameLine(k, d)));
+        return [...kept, ...added];
+      })()
+    : fromDiagnosis(),
 );
 
 const discountAmount = ref(workOrder.value.discountAmount);
