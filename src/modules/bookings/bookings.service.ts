@@ -1010,15 +1010,15 @@ function resolveStage(
     case WorkOrderStatus.DELIVERED:
       return BookingStage.DELIVERED;
     /**
-     * Xong viec sua nhung chua thu tien, chua giao xe thi o danh sach van
-     * la "Dang tien hanh".
+     * Sua xong roi nhung chua thu tien, chua giao xe — buoc nay hien ra
+     * cho le tan voi ten "Cho thanh toan".
      *
-     * Le tan nhin danh sach de biet con viec gi phai lam hom nay. Mot
-     * lich ghi "Da xong" trong khi xe con nam trong xuong va chua ai tra
-     * tien la coi nhu xong trong mat ho — de den luc khach den lay moi
-     * phat hien chua thu tien. Chi dong lai khi da ban giao.
+     * Truoc goi la "Da xong", ma mot lich ghi da xong trong khi xe con
+     * nam trong xuong va chua ai tra tien thi coi nhu xong trong mat
+     * nguoi doc danh sach. Chi dong han khi da ban giao.
      */
     case WorkOrderStatus.COMPLETED:
+      return BookingStage.COMPLETED;
     case WorkOrderStatus.IN_PROGRESS:
       return BookingStage.IN_PROGRESS;
     case WorkOrderStatus.QUOTED:
