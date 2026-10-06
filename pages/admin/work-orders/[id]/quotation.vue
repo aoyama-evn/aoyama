@@ -38,7 +38,7 @@ const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
 const { t, locale } = useI18n();
-const { i18n, money } = useFormat();
+const { i18n, money, fromLocalInput } = useFormat();
 
 const id = route.params.id as string;
 
@@ -146,6 +146,7 @@ const note = ref('');
 /** SA-12 — bao gia co the yeu cau khach dat coc truoc khi bat tay vao viec. */
 const requireDeposit = ref(false);
 const depositAmount = ref(0);
+/** Nguoi go gio cua hang; may chu luu UTC — xem toLocalInput o useFormat. */
 const depositDueAt = ref('');
 /**
  * Dang luu nao dang chay — de hai nut biet cai nao dang quay.
@@ -334,7 +335,9 @@ async function save(send: boolean): Promise<void> {
         validUntil: validUntil.value || undefined,
         depositAmount: requireDeposit.value ? depositAmount.value : undefined,
         depositDueAt:
-          requireDeposit.value && depositDueAt.value ? depositDueAt.value : undefined,
+          requireDeposit.value && depositDueAt.value
+            ? fromLocalInput(depositDueAt.value)
+            : undefined,
         note: note.value || undefined,
         aiSuggestion: suggestion.value ?? undefined,
       },

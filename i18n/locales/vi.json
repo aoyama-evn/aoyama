@@ -513,7 +513,7 @@
   },
   "sa10": {
     "act": {
-      "COMPLETED": "Đã xong →",
+      "COMPLETED": "Xác nhận hoàn thành",
       "DELIVERED": "Đã bàn giao →"
     },
     "ask": {
@@ -555,7 +555,7 @@
     "parts": "Phụ tùng",
     "quotes": "Báo giá",
     "remaining": "Còn phải thu",
-    "screenTitle": "Xác nhận hoàn thành",
+    "screenTitle": "Đang tiến hành",
     "statusSaved": "Đã cập nhật trạng thái",
     "summary1": "Khách · xe · cửa hàng",
     "summary2": "Hiện trạng khi tiếp nhận",

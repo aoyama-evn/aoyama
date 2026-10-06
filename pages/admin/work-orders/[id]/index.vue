@@ -15,7 +15,7 @@ const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
 const { t, te } = useI18n();
-const { i18n, money, dateTime, number } = useFormat();
+const { i18n, money, dateTime, number, toLocalInput, fromLocalInput } = useFormat();
 
 const id = route.params.id as string;
 
@@ -48,30 +48,28 @@ if (!workOrder.value) {
   throw createError({ statusCode: 404, statusMessage: t('sa10.notFound') });
 }
 
-/**
- * Man nay la cho tho doi chieu lai cong viec roi bao da xong, nen tieu de
- * goi dung viec do chu khong phai ten mot trang thai.
- */
+/** Day la man tho lam viec, nen tieu de goi dung ten buoc do. */
 setScreenTitle(() => t('sa10.screenTitle'));
 
 /**
  * Gio du kien xong — con so duy nhat khach hoi den khi goi dien.
  *
- * Khach xem o man theo doi tien do (SC-26). O nhap datetime-local lam viec
- * bang gio may, nen cat bot phan giay cua chuoi ISO cho khop dinh dang no
- * doi, va gui lai nguyen van cho may chu.
+ * Chua ai dat tay thi may chu dien san con so suy ra tu cong viec: luc
+ * bat tay vao lam cong voi tong thoi gian cac hang muc. Nhan vien sua
+ * lai duoc, va gia tri da luu thi thang.
  */
-const eta = ref(workOrder.value.estimatedCompletionAt?.slice(0, 16) ?? '');
+const eta = ref(toLocalInput(workOrder.value.estimatedCompletionAt));
 const savingEta = ref(false);
 
 async function saveEta(): Promise<void> {
   savingEta.value = true;
   try {
     await api.put(`/admin/work-orders/${id}/progress`, {
-      estimatedCompletionAt: eta.value || undefined,
+      estimatedCompletionAt: fromLocalInput(eta.value) || undefined,
     });
     ui.success(t('sa10.etaSaved'));
     await refresh();
+    eta.value = toLocalInput(workOrder.value?.estimatedCompletionAt);
   } catch (error) {
     ui.error(normalizeError(error).message);
   } finally {

@@ -1,4 +1,4 @@
-import { formatInTimeZone } from 'date-fns-tz';
+import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
 import type { I18nText, LanguageCode } from '~/types/models';
 
 /**
@@ -27,6 +27,23 @@ export function useFormat() {
 
   function time(value: string | Date | null | undefined): string {
     return date(value, 'HH:mm');
+  }
+
+  /**
+   * Doi qua lai giua moc thoi gian cua may chu va o nhap ngay gio.
+   *
+   * May chu luu UTC, con nhan vien go gio cua hang. Cat thang chuoi ISO
+   * thi o nhap hien gio UTC trong khi ca man con lai hien gio Nhat —
+   * lech chin tieng ma nhin khong ra.
+   */
+  function toLocalInput(value: string | Date | null | undefined): string {
+    if (!value) return '';
+    return formatInTimeZone(new Date(value), tz, "yyyy-MM-dd'T'HH:mm");
+  }
+
+  function fromLocalInput(value: string): string {
+    if (!value) return '';
+    return fromZonedTime(value, tz).toISOString();
   }
 
   /** Gio dang "HH:mm:ss" tu CSDL — cat phan giay khi hien. */
@@ -98,6 +115,7 @@ export function useFormat() {
 
   return {
     i18n, date, dateTime, time, clock, money, number, maskedPhone, relative,
+    toLocalInput, fromLocalInput,
     weekday, dayLabel, slotRange,
   };
 }
