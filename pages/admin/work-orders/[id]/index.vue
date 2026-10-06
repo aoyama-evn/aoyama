@@ -282,13 +282,9 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
         </p>
         <p v-else class="text-muted text-[12.5px]">{{ $t('sa10.etaNone') }}</p>
         <div v-if="editable" class="mt-0.5 flex flex-wrap items-center gap-2">
-          <input
-            v-model="eta"
-            class="input h-9 min-h-0 flex-1 py-0 text-[12.5px]"
-            style="min-width: 170px"
-            type="datetime-local"
-            :aria-label="$t('sa10.eta')"
-          >
+          <span class="min-w-0 flex-1" style="min-width: 170px">
+            <AyDateTimeField id="eta" v-model="eta" :aria-label="$t('sa10.eta')" />
+          </span>
           <AyButton variant="secondary" size="sm" :loading="savingEta" @click="saveEta">
             {{ $t('common.save') }}
           </AyButton>

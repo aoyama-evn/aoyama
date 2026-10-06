@@ -527,7 +527,7 @@ useHead({ title: () => `${t('sa12.headTitle')} — AOYAMA Admin` });
               </AyField>
               <AyField :label="$t('sa12.depositDue')">
                 <template #default="{ id: fid }">
-                  <input :id="fid" v-model="depositDueAt" class="input" type="datetime-local" />
+                  <AyDateTimeField :id="fid" v-model="depositDueAt" />
                 </template>
               </AyField>
             </div>
