@@ -513,13 +513,11 @@
   },
   "sa10": {
     "act": {
-      "COMPLETED": "Mark done →",
-      "DELIVERED": "Hand over →",
-      "DIAGNOSING": "Record diagnosis",
-      "IN_PROGRESS": "Start work →"
+      "COMPLETED": "Done →",
+      "DELIVERED": "Hand over →"
     },
     "ask": {
-      "COMPLETED": "Parts are deducted from stock, the service history is recorded, and the customer gets a completion SMS.",
+      "COMPLETED": "The customer is told the vehicle is ready to collect and pay for. Parts are deducted from stock and the vehicle service history is recorded.",
       "DELIVERED": "The booking moves to completed."
     },
     "askItemState": "Change this item’s progress?",
@@ -537,22 +535,12 @@
     "diagnosis": "Technician diagnosis",
     "editItems": "Edit diagnosis & items →",
     "finding": "Findings:",
-    "flow": {
-      "CANCELLED": "Cancelled",
-      "COMPLETED": "Finished",
-      "DELIVERED": "Delivered",
-      "DIAGNOSING": "Diagnosed",
-      "IN_PROGRESS": "In progress",
-      "QUOTED": "Quoting",
-      "RECEIVED": "Received"
-    },
     "fuelIs": "fuel {level}",
     "grandTotal": "TOTAL",
     "headTitle": "{code}",
     "itemStateFor": "Progress for {name}",
     "items": "Labour items",
     "log": "History",
-    "moveTo": "Move to: {status}",
     "newQuote": "Create new",
     "noDiagnosis": "No diagnosis recorded yet.",
     "noItems": "No labour items yet.",
@@ -562,6 +550,7 @@
     "parts": "Parts",
     "quotes": "Quotations",
     "remaining": "Still to collect",
+    "screenTitle": "In progress",
     "statusSaved": "Status updated",
     "summary1": "Customer · bike · store",
     "summary2": "Condition at intake",

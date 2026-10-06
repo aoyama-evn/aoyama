@@ -513,13 +513,11 @@
   },
   "sa10": {
     "act": {
-      "COMPLETED": "Hoàn thành →",
-      "DELIVERED": "Đã bàn giao →",
-      "DIAGNOSING": "Đã chẩn đoán",
-      "IN_PROGRESS": "Tiến hành →"
+      "COMPLETED": "Đã xong →",
+      "DELIVERED": "Đã bàn giao →"
     },
     "ask": {
-      "COMPLETED": "Phụ tùng sẽ bị trừ khỏi kho, lịch sử dịch vụ của xe được ghi lại và khách nhận SMS báo xe đã xong.",
+      "COMPLETED": "Khách sẽ nhận thông báo đến nhận xe và thanh toán. Phụ tùng bị trừ khỏi kho và lịch sử dịch vụ của xe được ghi lại.",
       "DELIVERED": "Lịch hẹn chuyển sang hoàn tất."
     },
     "askItemState": "Đổi tiến độ hạng mục?",
@@ -537,22 +535,12 @@
     "diagnosis": "Chẩn đoán kỹ thuật viên",
     "editItems": "Sửa chẩn đoán & hạng mục →",
     "finding": "Ghi nhận:",
-    "flow": {
-      "CANCELLED": "Đã hủy",
-      "COMPLETED": "Đã xong",
-      "DELIVERED": "Đã bàn giao",
-      "DIAGNOSING": "Đã chẩn đoán",
-      "IN_PROGRESS": "Đang tiến hành",
-      "QUOTED": "Đang báo giá",
-      "RECEIVED": "Đã tiếp nhận"
-    },
     "fuelIs": "nhiên liệu {level}",
     "grandTotal": "TỔNG",
     "headTitle": "{code}",
     "itemStateFor": "Tiến độ hạng mục {name}",
     "items": "Hạng mục công việc",
     "log": "Nhật ký",
-    "moveTo": "Chuyển sang: {status}",
     "newQuote": "Lập mới",
     "noDiagnosis": "Chưa ghi chẩn đoán.",
     "noItems": "Chưa có hạng mục nào.",
@@ -562,6 +550,7 @@
     "parts": "Phụ tùng",
     "quotes": "Báo giá",
     "remaining": "Còn phải thu",
+    "screenTitle": "Đang tiến hành",
     "statusSaved": "Đã cập nhật trạng thái",
     "summary1": "Khách · xe · cửa hàng",
     "summary2": "Hiện trạng khi tiếp nhận",

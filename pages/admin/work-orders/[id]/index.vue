@@ -83,12 +83,8 @@ if (!workOrder.value) {
   throw createError({ statusCode: 404, statusMessage: t('sa10.notFound') });
 }
 
-/**
- * Tieu de man la buoc phieu dang dung — "Dang tien hanh", "Da xong"...
- * Dong thanh "Phieu dich vu" thi cai dong chu to nhat tren man khong noi
- * duoc gi ma nhan vien chua biet.
- */
-setScreenTitle(() => flowLabel(workOrder.value?.status ?? ''));
+/** Day la man tho lam viec, nen goi dung ten buoc do. */
+setScreenTitle(() => t('sa10.screenTitle'));
 
 const { data: quotations } = await useAsyncData(`wo-quotes-${id}`, () =>
   api.get<Quotation[]>(`/admin/work-orders/${id}/quotations`),
@@ -119,14 +115,13 @@ function actionLabel(status: string): string {
   return t(`sa10.act.${status}`);
 }
 
-/** Ten moc tien do cua phieu — khac nhan trang thai o cho no ke chuyen da xong. */
-function flowLabel(status: string): string {
-  return t(`sa10.flow.${status}`);
-}
-
 /**
- * Bo huy phieu khoi hang nut: do la viec hiem va khong lui lai duoc, de
- * lan vao canh nut di tiep thi chi cho nguoi dang lam nhanh bam nham.
+ * Man nay chi co mot viec de bam: bao da xong.
+ *
+ * Huy cong viec la viec hiem va khong lui lai duoc, de lan vao canh nut
+ * di tiep thi chi cho nguoi dang lam nhanh bam nham. Con ban giao thi
+ * khong thuoc ve day: man thu tien (SA-14) vua ghi nhan tien vua chuyen
+ * sang da ban giao trong cung mot nut.
  */
 /**
  * Sua xong roi thi khong con sua chan doan hay lap bao gia moi duoc.
@@ -145,7 +140,7 @@ const editable = computed(() => !CLOSED_STAGES.includes(workOrder.value?.status 
 
 const nextStatuses = computed(() =>
   (TRANSITIONS[workOrder.value?.status ?? ''] ?? []).filter(
-    (status) => status !== WorkOrderStatus.CANCELLED,
+    (status) => status === WorkOrderStatus.COMPLETED,
   ),
 );
 
@@ -505,9 +500,8 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
 
     <AyConfirmDialog
       :open="statusTarget !== null"
-      :title="$t('sa10.moveTo', { status: statusTarget ? flowLabel(statusTarget) : '' })"
+      :title="$t('sa05.askDone')"
       :message="confirmMessage"
-      :danger="statusTarget === 'CANCELLED'"
       :loading="busy"
       @confirm="changeStatus"
       @cancel="statusTarget = null"

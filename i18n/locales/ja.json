@@ -514,12 +514,10 @@
   "sa10": {
     "act": {
       "COMPLETED": "作業完了 →",
-      "DELIVERED": "引渡し →",
-      "DIAGNOSING": "診断を記録",
-      "IN_PROGRESS": "作業を開始 →"
+      "DELIVERED": "引渡し →"
     },
     "ask": {
-      "COMPLETED": "部品が在庫から引き落とされ、整備履歴が記録され、お客様に完了のSMSが送信されます。",
+      "COMPLETED": "お客様に引取りとお支払いのご案内が届きます。部品が在庫から引き落とされ、車両の整備履歴に記録されます。",
       "DELIVERED": "予約が完了になります。"
     },
     "askItemState": "作業項目の進捗を変更しますか？",
@@ -537,22 +535,12 @@
     "diagnosis": "整備士の診断",
     "editItems": "診断と作業項目を編集 →",
     "finding": "所見：",
-    "flow": {
-      "CANCELLED": "取消",
-      "COMPLETED": "作業完了",
-      "DELIVERED": "引渡済み",
-      "DIAGNOSING": "診断済み",
-      "IN_PROGRESS": "作業中",
-      "QUOTED": "見積中",
-      "RECEIVED": "受付済み"
-    },
     "fuelIs": "燃料 {level}",
     "grandTotal": "合計",
     "headTitle": "{code}",
     "itemStateFor": "{name} の進捗",
     "items": "作業項目",
     "log": "履歴",
-    "moveTo": "{status} に進めますか？",
     "newQuote": "新規作成",
     "noDiagnosis": "診断はまだ記録されていません。",
     "noItems": "作業項目はまだありません。",
@@ -562,6 +550,7 @@
     "parts": "部品",
     "quotes": "見積",
     "remaining": "未収額",
+    "screenTitle": "作業中",
     "statusSaved": "ステータスを更新しました",
     "summary1": "お客様・バイク・店舗",
     "summary2": "受付時の状態",
