@@ -585,6 +585,19 @@ useHead({ title: () => `${t('sa05.headTitle', { code: booking.value?.code ?? '' 
       >
         {{ $t('sa05.markDone') }}
       </AyButton>
+      <!--
+        Sua xong roi nhung lich van nam o "Dang tien hanh" cho den khi thu
+        tien va giao xe, nen chi thang sang do chu khong bat le tan tu tim
+        duong qua man cong viec.
+      -->
+      <NuxtLink
+        v-else-if="openOrder && openOrder.status === 'COMPLETED'"
+        :to="`/admin/work-orders/${openOrder.id}/payment`"
+        class="btn btn-primary text-[15px]"
+        style="min-height: 48px; padding-inline: 26px"
+      >
+        {{ $t('sa10.goPayment') }}
+      </NuxtLink>
       <NuxtLink
         v-else-if="openOrder"
         :to="`/admin/work-orders/${openOrder.id}`"

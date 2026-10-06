@@ -176,8 +176,6 @@ const STAGE_DESTINATION: Record<string, (workOrderId: string) => string> = {
   DIAGNOSED: (wo) => `/admin/work-orders/${wo}/quotation`,
   // Da gui bao gia, viec ke tiep la doc tra loi cua khach va chot.
   QUOTING: (wo) => `/admin/work-orders/${wo}/quote-confirm`,
-  // Sua xong roi: mo man cong viec de doi chieu truoc khi thu tien va ban giao.
-  COMPLETED: (wo) => `/admin/work-orders/${wo}`,
 };
 
 function openBooking(row: Booking): void {
