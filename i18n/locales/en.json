@@ -141,7 +141,7 @@
     "code": "Error code: {code}"
   },
   "flow": {
-    "COMPLETED": "Work finished",
+    "COMPLETED": "Awaiting handover",
     "CONFIRMED": "Confirmed",
     "DELIVERED": "Delivered",
     "IN_PROGRESS": "In progress",

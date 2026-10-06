@@ -141,7 +141,7 @@
     "code": "エラーコード：{code}"
   },
   "flow": {
-    "COMPLETED": "作業完了",
+    "COMPLETED": "引渡し待ち",
     "CONFIRMED": "確定",
     "DELIVERED": "引渡済み",
     "IN_PROGRESS": "作業中",
