@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import type { ProgressStep } from '~/components/ui/AyProgressSteps.vue';
 import type { Payment, Quotation, WorkOrder } from '~/types/models';
-import { WORK_ORDER_FLOW, WorkOrderStatus } from '~/types/enums';
+import { WorkOrderStatus } from '~/types/enums';
 
 /**
  * SA-10 Chi tiet phieu dich vu (va SA-10b khi phieu da ban giao) —
@@ -20,62 +19,6 @@ const { i18n, money, dateTime, number } = useFormat();
 
 const id = route.params.id as string;
 
-/**
- * Tien do tung hang muc — tho tick ngay tai day.
- *
- * Phan tram tien do cua ca phieu do may chu tinh lai theo so hang muc da
- * xong, nen khong ai phai nho cap nhat con so do bang tay nua.
- */
-const ITEM_STATES = ['PENDING', 'IN_PROGRESS', 'DONE'] as const;
-const savingItem = ref<string | null>(null);
-
-/**
- * Doi tien do mot hang muc phai hoi lai.
- *
- * Khach thay thay doi nay ngay tren man theo doi tien do, va phan tram
- * tien do cua ca phieu tinh theo no. Mot cu bam nham vao o chon — rat de
- * xay ra khi cuon bang chuot — la khach nhan duoc tin "xe da xong" cho
- * viec chua ai dong vao.
- */
-const pendingItem = ref<{
-  id: string;
-  name: string;
-  state: string;
-  previous: string;
-  el: HTMLSelectElement;
-} | null>(null);
-
-function askItemState(item: { id: string; name: string; state: string }, event: Event): void {
-  const el = event.target as HTMLSelectElement;
-  pendingItem.value = { id: item.id, name: item.name, state: el.value, previous: item.state, el };
-}
-
-/**
- * O chon da nhay sang gia tri moi ngay luc bam. Bo thi phai tra lai bang
- * tay: Vue khong ve lai o do vi item.state trong du lieu dau co doi.
- */
-function dropItemState(): void {
-  const pending = pendingItem.value;
-  if (pending) pending.el.value = pending.previous;
-  pendingItem.value = null;
-}
-
-async function setItemState(): Promise<void> {
-  const pending = pendingItem.value;
-  if (!pending) return;
-  savingItem.value = pending.id;
-  try {
-    await api.put(`/admin/work-orders/${id}/items/${pending.id}/state`, { state: pending.state });
-    pendingItem.value = null;
-    await refresh();
-  } catch (error) {
-    ui.error(normalizeError(error).message);
-    dropItemState();
-  } finally {
-    savingItem.value = null;
-  }
-}
-
 const { data: workOrder, refresh } = await useAsyncData(`wo-${id}`, () =>
   api.get<WorkOrder>(`/admin/work-orders/${id}`),
 );
@@ -88,6 +31,31 @@ if (!workOrder.value) {
  * goi dung viec do chu khong phai ten mot trang thai.
  */
 setScreenTitle(() => t('sa10.screenTitle'));
+
+/**
+ * Gio du kien xong — con so duy nhat khach hoi den khi goi dien.
+ *
+ * Khach xem o man theo doi tien do (SC-26). O nhap datetime-local lam viec
+ * bang gio may, nen cat bot phan giay cua chuoi ISO cho khop dinh dang no
+ * doi, va gui lai nguyen van cho may chu.
+ */
+const eta = ref(workOrder.value.estimatedCompletionAt?.slice(0, 16) ?? '');
+const savingEta = ref(false);
+
+async function saveEta(): Promise<void> {
+  savingEta.value = true;
+  try {
+    await api.put(`/admin/work-orders/${id}/progress`, {
+      estimatedCompletionAt: eta.value || undefined,
+    });
+    ui.success(t('sa10.etaSaved'));
+    await refresh();
+  } catch (error) {
+    ui.error(normalizeError(error).message);
+  } finally {
+    savingEta.value = false;
+  }
+}
 
 const { data: quotations } = await useAsyncData(`wo-quotes-${id}`, () =>
   api.get<Quotation[]>(`/admin/work-orders/${id}/quotations`),
@@ -280,6 +248,30 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
         <p v-if="workOrder.intakeNote" class="text-muted text-[12px]">{{ workOrder.intakeNote }}</p>
       </div>
 
+      <!--
+        Gio du kien xong — con so duy nhat khach hoi den khi goi dien, va
+        la thu ho thay o man theo doi tien do. De canh hai the kia de tho
+        sua ngay, khong phai mo them man nao.
+      -->
+      <div class="card gap-1.5" style="background: #fff">
+        <div class="card-kicker">{{ $t('sa10.eta') }}</div>
+        <p v-if="workOrder.estimatedCompletionAt" class="text-[13.5px]">
+          {{ dateTime(workOrder.estimatedCompletionAt) }}
+        </p>
+        <p v-else class="text-muted text-[12.5px]">{{ $t('sa10.etaNone') }}</p>
+        <div v-if="editable" class="mt-0.5 flex flex-wrap items-center gap-2">
+          <input
+            v-model="eta"
+            class="input h-9 min-h-0 flex-1 py-0 text-[12.5px]"
+            style="min-width: 170px"
+            type="datetime-local"
+            :aria-label="$t('sa10.eta')"
+          >
+          <AyButton variant="secondary" size="sm" :loading="savingEta" @click="saveEta">
+            {{ $t('common.save') }}
+          </AyButton>
+        </div>
+      </div>
     </div>
 
     <!-- Chan doan -->
@@ -325,7 +317,6 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
             <tr>
               <th>{{ $t('sa10.colItem') }}</th>
               <th>{{ $t('sa10.colTime') }}</th>
-              <th class="w-32">{{ $t('sa10.colItemState') }}</th>
               <th class="text-right">{{ $t('sa10.colUnit') }}</th>
             </tr>
           </thead>
@@ -338,24 +329,6 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
               </td>
               <td class="whitespace-nowrap">
                 {{ item.laborMinutes ? $t('common.minutes', { n: item.laborMinutes }) : '—' }}
-              </td>
-              <!--
-                Tho tick o day la khach thay ngay o man theo doi tien do, va
-                phan tram tien do cua phieu tu tinh lai. Truoc day co is_done
-                nam trong CSDL nhung khong man nao dat duoc.
-              -->
-              <td>
-                <select
-                  class="input h-8 min-h-0 py-0 text-[12px]"
-                  :value="item.state"
-                  :disabled="savingItem === item.id"
-                  :aria-label="$t('sa10.itemStateFor', { name: item.name })"
-                  @change="askItemState(item, $event)"
-                >
-                  <option v-for="s in ITEM_STATES" :key="s" :value="s">
-                    {{ $t(`workItem.${s}`) }}
-                  </option>
-                </select>
               </td>
               <td class="text-right">{{ money(item.unitPrice * item.quantity) }}</td>
             </tr>
@@ -482,24 +455,6 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
         {{ actionLabel(status) }}
       </button>
     </div>
-
-    <AyConfirmDialog
-      :open="pendingItem !== null"
-      :title="$t('sa10.askItemState')"
-      :message="
-        pendingItem
-          ? $t('sa10.askItemStateBody', {
-            name: pendingItem.name,
-            state: $t(`workItem.${pendingItem.state}`),
-          })
-          : ''
-      "
-      :confirm-label="$t('common.yes')"
-      :cancel-label="$t('common.no')"
-      :loading="savingItem !== null"
-      @confirm="setItemState"
-      @cancel="dropItemState"
-    />
 
     <AyConfirmDialog
       :open="statusTarget !== null"
