@@ -6,7 +6,39 @@
  */
 const auth = useAuthStore();
 const menu = useSiteMenu();
+const api = useApi();
 const { locale, setLocale } = useI18n();
+
+/**
+ * So thong bao chua doc — SC-33.
+ *
+ * Tu goi tu goi thay vi useAsyncData: dau trang nam trong layout nen no
+ * dung day truoc khi kho phien kip doc lai localStorage. useAsyncData chay
+ * mot lan voi isCustomer con false, ghi 0, roi khong co gi lam no goi lai
+ * — chuong khong bao gio hien so.
+ *
+ * Doi duong dan cung goi lai: doc xong o trang thong bao thi quay ra phai
+ * thay con so da giam.
+ */
+const route = useRoute();
+const unreadCount = ref(0);
+
+async function refreshUnread(): Promise<void> {
+  if (!auth.isCustomer) {
+    unreadCount.value = 0;
+    return;
+  }
+  try {
+    const { count } = await api.get<{ count: number }>('/account/notifications/unread-count');
+    unreadCount.value = count;
+  } catch {
+    // Khong lay duoc thi an con so di, khong chan nguoi dung lam gi khac.
+    unreadCount.value = 0;
+  }
+}
+
+onMounted(refreshUnread);
+watch([() => auth.isCustomer, () => route.path], refreshUnread);
 
 /** Tieng Nhat dung truoc vi day la ngon ngu mac dinh cua he thong. */
 const LANGS = ['ja', 'en', 'vi'] as const;
@@ -37,6 +69,34 @@ function onLangChange(event: Event): void {
         >
           <option v-for="code in LANGS" :key="code" :value="code">{{ code.toUpperCase() }}</option>
         </select>
+
+        <!-- Chuong thong bao: chi thanh vien moi co hop thong bao trong ung dung. -->
+        <NuxtLink
+          v-if="auth.isCustomer"
+          to="/account/notifications"
+          class="btn btn-ghost btn-icon relative"
+          style="width: 34px; height: 34px; padding: 0"
+          :aria-label="$t('sc33.unread', { n: unreadCount })"
+          :title="$t('sc33.unread', { n: unreadCount })"
+        >
+          <svg
+            width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+          >
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <span
+            v-if="unreadCount > 0"
+            class="absolute flex items-center justify-center rounded-full font-heading"
+            style="
+              top: -2px; right: -2px; min-width: 16px; height: 16px; padding: 0 3px;
+              font-size: 10px; background: var(--color-danger); color: #fff;
+            "
+          >
+            {{ unreadCount }}
+          </span>
+        </NuxtLink>
 
         <NuxtLink
           v-if="auth.isCustomer"

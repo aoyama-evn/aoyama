@@ -70,6 +70,14 @@
     "step2": "日時",
     "step3": "お客様情報"
   },
+  "bookingFilter": {
+    "PENDING": "承認待ち",
+    "CONFIRMED": "確定済み",
+    "RECEIVED": "入庫中",
+    "DONE": "引渡済み",
+    "CANCELLED": "キャンセル",
+    "NO_SHOW": "来店なし"
+  },
   "card": {
     "cancel": "予約 {code} をキャンセル",
     "rebook": "予約 {code} を取り直す",
@@ -275,6 +283,11 @@
     "sent": "音声を送信しました",
     "stop": "停止",
     "useText": "文章でご説明いただくこともできます。"
+  },
+  "replyVia": {
+    "LINK": "お客様がWebで回答",
+    "COUNTER": "店頭で記録",
+    "PHONE": "電話で記録"
   },
   "sa01": {
     "backToLogin": "← ログインに戻る",
@@ -1729,16 +1742,10 @@
     "yourSymptom": "お客様の申告"
   },
   "sc33": {
-    "account": "アカウント",
-    "address": "住所（任意）",
-    "email": "メールアドレス（任意）",
-    "kana": "カナ（任意）",
-    "logout": "ログアウト",
-    "logoutAsk": "ログアウトしますか？",
-    "memberSince": "{year}年から会員",
-    "phoneHint": "アカウントの識別に使います",
-    "title": "プロフィール",
-    "logoutAskBody": "ご予約の確認には、再度OTPコードでのログインが必要になります。"
+    "empty": "お知らせはまだありません",
+    "lead": "店舗からお送りしたご連絡です。",
+    "title": "お知らせ",
+    "unread": "お知らせ（未読 {n} 件）"
   },
   "sc34": {
     "channels": "通知の受け取り方法",
@@ -1920,18 +1927,5 @@
     "PENDING": "未着手",
     "IN_PROGRESS": "作業中",
     "DONE": "完了"
-  },
-  "replyVia": {
-    "LINK": "お客様がWebで回答",
-    "COUNTER": "店頭で記録",
-    "PHONE": "電話で記録"
-  },
-  "bookingFilter": {
-    "PENDING": "承認待ち",
-    "CONFIRMED": "確定済み",
-    "RECEIVED": "入庫中",
-    "DONE": "引渡済み",
-    "CANCELLED": "キャンセル",
-    "NO_SHOW": "来店なし"
   }
 }

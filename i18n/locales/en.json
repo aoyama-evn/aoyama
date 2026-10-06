@@ -70,6 +70,14 @@
     "step2": "Date & time",
     "step3": "Your details"
   },
+  "bookingFilter": {
+    "PENDING": "Awaiting confirmation",
+    "CONFIRMED": "Confirmed",
+    "RECEIVED": "In the shop",
+    "DONE": "Handed over",
+    "CANCELLED": "Cancelled",
+    "NO_SHOW": "No show"
+  },
   "card": {
     "cancel": "Cancel booking {code}",
     "rebook": "Book again from {code}",
@@ -275,6 +283,11 @@
     "sent": "Voice recording sent",
     "stop": "Stop",
     "useText": "You can describe it in writing instead."
+  },
+  "replyVia": {
+    "LINK": "customer replied on the web",
+    "COUNTER": "recorded at the counter",
+    "PHONE": "recorded by phone"
   },
   "sa01": {
     "backToLogin": "← Back to sign in",
@@ -1729,16 +1742,10 @@
     "yourSymptom": "What you described"
   },
   "sc33": {
-    "account": "Account",
-    "address": "Address (optional)",
-    "email": "Email (optional)",
-    "kana": "Name in kana (optional)",
-    "logout": "Log out",
-    "logoutAsk": "Log out of your account?",
-    "memberSince": "Member since {year}",
-    "phoneHint": "identifies your account",
-    "title": "My profile",
-    "logoutAskBody": "You will need to sign in again with an OTP code to see your bookings."
+    "empty": "No notifications yet",
+    "lead": "Messages the store has sent you.",
+    "title": "Notifications",
+    "unread": "Notifications ({n} unread)"
   },
   "sc34": {
     "channels": "Notification channels",
@@ -1920,18 +1927,5 @@
     "PENDING": "Not started",
     "IN_PROGRESS": "In progress",
     "DONE": "Done"
-  },
-  "replyVia": {
-    "LINK": "customer replied on the web",
-    "COUNTER": "recorded at the counter",
-    "PHONE": "recorded by phone"
-  },
-  "bookingFilter": {
-    "PENDING": "Awaiting confirmation",
-    "CONFIRMED": "Confirmed",
-    "RECEIVED": "In the shop",
-    "DONE": "Handed over",
-    "CANCELLED": "Cancelled",
-    "NO_SHOW": "No show"
   }
 }

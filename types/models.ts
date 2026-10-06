@@ -688,6 +688,8 @@ export interface NotificationLog {
   errorMessage: string | null;
   retryCount: number;
   createdAt: string;
+  /** Luc khach mo hop thong bao — SC-33. Null la chua doc. */
+  readAt?: string | null;
 }
 
 export interface SystemSetting {
