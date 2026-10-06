@@ -358,11 +358,18 @@ export class WorkOrdersService {
       diagnosedAt: workOrder.diagnosedAt,
       diagnosisNote: workOrder.diagnosisNote,
       diagnosisCause: workOrder.diagnosisCause,
-      // Chi ten va tien do — gia nam o ban bao gia, khong nhac lai o day.
+      /**
+       * Chi ten hang muc — gia nam o ban bao gia, khong nhac lai o day.
+       *
+       * Khong gui tien do tung hang muc nua. O chon ben quan tri la so
+       * tay cua tho: ho danh dau de nho minh dang lam den dau, va con sua
+       * toi sua lui trong luc lam. Day thang ra man khach thi moi lan tho
+       * bam nham la khach thay xe "da xong" roi lai "cho lam".
+       */
       items: (workOrder.items ?? [])
         .slice()
         .sort((a, b) => a.sortOrder - b.sortOrder)
-        .map((i) => ({ name: i.name, state: i.state })),
+        .map((i) => ({ name: i.name })),
       progressPercent: workOrder.progressPercent,
       progressNote: workOrder.progressNote,
       estimatedCompletionAt: workOrder.estimatedCompletionAt,
@@ -488,9 +495,9 @@ export class WorkOrdersService {
   /**
    * SA-10 — tho danh dau mot hang muc dang lam hay da xong.
    *
-   * Tien do phan tram cua ca phieu tu tinh lai theo so hang muc da xong,
-   * de khach o SC-26 thay thanh tien do nhuc nhich that chu khong phai mot
-   * con so nhan vien phai nho cap nhat bang tay.
+   * Chi la so tay noi bo: khong day sang man khach va khong dong vao phan
+   * tram tien do. Tho sua toi sua lui trong luc lam, khach khong can thay
+   * tung nhip do.
    */
   async updateItemState(
     workOrderId: string,
@@ -507,12 +514,6 @@ export class WorkOrdersService {
     }
 
     await repo.update(itemId, { state });
-
-    const all = await repo.find({ where: { workOrderId } });
-    const done = all.filter((x) => x.state === WorkItemState.DONE).length;
-    const percent = all.length === 0 ? 0 : Math.round((done / all.length) * 100);
-    await this.repo.update(workOrderId, { progressPercent: percent });
-
     return this.findById(workOrderId);
   }
 
