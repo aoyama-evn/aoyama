@@ -94,11 +94,22 @@ const steps = computed<ProgressStep[]>(() => {
     stamps.set('QUOTE_ACCEPTED', { at: data.quoteAcceptedAt, note: null });
   }
 
+  /**
+   * Chot bao gia roi thi bo buoc "Dang bao gia" di.
+   *
+   * Hai dong "Dang bao gia" roi "Da chot bao gia" nam canh nhau doc nhu
+   * he thong con dang doi khach tra loi, trong khi khach tra loi xong
+   * roi. Chi giu buoc dang bao gia khi no that su la viec dang cho.
+   */
+  const flow = stamps.has('QUOTE_ACCEPTED')
+    ? FLOW.filter((step) => step.key !== 'QUOTED')
+    : FLOW;
+
   // Moc hien tai la moc cuoi cung co dau thoi gian.
-  const reached = FLOW.map((step) => stamps.has(step.key));
+  const reached = flow.map((step) => stamps.has(step.key));
   const currentIndex = reached.lastIndexOf(true);
 
-  return FLOW.map((step, index) => {
+  return flow.map((step, index) => {
     const stamp = stamps.get(step.key);
     return {
       key: step.key,
@@ -256,8 +267,27 @@ useHead({ title: () => t('sc26.headTitle', { code }) });
         <NuxtLink
           v-if="progress.quotation"
           :to="`/quotations/${progress.quotation.token}`"
-          class="mt-2 text-[12px]"
-          :class="progress.pendingQuotation ? 'btn btn-primary' : 'btn btn-secondary'"
+          class="btn btn-primary mt-2 text-[12px]"
+          style="min-height: 34px"
+        >
+          {{ $t('sc26.viewQuote') }}
+        </NuxtLink>
+      </template>
+
+      <!--
+        Chot roi thi buoc "Dang bao gia" bien mat, nen nut xem bao gia
+        chuyen xuong day — khach van mo lai xem minh da dong y nhung gi.
+      -->
+      <template #after-QUOTE_ACCEPTED>
+        <!--
+          Doi `quoteAcceptedAt`: o chua toi thi buoc nay van la mot vong
+          tron xam, treo nut duoi do thanh hai nut giong het nhau tren cung
+          mot man.
+        -->
+        <NuxtLink
+          v-if="progress.quotation && progress.quoteAcceptedAt"
+          :to="`/quotations/${progress.quotation.token}`"
+          class="btn btn-secondary mt-2 text-[12px]"
           style="min-height: 34px"
         >
           {{ $t('sc26.viewQuote') }}
