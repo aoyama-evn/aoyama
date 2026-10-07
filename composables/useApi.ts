@@ -22,10 +22,36 @@ type RequestOptions = {
 
 let refreshPromise: Promise<boolean> | null = null;
 
+/**
+ * Dia chi API tinh theo chinh dia chi trang dang mo.
+ *
+ * Cau hinh mac dinh tro ve "http://localhost:3001". Mo trang tu dien
+ * thoai bang IP cua may chu thi "localhost" lai la chinh cai dien thoai
+ * do — moi loi goi API deu truot. Nen khi trang khong mo bang localhost,
+ * doi ten may trong dia chi API theo ten may cua trang, giu nguyen cong.
+ *
+ * Dat NUXT_PUBLIC_API_BASE tro ra ten mien that thi khong dong vao nua.
+ */
+function resolveApiBase(configured: string): string {
+  if (!import.meta.client) return configured;
+  try {
+    const api = new URL(configured, window.location.origin);
+    const local = ['localhost', '127.0.0.1', '[::1]'];
+    if (!local.includes(api.hostname) || local.includes(window.location.hostname)) {
+      return configured;
+    }
+    api.hostname = window.location.hostname;
+    api.protocol = window.location.protocol;
+    return api.toString().replace(/\/$/, '');
+  } catch {
+    return configured;
+  }
+}
+
 export function useApi() {
   const config = useRuntimeConfig();
   const auth = useAuthStore();
-  const baseURL = config.public.apiBase;
+  const baseURL = resolveApiBase(config.public.apiBase);
 
   async function tryRefresh(): Promise<boolean> {
     if (!auth.refreshToken) return false;
