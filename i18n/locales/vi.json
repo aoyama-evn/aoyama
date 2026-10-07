@@ -44,7 +44,11 @@
       "markAll": "Đánh dấu đã đọc hết",
       "smsLogs": "Nhật ký gửi SMS",
       "emptyTitle": "Chưa có thông báo nào",
-      "emptyHint": "Lịch hẹn mới và báo giá khách vừa chốt sẽ hiện ở đây."
+      "emptyHint": "Lịch hẹn mới và báo giá khách vừa chốt sẽ hiện ở đây.",
+      "event": {
+        "BOOKING_CREATED": "Lịch hẹn mới",
+        "QUOTATION_ACCEPTED": "Khách đã chốt báo giá"
+      }
     },
     "cat": {
       "nav": "Danh mục dữ liệu nền",

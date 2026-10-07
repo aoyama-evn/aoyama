@@ -38,10 +38,54 @@ const initials = computed(() => {
  * Truoc day con so nay la "so tin nhan gui that bai", tuc mot canh bao ky
  * thuat lan vao cho danh cho cong viec hang ngay. Tin gui loi van xem o
  * trang nhat ky gui tin.
+ *
+ * Tu goi thay vi useAsyncData: thanh tieu de nam trong bo cuc nen no dung
+ * day truoc khi kho phien kip doc lai localStorage, va useAsyncData chi
+ * chay dung mot lan — goi som mot nhip la hong, khong co gi goi lai.
+ *
+ * Phai hoi lai theo nhip nua. Khach bam dong y bao gia tren dien thoai cua
+ * ho, con may nhan vien thi dang nam yen mot man hinh: khong co thao tac
+ * nao o day de lam coi nguyen cho con so chay. Trang bi an thi nghi, va
+ * hoi ngay luc nguoi ta quay lai nhin vao man hinh.
  */
-const { data: unread } = await useAsyncData('admin-unread', () =>
-  api.get<{ count: number }>('/admin/notifications/unread-count').catch(() => ({ count: 0 })),
-);
+const unreadCount = ref(0);
+const NHIP_HOI = 25_000;
+let dongHo: ReturnType<typeof setInterval> | null = null;
+
+async function refreshUnread(): Promise<void> {
+  if (!auth.isAdmin) {
+    unreadCount.value = 0;
+    return;
+  }
+  try {
+    const { count } = await api.get<{ count: number }>('/admin/notifications/unread-count');
+    unreadCount.value = count;
+  } catch {
+    // Khong lay duoc thi an con so di, khong chan nhan vien lam viec khac.
+    unreadCount.value = 0;
+  }
+}
+
+function hoiLaiNeuDangXem(): void {
+  if (document.visibilityState === 'visible') void refreshUnread();
+}
+
+onMounted(() => {
+  void refreshUnread();
+  dongHo = setInterval(hoiLaiNeuDangXem, NHIP_HOI);
+  document.addEventListener('visibilitychange', hoiLaiNeuDangXem);
+  window.addEventListener('focus', hoiLaiNeuDangXem);
+});
+
+onBeforeUnmount(() => {
+  if (dongHo) clearInterval(dongHo);
+  document.removeEventListener('visibilitychange', hoiLaiNeuDangXem);
+  window.removeEventListener('focus', hoiLaiNeuDangXem);
+});
+
+// Doc xong o trang thong bao thi quay ra phai thay con so da giam.
+const route = useRoute();
+watch([() => auth.isAdmin, () => route.path], refreshUnread);
 
 const logoutOpen = ref(false);
 
@@ -103,8 +147,8 @@ async function logout(): Promise<void> {
         to="/admin/notifications"
         class="relative inline-flex items-center"
         style="color: var(--color-neutral-700)"
-        :title="$t('adm.top.unread', { n: unread?.count ?? 0 })"
-        :aria-label="$t('adm.top.unread', { n: unread?.count ?? 0 })"
+        :title="$t('adm.top.unread', { n: unreadCount })"
+        :aria-label="$t('adm.top.unread', { n: unreadCount })"
       >
         <svg
           width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -114,14 +158,14 @@ async function logout(): Promise<void> {
           <path d="M13.7 20a2 2 0 0 1-3.4 0" />
         </svg>
         <span
-          v-if="unread?.count"
+          v-if="unreadCount > 0"
           class="absolute inline-flex items-center justify-center rounded-full text-[10px] font-bold"
           style="
             top: -5px; right: -6px; min-width: 16px; height: 16px; padding: 0 4px;
             background: #c0392b; color: #fff;
           "
         >
-          {{ unread.count }}
+          {{ unreadCount }}
         </span>
       </NuxtLink>
 

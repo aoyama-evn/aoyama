@@ -44,7 +44,11 @@
       "markAll": "Mark all as read",
       "smsLogs": "SMS send log",
       "emptyTitle": "No notifications yet",
-      "emptyHint": "New bookings and quotations your customers accept will appear here."
+      "emptyHint": "New bookings and quotations your customers accept will appear here.",
+      "event": {
+        "BOOKING_CREATED": "New booking",
+        "QUOTATION_ACCEPTED": "Customer accepted the quote"
+      }
     },
     "cat": {
       "nav": "Master data",

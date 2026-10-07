@@ -44,7 +44,11 @@
       "markAll": "すべて既読にする",
       "smsLogs": "SMS 送信ログ",
       "emptyTitle": "通知はありません",
-      "emptyHint": "新規予約とお客様が承認した見積がここに表示されます。"
+      "emptyHint": "新規予約とお客様が承認した見積がここに表示されます。",
+      "event": {
+        "BOOKING_CREATED": "新しいご予約",
+        "QUOTATION_ACCEPTED": "お客様が見積を承認しました"
+      }
     },
     "cat": {
       "nav": "マスタデータ",

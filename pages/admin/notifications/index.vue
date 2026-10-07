@@ -13,7 +13,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const api = useApi();
 const ui = useUiStore();
-const { t } = useI18n();
+const { t, te } = useI18n();
 const { dateTime } = useFormat();
 
 setScreenTitle(() => t('adm.notif.title'));
@@ -34,6 +34,22 @@ async function open(item: AdminNotification): Promise<void> {
   if (!item.read) await api.put(`/admin/notifications/feed/${item.id}/read`).catch(() => undefined);
   if (item.link) await navigateTo(item.link);
   else await refresh();
+}
+
+/**
+ * Ten su kien doc theo ngon ngu dang chon.
+ *
+ * Tieu de luu trong co so du lieu duoc ket san luc su kien xay ra, nen no
+ * chi co mot thu tieng; ma thanh tieu de lai cho doi ba thu. Phan loi van
+ * dich o day theo `event`, con than thong bao chi con du lieu (ma phieu,
+ * so tien, gio hen) nen doc thu tieng nao cung hieu.
+ *
+ * Su kien la chua co ban dich thi quay ve dung tieu de da luu — mat dau
+ * con hon mat chu.
+ */
+function tieuDe(item: AdminNotification): string {
+  const key = `adm.notif.event.${item.event}`;
+  return te(key) ? t(key) : item.title;
 }
 
 async function markAll(): Promise<void> {
@@ -93,7 +109,7 @@ useHead({ title: () => `${t('adm.notif.title')} — AOYAMA Admin` });
               style="background: var(--color-accent)"
               aria-hidden="true"
             />
-            {{ item.title }}
+            {{ tieuDe(item) }}
           </span>
           <span class="text-muted flex-none text-[11.5px]">{{ dateTime(item.createdAt) }}</span>
         </span>
