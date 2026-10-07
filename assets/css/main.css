@@ -530,6 +530,34 @@
   textarea.input {
     border-radius: var(--radius-sm);
   }
+
+  /**
+   * Tren man hinh cham, o nhap phai du 16px.
+   *
+   * Safari tren iPhone tu phong to trang khi con tro vao mot o co co chu
+   * duoi 16px, va phong roi thi khong tu thu lai — go xong mot o la man
+   * hinh lech han di, phai tu chum tay keo ve. Ca he thong dung 14px
+   * (.input trong organic.css) nen o nao cung dinh.
+   *
+   * Khong chan bang maximum-scale duoc: tu iOS 10 Safari co tinh bo qua
+   * cac khai bao chan phong to, vi nguoi mat kem can phong to that. Nang
+   * co chu len dung nguong la cach duy nhat con lai.
+   *
+   * Chi ap cho man cham, nen khung dien thoai xem tren may tinh van giu
+   * dung 14px nhu ban thiet ke.
+   *
+   * Dung !important vi vai o chon dat thang co chu trong thuoc tinh style
+   * (o chon ngon ngu tren dau trang, may o trong bang o site quan tri);
+   * khong co no thi rieng nhung o do van phong.
+   */
+  @media (pointer: coarse) {
+    input,
+    select,
+    textarea,
+    .input {
+      font-size: 16px !important;
+    }
+  }
 }
 
 @layer utilities {
