@@ -4,6 +4,7 @@ import { LessThan, Repository } from 'typeorm';
 import { PageDto, PaginationQueryDto } from 'src/common/dto';
 import { BookingStatus, DEFAULT_LANGUAGE, Language } from 'src/common/enums';
 import { pickI18n } from 'src/common/types';
+import { keywordsOf } from 'src/common/utils';
 import { CatalogService } from 'src/modules/catalog/catalog.service';
 import { PartsService } from 'src/modules/parts/parts.service';
 import { SettingsService, SETTING_KEYS } from 'src/modules/system/settings.service';
@@ -317,14 +318,29 @@ export class AiService {
     );
   }
 
+  /**
+   * Tim tai lieu lien quan den cau hoi.
+   *
+   * Truoc day do ca cau hoi vao mot ILIKE: "Thay dau xe Honda Lead bao
+   * lau mot lan?" phai xuat hien nguyen van trong tai lieu moi khop, ma
+   * khong tai lieu nao viet nhu the — nen tro ly luon tra loi "chua co
+   * du lieu". Gio tach cau hoi thanh tung tu va xep theo so tu khop
+   * duoc.
+   */
   private async searchKnowledge(
     question: string,
     filters?: { maker?: string; model?: string },
   ): Promise<KnowledgeDocument[]> {
+    const words = keywordsOf(question);
+    if (words.length === 0) return [];
+
     const qb = this.knowledgeRepo
       .createQueryBuilder('d')
-      .where('d.index_status = :status', { status: 'INDEXED' })
-      .andWhere('(d.title ILIKE :q OR d.content ILIKE :q)', { q: `%${question.slice(0, 80)}%` });
+      .where('d.index_status = :status', { status: 'INDEXED' });
+
+    const matches = words.map((_, i) => `(d.title ILIKE :w${i} OR d.content ILIKE :w${i})`);
+    const params = Object.fromEntries(words.map((w, i) => [`w${i}`, `%${w}%`]));
+    qb.andWhere(`(${matches.join(' OR ')})`, params);
 
     if (filters?.maker) {
       qb.andWhere('d.applicable_makers::text ILIKE :maker', { maker: `%${filters.maker}%` });
@@ -332,7 +348,12 @@ export class AiService {
     if (filters?.model) {
       qb.andWhere('d.applicable_models::text ILIKE :model', { model: `%${filters.model}%` });
     }
-    return qb.take(5).getMany();
+
+    // Tai lieu khop duoc nhieu tu hon thi xep truoc.
+    const score = words
+      .map((_, i) => `(case when d.title ILIKE :w${i} then 2 when d.content ILIKE :w${i} then 1 else 0 end)`)
+      .join(' + ');
+    return qb.addSelect(score, 'diem').orderBy('diem', 'DESC').take(5).getMany();
   }
 
   // ---------------- SA-31 — Kho tai lieu ky thuat ----------------

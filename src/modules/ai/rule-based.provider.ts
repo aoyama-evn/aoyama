@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { hasDistinctiveHit, keywordsOf, minKeywordHits } from 'src/common/utils';
 import { DiagnosisFinding } from './entities/ai-diagnosis.entity';
 import {
   AiProvider,
@@ -468,7 +469,91 @@ export class RuleBasedAiProvider implements AiProvider {
     return {};
   }
 
-  async answerTechnical(): Promise<TechAnswer> {
-    return { answer: 'Chua co du lieu de tra loi cau hoi nay.', citations: [] };
+  /**
+   * FR-TEC-01..04, FR-TEC-07 — tra loi tu chinh tai lieu, kem trich dan.
+   *
+   * Khong co mo hinh ngon ngu thi khong dien giai duoc, nhung van lam
+   * duoc viec co ich nhat: tim dung doan noi den dieu nguoi hoi can va
+   * dua nguyen van ra, kem ten tai lieu de ho doi chieu. Khong doan,
+   * khong vien them — dung tinh than FR-TEC-07.
+   *
+   * Moi phan tu `context` co dang "[id] tieu de" roi xuong dong la noi dung.
+   */
+  async answerTechnical(question: string, context: string[]): Promise<TechAnswer> {
+    const words = keywordsOf(question);
+    const need = minKeywordHits(words);
+
+    const found: {
+      documentId: string;
+      title: string;
+      excerpt: string;
+      score: number;
+      inLine: number;
+    }[] = [];
+
+    for (const entry of context) {
+      const breakAt = entry.indexOf('\n');
+      if (breakAt < 0) continue;
+      const head = entry.slice(0, breakAt);
+      const match = /^\[([^\]]+)\]\s*(.*)$/.exec(head);
+      if (!match) continue;
+      const [, documentId, title] = match;
+
+      /**
+       * Doan nao nhac den nhieu tu khoa nhat thi lay doan do. Bang diem
+       * thi lay doan dung truoc: tai lieu viet cau chot len dau, cac cau
+       * sau la truong hop ngoai le.
+       */
+      // Ten tai lieu la ngu canh chung cho moi dong ben trong no.
+      const titleWords = new Set(normalise(title).split(/[^a-z0-9]+/));
+
+      const best = entry
+        .slice(breakAt + 1)
+        .split(/\r?\n+/)
+        .map((line) => line.trim())
+        .filter((line) => line.length >= 20)
+        .map((line, index) => {
+          /**
+           * Doi tron tu chu khong phai chuoi con: "de" nam trong "den",
+           * "no" nam trong "nong" — dem kieu do thi doan nao cung khop
+           * va cau hoi nao cung ra cung mot dap an.
+           */
+          const tokens = new Set(normalise(line).split(/[^a-z0-9]+/));
+          const inLine = words.filter((w) => tokens.has(w));
+          const matched = words.filter((w) => tokens.has(w) || titleWords.has(w));
+          return { line, index, inLine, matched };
+        })
+        .sort((a, b) => b.matched.length - a.matched.length || a.index - b.index)[0];
+
+      /**
+       * Hai chot de khong tra loi bua: doan phai tu no nhac den it nhat
+       * hai tu cua cau hoi, va trong so tu khop duoc phai co mot tu that
+       * su dac trung — khop moi "xe", "may" thi tai lieu nao cung khop.
+       */
+      if (!best || best.inLine.length < 2 || best.matched.length < need) continue;
+      if (!hasDistinctiveHit(best.matched)) continue;
+      found.push({
+        documentId,
+        title: title.trim(),
+        excerpt: best.line,
+        score: best.matched.length,
+        inLine: best.inLine.length,
+      });
+    }
+
+    if (found.length === 0) {
+      // FR-TEC-07 — khong co nguon thi noi khong co, khong doan.
+      return { answer: 'Chua co du lieu de tra loi cau hoi nay.', citations: [] };
+    }
+
+    /**
+     * Bang diem thi uu tien tai lieu co chinh doan van nhac den nhieu tu
+     * hon — diem cua no khong phai nho ten tai lieu do vao.
+     */
+    const top = found.sort((a, b) => b.score - a.score || b.inLine - a.inLine).slice(0, 3);
+    return {
+      answer: top.map((d) => `${d.title}: ${d.excerpt}`).join('\n\n'),
+      citations: top.map(({ documentId, title, excerpt }) => ({ documentId, title, excerpt })),
+    };
   }
 }
