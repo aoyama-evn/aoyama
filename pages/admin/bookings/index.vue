@@ -167,33 +167,11 @@ function reset(): void {
 /**
  * Bam vao mot dong thi den thang viec dang cho o do.
  *
- * Lich dang cho khach duyet bao gia thi viec can lam nam o man chot bao
- * gia — do la noi doc duoc khach da tra loi gi va bam tiep. Dua ho ve
- * man chi tiet lich hen roi bat tu tim duong sang la thua mot chang.
+ * Bang duong di nam o utils/bookingDestination: man bao gia va chuong
+ * thong bao cung dan ve day, nen dinh nghia phai o mot cho.
  */
-const STAGE_DESTINATION: Record<string, (workOrderId: string) => string> = {
-  // Da kham xong, viec ke tiep la lap bao gia.
-  DIAGNOSED: (wo) => `/admin/work-orders/${wo}/quotation`,
-  // Da gui bao gia, viec ke tiep la doc tra loi cua khach va chot.
-  QUOTING: (wo) => `/admin/work-orders/${wo}/quote-confirm`,
-  /**
-   * Khach da dong y nhung xuong chua bam "Tien hanh" — van la man chot
-   * bao gia, dung cho ma thong bao tren chuong dan toi. Vao tu danh sach
-   * hay vao tu chuong deu phai ra cung mot cho, khong thi cung mot viec
-   * lai co hai duong di khac nhau.
-   */
-  QUOTE_ACCEPTED: (wo) => `/admin/work-orders/${wo}/quote-confirm`,
-  // Sua xong roi: viec con lai la thu tien va giao xe, mo thang man do.
-  COMPLETED: (wo) => `/admin/work-orders/${wo}/payment`,
-};
-
 function openBooking(row: Booking): void {
-  const to = row.stage ? STAGE_DESTINATION[row.stage] : undefined;
-  if (to && row.workOrderId) {
-    void navigateTo(to(row.workOrderId));
-    return;
-  }
-  void navigateTo(`/admin/bookings/${row.id}`);
+  void navigateTo(bookingDestination(row.stage, row.workOrderId, row.id));
 }
 
 const COLUMNS = computed(() => [

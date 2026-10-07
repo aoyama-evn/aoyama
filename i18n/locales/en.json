@@ -717,7 +717,7 @@
     "empty": "No quotations yet",
     "emptyHint": "Quotations are created from the work order screen.",
     "listTitle": "Quotation list",
-    "openOrder": "Open the work order",
+    "openOrder": "Go to the current step",
     "publicUrl": "Link the customer sees",
     "rejectReason": "Reason for declining",
     "respondedAt": "Customer responded",

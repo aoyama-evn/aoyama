@@ -717,7 +717,7 @@
     "empty": "お見積はまだありません",
     "emptyHint": "お見積は整備伝票の画面から作成します。",
     "listTitle": "お見積の一覧",
-    "openOrder": "伝票を開く",
+    "openOrder": "現在の工程へ",
     "publicUrl": "お客様が見るリンク",
     "rejectReason": "お断りの理由",
     "respondedAt": "お客様の回答",

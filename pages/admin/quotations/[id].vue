@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Quotation } from '~/types/models';
+import type { Booking, Quotation } from '~/types/models';
 
 /** SA-13 (chi tiet) — xem mot ban bao gia va gui neu con la ban nhap. */
 definePageMeta({ layout: 'admin', middleware: 'admin' });
@@ -20,6 +20,36 @@ if (!quotation.value) {
 }
 
 const sending = ref(false);
+
+/**
+ * Nut mo cong viec dan ve dung buoc lich hen dang dung.
+ *
+ * Truoc day no luon mo trang dau cua phieu dich vu. Nhung mot ban bao gia
+ * da chot thi viec dang cho la o man chot bao gia, sua xong roi thi la o
+ * man thu tien — nhan vien mo bao gia ra xem roi phai tu tim duong sang
+ * dung cho la thua mot chang. Danh sach lich hen va chuong thong bao da
+ * dan theo buoc, nut nay dan theo cung mot bang.
+ *
+ * Phai hoi rieng lich hen vi ban bao gia khong kem theo buoc: buoc la thu
+ * tinh ra luc doc lich hen, khong luu trong co so du lieu. Hoi hong thi
+ * de trong, nut se lui ve trang dau cua phieu nhu cu.
+ */
+const bookingId = computed(() => quotation.value?.workOrder?.bookingId ?? null);
+
+const { data: booking } = await useAsyncData(
+  `admin-quote-booking-${id}`,
+  () =>
+    bookingId.value
+      ? api.get<Booking>(`/admin/bookings/${bookingId.value}`).catch(() => null)
+      : Promise.resolve(null),
+  { watch: [bookingId] },
+);
+
+const openTo = computed(() =>
+  booking.value
+    ? bookingDestination(booking.value.stage, booking.value.workOrderId, booking.value.id)
+    : `/admin/work-orders/${quotation.value?.workOrderId}`,
+);
 
 async function send(): Promise<void> {
   sending.value = true;
@@ -59,7 +89,7 @@ useHead({ title: () => `${t('sa13.detailTitle', { code: quotation.value?.code ??
         <AyButton v-if="quotation.status === 'DRAFT'" size="sm" :loading="sending" @click="send">
           {{ $t('sa13.send') }}
         </AyButton>
-        <AyButton :to="`/admin/work-orders/${quotation.workOrderId}`" variant="secondary" size="sm">
+        <AyButton :to="openTo" variant="secondary" size="sm">
           {{ $t('sa13.openOrder') }}
         </AyButton>
       </template>
