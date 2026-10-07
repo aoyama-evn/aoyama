@@ -64,17 +64,45 @@ useHead({ title: () => t('sc33.title') });
     <AyEmptyState v-else-if="(items ?? []).length === 0" :title="$t('sc33.empty')" />
 
     <ul v-else class="flex flex-col gap-2.5">
-      <li
-        v-for="log in items ?? []"
-        :key="log.id"
-        class="card gap-1.5"
-        :style="log.readAt ? '' : 'border-left: 3px solid var(--color-accent)'"
-      >
-        <div class="flex items-baseline justify-between gap-2.5">
-          <span class="font-heading text-[13.5px]">{{ $t(`notifEvent.${log.event}`) }}</span>
-          <span class="text-muted whitespace-nowrap text-[11.5px]">{{ dateTime(log.createdAt) }}</span>
+      <!--
+        Bam vao mot thong bao la muon xem chiec xe cua minh den dau roi,
+        nen ca the dan thang sang man theo doi tien do. Tin khong gan
+        lich hen nao thi de nguyen, khong bien thanh lien ket cut.
+      -->
+      <li v-for="log in items ?? []" :key="log.id">
+        <NuxtLink
+          v-if="log.bookingCode"
+          :to="`/bookings/${log.bookingCode}/progress`"
+          class="card flex flex-col gap-1.5"
+          style="color: inherit; text-decoration: none"
+          :style="log.readAt ? undefined : { borderLeft: '3px solid var(--color-accent)' }"
+        >
+          <span class="flex items-baseline justify-between gap-2.5">
+            <span class="font-heading text-[13.5px]">{{ $t(`notifEvent.${log.event}`) }}</span>
+            <span class="text-muted whitespace-nowrap text-[11.5px]">
+              {{ dateTime(log.createdAt) }}
+            </span>
+          </span>
+          <span class="whitespace-pre-line text-[13px] leading-[1.55]">{{ body(log) }}</span>
+          <span class="text-[12px] font-semibold" style="color: var(--color-accent-700)">
+            {{ $t('sc33.openProgress') }}
+          </span>
+        </NuxtLink>
+
+        <!-- Tin khong gan lich hen nao thi de nguyen, khong thanh lien ket cut. -->
+        <div
+          v-else
+          class="card flex flex-col gap-1.5"
+          :style="log.readAt ? undefined : { borderLeft: '3px solid var(--color-accent)' }"
+        >
+          <span class="flex items-baseline justify-between gap-2.5">
+            <span class="font-heading text-[13.5px]">{{ $t(`notifEvent.${log.event}`) }}</span>
+            <span class="text-muted whitespace-nowrap text-[11.5px]">
+              {{ dateTime(log.createdAt) }}
+            </span>
+          </span>
+          <span class="whitespace-pre-line text-[13px] leading-[1.55]">{{ body(log) }}</span>
         </div>
-        <p class="whitespace-pre-line text-[13px] leading-[1.55]">{{ body(log) }}</p>
       </li>
     </ul>
 

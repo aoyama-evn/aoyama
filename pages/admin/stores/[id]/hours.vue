@@ -143,7 +143,7 @@ useHead({ title: () => `${t('sa34.headTitle')} — AOYAMA Admin` });
       <div class="flex flex-wrap items-end gap-2">
         <AyField :label="$t('sa34.date')">
           <template #default="{ id: fid }">
-            <input :id="fid" v-model="holidayDate" class="input" type="date">
+            <AyDateField :id="fid" v-model="holidayDate" />
           </template>
         </AyField>
         <AyField :label="$t('sa29.reason')" class="min-w-[200px] flex-1">

@@ -246,12 +246,12 @@ useHead({ title: () => `${t('sa03.title')} — AOYAMA Admin` });
       </AyField>
       <AyField :label="$t('sa03.fromDate')" class="min-w-[150px]">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.from" class="input" type="date" />
+          <AyDateField :id="id" v-model="filters.from" />
         </template>
       </AyField>
       <AyField :label="$t('sa03.toDate')" class="min-w-[150px]">
         <template #default="{ id }">
-          <input :id="id" v-model="filters.to" class="input" type="date" />
+          <AyDateField :id="id" v-model="filters.to" />
         </template>
       </AyField>
       <AyField :label="$t('sa03.serviceKind')" class="min-w-[160px]">

@@ -116,12 +116,7 @@ useHead({ title: () => `${t('sa04.headTitle')} — AOYAMA Admin` });
         >
           ←
         </button>
-        <input
-          v-model="anchor"
-          class="input h-9 w-auto min-h-0 py-1 text-[13px]"
-          type="date"
-          :aria-label="$t('sa04.pickDate')"
-        />
+        <AyDateField v-model="anchor" />
         <button
           type="button"
           class="btn btn-secondary btn-icon"

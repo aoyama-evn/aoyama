@@ -1745,6 +1745,7 @@
   "sc33": {
     "empty": "No notifications yet",
     "lead": "Messages the store has sent you.",
+    "openProgress": "View progress →",
     "title": "Notifications",
     "unread": "Notifications ({n} unread)"
   },

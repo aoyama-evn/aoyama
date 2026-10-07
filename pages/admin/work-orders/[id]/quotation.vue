@@ -501,7 +501,7 @@ useHead({ title: () => `${t('sa12.headTitle')} — AOYAMA Admin` });
 
             <AyField :label="$t('sa12.validUntil')">
               <template #default="{ id: fid }">
-                <input :id="fid" v-model="validUntil" class="input" type="date">
+                <AyDateField :id="fid" v-model="validUntil" />
               </template>
             </AyField>
           </div>

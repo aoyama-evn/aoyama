@@ -210,13 +210,13 @@ useHead({ title: () => `${t('sa24.headTitle')} — AOYAMA Admin` });
 
       <AyField :label="$t('sa24.validFrom')">
         <template #default="{ id }">
-          <input :id="id" v-model="editing.validFrom" class="input" type="date">
+          <AyDateField :id="id" v-model="editing.validFrom" />
         </template>
       </AyField>
 
       <AyField :label="$t('sa24.validTo')">
         <template #default="{ id }">
-          <input :id="id" v-model="editing.validTo" class="input" type="date">
+          <AyDateField :id="id" v-model="editing.validTo" />
         </template>
       </AyField>
 

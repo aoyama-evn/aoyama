@@ -1745,6 +1745,7 @@
   "sc33": {
     "empty": "Chưa có thông báo nào",
     "lead": "Những tin cửa hàng đã gửi cho bạn.",
+    "openProgress": "Xem tiến độ →",
     "title": "Thông báo",
     "unread": "Thông báo ({n} chưa đọc)"
   },

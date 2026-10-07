@@ -46,12 +46,12 @@ useHead({ title: () => `${t('sa38.headTitle')} — AOYAMA Admin` });
     <AyFilterBar>
       <AyField :label="$t('sa03.fromDate')">
         <template #default="{ id }">
-          <input :id="id" v-model="range.from" class="input" type="date">
+          <AyDateField :id="id" v-model="range.from" />
         </template>
       </AyField>
       <AyField :label="$t('sa03.toDate')">
         <template #default="{ id }">
-          <input :id="id" v-model="range.to" class="input" type="date">
+          <AyDateField :id="id" v-model="range.to" />
         </template>
       </AyField>
     </AyFilterBar>

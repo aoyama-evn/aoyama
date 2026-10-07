@@ -692,6 +692,8 @@ export interface NotificationLog {
   createdAt: string;
   /** Luc khach mo hop thong bao — SC-33. Null la chua doc. */
   readAt?: string | null;
+  /** Ma lich hen tin nay noi ve; co thi the thong bao bam sang duoc. */
+  bookingCode?: string | null;
 }
 
 export interface SystemSetting {
