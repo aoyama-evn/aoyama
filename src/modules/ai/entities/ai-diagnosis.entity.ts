@@ -18,6 +18,8 @@ export interface DiagnosisMessage {
   role: 'user' | 'assistant';
   text?: string;
   imageUrls?: string[];
+  /** Video ngan khach quay lai trieu chung — tieng la o day moi nghe ro. */
+  videoUrl?: string;
   audioUrl?: string;
   /** Van ban do he thong chuyen tu ghi am — FR-AI-04. */
   transcript?: string;

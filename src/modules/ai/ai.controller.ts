@@ -44,6 +44,7 @@ class StartSessionDto {
 class SendMessageDto {
   @IsOptional() @IsString() text?: string;
   @IsOptional() @IsArray() @IsString({ each: true }) imageUrls?: string[];
+  @IsOptional() @IsString() videoUrl?: string;
   @IsOptional() @IsString() audioUrl?: string;
   @IsOptional() @IsString() transcript?: string;
 }

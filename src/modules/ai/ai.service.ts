@@ -92,7 +92,13 @@ export class AiService {
    */
   async sendMessage(
     sessionId: string,
-    input: { text?: string; imageUrls?: string[]; audioUrl?: string; transcript?: string },
+    input: {
+      text?: string;
+      imageUrls?: string[];
+      videoUrl?: string;
+      audioUrl?: string;
+      transcript?: string;
+    },
   ): Promise<AiDiagnosis> {
     const session = await this.findSession(sessionId);
 
@@ -100,6 +106,7 @@ export class AiService {
       role: 'user',
       text: input.text,
       imageUrls: input.imageUrls,
+      videoUrl: input.videoUrl,
       audioUrl: input.audioUrl,
       transcript: input.transcript,
       at: new Date().toISOString(),
