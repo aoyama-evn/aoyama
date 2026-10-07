@@ -158,9 +158,19 @@ watch(
               :key="col.key"
               :class="col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : ''"
             >
-              <slot :name="`cell-${col.key}`" :row="row" :value="cell(row, col.key)">
-                {{ cell(row, col.key) ?? '—' }}
-              </slot>
+              <!--
+                Man goi da cung cap o nay thi de man goi quyet, ke ca khi
+                no khong ve gi. Dung noi dung du phong cua <slot> thi Vue
+                coi mot o rong (v-if sai) la "chua co gi" va do dau gach
+                vao — cot hanh dong khong co nut nao lai hien ra "—".
+              -->
+              <slot
+                v-if="$slots[`cell-${col.key}`]"
+                :name="`cell-${col.key}`"
+                :row="row"
+                :value="cell(row, col.key)"
+              />
+              <template v-else>{{ cell(row, col.key) ?? '—' }}</template>
             </td>
           </tr>
         </tbody>
