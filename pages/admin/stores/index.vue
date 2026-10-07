@@ -56,7 +56,10 @@ useHead({ title: () => `${t('sa32.title')} — AOYAMA Admin` });
         </div>
 
         <p class="text-[13px] text-muted">{{ i18n(store.address) }}</p>
-        <p class="text-[13.5px]">{{ store.phone }}</p>
+        <p class="text-[13.5px]">
+          {{ store.phone }}
+          <span v-if="store.fax" class="text-muted">· FAX {{ store.fax }}</span>
+        </p>
         <p class="text-[12.5px] text-muted">
           {{ $t('sa32.capacity', { n: store.defaultCapacity }) }}
         </p>

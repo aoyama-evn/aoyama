@@ -140,6 +140,8 @@ export interface Store {
   description: I18nText | null;
   address: I18nText;
   phone: string;
+  /** So fax in tren bang hieu, giu nguyen cach cua hang viet. */
+  fax: string | null;
   email: string | null;
   latitude: string | null;
   longitude: string | null;

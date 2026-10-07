@@ -18,6 +18,7 @@ const form = reactive({
   description: {} as I18nText,
   address: {} as I18nText,
   phone: '',
+  fax: '',
   email: '',
   latitude: '',
   longitude: '',
@@ -37,6 +38,7 @@ if (!isNew) {
       description: data.value.description ?? {},
       address: data.value.address ?? {},
       phone: data.value.phone,
+      fax: data.value.fax ?? '',
       email: data.value.email ?? '',
       latitude: data.value.latitude ?? '',
       longitude: data.value.longitude ?? '',
@@ -57,6 +59,7 @@ async function save(): Promise<void> {
   try {
     const body = {
       ...form,
+      fax: form.fax || undefined,
       email: form.email || undefined,
       latitude: form.latitude || undefined,
       longitude: form.longitude || undefined,
@@ -105,6 +108,13 @@ useHead({ title: () => (isNew ? t('sa33.addTitle') : t('sa33.editTitle')) });
       <div class="ay-col-full"><AyI18nInput v-model="form.name" :label="$t('sa33.nameLabel')" required /></div>
       <div class="ay-col-full"><AyI18nInput v-model="form.address" :label="$t('sa17.address')" required /></div>
       <div class="ay-col-full"><AyI18nInput v-model="form.description" :label="$t('sa33.intro')" multiline /></div>
+
+      <!-- So fax in tren bang hieu; he thong khong quay so nay. -->
+      <AyField :label="$t('sa33.fax')">
+        <template #default="{ id: fid }">
+          <input :id="fid" v-model="form.fax" class="input" type="text" placeholder="055-921-8020">
+        </template>
+      </AyField>
 
       <AyField :label="$t('sc14.email')">
         <template #default="{ id: fid }">

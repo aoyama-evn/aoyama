@@ -1088,6 +1088,7 @@
     "capacityHint": "Maximum bikes per slot when no slot-specific capacity is set",
     "code": "Store code",
     "editTitle": "Edit store",
+    "fax": "Fax number",
     "intro": "Introduction",
     "isActive": "Active",
     "lat": "Latitude",

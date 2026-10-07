@@ -1088,6 +1088,7 @@
     "capacityHint": "個別設定がないときの、1枠あたりの最大台数",
     "code": "店舗コード",
     "editTitle": "店舗の編集",
+    "fax": "FAX番号",
     "intro": "紹介文",
     "isActive": "営業中",
     "lat": "緯度",
