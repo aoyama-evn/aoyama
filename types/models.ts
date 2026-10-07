@@ -596,6 +596,8 @@ export interface DiagnosisMessage {
   role: 'user' | 'assistant';
   text?: string;
   imageUrls?: string[];
+  /** Video ngan khach quay lai trieu chung. */
+  videoUrl?: string;
   audioUrl?: string;
   transcript?: string;
   at: string;

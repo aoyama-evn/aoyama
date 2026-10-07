@@ -286,7 +286,12 @@
     "recording": "録音中 {time} / 2:00",
     "sent": "音声を送信しました",
     "stop": "停止",
-    "useText": "文章でご説明いただくこともできます。"
+    "useText": "文章でご説明いただくこともできます。",
+    "speakToType": "話す",
+    "listening": "認識中 {time} / 2:00",
+    "noSpeech": "音声が聞き取れませんでした",
+    "speakCloser": "マイクに近づいてお話しください。",
+    "sttFailed": "音声を文字に変換できませんでした"
   },
   "replyVia": {
     "LINK": "お客様がWebで回答",
@@ -1394,7 +1399,7 @@
     "needVehicle": "メーカーと車種を入力してください。",
     "otherVehicle": "＋ 別のバイク",
     "photos": "写真 ({n}/{max})",
-    "privacyNote": "写真と音声はこの診断のみに使用します。",
+    "privacyNote": "写真・動画・音声はこの診断のみに使用します。",
     "recordDesc": "音声で説明",
     "send": "送信",
     "suggestFor": "{label} のおすすめ",

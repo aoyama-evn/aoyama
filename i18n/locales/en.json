@@ -286,7 +286,12 @@
     "recording": "Recording {time} / 2:00",
     "sent": "Voice recording sent",
     "stop": "Stop",
-    "useText": "You can describe it in writing instead."
+    "useText": "You can describe it in writing instead.",
+    "speakToType": "Speak",
+    "listening": "Listening {time} / 2:00",
+    "noSpeech": "Nothing heard yet",
+    "speakCloser": "Try speaking a little closer to the microphone.",
+    "sttFailed": "Could not turn speech into text"
   },
   "replyVia": {
     "LINK": "customer replied on the web",
@@ -1394,7 +1399,7 @@
     "needVehicle": "Please enter the make and model.",
     "otherVehicle": "+ Another bike",
     "photos": "Photos ({n}/{max})",
-    "privacyNote": "Photos and voice notes are used only for this diagnosis.",
+    "privacyNote": "Photos, video and voice notes are used only for this diagnosis.",
     "recordDesc": "Record a note",
     "send": "Send",
     "suggestFor": "Suggestions for {label}",

@@ -286,7 +286,12 @@
     "recording": "Đang ghi {time} / 2:00",
     "sent": "Ghi âm đã gửi kèm",
     "stop": "Dừng",
-    "useText": "Bạn có thể mô tả bằng văn bản thay thế."
+    "useText": "Bạn có thể mô tả bằng văn bản thay thế.",
+    "speakToType": "Nói",
+    "listening": "Đang nghe {time} / 2:00",
+    "noSpeech": "Chưa nghe thấy gì",
+    "speakCloser": "Hãy nói gần micro hơn một chút.",
+    "sttFailed": "Không chuyển được lời nói thành chữ"
   },
   "replyVia": {
     "LINK": "khách tự xác nhận trên web",
@@ -1394,7 +1399,7 @@
     "needVehicle": "Hãy nhập hãng và dòng xe.",
     "otherVehicle": "+ Xe khác",
     "photos": "Ảnh ({n}/{max})",
-    "privacyNote": "Ảnh và ghi âm chỉ dùng cho phiên chẩn đoán này.",
+    "privacyNote": "Ảnh, video và ghi âm chỉ dùng cho phiên chẩn đoán này.",
     "recordDesc": "Ghi âm mô tả",
     "send": "Gửi",
     "suggestFor": "Gợi ý cho {label}",

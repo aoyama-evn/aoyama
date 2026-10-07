@@ -35,7 +35,30 @@ const manualVehicle = reactive({ maker: '', model: '', year: null as number | nu
 const vehicleConfirmed = ref(false);
 const text = ref('');
 const images = ref<string[]>([]);
+/**
+ * Video ngan khach quay lai trieu chung.
+ *
+ * Co nhung loi chi nghe moi biet — tieng ken ket khi bop phanh, tieng go
+ * trong may — anh chup khong noi duoc gi. Gioi han 8MB: than yeu cau gui
+ * len toi da 15MB ma ma hoa base64 thi mot tep phinh them chung mot phan
+ * ba, 8MB la con vua.
+ */
+const video = ref<string | null>(null);
 const transcript = ref<string | null>(null);
+
+/**
+ * Trinh duyet nay co nhan dang giong noi khong.
+ *
+ * Co thi cho khach noi va do thang ra chu; khong thi quay ve ghi am roi
+ * gui ban ghi cho cua hang nghe. Phai doi sang client moi hoi duoc, nen
+ * mac dinh la khong — may chu dung ve nut nao thi trinh duyet ve lai dung
+ * nut do, khong lech.
+ */
+const noiDuocThanhChu = ref(false);
+onMounted(() => {
+  const w = window as unknown as { SpeechRecognition?: unknown; webkitSpeechRecognition?: unknown };
+  noiDuocThanhChu.value = Boolean(w.SpeechRecognition ?? w.webkitSpeechRecognition);
+});
 const sending = ref(false);
 const scroller = ref<HTMLElement | null>(null);
 
@@ -137,7 +160,7 @@ const canSend = computed(() => {
   if (needsVehicle.value && !vehicleConfirmed.value) return false;
   // Chi bao duong / kiem tra: xong phan xe la du, khong bat go them.
   if (!needsSymptom.value) return true;
-  return Boolean(text.value.trim() || images.value.length || transcript.value);
+  return Boolean(text.value.trim() || images.value.length || video.value || transcript.value);
 });
 
 async function send(): Promise<void> {
@@ -148,10 +171,12 @@ async function send(): Promise<void> {
     session.value = await api.post<AiDiagnosis>(`/ai/diagnosis/sessions/${current.id}/messages`, {
       text: text.value.trim() || undefined,
       imageUrls: images.value.length ? images.value : undefined,
+      videoUrl: video.value ?? undefined,
       transcript: transcript.value ?? undefined,
     });
     text.value = '';
     images.value = [];
+    video.value = null;
     transcript.value = null;
     await scrollToEnd();
   } catch (error) {
@@ -538,6 +563,16 @@ useHead({ title: () => t('sc10.assistant') });
             style="width: 62px; height: 62px; border-radius: 14px"
           />
         </div>
+        <!-- Video khach gui: xem lai duoc ngay trong cuoc tro chuyen. -->
+        <video
+          v-if="message.videoUrl"
+          :src="message.videoUrl"
+          controls
+          playsinline
+          preload="metadata"
+          class="self-end"
+          style="width: 190px; border-radius: 14px"
+        />
       </template>
 
       <div
@@ -674,7 +709,14 @@ useHead({ title: () => t('sc10.assistant') });
     >
       <div class="flex gap-2">
         <AyImageUpload v-model="images" :max="5" compact />
-        <AyVoiceRecorder compact @recorded="transcript = t('rec.sent')" />
+        <AyVideoUpload v-model="video" :max-size-mb="8" compact />
+        <!--
+          Noi duoc thanh chu thi do thang vao o soan, khach sua lai duoc
+          truoc khi gui. Trinh duyet khong lam duoc thi gui ban ghi am cho
+          cua hang nghe — van hon la bat khach go tay.
+        -->
+        <AyVoiceToText v-if="noiDuocThanhChu" compact @text="text = $event" />
+        <AyVoiceRecorder v-else compact @recorded="transcript = t('rec.sent')" />
       </div>
       <div class="flex gap-2">
         <input
