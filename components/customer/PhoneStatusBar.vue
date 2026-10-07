@@ -3,6 +3,10 @@
  * Thanh trang thai cua khung dien thoai — chi hien khi dang xem tren man hinh
  * rong. Dong ho chay theo gio Nhat Ban (C-03) chu khong phai gio gia trong ban
  * thiet ke, de nhin vao la biet khung nay dang song.
+ *
+ * Phan `display` do .ay-device-statusbar trong main.css quyet dinh, nen o day
+ * khong dat lop `flex`: lop tien ich cua Tailwind nam o tang sau, de len
+ * `display: none` cua bo cuc va thanh nay hien ca tren dien thoai that.
  */
 const { date } = useFormat();
 
@@ -24,7 +28,7 @@ const clock = computed(() => date(now.value, 'HH:mm'));
 
 <template>
   <div
-    class="flex flex-none items-center justify-between px-[22px] pb-[3px] pt-[9px] text-[11.5px] font-semibold"
+    class="flex-none items-center justify-between px-[22px] pb-[3px] pt-[9px] text-[11.5px] font-semibold"
     style="color: var(--color-neutral-800)"
     aria-hidden="true"
   >
