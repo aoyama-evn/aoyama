@@ -19,8 +19,8 @@ const accountMenuOpen = ref(false);
 /** Ba thu tieng he thong ho tro; tieng Nhat dung truoc vi la mac dinh. */
 const LANGS = ['ja', 'en', 'vi'] as const;
 
-function pickLang(code: (typeof LANGS)[number]): void {
-  setLocale(code);
+function onLangChange(event: Event): void {
+  setLocale((event.target as HTMLSelectElement).value as (typeof LANGS)[number]);
 }
 
 const initials = computed(() => {
@@ -84,6 +84,21 @@ async function logout(): Promise<void> {
     <h1 class="font-heading text-[16px]">{{ title || $t('adm.top.default') }}</h1>
 
     <div class="ml-auto flex items-center gap-2.5">
+      <!--
+        Bo chon ngon ngu de ngay tren thanh nhu site khach. Truoc day no
+        nam trong menu tai khoan: nhan vien phai bam vao vong tron chu
+        cai dau moi thay, ma khong co gi goi y rang doi ngon ngu nam o do.
+      -->
+      <select
+        class="input"
+        style="width: 58px; min-width: 0; min-height: 28px; padding: 3px 4px 3px 7px; font-size: 11px"
+        :aria-label="$t('common.language')"
+        :value="locale"
+        @change="onLangChange"
+      >
+        <option v-for="code in LANGS" :key="code" :value="code">{{ code.toUpperCase() }}</option>
+      </select>
+
       <NuxtLink
         to="/admin/notifications"
         class="relative inline-flex items-center"
@@ -136,25 +151,6 @@ async function logout(): Promise<void> {
               auth.user?.adminRole === 'ADMIN' ? $t('adm.top.roleAdmin') : $t('adm.top.roleStaff')
             }}
           </p>
-          <div
-            class="flex items-center gap-2 px-3 py-2.5"
-            style="border-bottom: 1px solid var(--color-divider)"
-          >
-            <span class="text-muted text-[12px]">{{ $t('common.language') }}</span>
-            <div class="seg ml-auto" role="radiogroup" :aria-label="$t('ui.lang')">
-              <label v-for="code in LANGS" :key="code" class="seg-opt" style="font-size: 11px">
-                <input
-                  type="radio"
-                  name="ay-admin-lang"
-                  :value="code"
-                  :checked="locale === code"
-                  @change="pickLang(code)"
-                />
-                {{ code.toUpperCase() }}
-              </label>
-            </div>
-          </div>
-
           <NuxtLink
             to="/admin/change-password"
             class="block px-3 py-2.5 text-[13.5px] hover:bg-[var(--color-accent-100)]"

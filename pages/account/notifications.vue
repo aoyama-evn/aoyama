@@ -28,11 +28,25 @@ onMounted(async () => {
 });
 
 /**
- * Than tin nhan mo dau bang "【AOYAMA】" va ten khach. Trong ung dung thi
- * khach biet minh la ai va dang o dau roi, nen cat di cho do chat.
+ * Don than tin nhan cho hop voi trong ung dung.
+ *
+ * Mot, cat "【AOYAMA】" va ten khach o dau: trong ung dung khach biet
+ * minh la ai va dang o dau roi.
+ *
+ * Hai, bo duong dan. Tin nhan SMS phai dinh kem link vi do la duong duy
+ * nhat de khach bam sang; con o day khach dang o trong ung dung roi, mot
+ * chuoi http dai loong ngoong chi lam kho doc. Dong nao chi con moi cai
+ * nhan dan duong ("ご確認", "進捗確認") thi bo luon ca dong.
  */
 function body(log: NotificationLog): string {
-  return log.body.replace(/^【[^】]*】\s*/, '').trim();
+  return log.body
+    .replace(/^【[^】]*】\s*/, '')
+    .split('\n')
+    .map((line) => ({ line, rest: line.replace(/https?:\/\/\S+/g, '').trim() }))
+    .filter(({ line, rest }) => rest.length > 0 && !(line !== rest && rest.length <= 12))
+    .map(({ rest }) => rest)
+    .join('\n')
+    .trim();
 }
 
 useHead({ title: () => t('sc33.title') });
