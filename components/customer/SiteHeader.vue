@@ -10,7 +10,7 @@ const api = useApi();
 const { locale, setLocale } = useI18n();
 
 /**
- * So thong bao chua doc — SC-33.
+ * So thong bao chua doc — SC-35.
  *
  * Tu goi tu goi thay vi useAsyncData: dau trang nam trong layout nen no
  * dung day truoc khi kho phien kip doc lai localStorage. useAsyncData chay
@@ -108,8 +108,8 @@ function onLangChange(event: Event): void {
           to="/account/notifications"
           class="btn btn-ghost btn-icon relative"
           style="width: 34px; height: 34px; padding: 0"
-          :aria-label="$t('sc33.unread', { n: unreadCount })"
-          :title="$t('sc33.unread', { n: unreadCount })"
+          :aria-label="$t('sc35.unread', { n: unreadCount })"
+          :title="$t('sc35.unread', { n: unreadCount })"
         >
           <svg
             width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"

@@ -2,7 +2,7 @@
 import type { NotificationLog } from '~/types/models';
 
 /**
- * SC-33 Thong bao cua toi.
+ * SC-35 Thong bao cua toi.
  *
  * Cua hang van nhan tin SMS nhu cu; day la ban sao doc duoc ngay trong ung
  * dung, de khach khong phai lui tim giua ca hop tin nhan dien thoai. Mo
@@ -49,19 +49,19 @@ function body(log: NotificationLog): string {
     .trim();
 }
 
-useHead({ title: () => t('sc33.title') });
+useHead({ title: () => t('sc35.title') });
 </script>
 
 <template>
   <div class="flex flex-col gap-3.5 pb-4 pt-2">
     <div>
-      <h3 class="mb-1.5">{{ $t('sc33.title') }}</h3>
-      <p class="text-muted text-[12.5px]">{{ $t('sc33.lead') }}</p>
+      <h3 class="mb-1.5">{{ $t('sc35.title') }}</h3>
+      <p class="text-muted text-[12.5px]">{{ $t('sc35.lead') }}</p>
     </div>
 
     <AyLoading v-if="pending" :label="$t('common.loading')" />
 
-    <AyEmptyState v-else-if="(items ?? []).length === 0" :title="$t('sc33.empty')" />
+    <AyEmptyState v-else-if="(items ?? []).length === 0" :title="$t('sc35.empty')" />
 
     <ul v-else class="flex flex-col gap-2.5">
       <!--
@@ -85,7 +85,7 @@ useHead({ title: () => t('sc33.title') });
           </span>
           <span class="whitespace-pre-line text-[13px] leading-[1.55]">{{ body(log) }}</span>
           <span class="text-[12px] font-semibold" style="color: var(--color-accent-700)">
-            {{ $t('sc33.openProgress') }}
+            {{ $t('sc35.openProgress') }}
           </span>
         </NuxtLink>
 

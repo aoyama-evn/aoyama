@@ -1747,11 +1747,16 @@
     "yourSymptom": "What you described"
   },
   "sc33": {
-    "empty": "No notifications yet",
-    "lead": "Messages the store has sent you.",
-    "openProgress": "View progress →",
-    "title": "Notifications",
-    "unread": "Notifications ({n} unread)"
+    "account": "Account",
+    "address": "Address (optional)",
+    "email": "Email (optional)",
+    "kana": "Name in kana (optional)",
+    "logout": "Log out",
+    "logoutAsk": "Log out of your account?",
+    "memberSince": "Member since {year}",
+    "phoneHint": "identifies your account",
+    "title": "My profile",
+    "logoutAskBody": "You will need to sign in again with an OTP code to see your bookings."
   },
   "sc34": {
     "channels": "Notification channels",
@@ -1761,6 +1766,13 @@
     "saved": "Settings saved",
     "smsHint": "Booking confirmations, reminders and completion notices. Keep this on so you do not miss them.",
     "title": "Notification & language settings"
+  },
+  "sc35": {
+    "empty": "No notifications yet",
+    "lead": "Messages the store has sent you.",
+    "openProgress": "View progress →",
+    "title": "Notifications",
+    "unread": "Notifications ({n} unread)"
   },
   "serviceType": {
     "BOTH": "Combined",

@@ -1747,11 +1747,16 @@
     "yourSymptom": "Mô tả của bạn"
   },
   "sc33": {
-    "empty": "Chưa có thông báo nào",
-    "lead": "Những tin cửa hàng đã gửi cho bạn.",
-    "openProgress": "Xem tiến độ →",
-    "title": "Thông báo",
-    "unread": "Thông báo ({n} chưa đọc)"
+    "account": "Tài khoản",
+    "address": "Địa chỉ (tùy chọn)",
+    "email": "Email (tùy chọn)",
+    "kana": "Tên kana (tùy chọn)",
+    "logout": "Đăng xuất",
+    "logoutAsk": "Đăng xuất khỏi tài khoản?",
+    "memberSince": "Thành viên từ {year}",
+    "phoneHint": "định danh tài khoản",
+    "title": "Hồ sơ cá nhân",
+    "logoutAskBody": "Bạn sẽ cần đăng nhập lại bằng mã OTP để xem lịch hẹn của mình."
   },
   "sc34": {
     "channels": "Kênh nhận thông báo",
@@ -1761,6 +1766,13 @@
     "saved": "Đã lưu cài đặt",
     "smsHint": "Xác nhận lịch hẹn, nhắc lịch, báo xe đã sửa xong. Nên bật để không bỏ lỡ.",
     "title": "Cài đặt thông báo & ngôn ngữ"
+  },
+  "sc35": {
+    "empty": "Chưa có thông báo nào",
+    "lead": "Những tin cửa hàng đã gửi cho bạn.",
+    "openProgress": "Xem tiến độ →",
+    "title": "Thông báo",
+    "unread": "Thông báo ({n} chưa đọc)"
   },
   "serviceType": {
     "BOTH": "Kết hợp",
