@@ -1,3 +1,4 @@
+import { networkInterfaces } from 'node:os';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
@@ -14,6 +15,14 @@ import { AllExceptionsFilter } from './common/filters';
  */
 const BODY_LIMIT = '15mb';
 
+/** Cac dia chi IPv4 may dang dung trong mang noi bo, de in ra cho de doc. */
+function diaChiMangNoiBo(): string[] {
+  return Object.values(networkInterfaces())
+    .flatMap((list) => list ?? [])
+    .filter((net) => net.family === 'IPv4' && !net.internal)
+    .map((net) => net.address);
+}
+
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
   const config = app.get(ConfigService);
@@ -26,7 +35,26 @@ async function bootstrap(): Promise<void> {
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
 
   app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-  app.enableCors({ origin: corsOrigins, credentials: true });
+  /**
+   * Ngoai cac dia chi khai bao san, o moi truong phat trien cho phep ca
+   * may khac trong mang noi bo goi vao.
+   *
+   * Demo tren dien thoai thi trang mo bang dia chi IP cua may chu
+   * ("http://10.1.40.16:3000"), khong phai localhost — khong mo them thi
+   * trinh duyet chan het moi loi goi API. Khong ap dung cho ban that:
+   * ngoai do chi nhung dia chi ghi ro trong CORS_ORIGINS moi vao duoc.
+   */
+  const LAN_ORIGIN = /^https?:\/\/(localhost|127\.0\.0\.1|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)[^/]*$/;
+  const choMangNoiBo = config.get<string>('app.env') !== 'production';
+
+  app.enableCors({
+    origin: (origin, callback) => {
+      if (!origin || corsOrigins.includes(origin)) return callback(null, true);
+      if (choMangNoiBo && LAN_ORIGIN.test(origin)) return callback(null, true);
+      return callback(null, false);
+    },
+    credentials: true,
+  });
   app.use(json({ limit: BODY_LIMIT }));
   app.use(urlencoded({ extended: true, limit: BODY_LIMIT }));
 
@@ -74,8 +102,14 @@ async function bootstrap(): Promise<void> {
     });
   }
 
-  await app.listen(port);
-  new Logger('Bootstrap').log(`API chay tai http://localhost:${port}/${prefix}`);
+  // 0.0.0.0: may khac trong mang goi vao duoc, khong chi may dang chay.
+  await app.listen(port, '0.0.0.0');
+
+  const log = new Logger('Bootstrap');
+  log.log(`API chay tai http://localhost:${port}/${prefix}`);
+  for (const dia of diaChiMangNoiBo()) {
+    log.log(`  — trong mang noi bo: http://${dia}:${port}/${prefix}`);
+  }
 }
 
 void bootstrap();
