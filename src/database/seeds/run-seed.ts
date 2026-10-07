@@ -374,8 +374,32 @@ async function seedFaqs(ds: DataSource): Promise<void> {
   console.log(`  Cau hoi thuong gap: ${FAQS.length}`);
 }
 
+/**
+ * Ky thuat vien cua tung cua hang.
+ *
+ * He thong khong co vai tro rieng cho ky thuat vien: phan cap chi co ADMIN
+ * va STAFF (RD §8). Nguoi duoc phan cong sua xe la mot tai khoan STAFF gan
+ * vao phieu qua `assigned_technician_id`, va o chon ky thuat vien o man
+ * SA-10a lay thang danh sach tai khoan quan tri. Nen "them ky thuat vien"
+ * tuc la them tai khoan STAFF cho dung cua hang.
+ *
+ * Ten de dang nguoi that chu khong phai chuc danh: ten nay duoc ky duoi
+ * ket luan chan doan va hien trong lich su sua chua cua xe, nen "Ky thuat
+ * vien 1" thi doc ra khong biet ai lam.
+ */
+const TECHNICIANS: { username: string; fullName: string; storeCode: string }[] = [
+  { username: 'tech.numazu', fullName: 'Tanaka Kenichi', storeCode: 'AY-NUMAZU' },
+  { username: 'tech.mishima', fullName: 'Sato Daisuke', storeCode: 'AY-MISHIMA' },
+  { username: 'tech.fuji', fullName: 'Suzuki Takeshi', storeCode: 'AY-FUJI' },
+  { username: 'tech.sanarudai', fullName: 'Yamamoto Ryo', storeCode: 'AY-SANARUDAI' },
+];
+
 async function seedAdminUsers(ds: DataSource, stores: Store[]): Promise<void> {
   const repo = ds.getRepository(AdminUser);
+
+  // Tra theo ma cua hang, khong theo vi tri trong mang: them hay bot mot
+  // cua hang la thu tu doi, ma nguoi thi van phai o dung cho cu.
+  const storeByCode = new Map(stores.map((store) => [store.code, store.id]));
 
   const accounts = [
     {
@@ -391,9 +415,17 @@ async function seedAdminUsers(ds: DataSource, stores: Store[]): Promise<void> {
       password: 'Aoyama@2026',
       fullName: 'Le tan Hamamatsu',
       role: AdminRole.STAFF,
-      storeId: stores[0]?.id ?? null,
+      storeId: storeByCode.get('AY-SANARUDAI') ?? stores[0]?.id ?? null,
       email: 'staff.hamamatsu@aoyama-service.jp',
     },
+    ...TECHNICIANS.map((tech) => ({
+      username: tech.username,
+      password: 'Aoyama@2026',
+      fullName: tech.fullName,
+      role: AdminRole.STAFF,
+      storeId: storeByCode.get(tech.storeCode) ?? null,
+      email: `${tech.username}@aoyama-service.jp`,
+    })),
   ];
 
   for (const account of accounts) {
@@ -411,7 +443,11 @@ async function seedAdminUsers(ds: DataSource, stores: Store[]): Promise<void> {
       }),
     );
   }
-  console.log('  Tai khoan quan tri: admin / staff.hamamatsu (mat khau Aoyama@2026)');
+  console.log(
+    `  Tai khoan quan tri: admin / staff.hamamatsu / ${TECHNICIANS.map((t) => t.username).join(
+      ' / ',
+    )} (mat khau Aoyama@2026)`,
+  );
 }
 
 async function main(): Promise<void> {
