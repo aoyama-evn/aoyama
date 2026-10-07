@@ -22,24 +22,29 @@ const id = route.params.id as string;
 /**
  * Tien do tung hang muc — so tay cua tho.
  *
- * Doi thang, khong hoi lai: tho sua toi sua lui trong luc lam, hoi mot
- * cau moi lan thi thanh phien. Va con so nay khong day sang man khach
- * (xem getPublicProgress ben may chu), nen bam nham cung khong ai thay.
+ * Doi o chon thi chi ghi vao day, chua day len may chu; bam Luu moi gui
+ * di. Tho sua toi sua lui trong luc lam — nhac ac quy len roi lai ha
+ * xuong vi thieu do — gui tung nhat moi lan nhu the la ghi lai ca nhung
+ * buoc ho da doi y. Va con so nay khong day sang man khach (xem
+ * getPublicProgress ben may chu) nen cung khong ai cho tung giay.
  */
 const ITEM_STATES = ['PENDING', 'IN_PROGRESS', 'DONE'] as const;
-const savingItem = ref<string | null>(null);
 
-async function setItemState(itemId: string, state: string): Promise<void> {
-  savingItem.value = itemId;
-  try {
-    await api.put(`/admin/work-orders/${id}/items/${itemId}/state`, { state });
-    await refresh();
-  } catch (error) {
-    ui.error(normalizeError(error).message);
-  } finally {
-    savingItem.value = null;
-  }
+/** Trang thai dang chon tren man, theo ma hang muc. */
+const itemStates = reactive<Record<string, string>>({});
+
+/** Nap lai tu du lieu may chu — goi sau moi lan doc hay luu xong. */
+function syncItemStates(): void {
+  for (const key of Object.keys(itemStates)) delete itemStates[key];
+  for (const item of workOrder.value?.items ?? []) itemStates[item.id] = item.state;
 }
+
+/** Nhung hang muc dang khac voi ban tren may chu. */
+const dirtyItems = computed(() =>
+  (workOrder.value?.items ?? []).filter(
+    (item) => itemStates[item.id] && itemStates[item.id] !== item.state,
+  ),
+);
 
 const { data: workOrder, refresh } = await useAsyncData(`wo-${id}`, () =>
   api.get<WorkOrder>(`/admin/work-orders/${id}`),
@@ -47,6 +52,7 @@ const { data: workOrder, refresh } = await useAsyncData(`wo-${id}`, () =>
 if (!workOrder.value) {
   throw createError({ statusCode: 404, statusMessage: t('sa10.notFound') });
 }
+syncItemStates();
 
 /** Day la man tho lam viec, nen tieu de goi dung ten buoc do. */
 setScreenTitle(() => t('sa10.screenTitle'));
@@ -76,6 +82,68 @@ async function saveEta(): Promise<void> {
     savingEta.value = false;
   }
 }
+
+/**
+ * Luu tam — lam dang do thi cat day o day, mai vao lam tiep.
+ *
+ * Gui len may chu nhung hang muc vua doi, kem gio du kien neu co sua.
+ * Luu xong van o lai man nay: tho thuong lam vai hang muc roi luu, lam
+ * tiep vai hang muc nua roi luu; da nut nay ra cho khac thi moi lan luu
+ * lai phai tim duong quay vao.
+ *
+ * Luu tung hang muc mot vi may chu chi co duong do. Giua chung co cai
+ * hong thi nhung cai truoc do da luu roi — nen nap lai tu may chu de man
+ * hinh ke dung nhung gi that su da ghi, khong giu lai ve dep gia.
+ */
+const savingDraft = ref(false);
+
+const coThayDoi = computed(() => {
+  const gio = fromLocalInput(eta.value);
+  return dirtyItems.value.length > 0 || (gio !== '' && gio !== workOrder.value?.estimatedCompletionAt);
+});
+
+async function saveDraft(): Promise<void> {
+  savingDraft.value = true;
+  try {
+    for (const item of dirtyItems.value) {
+      await api.put(`/admin/work-orders/${id}/items/${item.id}/state`, {
+        state: itemStates[item.id],
+      });
+    }
+    const gio = fromLocalInput(eta.value);
+    if (gio && gio !== workOrder.value?.estimatedCompletionAt) {
+      await api.put(`/admin/work-orders/${id}/progress`, { estimatedCompletionAt: gio });
+    }
+    await refresh();
+    syncItemStates();
+    eta.value = toLocalInput(workOrder.value?.estimatedCompletionAt);
+    ui.success(t('sa10.draftSaved'), t('sa10.draftSavedSub'));
+  } catch (error) {
+    await refresh();
+    syncItemStates();
+    ui.error(normalizeError(error).message, t('sa10.draftPartial'));
+  } finally {
+    savingDraft.value = false;
+  }
+}
+
+/**
+ * Doi o chon roi bo di ma chua luu thi mat cong.
+ *
+ * Truoc day moi lan doi la gui di luon nen khong co gi de mat; gio thi
+ * co. Hoi lai mot cau truoc khi roi man — ca khi chuyen trang trong ung
+ * dung lan khi dong hang trinh duyet.
+ */
+onBeforeRouteLeave(() => {
+  if (!coThayDoi.value) return true;
+  return window.confirm(t('sa10.leaveUnsaved'));
+});
+
+function canhBaoDong(e: BeforeUnloadEvent): void {
+  if (coThayDoi.value) e.preventDefault();
+}
+onMounted(() => window.addEventListener('beforeunload', canhBaoDong));
+onBeforeUnmount(() => window.removeEventListener('beforeunload', canhBaoDong));
 
 const { data: quotations } = await useAsyncData(`wo-quotes-${id}`, () =>
   api.get<Quotation[]>(`/admin/work-orders/${id}/quotations`),
@@ -128,6 +196,19 @@ const CLOSED_STAGES: string[] = [
   WorkOrderStatus.CANCELLED,
 ];
 const editable = computed(() => !CLOSED_STAGES.includes(workOrder.value?.status ?? ''));
+
+/**
+ * Tien do hang muc thi mo lau hon nhung thu khac tren man.
+ *
+ * `editable` dong lai tu buoc "Da xong" vi luc do kho da tru va khach da
+ * nhan tin — sua chan doan hay ra bao gia moi se lam so sach noi mot dang
+ * con thuc te mot dang. Nhung tien do hang muc khong dinh gi den kho,
+ * tien hay tin nhan cho khach: no la so tay cua tho. Xe sua xong dang cho
+ * ban giao ma tho moi nho ra con mot hang muc chua danh dau thi van phai
+ * sua duoc. Ban giao xong hoac da huy thi het, khong con gi de chinh.
+ */
+const ITEMS_LOCKED: string[] = [WorkOrderStatus.DELIVERED, WorkOrderStatus.CANCELLED];
+const itemsEditable = computed(() => !ITEMS_LOCKED.includes(workOrder.value?.status ?? ''));
 
 const nextStatuses = computed(() =>
   (TRANSITIONS[workOrder.value?.status ?? ''] ?? []).filter(
@@ -349,11 +430,11 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
               </td>
               <td>
                 <select
+                  v-model="itemStates[item.id]"
                   class="input h-8 min-h-0 py-0 text-[12px]"
-                  :value="item.state"
-                  :disabled="savingItem === item.id"
+                  :class="itemStates[item.id] !== item.state ? 'ay-chua-luu' : undefined"
+                  :disabled="savingDraft || !itemsEditable"
                   :aria-label="$t('sa10.itemStateFor', { name: item.name })"
-                  @change="setItemState(item.id, ($event.target as HTMLSelectElement).value)"
                 >
                   <option v-for="st in ITEM_STATES" :key="st" :value="st">
                     {{ $t(`workItem.${st}`) }}
@@ -491,6 +572,28 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
           {{ $t('sa10.goPayment') }}
         </NuxtLink>
       </template>
+      <!--
+        Co gi chua luu thi noi ra, dung de tho tu doan qua mau o chon.
+        Dat truoc nut Luu de doc theo dung thu tu: con nay chua luu — luu.
+      -->
+      <span v-if="itemsEditable && coThayDoi" class="text-[12.5px]" style="color: var(--color-accent-700)">
+        {{ $t('sa10.unsaved') }}
+      </span>
+      <!--
+        Luu tam dung canh nut xac nhan: hai loi ra cua man nay, mot cai
+        cho viec da xong va mot cai cho viec con do.
+      -->
+      <AyButton
+        v-if="itemsEditable"
+        variant="secondary"
+        :loading="savingDraft"
+        :disabled="!coThayDoi"
+        class="text-[15px]"
+        style="min-height: 48px; padding-inline: 22px"
+        @click="saveDraft"
+      >
+        {{ $t('sa10.saveDraft') }}
+      </AyButton>
       <button
         v-for="status in nextStatuses"
         :key="status"

@@ -581,7 +581,13 @@
     "statusSaved": "Đã cập nhật trạng thái",
     "summary1": "Khách · xe · cửa hàng",
     "summary2": "Hiện trạng khi tiếp nhận",
-    "symptom": "Triệu chứng:"
+    "symptom": "Triệu chứng:",
+    "saveDraft": "Lưu",
+    "draftSaved": "Đã lưu tiến độ",
+    "draftSavedSub": "Lần sau vào lại cập nhật tiếp được.",
+    "draftPartial": "Màn hình đã nạp lại theo đúng những gì lưu được.",
+    "unsaved": "Có thay đổi chưa lưu",
+    "leaveUnsaved": "Tiến độ vừa chọn chưa được lưu. Rời khỏi màn này?"
   },
   "sa10b": {
     "backToBookings": "Về danh sách lịch hẹn",

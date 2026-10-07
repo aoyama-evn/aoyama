@@ -532,6 +532,19 @@
   }
 
   /**
+   * O chon dang mang gia tri chua luu.
+   *
+   * Tho doi tien do vai hang muc roi di lam tiep, luc quay lai man phai
+   * nhin ra ngay cai nao da ghi va cai nao chi moi chon. Vien dam mot
+   * mau nhan — kem dong chu "co thay doi chua luu" o hang nut, vi chi
+   * doi mau thoi thi nguoi phan biet mau kem khong thay (NFR-UX-09).
+   */
+  .ay-chua-luu {
+    border-color: var(--color-accent);
+    box-shadow: inset 0 0 0 1px var(--color-accent);
+  }
+
+  /**
    * Tren man hinh cham, o nhap phai du 16px.
    *
    * Safari tren iPhone tu phong to trang khi con tro vao mot o co co chu

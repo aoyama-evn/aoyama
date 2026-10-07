@@ -581,7 +581,13 @@
     "statusSaved": "ステータスを更新しました",
     "summary1": "お客様・バイク・店舗",
     "summary2": "受付時の状態",
-    "symptom": "症状："
+    "symptom": "症状：",
+    "saveDraft": "保存",
+    "draftSaved": "進捗を保存しました",
+    "draftSavedSub": "次回続きから更新できます。",
+    "draftPartial": "実際に保存できた内容で画面を読み直しました。",
+    "unsaved": "未保存の変更があります",
+    "leaveUnsaved": "選択した進捗がまだ保存されていません。この画面を離れますか？"
   },
   "sa10b": {
     "backToBookings": "予約一覧へ戻る",

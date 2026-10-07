@@ -581,7 +581,13 @@
     "statusSaved": "Status updated",
     "summary1": "Customer · bike · store",
     "summary2": "Condition at intake",
-    "symptom": "Symptom:"
+    "symptom": "Symptom:",
+    "saveDraft": "Save",
+    "draftSaved": "Progress saved",
+    "draftSavedSub": "Pick up where you left off next time.",
+    "draftPartial": "The screen was reloaded to show what actually saved.",
+    "unsaved": "Unsaved changes",
+    "leaveUnsaved": "The progress you picked has not been saved. Leave this screen?"
   },
   "sa10b": {
     "backToBookings": "Back to the booking list",
