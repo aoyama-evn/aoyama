@@ -124,11 +124,12 @@ useHead({ title: () => `${t('sa44.title')} — AOYAMA Admin` });
       </template>
     </AyDataTable>
 
+    <!-- Hop nay chi de xem, khong co gi de chon bo: mot nut Dong la du. -->
     <AyConfirmDialog
       :open="Boolean(detail)"
       :title="$t('sa44.detail')"
       :confirm-label="$t('common.close')"
-      :cancel-label="$t('common.close')"
+      hide-cancel
       @confirm="detail = null"
       @cancel="detail = null"
     >
