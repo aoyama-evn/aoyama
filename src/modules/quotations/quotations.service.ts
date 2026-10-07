@@ -394,13 +394,21 @@ export class QuotationsService {
     /**
      * Khach chot bao gia la tin hieu nhan vien cho: bat tay vao sua duoc roi.
      * Bao qua web, khong gui SMS — khach da biet chinh ho vua bam dong y.
+     *
+     * Dan thang sang man "Chot bao gia" (SA-12c) chu khong phai trang dau
+     * cua phieu: o day moi co dong "Khach da dong y" va nut chot de day
+     * phieu sang dang sua. Dua ve trang dau thi nhan vien con phai tu mo
+     * dung tab, ma viec can lam thi chi co mot.
+     *
+     * Than thong bao chi de du lieu, khong de cau chu: trang quan tri co
+     * ba thu tieng, phan loi van do giao dien dich theo `event`.
      */
     if (dto.accept && channel === QuotationReplyChannel.LINK) {
       await this.adminFeed.push({
         event: NotificationEvent.QUOTATION_ACCEPTED,
         title: `Khach da chot bao gia ${quotation.code}`,
-        body: `Tong ${quotation.totalAmount.toLocaleString('en-US')} JPY — co the bat dau sua xe.`,
-        link: `/admin/work-orders/${quotation.workOrderId}`,
+        body: `${quotation.code} · ${quotation.totalAmount.toLocaleString('en-US')} JPY`,
+        link: `/admin/work-orders/${quotation.workOrderId}/quote-confirm`,
         storeId: quotation.workOrder?.storeId ?? null,
       });
     }

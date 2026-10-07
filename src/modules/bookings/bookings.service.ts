@@ -192,11 +192,15 @@ export class BookingsService {
     await this.adminFeed.push({
       event: NotificationEvent.BOOKING_CREATED,
       title: `Lich hen moi ${booking.code}`,
-      // Ngon ngu cua hang, khong phai cua khach: day la tin noi bo.
-      body: `${booking.contactName} · ${formatAppDateTime(booking.scheduledAt)} · ${pickI18n(
-        store.name,
-        DEFAULT_LANGUAGE,
-      )}`,
+      /**
+       * Chi du lieu, khong cau chu: trang quan tri co ba thu tieng, phan
+       * loi van do giao dien dich theo `event`. Ngay gio viet dung dinh
+       * dang ca he thong dang dung (YYYY/MM/DD HH:MM).
+       */
+      body: `${booking.code} · ${booking.contactName} · ${formatAppDateTime(
+        booking.scheduledAt,
+        'yyyy/MM/dd HH:mm',
+      )} · ${pickI18n(store.name, DEFAULT_LANGUAGE)}`,
       link: `/admin/bookings/${booking.id}`,
       storeId: booking.storeId,
     });
