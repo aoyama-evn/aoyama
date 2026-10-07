@@ -11,6 +11,7 @@ import { InventoryTransaction } from 'src/modules/parts/entities/inventory-trans
 import { Part } from 'src/modules/parts/entities/part.entity';
 import { Store } from 'src/modules/stores/entities/store.entity';
 import { StoreBusinessHour } from 'src/modules/stores/entities/store-business-hour.entity';
+import { StoreHoliday } from 'src/modules/stores/entities/store-holiday.entity';
 import { TimeSlot } from 'src/modules/stores/entities/time-slot.entity';
 import { SystemSetting } from 'src/modules/system/entities/system-setting.entity';
 import { SETTING_KEYS } from 'src/modules/system/settings.service';
@@ -135,10 +136,82 @@ async function seedSettings(ds: DataSource): Promise<void> {
   console.log(`  Tham so he thong: ${defaults.length} khoa`);
 }
 
+/** Nghi thu Hai hang tuan. 0 = Chu nhat. */
+const CLOSED_WEEKDAY = 1;
+
+/** Sinh truoc bao nhieu thang ngay nghi dinh ky — xem secondAndFourthTuesdays. */
+const HOLIDAY_MONTHS = 18;
+
+/**
+ * Khung gio nhan xe trong mot ngay.
+ *
+ * Bang hieu ghi "整備受付は閉店時間の30分前まで" — nhan sua cham nhat la
+ * nua tieng truoc gio dong cua, nen khung cuoi phai ket thuc truoc moc
+ * do. Nghi trua 12:00-13:00.
+ */
+function bookableSlots(closeTime: string): [string, string][] {
+  const toMinutes = (hhmm: string): number => {
+    const [h, m] = hhmm.split(':').map(Number);
+    return h * 60 + m;
+  };
+  const toClock = (minutes: number): string =>
+    `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+
+  const LENGTH = 90;
+  const LUNCH_FROM = toMinutes('12:00');
+  const LUNCH_TO = toMinutes('13:00');
+  const lastEnd = toMinutes(closeTime) - 30;
+
+  const slots: [string, string][] = [];
+  for (let start = toMinutes('10:00'); start + LENGTH <= lastEnd; start += LENGTH) {
+    const end = start + LENGTH;
+    // Khung nao dam vao gio nghi trua thi bo, vong sau tu nhay qua.
+    if (start < LUNCH_TO && end > LUNCH_FROM) {
+      start = LUNCH_TO - LENGTH;
+      continue;
+    }
+    slots.push([toClock(start), toClock(end)]);
+  }
+  return slots;
+}
+
+/**
+ * Ngay thu Ba cua tuan thu hai va thu tu moi thang — ngay nghi dinh ky
+ * cua ca sau cua hang.
+ *
+ * Bang store_holidays chi nhan ngay cu the, khong co khai niem lap lai,
+ * nen phai sinh san ra. Het 18 thang phai sinh tiep; chua co viec dinh
+ * ky nao lo chuyen do.
+ */
+function secondAndFourthTuesdays(months: number): string[] {
+  const out: string[] = [];
+  const now = new Date();
+  for (let i = 0; i < months; i += 1) {
+    const year = now.getFullYear();
+    const month = now.getMonth() + i;
+    let seen = 0;
+    for (let day = 1; day <= 31; day += 1) {
+      const date = new Date(year, month, day);
+      if (date.getMonth() !== ((month % 12) + 12) % 12) break;
+      if (date.getDay() !== 2) continue;
+      seen += 1;
+      if (seen === 2 || seen === 4) {
+        out.push(
+          `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
+            date.getDate(),
+          ).padStart(2, '0')}`,
+        );
+      }
+    }
+  }
+  return out;
+}
+
 async function seedStores(ds: DataSource): Promise<Store[]> {
   const storeRepo = ds.getRepository(Store);
   const hourRepo = ds.getRepository(StoreBusinessHour);
   const slotRepo = ds.getRepository(TimeSlot);
+  const holidayRepo = ds.getRepository(StoreHoliday);
   const result: Store[] = [];
 
   for (const seedStore of STORES) {
@@ -150,15 +223,15 @@ async function seedStores(ds: DataSource): Promise<Store[]> {
 
     const hourCount = await hourRepo.count({ where: { storeId: store.id } });
     if (hourCount === 0) {
-      // Mo cua thu Ba den Chu nhat, nghi thu Hai — thoi quen pho bien cua cua hang xe may Nhat.
+      // Nghi thu Hai hang tuan — ca sau cua hang deu vay.
       await hourRepo.save(
         [0, 1, 2, 3, 4, 5, 6].map((weekday) =>
           hourRepo.create({
             storeId: store!.id,
             weekday,
-            isClosed: weekday === 1,
-            openTime: weekday === 1 ? null : '09:00',
-            closeTime: weekday === 1 ? null : '18:00',
+            isClosed: weekday === CLOSED_WEEKDAY,
+            openTime: weekday === CLOSED_WEEKDAY ? null : seedStore.openTime,
+            closeTime: weekday === CLOSED_WEEKDAY ? null : seedStore.closeTime,
           }),
         ),
       );
@@ -168,13 +241,7 @@ async function seedStores(ds: DataSource): Promise<Store[]> {
     if (slotCount === 0) {
       const slots: Partial<TimeSlot>[] = [];
       for (const weekday of [0, 2, 3, 4, 5, 6]) {
-        for (const [startTime, endTime] of [
-          ['09:00', '10:30'],
-          ['10:30', '12:00'],
-          ['13:00', '14:30'],
-          ['14:30', '16:00'],
-          ['16:00', '17:30'],
-        ]) {
+        for (const [startTime, endTime] of bookableSlots(seedStore.closeTime)) {
           slots.push({
             storeId: store.id,
             weekday,
@@ -185,6 +252,15 @@ async function seedStores(ds: DataSource): Promise<Store[]> {
         }
       }
       await slotRepo.save(slots.map((s) => slotRepo.create(s)));
+    }
+
+    const holidayCount = await holidayRepo.count({ where: { storeId: store.id } });
+    if (holidayCount === 0) {
+      await holidayRepo.save(
+        secondAndFourthTuesdays(HOLIDAY_MONTHS).map((date) =>
+          holidayRepo.create({ storeId: store!.id, date, reason: '第二・第四火曜日' }),
+        ),
+      );
     }
   }
 

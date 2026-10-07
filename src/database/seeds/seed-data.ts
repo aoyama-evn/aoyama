@@ -6,63 +6,135 @@ export interface StoreSeed {
   name: I18nText;
   address: I18nText;
   phone: string;
+  /** Giu nguyen cach cua hang in tren bang hieu: may chu khong bao gio quay so nay. */
+  fax: string;
   email: string;
   latitude: string;
   longitude: string;
   defaultCapacity: number;
   sortOrder: number;
+  openTime: string;
+  closeTime: string;
 }
 
-/** Ba cua hang mau — con so thuc te cho khach hang xac nhan tai OQ-03. */
+/**
+ * Sau cua hang that cua AOYAMA tai Shizuoka.
+ *
+ * So dien thoai luu dang E.164 vi may chu con dung de nhan tin; so fax
+ * giu nguyen cach cua hang in ra vi khong ai goi tu he thong.
+ *
+ * Ca sau cua hang nghi thu Hai hang tuan, va thu Ba tuan hai va tuan bon
+ * — ngay nghi dinh ky do nam o bang store_holidays, xem seedStores.
+ */
 export const STORES: StoreSeed[] = [
   {
-    code: 'AY-HAMAMATSU',
-    name: {
-      ja: 'アオヤマ 浜松店',
-      en: 'AOYAMA Hamamatsu',
-      vi: 'AOYAMA Hamamatsu',
-    },
+    code: 'AY-NUMAZU',
+    name: { ja: '沼津本店', en: 'AOYAMA Numazu', vi: 'AOYAMA Numazu' },
     address: {
-      ja: '静岡県浜松市中区板屋町111-2',
-      en: '111-2 Itayamachi, Naka-ku, Hamamatsu, Shizuoka',
-      vi: '111-2 Itayamachi, Naka-ku, Hamamatsu, Shizuoka',
+      ja: '沼津市筒井町10-4',
+      en: '10-4 Tsutsuicho, Numazu, Shizuoka',
+      vi: '10-4 Tsutsuicho, Numazu, Shizuoka',
     },
-    phone: '+81534501111',
-    email: 'hamamatsu@aoyama-service.jp',
-    latitude: '34.7108000',
-    longitude: '137.7261000',
+    phone: '+81559229311',
+    fax: '055-921-8020',
+    email: 'numazu@aoyama-service.jp',
+    latitude: '35.1096000',
+    longitude: '138.8720000',
     defaultCapacity: 4,
     sortOrder: 1,
+    // Cua hang chinh dong cua som hon nua tieng so voi cac chi nhanh.
+    openTime: '10:00',
+    closeTime: '18:00',
   },
   {
-    code: 'AY-IWATA',
-    name: { ja: 'アオヤマ 磐田店', en: 'AOYAMA Iwata', vi: 'AOYAMA Iwata' },
+    code: 'AY-MISHIMA',
+    name: { ja: '三島店', en: 'AOYAMA Mishima', vi: 'AOYAMA Mishima' },
     address: {
-      ja: '静岡県磐田市中泉1-1',
-      en: '1-1 Nakaizumi, Iwata, Shizuoka',
-      vi: '1-1 Nakaizumi, Iwata, Shizuoka',
+      ja: '三島市八反畑100-27',
+      en: '100-27 Hattanbata, Mishima, Shizuoka',
+      vi: '100-27 Hattanbata, Mishima, Shizuoka',
     },
-    phone: '+81538320000',
-    email: 'iwata@aoyama-service.jp',
-    latitude: '34.7180000',
-    longitude: '137.8510000',
+    phone: '+81559731007',
+    fax: '055-973-8358',
+    email: 'mishima@aoyama-service.jp',
+    latitude: '35.1186000',
+    longitude: '138.9189000',
     defaultCapacity: 3,
     sortOrder: 2,
+    openTime: '10:00',
+    closeTime: '18:30',
   },
   {
-    code: 'AY-KAKEGAWA',
-    name: { ja: 'アオヤマ 掛川店', en: 'AOYAMA Kakegawa', vi: 'AOYAMA Kakegawa' },
+    code: 'AY-FUJI',
+    name: { ja: '富士店', en: 'AOYAMA Fuji', vi: 'AOYAMA Fuji' },
     address: {
-      ja: '静岡県掛川市駅前1-5',
-      en: '1-5 Ekimae, Kakegawa, Shizuoka',
-      vi: '1-5 Ekimae, Kakegawa, Shizuoka',
+      ja: '富士市八代町3-40',
+      en: '3-40 Yashiromachi, Fuji, Shizuoka',
+      vi: '3-40 Yashiromachi, Fuji, Shizuoka',
     },
-    phone: '+81537220000',
-    email: 'kakegawa@aoyama-service.jp',
-    latitude: '34.7690000',
-    longitude: '138.0150000',
-    defaultCapacity: 2,
+    phone: '+81545550223',
+    fax: '0545-55-0230',
+    email: 'fuji@aoyama-service.jp',
+    latitude: '35.1614000',
+    longitude: '138.6764000',
+    defaultCapacity: 3,
     sortOrder: 3,
+    openTime: '10:00',
+    closeTime: '18:30',
+  },
+  {
+    code: 'AY-SHIZUOKA',
+    name: { ja: '静岡流通店', en: 'AOYAMA Shizuoka Ryutsu', vi: 'AOYAMA Shizuoka Ryutsu' },
+    address: {
+      ja: '静岡市葵区東千代田2-11-8',
+      en: '2-11-8 Higashi-chiyoda, Aoi-ku, Shizuoka',
+      vi: '2-11-8 Higashi-chiyoda, Aoi-ku, Shizuoka',
+    },
+    phone: '+81542640213',
+    fax: '054-264-0214',
+    email: 'shizuoka@aoyama-service.jp',
+    latitude: '34.9939000',
+    longitude: '138.4178000',
+    defaultCapacity: 4,
+    sortOrder: 4,
+    openTime: '10:00',
+    closeTime: '18:30',
+  },
+  {
+    code: 'AY-FUJIEDA',
+    name: { ja: '藤枝店', en: 'AOYAMA Fujieda', vi: 'AOYAMA Fujieda' },
+    address: {
+      ja: '藤枝市八幡485-1',
+      en: '485-1 Yawata, Fujieda, Shizuoka',
+      vi: '485-1 Yawata, Fujieda, Shizuoka',
+    },
+    phone: '+81546450775',
+    fax: '054-645-0776',
+    email: 'fujieda@aoyama-service.jp',
+    latitude: '34.8678000',
+    longitude: '138.2572000',
+    defaultCapacity: 3,
+    sortOrder: 5,
+    openTime: '10:00',
+    closeTime: '18:30',
+  },
+  {
+    code: 'AY-SANARUDAI',
+    name: { ja: '佐鳴台店', en: 'AOYAMA Sanarudai', vi: 'AOYAMA Sanarudai' },
+    address: {
+      ja: '浜松市中央区西伊場町63-6',
+      en: '63-6 Nishiibacho, Chuo-ku, Hamamatsu, Shizuoka',
+      vi: '63-6 Nishiibacho, Chuo-ku, Hamamatsu, Shizuoka',
+    },
+    phone: '+81534538195',
+    fax: '053-453-7885',
+    email: 'sanarudai@aoyama-service.jp',
+    latitude: '34.7006000',
+    longitude: '137.7064000',
+    defaultCapacity: 4,
+    sortOrder: 6,
+    openTime: '10:00',
+    closeTime: '18:30',
   },
 ];
 
@@ -83,7 +155,6 @@ export interface ServiceSeed {
   maintenanceIntervalKm?: number;
 }
 
-/** Danh muc dich vu khoi tao — bam theo cac the dich vu tren SC-01 cua thiet ke. */
 export const SERVICES: ServiceSeed[] = [
   {
     code: 'SVC-MAINT-PERIODIC',

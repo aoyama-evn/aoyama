@@ -24,6 +24,8 @@ export class CreateStoreDto {
   @IsString() @IsNotEmpty() phone!: string;
 
   @IsOptional() @IsObject() description?: I18nText;
+  /** Giu nguyen cach cua hang in ra, khong chuan hoa — xem Store.fax. */
+  @IsOptional() @IsString() fax?: string;
   @IsOptional() @IsString() email?: string;
   @IsOptional() @IsString() latitude?: string;
   @IsOptional() @IsString() longitude?: string;

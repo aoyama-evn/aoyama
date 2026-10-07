@@ -23,6 +23,16 @@ export class Store extends SoftDeletableEntity {
   @Column({ length: 32 })
   phone!: string;
 
+  /**
+   * So fax in tren bang hieu — FR-STO-01.
+   *
+   * Giu nguyen cach cua hang viet ("055-921-8020") chu khong chuan hoa
+   * ve E.164 nhu so dien thoai: he thong khong bao gio quay so nay, no
+   * chi de nhan vien va khach doc.
+   */
+  @Column({ type: 'varchar', length: 32, nullable: true })
+  fax!: string | null;
+
   @Column({ type: 'varchar', length: 128, nullable: true })
   email!: string | null;
 
