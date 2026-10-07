@@ -37,7 +37,39 @@ async function refreshUnread(): Promise<void> {
   }
 }
 
-onMounted(refreshUnread);
+/**
+ * Chuong phai tu song, khong doi nguoi dung di chuyen.
+ *
+ * Thong bao sinh ra o phia cua hang: nhan vien bam xac nhan tren may tinh
+ * thi may khach dang nam yen mot trang. Truoc day chuong chi hoi lai luc
+ * mo trang va luc doi duong dan, nen con so khong bao gio kip hien — khach
+ * phai tu bam vao chuong moi biet la co, ma bam vao la coi nhu da doc.
+ *
+ * Nen hoi lai theo nhip. Trang bi an thi thoi: dien thoai khoa man hinh
+ * hay chuyen sang ung dung khac ma van goi mang deu deu thi ton pin vo ich.
+ * Bu lai, luc quay ve thi hoi ngay chu khong cho het nhip — day moi la
+ * luc hay gap nhat tren dien thoai.
+ */
+const NHIP_HOI = 25_000;
+let dongHo: ReturnType<typeof setInterval> | null = null;
+
+function hoiLaiNeuDangXem(): void {
+  if (document.visibilityState === 'visible') void refreshUnread();
+}
+
+onMounted(() => {
+  void refreshUnread();
+  dongHo = setInterval(hoiLaiNeuDangXem, NHIP_HOI);
+  document.addEventListener('visibilitychange', hoiLaiNeuDangXem);
+  window.addEventListener('focus', hoiLaiNeuDangXem);
+});
+
+onBeforeUnmount(() => {
+  if (dongHo) clearInterval(dongHo);
+  document.removeEventListener('visibilitychange', hoiLaiNeuDangXem);
+  window.removeEventListener('focus', hoiLaiNeuDangXem);
+});
+
 watch([() => auth.isCustomer, () => route.path], refreshUnread);
 
 /** Tieng Nhat dung truoc vi day la ngon ngu mac dinh cua he thong. */
