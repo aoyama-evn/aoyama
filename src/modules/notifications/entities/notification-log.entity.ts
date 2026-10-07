@@ -50,6 +50,16 @@ export class NotificationLog extends BaseEntity {
   @Column({ name: 'read_at', type: 'timestamptz', nullable: true })
   readAt!: Date | null;
 
+  /**
+   * Ma lich hen tin nay noi ve — SC-33.
+   *
+   * Khach bam vao mot thong bao la muon xem chiec xe cua minh den dau
+   * roi, nen can duong di toi man theo doi tien do. Lay tu bien
+   * {{bookingCode}} ma moi noi gui deu truyen san.
+   */
+  @Column({ name: 'booking_code', type: 'varchar', length: 24, nullable: true })
+  bookingCode!: string | null;
+
   @Column({ name: 'error_message', type: 'text', nullable: true })
   errorMessage!: string | null;
 

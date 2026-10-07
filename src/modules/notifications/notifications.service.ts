@@ -86,6 +86,12 @@ export class NotificationsService {
       status: NotificationSendStatus.QUEUED,
       relatedType: input.relatedType ?? null,
       relatedId: input.relatedId ?? null,
+      /**
+       * Giu lai ma lich hen de hop thong bao trong ung dung co duong di
+       * toi man theo doi tien do. Moi noi gui deu da truyen bien nay cho
+       * mau tin nhan, nen khong phai sua cho goi nao.
+       */
+      bookingCode: String(input.variables.bookingCode ?? '') || null,
     });
     await this.logRepo.save(log);
 
