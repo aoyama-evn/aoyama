@@ -176,6 +176,13 @@ const STAGE_DESTINATION: Record<string, (workOrderId: string) => string> = {
   DIAGNOSED: (wo) => `/admin/work-orders/${wo}/quotation`,
   // Da gui bao gia, viec ke tiep la doc tra loi cua khach va chot.
   QUOTING: (wo) => `/admin/work-orders/${wo}/quote-confirm`,
+  /**
+   * Khach da dong y nhung xuong chua bam "Tien hanh" — van la man chot
+   * bao gia, dung cho ma thong bao tren chuong dan toi. Vao tu danh sach
+   * hay vao tu chuong deu phai ra cung mot cho, khong thi cung mot viec
+   * lai co hai duong di khac nhau.
+   */
+  QUOTE_ACCEPTED: (wo) => `/admin/work-orders/${wo}/quote-confirm`,
   // Sua xong roi: viec con lai la thu tien va giao xe, mo thang man do.
   COMPLETED: (wo) => `/admin/work-orders/${wo}/payment`,
 };
