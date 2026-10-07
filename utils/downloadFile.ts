@@ -33,7 +33,7 @@ export function downloadDataUrl(dataUrl: string, fileName: string): boolean {
   }
 }
 
-function dataUrlToBlob(dataUrl: string): Blob {
+export function dataUrlToBlob(dataUrl: string): Blob {
   const comma = dataUrl.indexOf(',');
   if (comma < 0) throw new Error('data URL khong hop le');
 
