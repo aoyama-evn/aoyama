@@ -1,0 +1,67 @@
+# Dung giao dien thanh tep tinh roi dat len GitHub Pages.
+#
+# Pages khong chay duoc may chu Nuxt nen ban nay la ung dung mot trang: moi
+# du lieu lay qua API luc trinh duyet da mo. API phai duoc host o cho khac
+# (xem render.yaml o nhanh `be`) va dia chi cua no truyen vao o duoi.
+#
+# Truoc khi chay lan dau: vao Settings > Pages, muc Source chon
+# "GitHub Actions". Khong chon thi buoc dat len se bao loi khong tim thay
+# moi truong github-pages.
+
+name: Dat giao dien len GitHub Pages
+
+on:
+  push:
+    branches: [fe]
+  # Cho phep bam chay tay, de doi dia chi API xong khong phai commit vu vo.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Hai lan day lien tiep thi chi can ban cuoi cung len song.
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  dung:
+    name: Dung ban tinh
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Sinh tep tinh
+        env:
+          # Bat che do Pages trong nuxt.config: tat dung san phia may chu va
+          # ghep duong dan con vao moi tai nguyen.
+          GITHUB_PAGES: 'true'
+          PAGES_BASE_URL: /${{ github.event.repository.name }}/
+          # Dat bien API_BASE o Settings > Secrets and variables > Actions >
+          # Variables neu dia chi API khac mac dinh duoi day.
+          NUXT_PUBLIC_API_BASE: ${{ vars.API_BASE || 'https://aoyama-api.onrender.com/api/v1' }}
+        run: npx nuxt generate
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .output/public
+
+  dat-len:
+    name: Dat len Pages
+    needs: dung
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.ket-qua.outputs.page_url }}
+    steps:
+      - id: ket-qua
+        uses: actions/deploy-pages@v4

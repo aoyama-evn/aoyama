@@ -1,7 +1,27 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
+/**
+ * Ban dung de dat len GitHub Pages.
+ *
+ * Pages chi phat tep tinh — khong chay duoc may chu Nuxt — nen ban nay tat
+ * dung san phia may chu va chay han thanh ung dung mot trang. Doi lai, moi
+ * du lieu phai lay qua API luc trinh duyet da mo, nen API bat buoc phai
+ * duoc host o cho khac va NUXT_PUBLIC_API_BASE phai tro dung vao do.
+ *
+ * Pages dat trang o duong dan con `/<ten-repo>/` chu khong phai goc ten
+ * mien, nen phai bao truoc cho Nuxt biet de no ghep dung duong dan cho mo
+ * tep va cho dieu huong.
+ *
+ * Chay o may van nhu cu: bien nay khong dat thi khong co gi doi.
+ */
+const lenGithubPages = process.env.GITHUB_PAGES === 'true';
+const duongDanGoc = process.env.PAGES_BASE_URL ?? '/challenges_PJ_2026/';
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
   devtools: { enabled: true },
+
+  ...(lenGithubPages ? { ssr: false } : {}),
 
   modules: ['@pinia/nuxt', '@vueuse/nuxt', '@nuxtjs/i18n'],
 
@@ -53,6 +73,7 @@ export default defineNuxtConfig({
   },
 
   app: {
+    baseURL: lenGithubPages ? duongDanGoc : '/',
     head: {
       htmlAttrs: { lang: 'ja' },
       title: 'AOYAMA Service',
