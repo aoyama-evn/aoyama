@@ -55,10 +55,20 @@ export class AuthService {
    * VA moi truong khong phai production.
    */
   private get exposeOtpCode(): boolean {
-    return (
-      this.config.get<string>('notification.sms.driver') === 'console' &&
-      this.config.get<string>('app.env') !== 'production'
-    );
+    if (this.config.get<string>('notification.sms.driver') !== 'console') return false;
+    if (this.config.get<string>('app.env') !== 'production') return true;
+
+    /**
+     * Ban demo cong khai: khong co cong SMS that nhung van phai cho nguoi xem
+     * dang nhap thu, nen mo rieng bang mot cong tac co ten noi ro no la gi.
+     *
+     * Day la mot lo hong co that, khong phai mot tien ich: ai cung goi duoc
+     * cua nay voi so bat ky va nhan lai ma, tuc la vao duoc tai khoan bat ky.
+     * Chi duoc bat tren ban demo chay du lieu gia. He thong that thi noi cong
+     * SMS vao va de bien nay tat — dat NODE_ENV=production mot minh khong con
+     * du de chan nua, phai nho tat ca bien nay.
+     */
+    return this.config.get<boolean>('app.demoExposeOtp') === true;
   }
 
   // ---------- Khach hang (SC-17, SC-18, SC-19) ----------

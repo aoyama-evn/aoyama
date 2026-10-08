@@ -57,6 +57,14 @@ export default registerAs('app', () => ({
   apiPrefix: process.env.API_PREFIX ?? 'api',
   /** C-03 — moi xu ly nghiep vu chay theo gio Nhat Ban. */
   timezone: process.env.APP_TIMEZONE ?? 'Asia/Tokyo',
+  /**
+   * Ban demo cong khai duoc tra ma OTP thang ve giao dien.
+   *
+   * Mac dinh tat. Xem AuthService.exposeOtpCode de biet vi sao day la mot lo
+   * hong co chu y chu khong phai mot tien ich.
+   */
+  demoExposeOtp: process.env.DEMO_EXPOSE_OTP === 'true',
+
   /** Dia chi giao dien web — dung de dung duong dan trong email (SA-01b). */
   webUrl: process.env.WEB_URL ?? diaChiWebMacDinh(),
   corsOrigins: (process.env.CORS_ORIGINS ?? 'http://localhost:3000')

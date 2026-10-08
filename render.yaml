@@ -1,0 +1,85 @@
+# Ban thiet ke trien khai cho Render — https://render.com/docs/blueprint-spec
+#
+# Dung o Render: New > Blueprint > tro vao repo nay, nhanh `be`. Render doc
+# tep nay roi dung len mot dich vu web va mot PostgreSQL, tu noi day giua hai
+# cai. Khong phai go tay bien nao ngoai nhung bien da ghi san o duoi.
+#
+# Goi mien phi co hai cho can biet truoc:
+#   - Dich vu web ngu sau 15 phut khong ai vao; lan goi ke tiep phai cho chung
+#     mot phut no thuc day. Demo thi nho mo truoc vai phut.
+#   - PostgreSQL mien phi cua Render het han sau mot thoi gian va bi xoa. Luc
+#     do dung lai cai moi roi chay lai `db:setup` la co du lieu nhu cu.
+
+databases:
+  - name: aoyama-db
+    databaseName: aoyama_service
+    user: aoyama
+    plan: free
+
+services:
+  - type: web
+    name: aoyama-api
+    runtime: node
+    plan: free
+    # Ma nguon may chu nam o nhanh `be`; nhanh `fe` va `docs` khong lien quan.
+    branch: be
+    buildCommand: npm ci && npm run build
+    # db:setup chay migration roi nap du lieu nen, ca hai deu lam lai duoc
+    # nhieu lan ma khong hong: migration da chay thi bo qua, du lieu nen da co
+    # thi khong ghi de. Nho vay database moi dung len la tu co bang va du lieu.
+    startCommand: npm run db:setup && npm run start:prod
+    # Duong dan cong khai, khong can dang nhap — hop de Render do xem song chua.
+    healthCheckPath: /api/v1/stores
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: API_PREFIX
+        value: api
+      - key: APP_TIMEZONE
+        value: Asia/Tokyo
+
+      # Render tu dien chuoi ket noi noi bo cua database o tren vao day.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: aoyama-db
+          property: connectionString
+      # Ket noi noi bo trong cung mot vung thi khong can SSL. Neu doi sang
+      # dung chuoi ket noi ngoai (External Database URL) thi phai dat true.
+      - key: DB_SSL
+        value: 'false'
+      - key: DB_LOGGING
+        value: 'false'
+
+      # Khoa ky phien. generateValue: Render tu sinh chuoi ngau nhien va giu
+      # kin — khong ai, ke ca nguoi lap trien khai, phai biet gia tri nay.
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+
+      # Giao dien chay tren GitHub Pages. CORS doi dung goc (khong kem duong
+      # dan), con WEB_URL la dia chi day du de ghep vao duong dan trong tin
+      # nhan gui cho khach.
+      - key: CORS_ORIGINS
+        value: https://kiemthuvien-enshu-1804.github.io
+      - key: WEB_URL
+        value: https://kiemthuvien-enshu-1804.github.io/challenges_PJ_2026
+
+      # Chua noi cong SMS that nen tin nhan chi ghi vao nhat ky may chu.
+      - key: SMS_DRIVER
+        value: console
+      - key: MAIL_DRIVER
+        value: console
+
+      # CANH BAO — chi dung cho ban demo chay du lieu gia.
+      #
+      # Bat bien nay thi may chu tra thang ma OTP ve cho giao dien, de nguoi
+      # xem dang nhap thu duoc khi chua co cong SMS. Doi lai: ai cung goi duoc
+      # cua do voi so dien thoai bat ky va nhan lai ma, tuc la vao duoc tai
+      # khoan bat ky. He thong that phai dat 'false' va noi cong SMS vao.
+      - key: DEMO_EXPOSE_OTP
+        value: 'true'
+
+      # Chua cau hinh khoa mo hinh nen tro ly AI chay bang bo luat tai cho.
+      - key: AI_ENABLED
+        value: 'false'
