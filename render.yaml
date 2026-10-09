@@ -67,7 +67,7 @@ services:
       - key: CORS_ORIGINS
         value: https://kiemthuvien-enshu-1804.github.io
       - key: WEB_URL
-        value: https://kiemthuvien-enshu-1804.github.io/challenges_PJ_2026
+        value: https://kiemthuvien-enshu-1804.github.io/aoyama
 
       # Chua noi cong SMS that nen tin nhan chi ghi vao nhat ky may chu.
       - key: SMS_DRIVER
