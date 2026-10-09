@@ -65,9 +65,9 @@ services:
       # dan), con WEB_URL la dia chi day du de ghep vao duong dan trong tin
       # nhan gui cho khach.
       - key: CORS_ORIGINS
-        value: https://kiemthuvien-enshu-1804.github.io
+        value: https://aoyama-evn.github.io
       - key: WEB_URL
-        value: https://kiemthuvien-enshu-1804.github.io/aoyama
+        value: https://aoyama-evn.github.io/aoyama
 
       # Chua noi cong SMS that nen tin nhan chi ghi vao nhat ky may chu.
       - key: SMS_DRIVER
