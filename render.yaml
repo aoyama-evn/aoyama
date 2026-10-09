@@ -23,7 +23,11 @@ services:
     plan: free
     # Ma nguon may chu nam o nhanh `be`; nhanh `fe` va `docs` khong lien quan.
     branch: be
-    buildCommand: npm ci && npm run build
+    # --include=dev la bat buoc, khong phai thua: NODE_ENV=production o duoi
+    # ap dung ca luc build, ma npm thay bien do thi bo qua devDependencies —
+    # trong khi nest va tsc (hai thu dung de build) deu nam o day. Thieu co
+    # nay thi build chet voi loi khong tim thay lenh `nest`.
+    buildCommand: npm ci --include=dev && npm run build
     # db:setup chay migration roi nap du lieu nen, ca hai deu lam lai duoc
     # nhieu lan ma khong hong: migration da chay thi bo qua, du lieu nen da co
     # thi khong ghi de. Nho vay database moi dung len la tu co bang va du lieu.
