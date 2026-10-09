@@ -86,7 +86,8 @@ export default defineNuxtConfig({
             'Dat lich bao duong va sua chua xe may tai chuoi cua hang AOYAMA — Mobility Enshu Railway.',
         },
       ],
-      link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
+      // Ghep san tien to: the <link> di thang vao HTML, Nuxt khong tu sua.
+      link: [{ rel: 'icon', type: 'image/svg+xml', href: `${lenGithubPages ? duongDanGoc : '/'}favicon.svg` }],
     },
   },
 

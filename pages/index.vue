@@ -71,7 +71,7 @@ function priceLabel(service: ServiceItem): string {
     <!-- Anh mo dau tran ra sat mep cot noi dung -->
     <div class="-mx-4 -mt-4 px-3 pb-3 pt-2" style="background: var(--color-accent-200)">
       <img
-        :src="'/design/hero-bike.jpg'"
+        :src="assetUrl('/design/hero-bike.jpg')"
         :alt="$t('sc01.heroAlt')"
         class="block h-auto w-full"
         style="mix-blend-mode: multiply"
