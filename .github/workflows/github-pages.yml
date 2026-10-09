@@ -40,16 +40,32 @@ jobs:
 
       - run: npm ci
 
+      # Hoi thang GitHub xem trang se nam o duong dan nao.
+      #
+      # Truoc day cho nay tu ghep tu ten repo trong du lieu su kien, nhung du
+      # lieu do la anh chup luc su kien xay ra: doi ten repo roi chay lai thi
+      # van ra ten cu, ban dung nuong duong dan sai va toan bo CSS, JS deu
+      # 404 — trang mo len trang tron. Lay tu cau hinh Pages thi luon dung.
+      - name: Lay duong dan goc tu cau hinh Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
       - name: Sinh tep tinh
         env:
           # Bat che do Pages trong nuxt.config: tat dung san phia may chu va
           # ghep duong dan con vao moi tai nguyen.
           GITHUB_PAGES: 'true'
-          PAGES_BASE_URL: /${{ github.event.repository.name }}/
+          DUONG_DAN_GOC: ${{ steps.pages.outputs.base_path }}
           # Dat bien API_BASE o Settings > Secrets and variables > Actions >
           # Variables neu dia chi API khac mac dinh duoi day.
           NUXT_PUBLIC_API_BASE: ${{ vars.API_BASE || 'https://aoyama-api.onrender.com/api/v1' }}
-        run: npx nuxt generate
+        run: |
+          # Nuxt doi baseURL ket thuc bang dau gach cheo; base_path thi khong
+          # co. Trang goc tai khoan tra ve "/" nen phai tranh thanh "//".
+          goc="${DUONG_DAN_GOC:-/}"
+          case "$goc" in */) ;; *) goc="$goc/" ;; esac
+          echo "duong dan goc: $goc"
+          PAGES_BASE_URL="$goc" npx nuxt generate
 
       - uses: actions/upload-pages-artifact@v3
         with:
