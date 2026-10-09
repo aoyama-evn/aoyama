@@ -15,7 +15,9 @@
  * Chay o may van nhu cu: bien nay khong dat thi khong co gi doi.
  */
 const lenGithubPages = process.env.GITHUB_PAGES === 'true';
-const duongDanGoc = process.env.PAGES_BASE_URL ?? '/challenges_PJ_2026/';
+// Workflow truyen PAGES_BASE_URL lay tu chinh ten repo, nen doi ten repo
+// la duong dan tu khop. Gia tri duoi chi dung khi dung tay o may.
+const duongDanGoc = process.env.PAGES_BASE_URL ?? '/aoyama/';
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
