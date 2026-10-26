@@ -423,6 +423,15 @@ useHead({ title: () => `${t('sa05.headTitle', { code: booking.value?.code ?? '' 
       </section>
 
       <!-- Goi y AI -->
+      <!--
+        Nhung gi khach gui kem — doc lap voi ket qua suy doan.
+      
+        Khach gui mot doan video ma may khong doan ra benh thi khoi ket
+        qua ben duoi an di; neu khong co khoi nay thi doan video coi nhu
+        mat tich, khong ai mo duoc.
+      -->
+      <AdminDiagnosisMedia :diagnosis="diagnosis" />
+
       <section
         v-if="diagnosis && diagnosis.findings.length"
         class="flex flex-col gap-[11px] p-4"

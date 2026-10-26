@@ -44,6 +44,19 @@ const images = ref<string[]>([]);
  * ba, 8MB la con vua.
  */
 const video = ref<string | null>(null);
+
+/**
+ * Ban ghi am, khi trinh duyet khong tu chuyen duoc giong noi thanh chu.
+ *
+ * Truoc day cho nay gan `transcript` bang mot nhan giao dien ("Ghi am da
+ * gui kem"), roi chuoi do di thang vao may chan doan nhu the la loi khach
+ * ta benh, va con hien ra trong khung chat nhu mot cau khach vua noi.
+ * Vua lam nhieu ket qua doi chieu tu khoa, vua noi doi nguoi dung.
+ *
+ * Gio giu dung ban ghi va gui qua audioUrl. Cua hang nghe duoc; may thi
+ * khong doc duoc am thanh nen khong vo doan gi ca.
+ */
+const audio = ref<string | null>(null);
 const transcript = ref<string | null>(null);
 
 /**
@@ -160,7 +173,9 @@ const canSend = computed(() => {
   if (needsVehicle.value && !vehicleConfirmed.value) return false;
   // Chi bao duong / kiem tra: xong phan xe la du, khong bat go them.
   if (!needsSymptom.value) return true;
-  return Boolean(text.value.trim() || images.value.length || video.value || transcript.value);
+  return Boolean(
+    text.value.trim() || images.value.length || video.value || audio.value || transcript.value,
+  );
 });
 
 async function send(): Promise<void> {
@@ -168,15 +183,29 @@ async function send(): Promise<void> {
   sending.value = true;
   try {
     const current = await ensureSession();
+
+    /**
+     * Rut mot khung hinh tu video de gui kem.
+     *
+     * Video de nguyen thi chi nguoi mo ra bam xem moi biet trong do co gi.
+     * Mot anh tinh di kem thi nhan vien liec la thay, va khi noi mo hinh
+     * nhin anh vao thi doan video cung co phan doc duoc. Rut khong duoc
+     * thi thoi, van gui video nhu cu.
+     */
+    const khungHinh = video.value ? await videoFrame(video.value) : null;
+    const anh = [...images.value, ...(khungHinh ? [khungHinh] : [])];
+
     session.value = await api.post<AiDiagnosis>(`/ai/diagnosis/sessions/${current.id}/messages`, {
       text: text.value.trim() || undefined,
-      imageUrls: images.value.length ? images.value : undefined,
+      imageUrls: anh.length ? anh : undefined,
       videoUrl: video.value ?? undefined,
+      audioUrl: audio.value ?? undefined,
       transcript: transcript.value ?? undefined,
     });
     text.value = '';
     images.value = [];
     video.value = null;
+    audio.value = null;
     transcript.value = null;
     await scrollToEnd();
   } catch (error) {
@@ -716,7 +745,7 @@ useHead({ title: () => t('sc10.assistant') });
           cua hang nghe — van hon la bat khach go tay.
         -->
         <AyVoiceToText v-if="noiDuocThanhChu" compact @text="text = $event" />
-        <AyVoiceRecorder v-else compact @recorded="transcript = t('rec.sent')" />
+        <AyVoiceRecorder v-else compact @recorded="audio = $event.dataUrl" />
       </div>
       <div class="flex gap-2">
         <input

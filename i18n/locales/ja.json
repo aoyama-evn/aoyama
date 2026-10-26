@@ -433,7 +433,13 @@
     "rescheduledFrom": "（{from} から）",
     "saveNote": "メモを保存",
     "title": "予約の詳細 {code}",
-    "vehicleHistory": "この車両の直近の履歴"
+    "vehicleHistory": "この車両の直近の履歴",
+    "media": {
+      "title": "お客様の添付",
+      "lead": "診断セッションの写真・動画・音声",
+      "audio": "お客様の音声",
+      "openPhoto": "写真{n}を拡大"
+    }
   },
   "sa05r": {
     "current": "{code} · 現在 {at}",

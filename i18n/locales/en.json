@@ -433,7 +433,13 @@
     "rescheduledFrom": " (from {from})",
     "saveNote": "Save note",
     "title": "Booking detail {code}",
-    "vehicleHistory": "Recent history for this bike"
+    "vehicleHistory": "Recent history for this bike",
+    "media": {
+      "title": "Sent by the customer",
+      "lead": "Photos, video and audio from the diagnosis session",
+      "audio": "Customer recording",
+      "openPhoto": "Open photo {n} full size"
+    }
   },
   "sa05r": {
     "current": "{code} · currently {at}",

@@ -433,7 +433,13 @@
     "rescheduledFrom": " (từ {from})",
     "saveNote": "Lưu ghi chú",
     "title": "Chi tiết lịch hẹn {code}",
-    "vehicleHistory": "Lịch sử gần nhất của xe"
+    "vehicleHistory": "Lịch sử gần nhất của xe",
+    "media": {
+      "title": "Khách gửi kèm",
+      "lead": "Ảnh, video và ghi âm từ phiên chẩn đoán",
+      "audio": "Ghi âm khách gửi",
+      "openPhoto": "Mở ảnh {n} cỡ lớn"
+    }
   },
   "sa05r": {
     "current": "{code} · hiện tại {at}",
