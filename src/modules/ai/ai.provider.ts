@@ -6,6 +6,15 @@ export interface DiagnoseInput {
   description?: string;
   transcript?: string;
   imageUrls?: string[];
+  /**
+   * Video va ghi am khach gui kem.
+   *
+   * Bo chan doan chay bang luat khong giai ma duoc hai thu nay — chung co
+   * mat o day de no biet khach KHONG phai gui mot tin rong, tu do tra loi
+   * cho dung. Mo hinh nhin duoc anh thi dung tiep.
+   */
+  videoUrl?: string | null;
+  audioUrl?: string | null;
   vehicleMaker?: string | null;
   vehicleModel?: string | null;
   serviceIntent?: string | null;

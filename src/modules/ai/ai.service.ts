@@ -122,6 +122,8 @@ export class AiService {
         description: input.text,
         transcript: input.transcript,
         imageUrls: input.imageUrls,
+        videoUrl: input.videoUrl,
+        audioUrl: input.audioUrl,
         vehicleMaker: session.vehicleMaker,
         vehicleModel: session.vehicleModel,
         serviceIntent: session.serviceIntent,
@@ -146,7 +148,7 @@ export class AiService {
       {
         role: 'assistant',
         text: assistantLine(
-          session.findings.length > 0 ? 'FOUND' : 'UNSURE',
+          session.findings.length > 0 ? 'FOUND' : coTepDinhKem(input) ? 'UNSURE_MEDIA' : 'UNSURE',
           session.language,
         ),
         at: new Date().toISOString(),
@@ -416,7 +418,7 @@ export class AiService {
  * tieng Nhat. Ba thu tieng de ngay day vi chi la hai cau — khong dang mot
  * mau thong bao rieng trong CSDL.
  */
-const ASSISTANT_LINES: Record<'FOUND' | 'UNSURE', Record<string, string>> = {
+const ASSISTANT_LINES: Record<'FOUND' | 'UNSURE' | 'UNSURE_MEDIA', Record<string, string>> = {
   FOUND: {
     ja: 'ご説明にもっとも近い可能性は次のとおりです。',
     en: 'Here are the possibilities that best match what you described.',
@@ -427,9 +429,39 @@ const ASSISTANT_LINES: Record<'FOUND' | 'UNSURE', Record<string, string>> = {
     en: 'Not enough to go on yet. Tell me a bit more, or book a visit and a technician will take a look.',
     vi: 'Chưa đủ thông tin để chẩn đoán. Bạn mô tả thêm giúp mình, hoặc đặt lịch để kỹ thuật viên kiểm tra trực tiếp.',
   },
+  /**
+   * Khach co gui anh, video hay ghi am — nhung he thong khong doc duoc.
+   *
+   * Phai noi ro la khong doc duoc, chu khong im lang de khach tuong may da
+   * xem roi ma khong nghi ra gi. Anh va ghi am van duoc luu va nhan vien
+   * mo ra xem duoc, nen cau nay huong sang dat lich chu khong bo di.
+   */
+  UNSURE_MEDIA: {
+    ja: '写真・動画・音声をお預かりしました。中身の判読はシステムではできないため、整備士が直接確認いたします。症状を文字か音声でひとこと添えていただけると、その場で絞り込めます。',
+    en: 'Your photo, video or recording is saved. The system cannot read what is in it, so a technician will look at it. A line about the symptom — typed or spoken — lets me narrow it down right here.',
+    vi: 'Mình đã nhận ảnh, video hoặc ghi âm của bạn. Hệ thống chưa đọc được nội dung bên trong nên kỹ thuật viên sẽ xem trực tiếp. Bạn mô tả thêm một câu bằng chữ hoặc giọng nói thì mình đoán được ngay tại đây.',
+  },
 };
 
-function assistantLine(kind: 'FOUND' | 'UNSURE', language: string): string {
+/**
+ * Khach co gui kem tep nao khong (anh, video hay ghi am).
+ *
+ * Dung de chon cau tra loi: khach go mot cau rong thi noi "chua du thong
+ * tin" la dung, nhung khach vua gui mot doan video ma cung nghe cau do
+ * thi hoa ra cong gui bi phi.
+ */
+function coTepDinhKem(input: {
+  imageUrls?: string[];
+  videoUrl?: string;
+  audioUrl?: string;
+}): boolean {
+  return Boolean(input.imageUrls?.length || input.videoUrl || input.audioUrl);
+}
+
+function assistantLine(
+  kind: 'FOUND' | 'UNSURE' | 'UNSURE_MEDIA',
+  language: string,
+): string {
   const table = ASSISTANT_LINES[kind];
   return table[language] ?? table[DEFAULT_LANGUAGE] ?? table.ja;
 }
