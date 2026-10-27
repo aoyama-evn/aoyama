@@ -2,12 +2,16 @@
 import type { WorkOrder } from '~/types/models';
 
 /**
- * SA-10b Phieu da ban giao — man cuoi cua luong tiep nhan → ban giao.
+ * SA-10b Da ban giao xe — man cuoi cua luong tiep nhan → ban giao.
  *
  * Ban thiet ke dat mot man xac nhan rieng sau khi thu tien va ban giao xe,
- * tom tat lai phieu roi dua nhan vien ve danh sach lich hen de tiep khach
- * sau. Truoc day buoc nay do ve man chi tiet phieu, nhan vien khong biet
- * viec da xong hay chua.
+ * tom tat lai roi dua nhan vien ve danh sach lich hen de tiep khach sau.
+ * Truoc day buoc nay do thang ve man cong viec, nhan vien khong biet viec
+ * da xong hay chua.
+ *
+ * Man nay khong nhac den phieu dich vu nua: xong den day la xong, va ma
+ * phieu la so sach noi bo — le tan dang dung truoc mat khach thi ma lich
+ * hen moi la cai doi chieu duoc.
  */
 definePageMeta({ layout: 'admin', middleware: 'admin' });
 
@@ -55,8 +59,9 @@ useHead({ title: () => `${t('sa10b.title')} — AOYAMA Admin` });
         </svg>
       </span>
       <div class="min-w-0 flex-1">
-        <h4 class="mb-0.5">{{ $t('sa10b.done', { code: workOrder.code }) }}</h4>
+        <h4 class="mb-0.5">{{ $t('sa10b.done') }}</h4>
         <p class="text-[12.5px]" style="color: var(--color-accent-2-800)">
+          <template v-if="workOrder.booking?.code">{{ workOrder.booking.code }} · </template>
           {{ $t('sa10b.lead') }}
         </p>
       </div>
@@ -116,14 +121,11 @@ useHead({ title: () => `${t('sa10b.title')} — AOYAMA Admin` });
       </p>
     </section>
 
+    <!--
+      Chi con mot loi ra. Truoc day canh no co nut mo phieu dich vu, nhung
+      xe da giao va tien da thu thi vao do khong con viec gi lam.
+    -->
     <div class="flex flex-wrap items-center justify-end gap-2.5">
-      <NuxtLink
-        :to="`/admin/work-orders/${id}`"
-        class="btn btn-secondary text-[13px]"
-        style="min-height: 48px; padding-inline: 20px"
-      >
-        {{ $t('sa10b.openOrder') }}
-      </NuxtLink>
       <NuxtLink
         to="/admin/bookings"
         class="btn btn-primary text-[15px]"

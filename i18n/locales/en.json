@@ -598,10 +598,9 @@
   "sa10b": {
     "backToBookings": "Back to the booking list",
     "deliveredAt": "Handed over at",
-    "done": "Work order {code} has been handed over",
-    "lead": "Nothing further is needed on this work order.",
+    "done": "The bike has been handed over",
+    "lead": "Nothing further is needed for this booking.",
     "money": "Payment",
-    "openOrder": "Open the work order",
     "outstanding": "Outstanding",
     "paid": "Paid",
     "title": "Handed over",

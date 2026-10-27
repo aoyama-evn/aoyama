@@ -598,15 +598,14 @@
   "sa10b": {
     "backToBookings": "Về danh sách lịch hẹn",
     "deliveredAt": "Bàn giao lúc",
-    "done": "Đã bàn giao phiếu {code}",
-    "lead": "Phiếu này không còn việc gì cần làm nữa.",
+    "done": "Đã bàn giao xe cho khách",
+    "lead": "Lịch hẹn này đã xong, không còn việc gì cần làm.",
     "money": "Thanh toán",
-    "openOrder": "Mở phiếu dịch vụ",
     "outstanding": "Còn lại",
     "paid": "Đã thu",
     "title": "Đã bàn giao",
     "total": "Tổng cộng",
-    "unpaidNote": "Phiếu vẫn còn khoản chưa thu. Hãy xử lý theo quy định của cửa hàng."
+    "unpaidNote": "Vẫn còn khoản chưa thu. Hãy xử lý theo quy định của cửa hàng."
   },
   "sa11": {
     "aiCompare": "✦ Đối chiếu chẩn đoán AI",

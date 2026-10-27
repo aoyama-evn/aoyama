@@ -598,10 +598,9 @@
   "sa10b": {
     "backToBookings": "予約一覧へ戻る",
     "deliveredAt": "お引渡し日時",
-    "done": "作業票 {code} をお引渡ししました",
-    "lead": "この作業票の対応は完了です。",
+    "done": "お客様へお引渡ししました",
+    "lead": "このご予約の対応は完了です。",
     "money": "お会計",
-    "openOrder": "作業票を開く",
     "outstanding": "未収",
     "paid": "入金済み",
     "title": "お引渡し済み",
