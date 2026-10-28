@@ -54,7 +54,6 @@ if (!workOrder.value) {
 }
 syncItemStates();
 
-/** Day la man tho lam viec, nen tieu de goi dung ten buoc do. */
 setScreenTitle(() => t('sa10.screenTitle'));
 
 /**
@@ -443,11 +442,22 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
                 {{ item.laborMinutes ? $t('common.minutes', { n: item.laborMinutes }) : '—' }}
               </td>
               <td>
+                <!--
+                  Phieu da ban giao hay da huy thi khong con gi de doi nua.
+                  Mot o chon xam khong bam duoc chi lam nguoi mo ra tuong
+                  man hinh hong — luc do noi thang hang muc dang o buoc nao.
+                -->
+                <AyStatusTag
+                  v-if="!itemsEditable"
+                  :status="item.state"
+                  :label="$t(`workItem.${item.state}`)"
+                />
                 <select
+                  v-else
                   v-model="itemStates[item.id]"
                   class="input h-8 min-h-0 py-0 text-[12px]"
                   :class="itemStates[item.id] !== item.state ? 'ay-chua-luu' : undefined"
-                  :disabled="savingDraft || !itemsEditable"
+                  :disabled="savingDraft"
                   :aria-label="$t('sa10.itemStateFor', { name: item.name })"
                 >
                   <option v-for="st in ITEM_STATES" :key="st" :value="st">
