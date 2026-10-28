@@ -44,6 +44,10 @@ const error = ref<ApiError | null>(null);
 
 if (!isNew) {
   const { data } = await useAsyncData(`admin-part-${id}`, () => api.get<Part>(`/admin/parts/${id}`));
+  // Khong nap duoc thi bao 404 — de nguyen se ra bieu mau trong giong man them moi.
+  if (!data.value) {
+    throw createError({ statusCode: 404, statusMessage: t('sa10.notFound') });
+  }
   if (data.value) {
     readName(data.value.name);
     Object.assign(form, {

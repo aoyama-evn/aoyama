@@ -38,6 +38,10 @@ if (!isNew) {
   const { data } = await useAsyncData(`admin-service-${id}`, () =>
     api.get<ServiceItem>(`/admin/services/${id}`),
   );
+  // Khong nap duoc thi bao 404 — de nguyen se ra bieu mau trong giong man them moi.
+  if (!data.value) {
+    throw createError({ statusCode: 404, statusMessage: t('sc03.notFound') });
+  }
   if (data.value) {
     Object.assign(form, {
       code: data.value.code,

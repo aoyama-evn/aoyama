@@ -27,43 +27,45 @@ const ICON_PATH: Record<string, string> = {
 </script>
 
 <template>
-  <Teleport :to="overlayTarget">
-    <div
-      class="ay-toast-host pointer-events-none z-[70] flex flex-col items-center gap-2 px-4"
-      role="status"
-      aria-live="polite"
-    >
-      <TransitionGroup name="ay-toast">
-        <div
-          v-for="toast in ui.toasts"
-          :key="toast.id"
-          class="ay-toast pointer-events-auto"
-        >
-          <svg
-            width="15" height="15" viewBox="0 0 24 24" fill="none"
-            :stroke="ICON_COLOR[toast.type]" stroke-width="2.75" stroke-linecap="round"
-            stroke-linejoin="round" class="mt-0.5 flex-none" aria-hidden="true"
+  <ClientOnly>
+    <Teleport :to="overlayTarget">
+      <div
+        class="ay-toast-host pointer-events-none z-[70] flex flex-col items-center gap-2 px-4"
+        role="status"
+        aria-live="polite"
+      >
+        <TransitionGroup name="ay-toast">
+          <div
+            v-for="toast in ui.toasts"
+            :key="toast.id"
+            class="ay-toast pointer-events-auto"
           >
-            <path :d="ICON_PATH[toast.type]" />
-          </svg>
+            <svg
+              width="15" height="15" viewBox="0 0 24 24" fill="none"
+              :stroke="ICON_COLOR[toast.type]" stroke-width="2.75" stroke-linecap="round"
+              stroke-linejoin="round" class="mt-0.5 flex-none" aria-hidden="true"
+            >
+              <path :d="ICON_PATH[toast.type]" />
+            </svg>
 
-          <div class="min-w-0">
-            <p class="text-[13px]">{{ toast.message }}</p>
-            <p v-if="toast.detail" class="text-[11.5px] opacity-75">{{ toast.detail }}</p>
+            <div class="min-w-0">
+              <p class="text-[13px]">{{ toast.message }}</p>
+              <p v-if="toast.detail" class="text-[11.5px] opacity-75">{{ toast.detail }}</p>
+            </div>
+
+            <button
+              type="button"
+              class="ml-1 flex-none text-[15px] leading-none opacity-60 hover:opacity-100"
+              :aria-label="$t('ui.closeToast')"
+              @click="ui.dismiss(toast.id)"
+            >
+              ✕
+            </button>
           </div>
-
-          <button
-            type="button"
-            class="ml-1 flex-none text-[15px] leading-none opacity-60 hover:opacity-100"
-            :aria-label="$t('ui.closeToast')"
-            @click="ui.dismiss(toast.id)"
-          >
-            ✕
-          </button>
-        </div>
-      </TransitionGroup>
-    </div>
-  </Teleport>
+        </TransitionGroup>
+      </div>
+    </Teleport>
+  </ClientOnly>
 </template>
 
 <style scoped>

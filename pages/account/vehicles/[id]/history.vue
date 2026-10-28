@@ -25,6 +25,10 @@ const { data } = await useAsyncData(`veh-history-${id}`, async () => {
   return { vehicle, history, stores };
 });
 
+if (!data.value?.vehicle) {
+  throw createError({ statusCode: 404, statusMessage: t('sa20.notFound') });
+}
+
 const vehicle = computed(() => data.value?.vehicle ?? null);
 const records = computed(() => data.value?.history.items ?? []);
 

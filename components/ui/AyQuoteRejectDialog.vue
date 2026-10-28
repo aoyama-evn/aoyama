@@ -60,65 +60,67 @@ async function send(mode: 'REJECT' | 'REVISION'): Promise<void> {
 </script>
 
 <template>
-  <Teleport :to="overlayTarget">
-    <div
-      v-if="open"
-      class="ay-overlay z-50 grid place-items-center px-4"
-      style="background: rgb(32 30 29 / 50%)"
-      role="dialog"
-      aria-modal="true"
-      @click.self="emit('close')"
-    >
-      <div class="card w-full gap-3" style="max-height: 86%; overflow-y: auto">
-        <h4>{{ $t('sc27.rejectTitle') }}</h4>
-        <p class="text-muted text-[12.5px] leading-[1.5]">{{ $t('sc27.rejectLead') }}</p>
+  <ClientOnly>
+    <Teleport :to="overlayTarget">
+      <div
+        v-if="open"
+        class="ay-overlay z-50 grid place-items-center px-4"
+        style="background: rgb(32 30 29 / 50%)"
+        role="dialog"
+        aria-modal="true"
+        @click.self="emit('close')"
+      >
+        <div class="card w-full gap-3" style="max-height: 86%; overflow-y: auto">
+          <h4>{{ $t('sc27.rejectTitle') }}</h4>
+          <p class="text-muted text-[12.5px] leading-[1.5]">{{ $t('sc27.rejectLead') }}</p>
 
-        <AyField :label="$t('sc28.reasonLabel')" :hint="$t('sc24.reasonHint')">
-          <template #default="{ id }">
-            <textarea
-              :id="id"
-              v-model="reason"
-              class="input min-h-[80px]"
-              maxlength="400"
-              :placeholder="$t('sc27.rejectPlaceholder')"
-            />
-          </template>
-        </AyField>
+          <AyField :label="$t('sc28.reasonLabel')" :hint="$t('sc24.reasonHint')">
+            <template #default="{ id }">
+              <textarea
+                :id="id"
+                v-model="reason"
+                class="input min-h-[80px]"
+                maxlength="400"
+                :placeholder="$t('sc27.rejectPlaceholder')"
+              />
+            </template>
+          </AyField>
 
-        <AyErrorNote :error="error" />
+          <AyErrorNote :error="error" />
 
-        <!-- Xin bao gia lai dat truoc: do la duong khach hay chon hon. -->
-        <button
-          type="button"
-          class="btn btn-primary btn-block"
-          style="min-height: 46px; margin: 0"
-          :disabled="submitting !== null"
-          @click="send('REVISION')"
-        >
-          {{ submitting === 'REVISION' ? $t('common.sending') : $t('sc27.askRevision') }}
-        </button>
-
-        <div class="flex gap-2">
+          <!-- Xin bao gia lai dat truoc: do la duong khach hay chon hon. -->
           <button
             type="button"
-            class="btn btn-secondary flex-1"
+            class="btn btn-primary btn-block"
             style="min-height: 46px; margin: 0"
             :disabled="submitting !== null"
-            @click="emit('close')"
+            @click="send('REVISION')"
           >
-            {{ $t('common.close') }}
+            {{ submitting === 'REVISION' ? $t('common.sending') : $t('sc27.askRevision') }}
           </button>
-          <button
-            type="button"
-            class="btn btn-danger flex-1"
-            style="min-height: 46px; margin: 0"
-            :disabled="submitting !== null"
-            @click="send('REJECT')"
-          >
-            {{ submitting === 'REJECT' ? $t('common.sending') : $t('sc28.reject') }}
-          </button>
+
+          <div class="flex gap-2">
+            <button
+              type="button"
+              class="btn btn-secondary flex-1"
+              style="min-height: 46px; margin: 0"
+              :disabled="submitting !== null"
+              @click="emit('close')"
+            >
+              {{ $t('common.close') }}
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger flex-1"
+              style="min-height: 46px; margin: 0"
+              :disabled="submitting !== null"
+              @click="send('REJECT')"
+            >
+              {{ submitting === 'REJECT' ? $t('common.sending') : $t('sc28.reject') }}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  </Teleport>
+    </Teleport>
+  </ClientOnly>
 </template>

@@ -23,6 +23,10 @@ if (!isNew) {
   const { data } = await useAsyncData(`admin-customer-edit-${id}`, () =>
     api.get<CustomerProfile>(`/admin/customers/${id}`),
   );
+  // Khong nap duoc thi bao 404 — de nguyen se ra bieu mau trong giong man them moi.
+  if (!data.value) {
+    throw createError({ statusCode: 404, statusMessage: t('sa16.notFound') });
+  }
   if (data.value) {
     Object.assign(form, {
       phone: data.value.phone,

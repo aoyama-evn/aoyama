@@ -34,7 +34,16 @@ const ITEMS: NavItem[] = [
   {
     to: '/admin/users',
     label: 'adm.nav.system',
-    match: ['/admin/notifications', '/admin/settings', '/admin/audit-logs', '/admin/reports'],
+    // Hop thong bao (/admin/notifications) khong nam day: chuong o thanh tren
+    // dan thang toi do va nhan vien cung mo duoc. Chi nhat ky gui va mau
+    // thong bao moi la phan rieng cua ADMIN.
+    match: [
+      '/admin/notifications/logs',
+      '/admin/notifications/templates',
+      '/admin/settings',
+      '/admin/audit-logs',
+      '/admin/reports',
+    ],
     adminOnly: true,
   },
 ];

@@ -2,7 +2,7 @@
 import type { NotificationTemplate } from '~/types/models';
 
 /** SA-41 Mau thong bao — FR-NOT-09, FR-NOT-10, FR-NOT-11. */
-definePageMeta({ layout: 'admin', middleware: 'admin' });
+definePageMeta({ layout: 'admin', middleware: ['admin', 'admin-only'] });
 
 const api = useApi();
 const ui = useUiStore();

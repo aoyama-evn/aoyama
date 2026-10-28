@@ -13,6 +13,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const api = useApi();
 const ui = useUiStore();
+const auth = useAuthStore();
 const { t, te } = useI18n();
 const { dateTime } = useFormat();
 
@@ -76,7 +77,13 @@ useHead({ title: () => `${t('adm.notif.title')} — AOYAMA Admin` });
         >
           {{ $t('adm.notif.markAll') }}
         </AyButton>
-        <AyButton to="/admin/notifications/logs" variant="ghost" size="sm">
+        <!-- Nhat ky gui la viec cua ADMIN; nhan vien bam vao chi ra man bi chan. -->
+        <AyButton
+          v-if="auth.isSuperAdmin"
+          to="/admin/notifications/logs"
+          variant="ghost"
+          size="sm"
+        >
           {{ $t('adm.notif.smsLogs') }}
         </AyButton>
       </template>

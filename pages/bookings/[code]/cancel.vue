@@ -15,6 +15,10 @@ const { data: booking } = await useAsyncData(`cancel-${code}`, () =>
   api.get<Booking>(`/bookings/${code}`),
 );
 
+if (!booking.value) {
+  throw createError({ statusCode: 404, statusMessage: t('sc22.notFound') });
+}
+
 const reason = ref('');
 const submitting = ref(false);
 const error = ref<ApiError | null>(null);

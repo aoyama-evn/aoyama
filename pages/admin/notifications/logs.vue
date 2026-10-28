@@ -3,7 +3,7 @@ import type { NotificationLog, Page } from '~/types/models';
 import { NotificationChannel, NotificationSendStatus } from '~/types/enums';
 
 /** SA-42 Nhat ky gui thong bao — FR-NOT-12, FR-NOT-13. */
-definePageMeta({ layout: 'admin', middleware: 'admin' });
+definePageMeta({ layout: 'admin', middleware: ['admin', 'admin-only'] });
 
 const api = useApi();
 const ui = useUiStore();

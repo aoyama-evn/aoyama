@@ -41,6 +41,17 @@ if (!isNew) {
   const { data } = await useAsyncData(`vehicle-${id}`, () =>
     api.get<Vehicle>(`/account/vehicles/${id}`),
   );
+  /**
+   * Khong nap duoc xe thi phai bao 404, khong duoc de bieu mau trong.
+   *
+   * May chu tra 403 khi xe thuoc tai khoan khac va 404 khi khong co xe do.
+   * Ca hai deu lam `data` rong, ma man nay dung chung bieu mau voi man them
+   * xe moi — nen de nguyen thi khach thay dung mot bieu mau "Them / sua xe"
+   * trang tron, bam Luu la ghi de len id khong phai cua minh.
+   */
+  if (!data.value) {
+    throw createError({ statusCode: 404, statusMessage: t('sa20.notFound') });
+  }
   if (data.value) {
     form.value = {
       plateNumber: data.value.plateNumber,

@@ -2,7 +2,7 @@
 import type { PartsReport } from '~/types/models';
 
 /** SA-38 Bao cao phu tung va ton kho — FR-RPT-07, FR-PRT-12. */
-definePageMeta({ layout: 'admin', middleware: 'admin' });
+definePageMeta({ layout: 'admin', middleware: ['admin', 'admin-only'] });
 
 const api = useApi();
 const ui = useUiStore();

@@ -67,6 +67,12 @@ setScreenTitle(() => t('sa10.screenTitle'));
 const eta = ref(toLocalInput(workOrder.value.estimatedCompletionAt));
 const savingEta = ref(false);
 
+/** Chua sua gi thi khong cho bam: truoc day bam o trong van goi may chu va bao da luu. */
+const etaThayDoi = computed(() => {
+  const gio = fromLocalInput(eta.value);
+  return gio !== '' && gio !== workOrder.value?.estimatedCompletionAt;
+});
+
 async function saveEta(): Promise<void> {
   savingEta.value = true;
   try {
@@ -97,10 +103,7 @@ async function saveEta(): Promise<void> {
  */
 const savingDraft = ref(false);
 
-const coThayDoi = computed(() => {
-  const gio = fromLocalInput(eta.value);
-  return dirtyItems.value.length > 0 || (gio !== '' && gio !== workOrder.value?.estimatedCompletionAt);
-});
+const coThayDoi = computed(() => dirtyItems.value.length > 0 || etaThayDoi.value);
 
 async function saveDraft(): Promise<void> {
   savingDraft.value = true;
@@ -364,8 +367,19 @@ useHead({ title: () => `${t('sa10.headTitle', { code: workOrder.value?.code ?? '
           <span class="min-w-0 flex-1" style="min-width: 170px">
             <AyDateTimeField id="eta" v-model="eta" :aria-label="$t('sa10.eta')" />
           </span>
-          <AyButton variant="secondary" size="sm" :loading="savingEta" @click="saveEta">
-            {{ $t('common.save') }}
+          <!--
+            Nhan rieng, khong dung chung "Lưu" voi nut duoi thanh thao tac:
+            hai nut cung chu tren mot man thi nhan vien bam nham, ma nut nay
+            chi ghi gio con nut kia ghi ca tien do hang muc.
+          -->
+          <AyButton
+            variant="secondary"
+            size="sm"
+            :loading="savingEta"
+            :disabled="!etaThayDoi"
+            @click="saveEta"
+          >
+            {{ $t('sa10.etaSave') }}
           </AyButton>
         </div>
       </div>

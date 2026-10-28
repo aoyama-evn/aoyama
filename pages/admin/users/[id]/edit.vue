@@ -35,6 +35,10 @@ if (!isNew) {
   const { data } = await useAsyncData(`admin-user-${id}`, () =>
     api.get<AdminUser>(`/admin/users/${id}`),
   );
+  // Khong nap duoc thi bao 404 — de nguyen se ra bieu mau trong giong man them moi.
+  if (!data.value) {
+    throw createError({ statusCode: 404, statusMessage: t('sa10.notFound') });
+  }
   if (data.value) {
     Object.assign(form, {
       username: data.value.username,

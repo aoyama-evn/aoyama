@@ -53,62 +53,64 @@ async function confirm(): Promise<void> {
 </script>
 
 <template>
-  <Teleport :to="overlayTarget">
-    <div
-      v-if="open && booking"
-      class="ay-overlay z-50 grid place-items-center px-4"
-      style="background: rgb(32 30 29 / 50%)"
-      role="dialog"
-      aria-modal="true"
-      @click.self="emit('close')"
-    >
-      <form class="card w-full gap-3" style="max-height: 86%; overflow-y: auto" @submit.prevent="confirm">
-        <h4>{{ $t('sc24.confirmTitle') }}</h4>
+  <ClientOnly>
+    <Teleport :to="overlayTarget">
+      <div
+        v-if="open && booking"
+        class="ay-overlay z-50 grid place-items-center px-4"
+        style="background: rgb(32 30 29 / 50%)"
+        role="dialog"
+        aria-modal="true"
+        @click.self="emit('close')"
+      >
+        <form class="card w-full gap-3" style="max-height: 86%; overflow-y: auto" @submit.prevent="confirm">
+          <h4>{{ $t('sc24.confirmTitle') }}</h4>
 
-        <div
-          class="flex flex-col gap-1 px-3.5 py-3"
-          style="background: var(--color-neutral-100); border-radius: 16px"
-        >
-          <span class="font-heading text-[14px]">{{ booking.code }}</span>
-          <span class="text-[13px]">{{ slotRange(booking) }}</span>
-          <span class="text-muted text-[11.5px] leading-[1.45]">{{ $t('sc24.qrWarning') }}</span>
-        </div>
-
-        <AyField :label="$t('sc24.reasonLabel')" :hint="$t('sc24.reasonHint')">
-          <template #default="{ id }">
-            <input
-              :id="id"
-              v-model="reason"
-              class="input"
-              type="text"
-              maxlength="200"
-              :placeholder="$t('sc24.reasonPlaceholder')"
-            />
-          </template>
-        </AyField>
-
-        <AyErrorNote :error="error" />
-
-        <div class="flex gap-2">
-          <button
-            type="button"
-            class="btn btn-secondary flex-1"
-            style="min-height: 46px; margin: 0"
-            :disabled="submitting"
-            @click="emit('close')"
+          <div
+            class="flex flex-col gap-1 px-3.5 py-3"
+            style="background: var(--color-neutral-100); border-radius: 16px"
           >
-            {{ $t('common.close') }}
-          </button>
-          <button
-            type="submit"
-            class="btn btn-primary flex-1"
-            style="min-height: 46px; margin: 0"
-            :disabled="submitting"
-          >
-            {{ submitting ? $t('common.saving') : $t('common.agree') }}
-          </button>
-        </div>
-      </form>
-    </div>
-  </Teleport>
+            <span class="font-heading text-[14px]">{{ booking.code }}</span>
+            <span class="text-[13px]">{{ slotRange(booking) }}</span>
+            <span class="text-muted text-[11.5px] leading-[1.45]">{{ $t('sc24.qrWarning') }}</span>
+          </div>
+
+          <AyField :label="$t('sc24.reasonLabel')" :hint="$t('sc24.reasonHint')">
+            <template #default="{ id }">
+              <input
+                :id="id"
+                v-model="reason"
+                class="input"
+                type="text"
+                maxlength="200"
+                :placeholder="$t('sc24.reasonPlaceholder')"
+              />
+            </template>
+          </AyField>
+
+          <AyErrorNote :error="error" />
+
+          <div class="flex gap-2">
+            <button
+              type="button"
+              class="btn btn-secondary flex-1"
+              style="min-height: 46px; margin: 0"
+              :disabled="submitting"
+              @click="emit('close')"
+            >
+              {{ $t('common.close') }}
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary flex-1"
+              style="min-height: 46px; margin: 0"
+              :disabled="submitting"
+            >
+              {{ submitting ? $t('common.saving') : $t('common.agree') }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </Teleport>
+  </ClientOnly>
 </template>

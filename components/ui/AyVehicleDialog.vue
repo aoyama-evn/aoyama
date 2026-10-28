@@ -80,54 +80,56 @@ async function save(): Promise<void> {
 </script>
 
 <template>
-  <Teleport :to="overlayTarget">
-    <div
-      v-if="open"
-      class="ay-overlay z-50 grid place-items-center px-4"
-      style="background: rgb(32 30 29 / 50%)"
-      role="dialog"
-      aria-modal="true"
-      :aria-label="$t('sc30.addTitle')"
-      @click.self="emit('close')"
-    >
-      <form
-        class="card w-full gap-3"
-        style="max-height: 86%; overflow-y: auto"
-        @submit.prevent="save"
+  <ClientOnly>
+    <Teleport :to="overlayTarget">
+      <div
+        v-if="open"
+        class="ay-overlay z-50 grid place-items-center px-4"
+        style="background: rgb(32 30 29 / 50%)"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="$t('sc30.addTitle')"
+        @click.self="emit('close')"
       >
-        <div class="flex items-center gap-2">
-          <h4 class="min-w-0 flex-1">{{ $t('sc30.addTitle') }}</h4>
+        <form
+          class="card w-full gap-3"
+          style="max-height: 86%; overflow-y: auto"
+          @submit.prevent="save"
+        >
+          <div class="flex items-center gap-2">
+            <h4 class="min-w-0 flex-1">{{ $t('sc30.addTitle') }}</h4>
+            <button
+              type="button"
+              class="btn btn-ghost flex-none p-1 text-[16px] leading-none"
+              :aria-label="$t('common.close')"
+              @click="emit('close')"
+            >
+              ✕
+            </button>
+          </div>
+
+          <AyVehicleForm v-model="form" :errors="errors" />
+
+          <AyErrorNote :error="error" />
+
+          <button
+            type="submit"
+            class="btn btn-primary btn-block"
+            style="min-height: 46px; margin: 0"
+            :disabled="saving"
+          >
+            {{ saving ? $t('common.saving') : $t('sc30.save') }}
+          </button>
+
           <button
             type="button"
-            class="btn btn-ghost flex-none p-1 text-[16px] leading-none"
-            :aria-label="$t('common.close')"
+            class="btn btn-ghost self-center text-[13px]"
             @click="emit('close')"
           >
-            ✕
+            {{ $t('common.back') }}
           </button>
-        </div>
-
-        <AyVehicleForm v-model="form" :errors="errors" />
-
-        <AyErrorNote :error="error" />
-
-        <button
-          type="submit"
-          class="btn btn-primary btn-block"
-          style="min-height: 46px; margin: 0"
-          :disabled="saving"
-        >
-          {{ saving ? $t('common.saving') : $t('sc30.save') }}
-        </button>
-
-        <button
-          type="button"
-          class="btn btn-ghost self-center text-[13px]"
-          @click="emit('close')"
-        >
-          {{ $t('common.back') }}
-        </button>
-      </form>
-    </div>
-  </Teleport>
+        </form>
+      </div>
+    </Teleport>
+  </ClientOnly>
 </template>

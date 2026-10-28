@@ -102,59 +102,71 @@ function onLangChange(event: Event): void {
           <option v-for="code in LANGS" :key="code" :value="code">{{ code.toUpperCase() }}</option>
         </select>
 
-        <!-- Chuong thong bao: chi thanh vien moi co hop thong bao trong ung dung. -->
-        <NuxtLink
-          v-if="auth.isCustomer"
-          to="/account/notifications"
-          class="btn btn-ghost btn-icon relative"
-          style="width: 34px; height: 34px; padding: 0"
-          :aria-label="$t('sc35.unread', { n: unreadCount })"
-          :title="$t('sc35.unread', { n: unreadCount })"
-        >
-          <svg
-            width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+        <!--
+          Phien dang nhap nam o localStorage nen may chu khong biet khach da
+          dang nhap hay chua: no luon dung ra nut "Dang nhap", roi trinh duyet
+          nap lai phien va doi thanh chuong + ho so. Hai ben khac nhau thi Vue
+          bao hydration mismatch tren moi trang. Nen de han phan nay cho trinh
+          duyet dung, kem mot o trong cung kich thuoc giu cho khoi giat bo cuc.
+        -->
+        <ClientOnly>
+          <!-- Chuong thong bao: chi thanh vien moi co hop thong bao trong ung dung. -->
+          <NuxtLink
+            v-if="auth.isCustomer"
+            to="/account/notifications"
+            class="btn btn-ghost btn-icon relative"
+            style="width: 34px; height: 34px; padding: 0"
+            :aria-label="$t('sc35.unread', { n: unreadCount })"
+            :title="$t('sc35.unread', { n: unreadCount })"
           >
-            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
-            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-          </svg>
-          <span
-            v-if="unreadCount > 0"
-            class="absolute flex items-center justify-center rounded-full font-heading"
-            style="
-              top: -2px; right: -2px; min-width: 16px; height: 16px; padding: 0 3px;
-              font-size: 10px; background: var(--color-danger); color: #fff;
-            "
-          >
-            {{ unreadCount }}
-          </span>
-        </NuxtLink>
+            <svg
+              width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+            >
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+            <span
+              v-if="unreadCount > 0"
+              class="absolute flex items-center justify-center rounded-full font-heading"
+              style="
+                top: -2px; right: -2px; min-width: 16px; height: 16px; padding: 0 3px;
+                font-size: 10px; background: var(--color-danger); color: #fff;
+              "
+            >
+              {{ unreadCount }}
+            </span>
+          </NuxtLink>
 
-        <NuxtLink
-          v-if="auth.isCustomer"
-          to="/account/profile"
-          class="btn btn-primary btn-icon"
-          style="width: 34px; height: 34px; padding: 0"
-          :aria-label="$t('nav.myProfile')"
-          :title="$t('nav.myProfile')"
-        >
-          <svg
-            width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+          <NuxtLink
+            v-if="auth.isCustomer"
+            to="/account/profile"
+            class="btn btn-primary btn-icon"
+            style="width: 34px; height: 34px; padding: 0"
+            :aria-label="$t('nav.myProfile')"
+            :title="$t('nav.myProfile')"
           >
-            <circle cx="12" cy="8" r="3.6" />
-            <path d="M5 20a7 7 0 0 1 14 0" />
-          </svg>
-        </NuxtLink>
+            <svg
+              width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+            >
+              <circle cx="12" cy="8" r="3.6" />
+              <path d="M5 20a7 7 0 0 1 14 0" />
+            </svg>
+          </NuxtLink>
 
-        <NuxtLink
-          v-else
-          to="/login"
-          class="btn btn-primary"
-          style="min-height: 34px; font-size: 12px; padding: 6px 14px"
-        >
-          {{ $t('nav.login') }}
-        </NuxtLink>
+          <NuxtLink
+            v-else
+            to="/login"
+            class="btn btn-primary"
+            style="min-height: 34px; font-size: 12px; padding: 6px 14px"
+          >
+            {{ $t('nav.login') }}
+          </NuxtLink>
+          <template #fallback>
+            <span style="display: block; width: 34px; height: 34px" aria-hidden="true" />
+          </template>
+        </ClientOnly>
 
         <button
           type="button"

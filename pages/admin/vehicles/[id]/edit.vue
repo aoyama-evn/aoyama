@@ -28,6 +28,10 @@ if (!isNew) {
   const { data } = await useAsyncData(`admin-vehicle-edit-${id}`, () =>
     api.get<Vehicle>(`/admin/vehicles/${id}`),
   );
+  // Khong nap duoc thi bao 404 — de nguyen se ra bieu mau trong giong man them moi.
+  if (!data.value) {
+    throw createError({ statusCode: 404, statusMessage: t('sa20.notFound') });
+  }
   if (data.value) {
     customerId.value = data.value.customerId;
     form.value = {

@@ -2,7 +2,7 @@
 import type { SummaryReport } from '~/types/models';
 
 /** SA-36 Bao cao tong hop — FR-RPT-01..06, FR-RPT-12. */
-definePageMeta({ layout: 'admin', middleware: 'admin' });
+definePageMeta({ layout: 'admin', middleware: ['admin', 'admin-only'] });
 
 const api = useApi();
 const ui = useUiStore();

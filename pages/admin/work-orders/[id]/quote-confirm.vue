@@ -41,6 +41,10 @@ const { data, refresh } = await useAsyncData(`quote-confirm-${id}-${quoteId ?? '
   return { workOrder, quotation, quotations: list };
 });
 
+if (!data.value?.workOrder) {
+  throw createError({ statusCode: 404, statusMessage: t('sa10.notFound') });
+}
+
 const workOrder = computed(() => data.value?.workOrder ?? null);
 const quotation = computed(() => data.value?.quotation ?? null);
 

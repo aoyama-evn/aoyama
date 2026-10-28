@@ -2,7 +2,7 @@
 import type { RevenueReport } from '~/types/models';
 
 /** SA-37 Bao cao doanh thu — FR-RPT-06, FR-RPT-08..10. */
-definePageMeta({ layout: 'admin', middleware: 'admin' });
+definePageMeta({ layout: 'admin', middleware: ['admin', 'admin-only'] });
 
 const api = useApi();
 const ui = useUiStore();

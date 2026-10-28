@@ -18,6 +18,10 @@ const { data: progress, refresh } = await useAsyncData(`progress-${code}`, () =>
   api.get<PublicProgress>(`/bookings/${code}/progress`),
 );
 
+if (!progress.value) {
+  throw createError({ statusCode: 404, statusMessage: t('sc22.notFound') });
+}
+
 /** Anh chup luc tiep nhan — cac giai doan sau co anh rieng, khong tron vao. */
 const intakePhotos = computed(() =>
   (progress.value?.photos ?? []).filter((photo) => photo.stage === 'INTAKE'),

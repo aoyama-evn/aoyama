@@ -25,6 +25,10 @@ const { data } = await useAsyncData(`resched-${code}`, async () => {
   return { booking, services, stores };
 });
 
+if (!data.value?.booking) {
+  throw createError({ statusCode: 404, statusMessage: t('sc22.notFound') });
+}
+
 const booking = computed(() => data.value?.booking ?? null);
 
 /**

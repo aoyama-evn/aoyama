@@ -15,6 +15,10 @@ const { data: booking } = await useAsyncData(`admin-resched-${id}`, () =>
   api.get<Booking>(`/admin/bookings/${id}`),
 );
 
+if (!booking.value) {
+  throw createError({ statusCode: 404, statusMessage: t('sc22.notFound') });
+}
+
 const days = ref<DayAvailability[]>([]);
 const slot = ref<{ date: string; startTime: string } | null>(null);
 const reason = ref('');

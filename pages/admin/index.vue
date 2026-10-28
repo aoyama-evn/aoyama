@@ -10,8 +10,19 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const api = useApi();
 const ui = useUiStore();
+const auth = useAuthStore();
 const { t } = useI18n();
 const { i18n, money, clock, dayLabel } = useFormat();
+
+/**
+ * Doanh thu chi danh cho ADMIN — muc 34 bang phan quyen.
+ *
+ * Nhan vien van can bang dieu khien de xem lich hen hom nay va hang sap het,
+ * nen chi cat rieng bieu do doanh thu chu khong chan ca trang. Khong goi API
+ * doanh thu luon: cat o giao dien ma van tai so lieu ve may thi coi nhu khong
+ * chan gi.
+ */
+const xemDuocDoanhThu = computed(() => auth.isSuperAdmin);
 
 setScreenTitle(() => t('adm.nav.dashboard'));
 
@@ -32,11 +43,13 @@ const { data, pending } = await useAsyncData(
         sortOrder: 'ASC',
       }),
       api.get<Inventory[]>('/admin/inventory/low-stock', { storeId: storeId.value }),
-      api.get<{ byDay: { date: string; amount: string }[] }>('/admin/reports/revenue', {
-        from: weekAgo,
-        to: today,
-        storeId: storeId.value,
-      }),
+      xemDuocDoanhThu.value
+        ? api.get<{ byDay: { date: string; amount: string }[] }>('/admin/reports/revenue', {
+            from: weekAgo,
+            to: today,
+            storeId: storeId.value,
+          })
+        : Promise.resolve({ byDay: [] as { date: string; amount: string }[] }),
     ]);
     return { stats, todayBookings, lowStock, revenue };
   },
@@ -157,8 +170,8 @@ useHead({ title: () => `${t('adm.nav.dashboard')} — AOYAMA Admin` });
       </section>
     </div>
 
-    <!-- Doanh thu 7 ngay -->
-    <section class="card gap-3" style="background: #fff">
+    <!-- Doanh thu 7 ngay — chi ADMIN. -->
+    <section v-if="xemDuocDoanhThu" class="card gap-3" style="background: #fff">
       <h5>{{ $t('sa02.revenue7') }}</h5>
       <AyBarChart :data="revenueSeries" :aria-label="$t('sa02.revenueChart')" />
     </section>

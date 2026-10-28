@@ -27,6 +27,17 @@ const { data } = await useAsyncData(`booking-done-${code}`, async () => {
   return { booking, qr };
 });
 
+/**
+ * Khong tra duoc lich hen thi khong duoc bao "Dat lich thanh cong".
+ *
+ * Man nay nhan ma qua tham so dia chi, nen bat ky ai go sai mot ky tu — hoac
+ * gui nham duong dan cho nguoi khac — cung ra dung mot dau tich xanh kem ma
+ * ho vua go. Thieu ma, hoac co ma ma may chu khong tim thay, deu la 404.
+ */
+if (!code || !data.value?.booking) {
+  throw createError({ statusCode: 404, statusMessage: t('sc22.notFound') });
+}
+
 const booking = computed(() => data.value?.booking ?? null);
 const qr = computed(() => data.value?.qr ?? null);
 

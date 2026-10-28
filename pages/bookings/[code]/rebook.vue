@@ -25,6 +25,10 @@ const { data } = await useAsyncData(`rebook-${code}`, async () => {
   return { previous, services };
 });
 
+if (!data.value?.previous) {
+  throw createError({ statusCode: 404, statusMessage: t('sc22.notFound') });
+}
+
 const previous = computed(() => data.value?.previous ?? null);
 
 const days = ref<DayAvailability[]>([]);
