@@ -17,7 +17,7 @@ import {
   QuotationSuggestionLine,
   TechAnswer,
 } from './ai.provider';
-import { RuleBasedAiProvider } from './rule-based.provider';
+import { RuleBasedAiProvider, symptomTags } from './rule-based.provider';
 import { AiDiagnosis, DiagnosisFinding, DiagnosisMessage } from './entities/ai-diagnosis.entity';
 import { KnowledgeDocument } from './entities/knowledge-document.entity';
 
@@ -117,6 +117,7 @@ export class AiService {
     const startedAt = Date.now();
 
     let findings: DiagnosisFinding[] = [];
+    let dichVuLoi = false;
     try {
       findings = await this.provider.diagnose({
         description: input.text,
@@ -134,11 +135,22 @@ export class AiService {
           type: s.type,
         })),
       });
-      session.status = findings.length > 0 ? 'COMPLETED' : 'FAILED';
     } catch (error) {
       this.logger.error(`Chan doan AI that bai cho phien ${sessionId}`);
-      session.status = 'FAILED';
+      dichVuLoi = true;
     }
+
+    /**
+     * FAILED danh rieng cho luc dich vu AI khong phan hoi (RK-01) — man
+     * hinh se bo cuoc va moi khach dat lich kiem tra.
+     *
+     * Khach gui moi tam anh ma khong kem chu thi khong co gi hong ca: he
+     * thong chua doc duoc anh, nhung phien van song va chi thieu mot cau
+     * mo ta. Truoc day cho nay cung danh FAILED, nen khach vua gui anh len
+     * da nhan ngay mot the bao that bai — gio de NEEDS_DETAIL va man hinh
+     * moi ho bam chon nhom trieu chung.
+     */
+    session.status = findings.length > 0 ? 'COMPLETED' : dichVuLoi ? 'FAILED' : 'NEEDS_DETAIL';
 
     session.latencyMs = Date.now() - startedAt;
     // FR-AI-06 — sap xep theo muc do khop giam dan de man hinh hien dung thu tu.
@@ -148,7 +160,13 @@ export class AiService {
       {
         role: 'assistant',
         text: assistantLine(
-          session.findings.length > 0 ? 'FOUND' : coTepDinhKem(input) ? 'UNSURE_MEDIA' : 'UNSURE',
+          dichVuLoi
+            ? 'ERROR'
+            : session.findings.length > 0
+              ? 'FOUND'
+              : coTepDinhKem(input)
+                ? 'UNSURE_MEDIA'
+                : 'UNSURE',
           session.language,
         ),
         at: new Date().toISOString(),
@@ -156,6 +174,17 @@ export class AiService {
     ];
 
     return this.diagnosisRepo.save(session);
+  }
+
+  /**
+   * SC-10 — cac nhom trieu chung khach bam chon duoc.
+   *
+   * Co nhung thu chi nhin thay chu khong goi ten duoc: khach chup tam anh
+   * ma phanh mon roi dung lai, vi khong biet phai go chu gi. Day la loi
+   * thoat cho truong hop do.
+   */
+  symptomTags(language: Language = DEFAULT_LANGUAGE): { key: string; label: string }[] {
+    return symptomTags(language);
   }
 
   /** Gan phien chan doan vao lich hen khi khach bam dat lich tu SC-11. */
@@ -418,28 +447,39 @@ export class AiService {
  * tieng Nhat. Ba thu tieng de ngay day vi chi la hai cau — khong dang mot
  * mau thong bao rieng trong CSDL.
  */
-const ASSISTANT_LINES: Record<'FOUND' | 'UNSURE' | 'UNSURE_MEDIA', Record<string, string>> = {
+const ASSISTANT_LINES: Record<
+  'FOUND' | 'UNSURE' | 'UNSURE_MEDIA' | 'ERROR',
+  Record<string, string>
+> = {
   FOUND: {
     ja: 'ご説明にもっとも近い可能性は次のとおりです。',
     en: 'Here are the possibilities that best match what you described.',
     vi: 'Dưới đây là các khả năng phù hợp nhất với mô tả của bạn.',
   },
   UNSURE: {
-    ja: '診断に必要な情報が足りません。もう少し詳しくご入力いただくか、ご予約のうえ整備士が直接確認いたします。',
-    en: 'Not enough to go on yet. Tell me a bit more, or book a visit and a technician will take a look.',
-    vi: 'Chưa đủ thông tin để chẩn đoán. Bạn mô tả thêm giúp mình, hoặc đặt lịch để kỹ thuật viên kiểm tra trực tiếp.',
+    ja: '診断に必要な情報が足りません。下のボタンから近い症状をお選びいただくか、もう少し詳しくご入力ください。',
+    en: 'Not enough to go on yet. Pick the closest symptom below, or tell me a bit more.',
+    vi: 'Chưa đủ thông tin để chẩn đoán. Bạn chọn nhóm gần nhất ở bên dưới, hoặc mô tả thêm một câu giúp mình.',
   },
   /**
    * Khach co gui anh, video hay ghi am — nhung he thong khong doc duoc.
    *
    * Phai noi ro la khong doc duoc, chu khong im lang de khach tuong may da
    * xem roi ma khong nghi ra gi. Anh va ghi am van duoc luu va nhan vien
-   * mo ra xem duoc, nen cau nay huong sang dat lich chu khong bo di.
+   * mo ra xem duoc, nen cau nay chi ra loi di tiep chu khong bo di: bam
+   * mot nhom trieu chung o ngay duoi la co ket qua.
    */
   UNSURE_MEDIA: {
-    ja: '写真・動画・音声をお預かりしました。中身の判読はシステムではできないため、整備士が直接確認いたします。症状を文字か音声でひとこと添えていただけると、その場で絞り込めます。',
-    en: 'Your photo, video or recording is saved. The system cannot read what is in it, so a technician will look at it. A line about the symptom — typed or spoken — lets me narrow it down right here.',
-    vi: 'Mình đã nhận ảnh, video hoặc ghi âm của bạn. Hệ thống chưa đọc được nội dung bên trong nên kỹ thuật viên sẽ xem trực tiếp. Bạn mô tả thêm một câu bằng chữ hoặc giọng nói thì mình đoán được ngay tại đây.',
+    ja: '写真・動画・音声をお預かりしました。中身の判読はシステムではできないため、整備士が直接確認いたします。下のボタンから近い症状をお選びいただければ、この場で絞り込めます。',
+    en: 'Your photo, video or recording is saved, and a technician will look at it — the system cannot read what is inside yet. Pick the closest symptom below and I can narrow it down right here.',
+    vi: 'Mình đã nhận ảnh, video hoặc ghi âm của bạn — kỹ thuật viên sẽ xem trực tiếp vì hệ thống chưa đọc được nội dung bên trong. Bạn chọn nhóm gần nhất ở bên dưới thì mình đoán được ngay tại đây.',
+  },
+
+  /** Dich vu AI khong phan hoi (RK-01) — khac han voi thieu mo ta. */
+  ERROR: {
+    ja: '申し訳ございません、ただいま診断サービスに接続できません。ご予約いただければ整備士が直接確認いたします。',
+    en: 'Sorry — the diagnosis service is unreachable right now. Book a visit and a technician will check the bike directly.',
+    vi: 'Xin lỗi, hiện chưa kết nối được dịch vụ chẩn đoán. Bạn đặt lịch thì kỹ thuật viên sẽ kiểm tra trực tiếp giúp bạn.',
   },
 };
 
@@ -459,7 +499,7 @@ function coTepDinhKem(input: {
 }
 
 function assistantLine(
-  kind: 'FOUND' | 'UNSURE' | 'UNSURE_MEDIA',
+  kind: 'FOUND' | 'UNSURE' | 'UNSURE_MEDIA' | 'ERROR',
   language: string,
 ): string {
   const table = ASSISTANT_LINES[kind];

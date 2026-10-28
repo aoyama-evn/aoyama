@@ -99,6 +99,13 @@ export class PublicAiController {
   }
 
   @Public()
+  @Get('symptom-tags')
+  @ApiOperation({ summary: 'SC-10 — nhom trieu chung de khach bam chon' })
+  symptomTags(@Query() query: SuggestQuotationQueryDto) {
+    return this.service.symptomTags(query.lang);
+  }
+
+  @Public()
   @Get('sessions/:id')
   @ApiOperation({ summary: 'SC-11 — ket qua chan doan kem muc do khop' })
   detail(@Param('id', ParseUUIDPipe) id: string) {

@@ -228,6 +228,24 @@ const RULES: SymptomRule[] = [
 ];
 
 /**
+ * Nhom trieu chung de khach bam chon thay vi go tay (SC-10).
+ *
+ * Nhan lay thang tu bang luat chu khong chep tay sang giao dien: moi nhan
+ * deu chua san mot tu khoa cua chinh luat do, nen bam vao la ra ket qua
+ * ngay, va them luat moi thi nut hien ra theo, khong phai sua hai noi.
+ *
+ * Bo PERIODIC: do la viec khach da chon o dau phien, khong phai hien tuong
+ * hong hoc de ho nhan ra tren chiec xe cua minh.
+ */
+export function symptomTags(language: string): { key: string; label: string }[] {
+  const lang = ['ja', 'en', 'vi'].includes(language) ? language : 'ja';
+  return RULES.filter((rule) => rule.key !== 'PERIODIC').map((rule) => ({
+    key: rule.key,
+    label: rule.label[lang] ?? rule.label.ja,
+  }));
+}
+
+/**
  * Khach chi bam "Kiem tra" o SC-10 thi ho khong ta trieu chung nao ca — day la
  * mot yeu cau ro rang, khong phai suy doan. Truoc day moi truong hop khong co
  * mo ta deu tra ve luat PERIODIC, nen chon "Kiem tra" va chon "Bao duong" cho
