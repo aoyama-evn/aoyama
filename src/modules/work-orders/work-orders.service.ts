@@ -77,13 +77,6 @@ export class WorkOrdersService {
    * phieu da mo ma lich hen van con o trang thai cu.
    */
   async intake(dto: IntakeDto, actor: Actor): Promise<WorkOrder> {
-    if (dto.intakePhotoUrls.length === 0) {
-      throw new BadRequestException({
-        code: 'INTAKE_PHOTO_REQUIRED',
-        message: 'Can it nhat mot anh hien trang xe khi tiep nhan',
-      });
-    }
-
     let customerId = dto.customerId ?? null;
     let vehicleId = dto.vehicleId ?? null;
     let storeId = dto.storeId ?? null;
@@ -137,7 +130,7 @@ export class WorkOrdersService {
       const saved = await manager.getRepository(WorkOrder).save(entity);
 
       await manager.getRepository(WorkOrderPhoto).save(
-        dto.intakePhotoUrls.map((url) =>
+        (dto.intakePhotoUrls ?? []).map((url) =>
           manager.getRepository(WorkOrderPhoto).create({
             workOrderId: saved.id,
             stage: 'INTAKE',

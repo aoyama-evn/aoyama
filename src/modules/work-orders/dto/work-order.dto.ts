@@ -57,10 +57,18 @@ export class IntakeDto {
   @IsOptional() @IsString() intakeNote?: string;
   @IsOptional() @IsString() customerSymptom?: string;
 
-  @ApiProperty({ description: 'Anh hien trang xe — bat buoc it nhat mot anh (BR-18)' })
+  /**
+   * Anh hien trang xe.
+   *
+   * BR-18 doi it nhat mot anh, nhung o quay thi co luc chup khong kip —
+   * chan lai thi le tan khong mo duoc phieu. Van nen chup, va man hinh
+   * van moi chup, chi khong chan nua.
+   */
+  @ApiPropertyOptional({ description: 'Anh hien trang xe khi tiep nhan' })
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  intakePhotoUrls!: string[];
+  intakePhotoUrls?: string[];
 }
 
 export class WorkOrderItemDto {

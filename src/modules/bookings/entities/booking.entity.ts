@@ -166,6 +166,17 @@ export class Booking extends BaseEntity {
    */
   workOrderId?: string | null;
 
+  /**
+   * Ban bao gia moi nhat cua lich hen — KHONG luu trong CSDL, lay cung
+   * mot cau truy van voi `stage`.
+   *
+   * Khac `pendingQuotation` o cho khong loc theo trang thai: danh sach
+   * quan tri can dan sang ban bao gia ke ca khi khach da tra loi xong,
+   * con `pendingQuotation` chi dung cho viec dang cho khach bam.
+   */
+  quotationId?: string | null;
+  quotationCode?: string | null;
+
   pendingQuotation?: {
     token: string;
     code: string;

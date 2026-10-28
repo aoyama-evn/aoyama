@@ -430,12 +430,16 @@ export class BookingsService {
       workOrderId: string | null;
       woStatus: string | null;
       quoteStatus: string | null;
+      quotationId: string | null;
+      quotationCode: string | null;
       started: boolean | null;
     }[] = await this.dataSource.query(
       `select b.id as "bookingId",
               w.id as "workOrderId",
               w.status as "woStatus",
               q.status as "quoteStatus",
+              q.id as "quotationId",
+              q.code as "quotationCode",
               exists(
                 select 1 from work_order_items i
                  where i.work_order_id = w.id and i.state <> 'PENDING'
@@ -460,6 +464,9 @@ export class BookingsService {
       const row = byBooking.get(booking.id);
       booking.stage = resolveStage(booking.status, row);
       booking.workOrderId = row?.workOrderId ?? null;
+      // SA-03 — ma ban bao gia de danh sach dan thang sang ban do.
+      booking.quotationId = row?.quotationId ?? null;
+      booking.quotationCode = row?.quotationCode ?? null;
     }
   }
 
