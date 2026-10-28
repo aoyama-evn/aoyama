@@ -42,7 +42,10 @@ export class SystemController {
     private readonly audit: AuditService,
   ) {}
 
+  // Cau hinh he thong la muc 37 bang phan quyen — doc cung chi ADMIN, khong
+  // chi rieng ghi. Man SA-43 la noi duy nhat goi tuyen nay.
   @Get('settings')
+  @Roles(AdminRole.ADMIN)
   @ApiOperation({ summary: 'SA-43 — doc tham so he thong' })
   async getSettings(@Query('group') group?: string) {
     return this.settings.findAll(group);

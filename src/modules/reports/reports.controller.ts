@@ -2,6 +2,8 @@ import { Controller, Get, Query, Res, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { IsIn, IsOptional, IsUUID, Matches } from 'class-validator';
+import { Roles } from 'src/common/decorators';
+import { AdminRole } from 'src/common/enums';
 import { AdminGuard, RolesGuard } from 'src/common/guards';
 import { ExportService } from './export.service';
 import { ReportsService } from './reports.service';
@@ -29,6 +31,11 @@ export class ReportsController {
     private readonly exporter: ExportService,
   ) {}
 
+  /**
+   * Bang dieu khien mo cho ca nhan vien: do la man dau ca lam viec, co lich
+   * hen hom nay va hang sap het. Bon tuyen bao cao con lai la muc 34 va 35
+   * trong bang phan quyen — chi ADMIN.
+   */
   @Get('dashboard')
   @ApiOperation({ summary: 'SA-02 — so lieu nhanh tren bang dieu khien' })
   dashboard(@Query('storeId') storeId?: string) {
@@ -36,24 +43,28 @@ export class ReportsController {
   }
 
   @Get()
+  @Roles(AdminRole.ADMIN)
   @ApiOperation({ summary: 'SA-36 — bao cao tong hop' })
   summary(@Query() query: RangeQueryDto) {
     return this.reports.summary(query);
   }
 
   @Get('revenue')
+  @Roles(AdminRole.ADMIN)
   @ApiOperation({ summary: 'SA-37 — bao cao doanh thu' })
   revenue(@Query() query: RangeQueryDto) {
     return this.reports.revenue(query);
   }
 
   @Get('parts')
+  @Roles(AdminRole.ADMIN)
   @ApiOperation({ summary: 'SA-38 — bao cao phu tung va ton kho' })
   parts(@Query() query: RangeQueryDto) {
     return this.reports.partsReport(query);
   }
 
   @Get('export')
+  @Roles(AdminRole.ADMIN)
   @ApiOperation({ summary: 'FR-RPT-12 — xuat bao cao ra Excel hoac PDF' })
   async export(@Query() query: ExportQueryDto, @Res() res: Response): Promise<void> {
     const report = query.report ?? 'summary';

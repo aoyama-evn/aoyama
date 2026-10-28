@@ -53,7 +53,13 @@ export class NotificationsController {
     private readonly adminFeed: AdminNotificationsService,
   ) {}
 
+  /**
+   * Mau thong bao va nhat ky gui deu la muc 33 trong bang phan quyen — chi
+   * ADMIN. Hop thong bao (feed) va con so tren chuong thi de mo, vi nhan vien
+   * cung phai nhan duoc tin bao khach vua chot bao gia.
+   */
   @Get('templates')
+  @Roles(AdminRole.ADMIN)
   @ApiOperation({ summary: 'SA-41 — danh sach mau thong bao' })
   listTemplates() {
     return this.service.listTemplates();
@@ -71,6 +77,7 @@ export class NotificationsController {
   }
 
   @Get('logs')
+  @Roles(AdminRole.ADMIN)
   @ApiOperation({ summary: 'SA-42 — tra cuu nhat ky gui thong bao' })
   logs(@Query() query: LogQueryDto) {
     return this.service.searchLogs(query);
@@ -116,6 +123,7 @@ export class NotificationsController {
   }
 
   @Post('logs/:id/retry')
+  @Roles(AdminRole.ADMIN)
   @ApiOperation({ summary: 'SA-42 — gui lai thong bao that bai' })
   retry(@Param('id', ParseUUIDPipe) id: string) {
     return this.service.retry(id);
