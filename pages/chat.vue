@@ -387,6 +387,52 @@ async function openFullCalendar(): Promise<void> {
 const findings = computed(() => session.value?.findings ?? []);
 const analysisFailed = computed(() => session.value?.status === 'FAILED');
 
+/**
+ * May chay xong ma chua doan ra duoc gi — khac han voi dich vu AI chet.
+ *
+ * Hay gap nhat la khach gui moi tam anh: he thong chua doc duoc anh, nen
+ * khong co tu nao de doi chieu. Truoc day cho nay cung roi vao nhanh
+ * FAILED, va khach vua gui anh len da thay ngay the bao that bai.
+ */
+const needsDetail = computed(() => session.value?.status === 'NEEDS_DETAIL');
+
+/**
+ * Cac nhom trieu chung cho khach bam chon.
+ *
+ * Lay tu may chu chu khong chep vao i18n: nhan o day phai khop voi chinh
+ * bang tu khoa ma may dung de doi chieu, hai noi roi nhau mot chu la bam
+ * vao khong ra gi.
+ */
+const symptomTags = ref<{ key: string; label: string }[]>([]);
+
+watch(
+  symptomStage,
+  async (on) => {
+    if (!on || symptomTags.value.length) return;
+    symptomTags.value = await api
+      .get<{ key: string; label: string }[]>('/ai/diagnosis/symptom-tags', {
+        lang: locale.value,
+      })
+      .catch(() => []);
+  },
+  { immediate: true },
+);
+
+const showSymptomTags = computed(
+  () =>
+    symptomStage.value &&
+    bookStage.value === 'NONE' &&
+    findings.value.length === 0 &&
+    symptomTags.value.length > 0,
+);
+
+/** Nhan da chua san tu khoa cua luat tuong ung, nen gui thang la ra ket qua. */
+async function sendSymptomTag(label: string): Promise<void> {
+  if (sending.value) return;
+  text.value = label;
+  await send();
+}
+
 function vehicleLine(item: Vehicle): string {
   const parts = [item.plateNumber];
   if (item.currentOdometer !== null) parts.push(`${number(item.currentOdometer)} km`);
@@ -617,6 +663,27 @@ useHead({ title: () => t('sc10.assistant') });
         {{ $t('sc12.analysing') }}
       </div>
 
+      <!--
+        Co nhung thu khach nhin thay ma khong goi ten duoc: ho chup tam anh
+        ma phanh mon roi dung lai vi khong biet go chu gi. Bam mot nhom o
+        day la ra goi y ngay.
+      -->
+      <div v-if="showSymptomTags" class="flex flex-col gap-1.5 self-stretch">
+        <p class="text-muted text-[11.5px]">{{ $t('sc10.pickSymptom') }}</p>
+        <div class="flex flex-wrap gap-2">
+          <button
+            v-for="tag in symptomTags"
+            :key="tag.key"
+            type="button"
+            class="btn btn-secondary text-[12.5px]"
+            :disabled="sending"
+            @click="sendSymptomTag(tag.label)"
+          >
+            {{ tag.label }}
+          </button>
+        </div>
+      </div>
+
       <!-- SC-11 ket qua chan doan -->
       <AyDiagnosisCard
         v-if="findings.length"
@@ -718,6 +785,18 @@ useHead({ title: () => t('sc10.assistant') });
           {{ $t('sc10.pickAnotherTime') }}
         </AyButton>
       </section>
+
+      <!--
+        Chua doan ra, nhung phien van song va tep da duoc luu. Chi mo them
+        loi dat lich ben canh cac nhom trieu chung o tren — khong dung lai
+        mot the bao that bai nua.
+      -->
+      <div v-else-if="needsDetail" class="card gap-2">
+        <p class="text-muted text-[13px]">{{ $t('sc10.needDetailLead') }}</p>
+        <NuxtLink to="/booking/step1" class="btn btn-secondary self-start text-[12.5px]">
+          {{ $t('sc10.bookInspection') }}
+        </NuxtLink>
+      </div>
 
       <div v-else-if="analysisFailed" class="card gap-2">
         <p class="text-[14px] font-semibold">{{ $t('sc10.failTitle') }}</p>

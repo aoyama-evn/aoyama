@@ -1398,6 +1398,8 @@
     "assistant": "AOYAMA assistant",
     "assistantSub": "AOYAMA assistant",
     "bookInspection": "Book an inspection",
+    "pickSymptom": "Or pick the group closest to what you noticed:",
+    "needDetailLead": "Your photo and recording are saved — a technician will look at them when you come in. Pick a group above for a suggestion right now, or book a hands-on check.",
     "closeAssistant": "Close assistant",
     "failLead": "Add more detail, or book a visit so a technician can check it — that is always the most accurate.",
     "failTitle": "Not enough to diagnose yet",

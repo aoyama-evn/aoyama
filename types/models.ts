@@ -613,7 +613,11 @@ export interface AiDiagnosis {
   messages: DiagnosisMessage[];
   findings: DiagnosisFinding[];
   summaryText: string | null;
-  status: 'PENDING' | 'COMPLETED' | 'FAILED' | string;
+  /**
+   * NEEDS_DETAIL: may chay xong nhung chua doan ra — khach gui moi tam anh
+   * chang han. Khac FAILED, la luc chinh dich vu AI khong phan hoi.
+   */
+  status: 'PENDING' | 'COMPLETED' | 'NEEDS_DETAIL' | 'FAILED' | string;
   latencyMs: number | null;
   bookingId: string | null;
 }

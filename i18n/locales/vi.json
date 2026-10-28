@@ -1398,6 +1398,8 @@
     "assistant": "Trợ lý AOYAMA",
     "assistantSub": "AOYAMA assistant",
     "bookInspection": "Đặt lịch kiểm tra",
+    "pickSymptom": "Hoặc chọn nhóm gần nhất với hiện tượng bạn gặp:",
+    "needDetailLead": "Ảnh và ghi âm của bạn đã được lưu — kỹ thuật viên sẽ xem khi bạn đến. Chọn một nhóm ở trên để có gợi ý ngay, hoặc đặt lịch để kiểm tra trực tiếp.",
     "closeAssistant": "Đóng trợ lý",
     "failLead": "Bạn có thể mô tả thêm, hoặc đặt lịch để kỹ thuật viên kiểm tra trực tiếp — cách này luôn chính xác nhất.",
     "failTitle": "Chưa đủ thông tin để chẩn đoán",

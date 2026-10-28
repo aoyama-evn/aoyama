@@ -1398,6 +1398,8 @@
     "assistant": "アオヤマアシスタント",
     "assistantSub": "AOYAMA assistant",
     "bookInspection": "点検を予約",
+    "pickSymptom": "または、近い症状をお選びください：",
+    "needDetailLead": "お預かりした写真・音声はご来店時に整備士が確認いたします。上のボタンから近い症状をお選びいただくと、その場で候補が表示されます。点検のご予約も承ります。",
     "closeAssistant": "アシスタントを閉じる",
     "failLead": "もう少し詳しく教えていただくか、ご予約のうえ整備士が直接確認するのが確実です。",
     "failTitle": "診断に必要な情報が足りません",
