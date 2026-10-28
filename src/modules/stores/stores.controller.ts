@@ -11,9 +11,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthUser, CurrentUser, Public, Roles } from 'src/common/decorators';
+import { AuthUser, CurrentUser, Public, Roles, ScopeByStore } from 'src/common/decorators';
 import { AdminRole } from 'src/common/enums';
-import { AdminGuard, RolesGuard } from 'src/common/guards';
+import { AdminGuard, RolesGuard, StoreScopeGuard, restrictedStoreId } from 'src/common/guards';
 import { AuditService } from 'src/modules/system/audit.service';
 import {
   CreateHolidayDto,
@@ -48,7 +48,8 @@ export class PublicStoresController {
 /** SA-32..SA-35 — quan tri cua hang, gio lam viec, khung gio. */
 @ApiTags('stores')
 @ApiBearerAuth()
-@UseGuards(AdminGuard, RolesGuard)
+@UseGuards(AdminGuard, RolesGuard, StoreScopeGuard)
+@ScopeByStore({ param: 'id', sql: 'select id as store_id from stores where id = $1' })
 @Controller('admin/stores')
 export class AdminStoresController {
   constructor(
@@ -58,8 +59,10 @@ export class AdminStoresController {
 
   @Get()
   @ApiOperation({ summary: 'SA-32 — danh sach cua hang' })
-  list(@Query('includeInactive') includeInactive?: string) {
-    return this.service.findAll(includeInactive === 'true');
+  list(@CurrentUser() user: AuthUser, @Query('includeInactive') includeInactive?: string) {
+    // Nhan vien chi thay cua hang minh thuoc ve; danh sach nay con dung lam
+    // o chon chi nhanh tren cac man quan tri nen phai thu hep tu day.
+    return this.service.findAll(includeInactive === 'true', restrictedStoreId(user));
   }
 
   @Get(':id')

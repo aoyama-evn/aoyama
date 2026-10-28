@@ -2,9 +2,9 @@ import { Controller, Get, Query, Res, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { IsIn, IsOptional, IsUUID, Matches } from 'class-validator';
-import { Roles } from 'src/common/decorators';
+import { ForceStoreFilter, Roles } from 'src/common/decorators';
 import { AdminRole } from 'src/common/enums';
-import { AdminGuard, RolesGuard } from 'src/common/guards';
+import { AdminGuard, RolesGuard, StoreScopeGuard } from 'src/common/guards';
 import { ExportService } from './export.service';
 import { ReportsService } from './reports.service';
 
@@ -23,7 +23,7 @@ class ExportQueryDto extends RangeQueryDto {
 /** SA-02, SA-36, SA-37, SA-38 — bang dieu khien va bao cao. */
 @ApiTags('reports')
 @ApiBearerAuth()
-@UseGuards(AdminGuard, RolesGuard)
+@UseGuards(AdminGuard, RolesGuard, StoreScopeGuard)
 @Controller('admin/reports')
 export class ReportsController {
   constructor(
@@ -37,6 +37,7 @@ export class ReportsController {
    * trong bang phan quyen — chi ADMIN.
    */
   @Get('dashboard')
+  @ForceStoreFilter('query')
   @ApiOperation({ summary: 'SA-02 — so lieu nhanh tren bang dieu khien' })
   dashboard(@Query('storeId') storeId?: string) {
     return this.reports.dashboard(storeId);

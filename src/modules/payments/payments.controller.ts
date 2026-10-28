@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
-import { AuthUser, CurrentUser } from 'src/common/decorators';
+import { AuthUser, CurrentUser, ScopeByStore } from 'src/common/decorators';
 import { PaymentMethod } from 'src/common/enums';
-import { AdminGuard, RolesGuard } from 'src/common/guards';
+import { AdminGuard, RolesGuard, StoreScopeGuard } from 'src/common/guards';
 import { AuditService } from 'src/modules/system/audit.service';
 import { PaymentsService } from './payments.service';
 
@@ -24,7 +24,8 @@ class VoidPaymentDto {
 /** SA-14 — ghi nhan thanh toan tai cua hang. */
 @ApiTags('payments')
 @ApiBearerAuth()
-@UseGuards(AdminGuard, RolesGuard)
+@UseGuards(AdminGuard, RolesGuard, StoreScopeGuard)
+@ScopeByStore({ param: 'workOrderId', sql: 'select store_id from work_orders where id = $1' })
 @Controller('admin/work-orders/:workOrderId/payments')
 export class AdminPaymentsController {
   constructor(

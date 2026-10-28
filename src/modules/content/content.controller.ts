@@ -22,10 +22,17 @@ import {
   IsString,
   IsUUID,
 } from 'class-validator';
-import { AuthUser, CurrentUser, Public } from 'src/common/decorators';
+import {
+  AuthUser,
+  CurrentUser,
+  ForceStoreFilter,
+  Public,
+  Roles,
+  ScopeByStore,
+} from 'src/common/decorators';
 import { PaginationQueryDto } from 'src/common/dto';
-import { Language } from 'src/common/enums';
-import { AdminGuard, RolesGuard } from 'src/common/guards';
+import { AdminRole, Language } from 'src/common/enums';
+import { AdminGuard, RolesGuard, StoreScopeGuard } from 'src/common/guards';
 import { I18nText } from 'src/common/types';
 import { ContentService } from './content.service';
 
@@ -51,6 +58,7 @@ class UpsertFaqDto {
 
 class ContactQueryDto extends PaginationQueryDto {
   @IsOptional() @IsBoolean() isHandled?: boolean;
+  @IsOptional() @IsUUID('4') storeId?: string;
 }
 
 /** SC-07, SC-08 — noi dung cong khai. */
@@ -77,7 +85,7 @@ export class PublicContentController {
 /** Quan tri noi dung cong khai va hop thu lien he. */
 @ApiTags('public')
 @ApiBearerAuth()
-@UseGuards(AdminGuard, RolesGuard)
+@UseGuards(AdminGuard, RolesGuard, StoreScopeGuard)
 @Controller('admin/content')
 export class AdminContentController {
   constructor(private readonly service: ContentService) {}
@@ -87,23 +95,28 @@ export class AdminContentController {
     return this.service.listFaqs();
   }
 
+  // Cau hoi thuong gap hien tren site khach cua ca chuoi — chi ADMIN sua.
   @Post('faqs')
+  @Roles(AdminRole.ADMIN)
   upsertFaq(@Body() dto: UpsertFaqDto) {
     return this.service.upsertFaq(dto);
   }
 
   @Delete('faqs/:id')
+  @Roles(AdminRole.ADMIN)
   removeFaq(@Param('id', ParseUUIDPipe) id: string) {
     return this.service.removeFaq(id);
   }
 
   @Get('contacts')
+  @ForceStoreFilter('query')
   @ApiOperation({ summary: 'Hop thu lien he tu SC-08' })
   contacts(@Query() query: ContactQueryDto) {
     return this.service.listContacts(query);
   }
 
   @Put('contacts/:id/handled')
+  @ScopeByStore({ param: 'id', sql: 'select store_id from contact_messages where id = $1' })
   markHandled(
     @Param('id', ParseUUIDPipe) id: string,
     @Body('note') note: string,

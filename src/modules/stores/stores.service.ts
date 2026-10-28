@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { Store } from './entities/store.entity';
 import { StoreBusinessHour } from './entities/store-business-hour.entity';
 import { StoreHoliday } from './entities/store-holiday.entity';
@@ -25,11 +25,11 @@ export class StoresService {
     });
   }
 
-  async findAll(includeInactive = false): Promise<Store[]> {
-    return this.storeRepo.find({
-      where: includeInactive ? {} : { isActive: true },
-      order: { sortOrder: 'ASC', code: 'ASC' },
-    });
+  /** `storeId` co gia tri thi chi tra ve dung cua hang do — OQ-02. */
+  async findAll(includeInactive = false, storeId?: string): Promise<Store[]> {
+    const where: FindOptionsWhere<Store> = includeInactive ? {} : { isActive: true };
+    if (storeId) where.id = storeId;
+    return this.storeRepo.find({ where, order: { sortOrder: 'ASC', code: 'ASC' } });
   }
 
   async findOne(id: string): Promise<Store> {

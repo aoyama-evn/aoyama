@@ -11,8 +11,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthUser, CurrentUser, Public } from 'src/common/decorators';
-import { AdminGuard, RolesGuard } from 'src/common/guards';
+import {
+  AuthUser,
+  CurrentUser,
+  ForceStoreFilter,
+  Public,
+  ScopeByStore,
+} from 'src/common/decorators';
+import { AdminGuard, RolesGuard, StoreScopeGuard } from 'src/common/guards';
 import { AuditService } from 'src/modules/system/audit.service';
 import { AvailabilityService } from './availability.service';
 import { BookingsService } from './bookings.service';
@@ -139,7 +145,12 @@ export class MyBookingsController {
 /** SA-03..SA-06 — quan tri lich hen. */
 @ApiTags('bookings')
 @ApiBearerAuth()
-@UseGuards(AdminGuard, RolesGuard)
+@UseGuards(AdminGuard, RolesGuard, StoreScopeGuard)
+@ScopeByStore(
+  { param: 'id', sql: 'select store_id from bookings where id = $1' },
+  // bulk-confirm gui ca mot danh sach ma, khong di qua bo loc cua hang.
+  { from: 'body', param: 'ids', sql: 'select store_id from bookings where id = $1' },
+)
 @Controller('admin/bookings')
 export class AdminBookingsController {
   constructor(
@@ -148,12 +159,14 @@ export class AdminBookingsController {
   ) {}
 
   @Get()
+  @ForceStoreFilter('query')
   @ApiOperation({ summary: 'SA-03 — danh sach lich hen' })
   list(@Query() query: BookingQueryDto) {
     return this.service.search(query);
   }
 
   @Get('calendar')
+  @ForceStoreFilter('query')
   @ApiOperation({ summary: 'SA-04 — lich hen dang lich theo ngay hoac tuan' })
   calendar(@Query() query: CalendarQueryDto) {
     return this.service.findForCalendar(query.storeId, query.from, query.days ?? 7);
@@ -166,6 +179,7 @@ export class AdminBookingsController {
   }
 
   @Post()
+  @ForceStoreFilter('body')
   @ApiOperation({ summary: 'SA-06 — dat lich thay khach (BR-12)' })
   async create(@Body() dto: AdminCreateBookingDto, @CurrentUser() user: AuthUser) {
     const booking = await this.service.createByAdmin(dto, {

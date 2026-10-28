@@ -11,8 +11,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthUser, CurrentUser, Public } from 'src/common/decorators';
-import { AdminGuard, RolesGuard } from 'src/common/guards';
+import {
+  AuthUser,
+  CurrentUser,
+  ForceStoreFilter,
+  Public,
+  ScopeByStore,
+} from 'src/common/decorators';
+import { AdminGuard, RolesGuard, StoreScopeGuard } from 'src/common/guards';
 import { AuditService } from 'src/modules/system/audit.service';
 import {
   CreateQuotationDto,
@@ -46,7 +52,15 @@ export class PublicQuotationsController {
 /** SA-12, SA-13 — lap va quan ly bao gia. */
 @ApiTags('quotations')
 @ApiBearerAuth()
-@UseGuards(AdminGuard, RolesGuard)
+@UseGuards(AdminGuard, RolesGuard, StoreScopeGuard)
+@ScopeByStore(
+  // Bao gia khong mang cua hang rieng — no theo phieu dich vu.
+  {
+    param: 'id',
+    sql: 'select w.store_id from quotations q join work_orders w on w.id = q.work_order_id where q.id = $1',
+  },
+  { param: 'workOrderId', sql: 'select store_id from work_orders where id = $1' },
+)
 @Controller('admin')
 export class AdminQuotationsController {
   constructor(
@@ -55,6 +69,7 @@ export class AdminQuotationsController {
   ) {}
 
   @Get('quotations')
+  @ForceStoreFilter('query')
   @ApiOperation({ summary: 'SA-13 — danh sach bao gia' })
   list(@Query() query: QuotationQueryDto) {
     return this.service.search(query);

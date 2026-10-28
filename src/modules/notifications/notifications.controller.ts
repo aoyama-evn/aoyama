@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
-import { AuthUser, CurrentUser, Roles } from 'src/common/decorators';
+import { AuthUser, CurrentUser, ForceStoreFilter, Roles, ScopeByStore } from 'src/common/decorators';
 import { PaginationQueryDto } from 'src/common/dto';
 import {
   AdminRole,
@@ -19,7 +19,7 @@ import {
   NotificationEvent,
   NotificationSendStatus,
 } from 'src/common/enums';
-import { AdminGuard, RolesGuard } from 'src/common/guards';
+import { AdminGuard, RolesGuard, StoreScopeGuard } from 'src/common/guards';
 import { AdminNotificationsService } from './admin-notifications.service';
 import { NotificationsService } from './notifications.service';
 
@@ -45,7 +45,7 @@ class LogQueryDto extends PaginationQueryDto {
 /** SA-41 Mau thong bao, SA-42 Nhat ky gui thong bao. */
 @ApiTags('notifications')
 @ApiBearerAuth()
-@UseGuards(AdminGuard, RolesGuard)
+@UseGuards(AdminGuard, RolesGuard, StoreScopeGuard)
 @Controller('admin/notifications')
 export class NotificationsController {
   constructor(
@@ -91,18 +91,21 @@ export class NotificationsController {
    * chot bao gia. Tin gui loi van xem o trang nhat ky.
    */
   @Get('unread-count')
+  @ForceStoreFilter('query')
   @ApiOperation({ summary: 'CP-05 — so thong bao nhan vien chua doc' })
   unreadCount(@CurrentUser() user: AuthUser, @Query() query: FeedQueryDto) {
     return this.adminFeed.unreadCount(user.sub, query.storeId);
   }
 
   @Get('feed')
+  @ForceStoreFilter('query')
   @ApiOperation({ summary: 'CP-05 — danh sach thong bao trong trang quan tri' })
   feed(@CurrentUser() user: AuthUser, @Query() query: FeedQueryDto) {
     return this.adminFeed.list(user.sub, query.storeId);
   }
 
   @Put('feed/:id/read')
+  @ScopeByStore({ param: 'id', sql: 'select store_id from admin_notifications where id = $1' })
   @ApiOperation({ summary: 'Danh dau mot thong bao la da doc' })
   async markRead(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthUser) {
     await this.adminFeed.markRead(id, user.sub);
@@ -110,6 +113,7 @@ export class NotificationsController {
   }
 
   @Put('feed/read-all')
+  @ForceStoreFilter('query')
   @ApiOperation({ summary: 'Danh dau tat ca la da doc' })
   async markAllRead(@CurrentUser() user: AuthUser, @Query() query: FeedQueryDto) {
     await this.adminFeed.markAllRead(user.sub, query.storeId);

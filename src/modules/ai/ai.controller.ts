@@ -21,10 +21,10 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { AuthUser, CurrentUser, Public } from 'src/common/decorators';
+import { AuthUser, CurrentUser, Public, Roles, ScopeByStore } from 'src/common/decorators';
 import { PaginationQueryDto } from 'src/common/dto';
-import { Language } from 'src/common/enums';
-import { AdminGuard, RolesGuard } from 'src/common/guards';
+import { AdminRole, Language } from 'src/common/enums';
+import { AdminGuard, RolesGuard, StoreScopeGuard } from 'src/common/guards';
 import { AiService } from './ai.service';
 
 class StartSessionDto {
@@ -109,7 +109,8 @@ export class PublicAiController {
 /** SA-12 (goi y bao gia), SA-27 (nhan dang phu tung), SA-30, SA-31. */
 @ApiTags('ai')
 @ApiBearerAuth()
-@UseGuards(AdminGuard, RolesGuard)
+@UseGuards(AdminGuard, RolesGuard, StoreScopeGuard)
+@ScopeByStore({ param: 'workOrderId', sql: 'select store_id from work_orders where id = $1' })
 @Controller('admin/ai')
 export class AdminAiController {
   constructor(private readonly service: AiService) {}
@@ -149,13 +150,16 @@ export class AdminAiController {
     return this.service.listDocuments(query);
   }
 
+  // Kho tai lieu dung chung cho ca chuoi — chi ADMIN duoc them bot.
   @Post('knowledge-base')
+  @Roles(AdminRole.ADMIN)
   @ApiOperation({ summary: 'SA-31 — them tai lieu ky thuat' })
   addDocument(@Body() dto: AddDocumentDto, @CurrentUser() user: AuthUser) {
     return this.service.addDocument({ ...dto, uploadedById: user.sub });
   }
 
   @Delete('knowledge-base/:id')
+  @Roles(AdminRole.ADMIN)
   removeDocument(@Param('id', ParseUUIDPipe) id: string) {
     return this.service.removeDocument(id);
   }

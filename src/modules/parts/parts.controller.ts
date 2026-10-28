@@ -23,10 +23,10 @@ import {
   IsUUID,
   Min,
 } from 'class-validator';
-import { AuthUser, CurrentUser } from 'src/common/decorators';
+import { AuthUser, CurrentUser, ForceStoreFilter, Roles } from 'src/common/decorators';
 import { PaginationQueryDto } from 'src/common/dto';
-import { InventoryTxType } from 'src/common/enums';
-import { AdminGuard, RolesGuard } from 'src/common/guards';
+import { AdminRole, InventoryTxType } from 'src/common/enums';
+import { AdminGuard, RolesGuard, StoreScopeGuard } from 'src/common/guards';
 import { I18nText } from 'src/common/types';
 import { InventoryService } from './inventory.service';
 import { PartsService } from './parts.service';
@@ -90,7 +90,7 @@ class SetMinQuantityDto {
 /** SA-25..SA-29 — phu tung va ton kho. */
 @ApiTags('parts')
 @ApiBearerAuth()
-@UseGuards(AdminGuard, RolesGuard)
+@UseGuards(AdminGuard, RolesGuard, StoreScopeGuard)
 @Controller('admin')
 export class AdminPartsController {
   constructor(
@@ -114,49 +114,60 @@ export class AdminPartsController {
     return this.parts.findById(id);
   }
 
+  // Danh muc phu tung dung chung cho ca chuoi: mot nguoi sua la doi gia o
+  // moi cua hang, nen chi ADMIN duoc ghi. Ton kho ben duoi moi la so lieu
+  // rieng cua tung chi nhanh.
   @Post('parts')
+  @Roles(AdminRole.ADMIN)
   @ApiOperation({ summary: 'SA-26 — them phu tung' })
   create(@Body() dto: CreatePartDto) {
     return this.parts.create(dto);
   }
 
   @Put('parts/:id')
+  @Roles(AdminRole.ADMIN)
   @ApiOperation({ summary: 'SA-26 — sua phu tung' })
   update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: PartBodyDto) {
     return this.parts.update(id, dto);
   }
 
   @Delete('parts/:id')
+  @Roles(AdminRole.ADMIN)
   @ApiOperation({ summary: 'SA-25 — ngung dung phu tung (FR-PRT-14)' })
   deactivate(@Param('id', ParseUUIDPipe) id: string) {
     return this.parts.deactivate(id);
   }
 
   @Get('inventory')
+  @ForceStoreFilter('query')
   @ApiOperation({ summary: 'SA-28 — ton kho theo cua hang' })
   inventoryList(@Query() query: InventoryQueryDto) {
     return this.inventory.list(query);
   }
 
   @Get('inventory/low-stock')
+  @ForceStoreFilter('query')
   @ApiOperation({ summary: 'FR-PRT-12 — phu tung sap het' })
   lowStock(@Query('storeId') storeId?: string) {
     return this.inventory.findLowStock(storeId);
   }
 
   @Get('inventory/transactions')
+  @ForceStoreFilter('query')
   @ApiOperation({ summary: 'SA-29 — lich su bien dong kho' })
   transactions(@Query() query: TransactionQueryDto) {
     return this.inventory.listTransactions(query);
   }
 
   @Post('inventory/transactions')
+  @ForceStoreFilter('body')
   @ApiOperation({ summary: 'SA-29 — nhap, xuat hoac dieu chinh kho' })
   adjust(@Body() dto: AdjustStockDto, @CurrentUser() user: AuthUser) {
     return this.inventory.adjust({ ...dto, performedById: user.sub });
   }
 
   @Put('inventory/min-quantity')
+  @ForceStoreFilter('body')
   @ApiOperation({ summary: 'SA-28 — dat nguong canh bao ton kho' })
   setMinQuantity(@Body() dto: SetMinQuantityDto) {
     return this.inventory.setMinQuantity(dto.storeId, dto.partId, dto.minQuantity);

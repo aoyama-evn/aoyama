@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { PageDto, PaginationQueryDto } from 'src/common/dto';
 import { ContactMessage } from './entities/contact-message.entity';
 import { Faq } from './entities/faq.entity';
@@ -39,10 +39,14 @@ export class ContentService {
   }
 
   async listContacts(
-    query: PaginationQueryDto & { isHandled?: boolean },
+    query: PaginationQueryDto & { isHandled?: boolean; storeId?: string },
   ): Promise<PageDto<ContactMessage>> {
+    const where: FindOptionsWhere<ContactMessage> = {};
+    if (query.isHandled !== undefined) where.isHandled = query.isHandled;
+    // OQ-02 — nhan vien chi doc thu gui ve cua hang minh.
+    if (query.storeId) where.storeId = query.storeId;
     const [items, total] = await this.contactRepo.findAndCount({
-      where: query.isHandled === undefined ? {} : { isHandled: query.isHandled },
+      where,
       order: { createdAt: 'DESC' },
       skip: query.skip,
       take: query.limit,

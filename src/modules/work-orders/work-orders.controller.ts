@@ -12,8 +12,14 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ForbiddenException } from '@nestjs/common';
-import { AuthUser, CurrentUser, Public } from 'src/common/decorators';
-import { AdminGuard, RolesGuard } from 'src/common/guards';
+import {
+  AuthUser,
+  CurrentUser,
+  ForceStoreFilter,
+  Public,
+  ScopeByStore,
+} from 'src/common/decorators';
+import { AdminGuard, RolesGuard, StoreScopeGuard } from 'src/common/guards';
 import { AuditService } from 'src/modules/system/audit.service';
 import {
   AddPhotoDto,
@@ -71,7 +77,13 @@ export class MyServiceRecordsController {
 /** SA-08..SA-11 — tiep nhan xe va phieu dich vu. */
 @ApiTags('work-orders')
 @ApiBearerAuth()
-@UseGuards(AdminGuard, RolesGuard)
+@UseGuards(AdminGuard, RolesGuard, StoreScopeGuard)
+@ScopeByStore(
+  { param: 'id', sql: 'select store_id from work_orders where id = $1' },
+  // Tiep nhan tu lich hen: cua hang lay theo lich hen chu khong theo than
+  // yeu cau, nen phai doi chieu chinh ma lich hen.
+  { from: 'body', param: 'bookingId', sql: 'select store_id from bookings where id = $1' },
+)
 @Controller('admin/work-orders')
 export class AdminWorkOrdersController {
   constructor(
@@ -80,6 +92,7 @@ export class AdminWorkOrdersController {
   ) {}
 
   @Post('intake')
+  @ForceStoreFilter('body')
   @ApiOperation({ summary: 'SA-08 — tiep nhan xe va mo phieu dich vu' })
   async intake(@Body() dto: IntakeDto, @CurrentUser() user: AuthUser) {
     const workOrder = await this.service.intake(dto, {
@@ -100,6 +113,7 @@ export class AdminWorkOrdersController {
   }
 
   @Get()
+  @ForceStoreFilter('query')
   @ApiOperation({ summary: 'SA-09 — danh sach phieu dich vu' })
   list(@Query() query: WorkOrderQueryDto) {
     return this.service.search(query);

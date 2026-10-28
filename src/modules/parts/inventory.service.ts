@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { PageDto, PaginationQueryDto } from 'src/common/dto';
 import { InventoryTxType } from 'src/common/enums';
 import { Inventory } from './entities/inventory.entity';
+import { Part } from './entities/part.entity';
 import { InventoryTransaction } from './entities/inventory-transaction.entity';
 
 export interface StockLine {
@@ -77,6 +78,19 @@ export class InventoryService {
 
     return this.dataSource.transaction(async (manager) => {
       const invRepo = manager.getRepository(Inventory);
+
+      // Ma phu tung khong co that thi ben duoi se tao dong ton kho moi roi
+      // vap rang buoc khoa ngoai — khach nhan 500 thay vi mot loi doc duoc.
+      const coPhuTung = await manager
+        .getRepository(Part)
+        .exist({ where: { id: input.partId } });
+      if (!coPhuTung) {
+        throw new NotFoundException({
+          code: 'PART_NOT_FOUND',
+          message: 'Khong tim thay phu tung',
+        });
+      }
+
       let inventory = await invRepo.findOne({
         where: { storeId: input.storeId, partId: input.partId },
         lock: { mode: 'pessimistic_write' },
