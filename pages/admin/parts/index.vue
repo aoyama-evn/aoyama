@@ -5,6 +5,7 @@ import type { Page, Part } from '~/types/models';
 definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const api = useApi();
+const auth = useAuthStore();
 const ui = useUiStore();
 const { t } = useI18n();
 const { i18n, money } = useFormat();
@@ -63,7 +64,7 @@ useHead({ title: () => `${t('sa25.title')} — AOYAMA Admin` });
     <AyPageHeader code="SA-25" :title="$t('sa25.catalog')">
       <template #actions>
         <AyButton to="/admin/inventory" variant="secondary" size="sm">{{ $t('sa25.stockCta') }}</AyButton>
-        <AyButton to="/admin/parts/new/edit" size="sm">{{ $t('sa25.addCta') }}</AyButton>
+        <AyButton v-if="auth.isSuperAdmin" to="/admin/parts/new/edit" size="sm">{{ $t('sa25.addCta') }}</AyButton>
       </template>
     </AyPageHeader>
 
@@ -96,9 +97,14 @@ useHead({ title: () => `${t('sa25.title')} — AOYAMA Admin` });
     >
       <template #cell-code="{ row }"><span class="font-mono text-[12.5px]">{{ row.code }}</span></template>
       <template #cell-name="{ row }">
-        <NuxtLink :to="`/admin/parts/${row.id}/edit`" class="font-semibold hover:underline">
+        <NuxtLink
+          v-if="auth.isSuperAdmin"
+          :to="`/admin/parts/${row.id}/edit`"
+          class="font-semibold hover:underline"
+        >
           {{ i18n((row as unknown as Part).name) }}
         </NuxtLink>
+        <span v-else class="font-semibold">{{ i18n((row as unknown as Part).name) }}</span>
         <span v-if="!row.isActive" class="tag ml-2 bg-neutral-200 text-neutral-600">{{ $t('sa25.retiredTag') }}</span>
       </template>
       <template #cell-maker="{ row }">{{ row.maker ?? '—' }}</template>
@@ -110,7 +116,7 @@ useHead({ title: () => `${t('sa25.title')} — AOYAMA Admin` });
       </template>
       <template #cell-actions="{ row }">
         <button
-          v-if="row.isActive" type="button" class="text-[12.5px] text-danger underline"
+          v-if="row.isActive && auth.isSuperAdmin" type="button" class="text-[12.5px] text-danger underline"
           @click.stop="deactivateTarget = row as unknown as Part"
         >
           {{ $t('sa25.retire') }}

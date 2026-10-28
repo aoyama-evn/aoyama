@@ -5,6 +5,7 @@ import type { KnowledgeDocument, Page } from '~/types/models';
 definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const api = useApi();
+const auth = useAuthStore();
 const ui = useUiStore();
 const { t } = useI18n();
 const { date } = useFormat();
@@ -83,7 +84,7 @@ useHead({ title: () => `${t('sa31k.title')} — AOYAMA Admin` });
     >
       <template #actions>
         <AyButton to="/admin/tech-assistant" variant="secondary" size="sm">{{ $t('sa31k.assistantCta') }}</AyButton>
-        <AyButton size="sm" @click="adding = !adding">
+        <AyButton v-if="auth.isSuperAdmin" size="sm" @click="adding = !adding">
           {{ adding ? $t('common.close') : $t('sa31k.addCta') }}
         </AyButton>
       </template>
@@ -164,6 +165,7 @@ useHead({ title: () => `${t('sa31k.title')} — AOYAMA Admin` });
       <template #cell-createdAt="{ row }">{{ date(row.createdAt as string) }}</template>
       <template #cell-actions="{ row }">
         <button
+          v-if="auth.isSuperAdmin"
           type="button" class="text-[12.5px] text-danger underline"
           @click.stop="deleteTarget = row as unknown as KnowledgeDocument"
         >

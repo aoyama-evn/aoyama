@@ -6,6 +6,7 @@ import { ServiceType } from '~/types/enums';
 definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const api = useApi();
+const auth = useAuthStore();
 const ui = useUiStore();
 const { t } = useI18n();
 const { i18n, money } = useFormat();
@@ -60,7 +61,7 @@ useHead({ title: () => `${t('sa22.title')} — AOYAMA Admin` });
     <AyPageHeader code="SA-22" :title="$t('sa22.catalog')">
       <template #actions>
         <AyButton to="/admin/pricing" variant="secondary" size="sm">{{ $t('sa22.priceCta') }}</AyButton>
-        <AyButton to="/admin/services/new/edit" size="sm">{{ $t('sa22.addCta') }}</AyButton>
+        <AyButton v-if="auth.isSuperAdmin" to="/admin/services/new/edit" size="sm">{{ $t('sa22.addCta') }}</AyButton>
       </template>
     </AyPageHeader>
 
@@ -96,9 +97,14 @@ useHead({ title: () => `${t('sa22.title')} — AOYAMA Admin` });
         <span class="font-mono text-[12.5px]">{{ row.code }}</span>
       </template>
       <template #cell-name="{ row }">
-        <NuxtLink :to="`/admin/services/${row.id}/edit`" class="font-semibold hover:underline">
+        <NuxtLink
+          v-if="auth.isSuperAdmin"
+          :to="`/admin/services/${row.id}/edit`"
+          class="font-semibold hover:underline"
+        >
           {{ i18n((row as unknown as ServiceItem).name) }}
         </NuxtLink>
+        <span v-else class="font-semibold">{{ i18n((row as unknown as ServiceItem).name) }}</span>
       </template>
       <template #cell-type="{ row }">
         {{ $t(`serviceType.${row.type}`) }}
@@ -120,7 +126,7 @@ useHead({ title: () => `${t('sa22.title')} — AOYAMA Admin` });
       </template>
       <template #cell-actions="{ row }">
         <button
-          v-if="row.isActive" type="button" class="text-[12.5px] text-danger underline"
+          v-if="row.isActive && auth.isSuperAdmin" type="button" class="text-[12.5px] text-danger underline"
           @click.stop="deactivateTarget = row as unknown as ServiceItem"
         >
           {{ $t('sa22.retire') }}

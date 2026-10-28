@@ -2,7 +2,7 @@
 import type { ApiError, I18nText, Part, PartRecognition } from '~/types/models';
 
 /** SA-26 Them hoac sua phu tung — FR-PRT-01..03. */
-definePageMeta({ layout: 'admin', middleware: 'admin' });
+definePageMeta({ layout: 'admin', middleware: ['admin', 'admin-only'] });
 
 const route = useRoute();
 const { t, locale } = useI18n();

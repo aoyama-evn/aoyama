@@ -60,11 +60,15 @@ function pick(id: string | null): void {
       >
         {{ i18n(store.name) }}
       </button>
+      <!--
+        Tai khoan gan cua hang khong co lua chon "tat ca" — hien ra mot nut
+        mo vinh vien chi lam nguoi dung tuong he thong dang hong.
+      -->
       <button
+        v-if="!locked"
         type="button"
         class="ay-store-chip"
         :class="ui.activeStoreId === null ? 'ay-store-chip-on' : ''"
-        :disabled="locked"
         :aria-pressed="ui.activeStoreId === null"
         @click="pick(null)"
       >
@@ -81,7 +85,7 @@ function pick(id: string | null): void {
       :value="ui.activeStoreId ?? ''"
       @change="pick(($event.target as HTMLSelectElement).value || null)"
     >
-      <option value="">{{ $t('adm.store.allLong') }}</option>
+      <option v-if="!locked" value="">{{ $t('adm.store.allLong') }}</option>
       <option v-for="store in stores ?? []" :key="store.id" :value="store.id">
         {{ i18n(store.name) }}
       </option>

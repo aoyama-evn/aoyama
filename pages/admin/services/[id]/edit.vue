@@ -3,7 +3,7 @@ import type { ApiError, I18nText, ServiceItem } from '~/types/models';
 import { ServiceType } from '~/types/enums';
 
 /** SA-23 Them hoac sua dich vu — FR-SVC-01..03, FR-SVC-07, FR-I18N-04. */
-definePageMeta({ layout: 'admin', middleware: 'admin' });
+definePageMeta({ layout: 'admin', middleware: ['admin', 'admin-only'] });
 
 const route = useRoute();
 const { t } = useI18n();

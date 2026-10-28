@@ -5,6 +5,7 @@ import type { PriceRule, ServiceItem, Store } from '~/types/models';
 definePageMeta({ layout: 'admin', middleware: 'admin' });
 
 const api = useApi();
+const auth = useAuthStore();
 const ui = useUiStore();
 const { t } = useI18n();
 const { i18n, money } = useFormat();
@@ -96,7 +97,7 @@ useHead({ title: () => `${t('sa24.headTitle')} — AOYAMA Admin` });
       :description="$t('sa24.lead')"
     >
       <template #actions>
-        <AyButton size="sm" @click="startNew">{{ $t('sa24.addRule') }}</AyButton>
+        <AyButton v-if="auth.isSuperAdmin" size="sm" @click="startNew">{{ $t('sa24.addRule') }}</AyButton>
       </template>
     </AyPageHeader>
 
@@ -139,8 +140,10 @@ useHead({ title: () => `${t('sa24.headTitle')} — AOYAMA Admin` });
               {{ rule.validFrom ?? '—' }} → {{ rule.validTo ?? '—' }}
             </td>
             <td>
-              <button type="button" class="text-[12.5px] underline" @click="editing = { ...rule }">{{ $t('common.edit') }}</button>
-              <button type="button" class="ml-2 text-[12.5px] text-danger underline" @click="deleteTarget = rule">{{ $t('common.delete') }}</button>
+              <template v-if="auth.isSuperAdmin">
+                <button type="button" class="text-[12.5px] underline" @click="editing = { ...rule }">{{ $t('common.edit') }}</button>
+                <button type="button" class="ml-2 text-[12.5px] text-danger underline" @click="deleteTarget = rule">{{ $t('common.delete') }}</button>
+              </template>
             </td>
           </tr>
           <tr v-if="(rules ?? []).length === 0">
