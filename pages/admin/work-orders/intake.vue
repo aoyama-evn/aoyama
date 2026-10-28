@@ -92,12 +92,10 @@ const estimatedTotal = computed(() =>
 
 function validate(): boolean {
   Object.keys(errors).forEach((key) => delete errors[key]);
-  // BR-18 — so km va anh hien trang la bat buoc khi tiep nhan.
+  // So km van bat buoc. Anh hien trang thi khong: o quay co luc chup khong
+  // kip, chan lai thi le tan khong mo duoc phieu (noi long BR-18).
   if (form.intakeOdometer === null || form.intakeOdometer < 0) {
     errors.intakeOdometer = t('sa08.odometerRequired');
-  }
-  if (photos.value.length === 0) {
-    errors.photos = t('sa08.photosRequired');
   }
   const previous = booking.value?.vehicle?.currentOdometer;
   if (previous != null && form.intakeOdometer != null && form.intakeOdometer < previous) {
@@ -338,7 +336,7 @@ useHead({ title: () => `${t('sa08.title')} — AOYAMA Admin` });
           </AyField>
         </div>
 
-        <AyField :label="$t('sa08.photos')" required :error="errors.photos">
+        <AyField :label="$t('sa08.photos')">
           <!-- O keo tha chi rong bang mot khung anh; trai het the thi no thanh
                mot dai trong gan met ruoi tren man rong. -->
           <div style="max-width: 460px">

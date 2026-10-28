@@ -275,6 +275,7 @@
     "stopCamera": "カメラを停止",
     "typeCode": "予約番号を手で入力してください。",
     "unreadable": "画像を読み取れませんでした",
+    "uploadedAlt": "アップロードしたQRコード画像",
     "uploadImage": "QR画像をアップロード"
   },
   "rec": {
@@ -364,6 +365,7 @@
     "calendarCta": "カレンダーで見る",
     "colCode": "番号",
     "colCustomer": "お客様",
+    "colQuotation": "見積",
     "colStore": "店舗",
     "colVehicle": "バイク",
     "colWhen": "日時",
@@ -518,7 +520,6 @@
     "odometerLower": "前回の記録（{km} km）より小さい値です — ご確認ください",
     "odometerRequired": "現在の走行距離を入力してください",
     "photos": "受付時の写真",
-    "photosRequired": "受付時の写真が1枚以上必要です",
     "recentHistory": "直近の整備履歴",
     "reference": "参考",
     "symptom": "お客様が申告された症状",
@@ -730,7 +731,6 @@
     "emptyHint": "お見積は整備伝票の画面から作成します。",
     "listTitle": "お見積の一覧",
     "openOrder": "現在の工程へ",
-    "publicUrl": "お客様が見るリンク",
     "rejectReason": "お断りの理由",
     "respondedAt": "お客様の回答",
     "searchPlaceholder": "番号・お客様名・ナンバー",

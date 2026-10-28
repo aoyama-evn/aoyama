@@ -17,7 +17,25 @@ const scanning = ref(false);
 let stream: MediaStream | null = null;
 let frameId: number | null = null;
 
+/**
+ * Tam anh QR vua tai len.
+ *
+ * O xem truoc la mot khung den suot ca qua trinh tai anh, nen le tan khong
+ * biet may vua doc tam nao — nhat la luc quet lien may ma o quay. Doc duoc
+ * thi giu anh lai o day, nam ngay canh ket qua doi chieu.
+ */
+const anhDaTai = ref<string | null>(null);
+
+function datAnh(url: string | null): void {
+  // Moi tam giu mot dia chi blob rieng; khong tra lai thi no nam trong bo
+  // nho den luc dong tab.
+  if (anhDaTai.value) URL.revokeObjectURL(anhDaTai.value);
+  anhDaTai.value = url;
+}
+
 async function start(): Promise<void> {
+  // Bat camera la quay ve quet truc tiep — anh cu khong con lien quan.
+  datAnh(null);
   if (!navigator.mediaDevices?.getUserMedia) {
     ui.warning(t('qr.noCamera'), t('qr.typeCode'));
     return;
@@ -74,8 +92,12 @@ async function readFromImage(event: Event): Promise<void> {
   if (!file) return;
   try {
     const found = await readQrFromFile(file);
-    if (found) emit('scanned', found);
-    else ui.warning(t('qr.notFound'), t('qr.retry'));
+    if (found) {
+      // Camera con chay thi tat di: o xem truoc gio la tam anh vua tai.
+      stop();
+      datAnh(URL.createObjectURL(file));
+      emit('scanned', found);
+    } else ui.warning(t('qr.notFound'), t('qr.retry'));
   } catch {
     ui.warning(t('qr.unreadable'), t('qr.typeCode'));
   } finally {
@@ -83,7 +105,10 @@ async function readFromImage(event: Event): Promise<void> {
   }
 }
 
-onBeforeUnmount(stop);
+onBeforeUnmount(() => {
+  stop();
+  datAnh(null);
+});
 </script>
 
 <template>
@@ -92,10 +117,25 @@ onBeforeUnmount(stop);
       class="relative grid place-items-center overflow-hidden"
       style="border-radius: 20px; background: #171614; aspect-ratio: 4 / 3"
     >
-      <video ref="video" class="h-full w-full object-cover" playsinline muted />
+      <!-- v-show chu khong v-if: start() can the <video> con nam trong cay. -->
+      <video
+        v-show="!anhDaTai"
+        ref="video"
+        class="h-full w-full object-cover"
+        playsinline
+        muted
+      />
+
+      <!-- object-contain de ma QR khong bi cat mat goc dinh vi. -->
+      <img
+        v-if="anhDaTai"
+        :src="anhDaTai"
+        :alt="$t('qr.uploadedAlt')"
+        class="h-full w-full object-contain"
+      />
 
       <p
-        v-if="!scanning"
+        v-if="!scanning && !anhDaTai"
         class="absolute inset-0 grid place-items-center text-[12px]"
         style="color: var(--color-neutral-600)"
       >
@@ -104,7 +144,7 @@ onBeforeUnmount(stop);
 
       <!-- Bon goc ngam, dung do day va bo tron cua ban thiet ke -->
       <div
-        v-else
+        v-else-if="scanning"
         class="pointer-events-none absolute"
         style="width: 58%; aspect-ratio: 1"
         aria-hidden="true"

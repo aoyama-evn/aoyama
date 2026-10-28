@@ -180,6 +180,7 @@ const COLUMNS = computed(() => [
   { key: 'contactName', label: t('sa03.colCustomer') },
   { key: 'vehicle', label: t('sa03.colVehicle') },
   { key: 'store', label: t('sa03.colStore') },
+  { key: 'quotation', label: t('sa03.colQuotation'), width: '150px' },
   { key: 'status', label: t('sa02.colStatus'), width: '150px' },
   { key: 'actions', label: '', width: '120px', align: 'right' as const },
 ]);
@@ -302,6 +303,21 @@ useHead({ title: () => `${t('sa03.title')} — AOYAMA Admin` });
       </template>
       <template #cell-store="{ row }">
         {{ i18n(row.store?.name ?? null) }}
+      </template>
+      <!--
+        @click.stop: bam vao ma bao gia phai sang dung ban bao gia do, chu
+        khong de dong phia duoi keo nguoi dung ve buoc hien tai cua lich hen.
+      -->
+      <template #cell-quotation="{ row }">
+        <NuxtLink
+          v-if="row.quotationId"
+          :to="`/admin/quotations/${row.quotationId}`"
+          class="font-mono text-[12.5px] underline"
+          @click.stop
+        >
+          {{ row.quotationCode }}
+        </NuxtLink>
+        <span v-else class="text-muted">—</span>
       </template>
       <!--
         Hien BUOC chu khong phai trang thai tho: "Da tiep nhan" om tron ca

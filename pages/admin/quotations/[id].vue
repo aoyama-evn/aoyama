@@ -7,7 +7,6 @@ definePageMeta({ layout: 'admin', middleware: 'admin' });
 const route = useRoute();
 const api = useApi();
 const ui = useUiStore();
-const config = useRuntimeConfig();
 const { t } = useI18n();
 const { money, dateTime, date } = useFormat();
 
@@ -63,13 +62,6 @@ async function send(): Promise<void> {
     sending.value = false;
   }
 }
-
-/** Duong dan khach mo — hien de nhan vien doc lai qua dien thoai khi can. */
-const publicUrl = computed(() => {
-  if (!quotation.value) return '';
-  const origin = config.public.apiBase.replace(/\/api\/v1\/?$/, '');
-  return `${origin}/quotations/${quotation.value.publicToken}`;
-});
 
 useHead({ title: () => `${t('sa13.detailTitle', { code: quotation.value?.code ?? '' })} — AOYAMA Admin` });
 </script>
@@ -165,10 +157,6 @@ useHead({ title: () => `${t('sa13.detailTitle', { code: quotation.value?.code ??
         <div v-if="quotation.customerComment">
           <span class="text-muted">{{ $t('sa13.customerComment') }}</span>
           <p>{{ quotation.customerComment }}</p>
-        </div>
-        <div class="mt-1 border-t border-divider pt-2">
-          <span class="text-muted">{{ $t('sa13.publicUrl') }}</span>
-          <p class="break-all font-mono text-[11.5px]">{{ publicUrl }}</p>
         </div>
       </section>
     </div>

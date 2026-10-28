@@ -275,6 +275,7 @@
     "stopCamera": "Stop camera",
     "typeCode": "Please type the booking code by hand.",
     "unreadable": "Could not read that image",
+    "uploadedAlt": "The QR image you uploaded",
     "uploadImage": "Upload a QR image"
   },
   "rec": {
@@ -364,6 +365,7 @@
     "calendarCta": "Calendar view",
     "colCode": "Code",
     "colCustomer": "Customer",
+    "colQuotation": "Quotation",
     "colStore": "Store",
     "colVehicle": "Vehicle",
     "colWhen": "Date & time",
@@ -518,7 +520,6 @@
     "odometerLower": "Lower than the last reading ({km} km) — please check",
     "odometerRequired": "Please enter the current odometer",
     "photos": "Condition photos",
-    "photosRequired": "At least one condition photo is required",
     "recentHistory": "Recent service history",
     "reference": "Reference",
     "symptom": "Problem as described by the customer",
@@ -730,7 +731,6 @@
     "emptyHint": "Quotations are created from the work order screen.",
     "listTitle": "Quotation list",
     "openOrder": "Go to the current step",
-    "publicUrl": "Link the customer sees",
     "rejectReason": "Reason for declining",
     "respondedAt": "Customer responded",
     "searchPlaceholder": "Code, customer name, plate",

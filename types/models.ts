@@ -294,6 +294,9 @@ export interface Booking {
   stage?: BookingStage;
   /** Phieu dich vu dang mo — de danh sach bam thang vao viec can lam. */
   workOrderId?: string | null;
+  /** Ban bao gia moi nhat cua lich hen, bat ke trang thai — SA-03. */
+  quotationId?: string | null;
+  quotationCode?: string | null;
   createdAt: string;
 }
 

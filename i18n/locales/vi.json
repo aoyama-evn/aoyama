@@ -275,6 +275,7 @@
     "stopCamera": "Tắt camera",
     "typeCode": "Hãy nhập mã lịch hẹn bằng tay.",
     "unreadable": "Không đọc được ảnh",
+    "uploadedAlt": "Ảnh mã QR vừa tải lên",
     "uploadImage": "Tải ảnh QR lên"
   },
   "rec": {
@@ -364,6 +365,7 @@
     "calendarCta": "Xem dạng lịch",
     "colCode": "Mã",
     "colCustomer": "Khách hàng",
+    "colQuotation": "Báo giá",
     "colStore": "Cửa hàng",
     "colVehicle": "Xe",
     "colWhen": "Thời gian",
@@ -518,7 +520,6 @@
     "odometerLower": "Số km nhỏ hơn lần ghi trước ({km} km) — kiểm tra lại",
     "odometerRequired": "Vui lòng nhập số km hiện tại",
     "photos": "Ảnh hiện trạng",
-    "photosRequired": "Cần ít nhất một ảnh hiện trạng xe",
     "recentHistory": "Lịch sử gần nhất",
     "reference": "Tham khảo",
     "symptom": "Mô tả tình trạng do khách nêu",
@@ -730,7 +731,6 @@
     "emptyHint": "Báo giá được lập từ màn hình phiếu dịch vụ.",
     "listTitle": "Danh sách báo giá",
     "openOrder": "Đến bước hiện tại",
-    "publicUrl": "Đường dẫn khách xem",
     "rejectReason": "Lý do từ chối",
     "respondedAt": "Khách phản hồi",
     "searchPlaceholder": "Mã, tên khách, biển số",
