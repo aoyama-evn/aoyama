@@ -1,15 +1,22 @@
 /**
  * Luu anh ma QR cua lich hen ve may — dung chung o SC-16 va SC-26.
  *
- * Tren dien thoai, khach muon ma QR nam trong thu vien anh de luc den cua
- * hang mo ra cho nhanh. Trang web khong duoc phep tu ghi vao thu muc anh —
- * khong trinh duyet nao cho, va cung khong nen cho. Duong hop le duy nhat
- * la dua tep cho he dieu hanh qua bang chia se, roi khach bam "Luu anh"
- * (iOS) hoac "Luu vao anh" (Android). Nen thu bang chia se truoc.
+ * Hai noi den khac nhau, tuy may:
  *
- * May tinh ban khong co bang chia se kem tep thi tai thang xuong thu muc
- * Tai ve nhu cu. May cu khong tai duoc tep tu trang thi lui them mot buoc
- * nua: mo anh ra tab moi de khach nhan giu va luu tay.
+ * - Dien thoai, may tinh bang: khach muon ma QR nam trong thu vien anh de
+ *   luc den cua hang mo ra cho nhanh. Trang web khong duoc phep tu ghi vao
+ *   thu muc anh — khong trinh duyet nao cho, va cung khong nen cho. Duong
+ *   hop le duy nhat la dua tep cho he dieu hanh qua bang chia se, roi khach
+ *   bam "Luu anh" (iOS) hoac "Luu vao anh" (Android).
+ * - May tinh: tai thang xuong thu muc Tai ve.
+ *
+ * Phai tu hoi dang o may nao, vi `navigator.canShare` khong tra loi giup:
+ * Chrome tren Windows cung nhan chia se kem tep. Cu goi bua thi khach ngoi
+ * may ban bam Luu lai thay hop Chia se cua Windows hien ra — trong do khong
+ * he co muc nao luu anh.
+ *
+ * May cu khong tai duoc tep tu trang thi lui them mot buoc nua: mo anh ra
+ * tab moi de khach nhan giu va luu tay.
  */
 export function useSaveQr() {
   const ui = useUiStore();
@@ -37,7 +44,7 @@ export function useSaveQr() {
     if (!dataUrl) return;
 
     const fileName = safeFileName(`aoyama-qr-${bookingCode || 'booking'}.png`);
-    const file = toFile(dataUrl, fileName);
+    const file = isHandheld() ? toFile(dataUrl, fileName) : null;
 
     if (file && navigator.canShare?.({ files: [file] })) {
       try {
@@ -56,8 +63,10 @@ export function useSaveQr() {
       }
     }
 
+    // Noi ro thu muc chu khong chi dua moi ten tep: khach vua bam xong thi
+    // dieu ho can biet la bay gio mo no o dau.
     if (downloadDataUrl(dataUrl, fileName)) {
-      ui.success(t('sc16.qrSaved'), fileName);
+      ui.success(t('sc16.qrSaved'), t('sc16.qrSavedWhere', { file: fileName }));
       return;
     }
 

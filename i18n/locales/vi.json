@@ -1535,7 +1535,8 @@
     "title": "Đặt lịch thành công",
     "trackCta": "Theo dõi tiến độ",
     "yourCode": "Mã của bạn là {code}",
-    "qrSaved": "Đã lưu mã QR về máy"
+    "qrSaved": "Đã lưu mã QR về máy",
+    "qrSavedWhere": "Trong thư mục Tải về: {file}"
   },
   "sc17": {
     "agree": "Tôi đồng ý với {terms} và {privacy}.",
